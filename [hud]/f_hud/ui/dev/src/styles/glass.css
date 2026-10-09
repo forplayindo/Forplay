@@ -1,0 +1,113 @@
+/* =========================================================================
+   0r-hud-v3 · Soft blur theme (flat frosted panels)
+   FiveM NUI sits on top of the game frame, so backdrop-filter cannot blur
+   the game – the frosted look is a flat translucent fill (no bevel/emboss).
+   ========================================================================= */
+:root {
+  --gl-font: "sentic-text-bold", "Segoe UI", system-ui, sans-serif;
+  --gl-fill: rgba(16, 20, 28, 0.34);
+  --gl-fill-soft: rgba(16, 20, 28, 0.26);
+  --gl-line: rgba(255, 255, 255, 0.10);
+  --gl-dim: rgba(255, 255, 255, 0.68);
+  --gl-radius: 16px;
+}
+
+.gl {
+  background: var(--gl-fill);
+  border: 1px solid var(--gl-line);
+  border-radius: var(--gl-radius);
+  color: #fff;
+  font-family: var(--gl-font);
+  overflow: hidden;
+}
+.gl-round { border-radius: 999px; }
+
+.gl--cash { background: rgba(60, 190, 110, 0.38); }
+.gl--bank { background: rgba(70, 130, 220, 0.38); }
+.gl--extra { background: rgba(150, 100, 220, 0.36); }
+.gl--accent { border: 1.5px solid rgba(190, 242, 100, 0.9); }
+
+/* ---------- CLIENT INFO (top-right) ---------- */
+.gl-info { width: 196px; display: flex; flex-direction: column; gap: 5px; user-select: none; }
+.gl-info .gl:not(.gl-round) { border-radius: 10px; }
+.gl-row { display: flex; align-items: center; gap: 5px; }
+.gl-bubble {
+  width: 32px; height: 32px; min-width: 32px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1;
+}
+.gl-bubble .k { font-size: 7px; letter-spacing: 0.08em; color: var(--gl-dim); text-transform: uppercase; }
+.gl-bubble .v { font-size: 11px; font-weight: 800; margin-top: 1px; }
+.gl-bubble--online .v { font-size: 10px; color: #d9f99d; }
+.gl-bubble--online svg { width: 8px; height: 8px; margin-top: 1px; fill: #d9f99d; }
+
+.gl-card { flex: 1; min-width: 0; height: 32px; display: flex; align-items: center; gap: 6px; padding: 0 5px 0 8px; }
+.gl-card .txt { flex: 1; min-width: 0; line-height: 1.2; }
+.gl-card .t1 { font-size: 9.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gl-card .t2 { font-size: 8px; color: var(--gl-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px; }
+.gl-card .t2 img { width: 8px; height: 8px; opacity: 0.8; }
+.gl-idbox {
+  min-width: 20px; height: 20px; padding: 0 4px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255, 255, 255, 0.12); font-size: 9.5px; font-weight: 800;
+}
+.gl-time {
+  height: 20px; padding: 0 5px; border-radius: 6px; display: flex; align-items: center; gap: 3px; flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.12); font-size: 9px; font-weight: 800; white-space: nowrap;
+}
+.gl-time img { width: 11px; height: 11px; }
+/* jam di kartu job disembunyikan: nama job & geng butuh seluruh lebar kartu */
+.gl-card .gl-time { display: none !important; }
+
+.gl-money { height: 28px; display: flex; align-items: center; gap: 6px; padding: 0 10px; }
+.gl-money .ico { width: 12px; height: 12px; display: flex; align-items: center; justify-content: center; }
+.gl-money .ico img { width: 100%; height: 100%; }
+.gl-money .lbl { font-size: 9.5px; font-weight: 700; }
+.gl-money .amt { margin-left: auto; font-size: 10.5px; font-weight: 800; letter-spacing: 0.02em; }
+.gl-realtime { font-size: 8px; color: var(--gl-dim); text-align: right; padding-right: 6px; }
+
+/* ---------- COMPASS (top-center) ---------- */
+.gl-compass { position: relative; width: 460px; height: 46px; border-top: none !important; border-radius: 0 0 22px 22px; }
+.gl-compass .win {
+  position: absolute; inset: 0 22px; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+}
+.gl-compass .tape { position: absolute; left: 50%; top: 0; height: 100%; transition: transform 0.22s linear; will-change: transform; }
+.gl-compass .tk { position: absolute; top: 0; width: 1px; transform: translateX(-0.5px); background: rgba(255, 255, 255, 0.45); height: 6px; }
+.gl-compass .tk.maj { height: 10px; background: rgba(255, 255, 255, 0.8); }
+.gl-compass .lb { position: absolute; top: 15px; transform: translateX(-50%); font-size: 10px; font-weight: 700; color: rgba(255, 255, 255, 0.72); white-space: nowrap; }
+.gl-compass .lb.card { font-size: 13px; font-weight: 800; color: #fff; top: 13px; }
+.gl-compass .needle { position: absolute; left: 50%; top: 0; width: 2px; height: 14px; transform: translateX(-1px); background: #ff3b4e; border-radius: 0 0 2px 2px; z-index: 2; }
+.gl-compass .notch {
+  position: absolute; left: 50%; bottom: 3px; width: 0; height: 0; transform: translateX(-6px);
+  border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 6px solid rgba(255, 255, 255, 0.6);
+}
+.gl-compass-street { margin-top: 6px; height: 22px; padding: 0 12px; display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.gl-compass-street .sep { width: 4px; height: 4px; border-radius: 99px; background: rgba(255, 255, 255, 0.5); }
+.gl-compass-street .s2 { color: var(--gl-dim); }
+
+/* ---------- existing location widget ---------- */
+#navigation-widget .h-\[51px\] {
+  background: var(--gl-fill) !important;
+  border: 1px solid var(--gl-line) !important;
+  border-radius: 16px !important;
+  height: 54px !important;
+}
+
+@media (min-width: 2560px) {
+  .gl-compass-wrap { transform: scale(1.35); transform-origin: top center; }
+}
+
+/* ---------- real blur active (blur.js found the game view) ----------
+   The blurred game is drawn underneath, so panels only need a light veil. */
+.hud-blur-on .gl { background: rgba(170, 188, 210, 0.16); border-color: rgba(255, 255, 255, 0.14); }
+.hud-blur-on .gl--cash { background: rgba(60, 200, 115, 0.30); }
+.hud-blur-on .gl--bank { background: rgba(70, 135, 230, 0.30); }
+.hud-blur-on .gl--extra { background: rgba(150, 100, 225, 0.30); }
+.hud-blur-on .gl-idbox, .hud-blur-on .gl-time { background: rgba(255, 255, 255, 0.14); }
+.hud-blur-on #navigation-widget .h-\[51px\] { background: rgba(170, 188, 210, 0.16) !important; }
+
+/* ---------- low / off tier: stop looping animations (they repaint every frame) ---------- */
+.hud-lite .wave, .hud-lite .wave2, .hud-lite .wave3,
+.hud-lite .animate-plane-dial, .hud-lite .animate-rpmbounce { animation: none !important; }
+.hud-lite .gl-compass .tape { transition-duration: 0.12s; }

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Hygiene HUD</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="hygiene-hud" class="hidden">
+    <div class="hg-title">Show/Hide (<span id="hg-keybind">F3</span>)</div>
+    <div class="hg-row" data-key="mandi">
+        <div class="hg-icon">🚿</div>
+        <div class="hg-bar"><div class="hg-fill" id="fill-mandi"></div></div>
+        <div class="hg-pct" id="pct-mandi">0%</div>
+    </div>
+    <div class="hg-row" data-key="kencing">
+        <div class="hg-icon">💧</div>
+        <div class="hg-bar"><div class="hg-fill" id="fill-kencing"></div></div>
+        <div class="hg-pct" id="pct-kencing">0%</div>
+    </div>
+    <div class="hg-row" data-key="poop">
+        <div class="hg-icon">🚽</div>
+        <div class="hg-bar"><div class="hg-fill" id="fill-poop"></div></div>
+        <div class="hg-pct" id="pct-poop">0%</div>
+    </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

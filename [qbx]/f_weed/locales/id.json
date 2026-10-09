@@ -1,0 +1,23 @@
+{
+    "error": {
+        "process_canceled": "Proses dibatalkan",
+        "plant_has_died": "Tanamannya mati. Tekan ~r~E~w~ untuk mencabut.",
+        "cant_place_here": "Tidak bisa ditanam di sini",
+        "not_safe_here": "Di sini tidak aman, coba di rumahmu",
+        "not_need_nutrition": "Tanaman ini belum butuh nutrisi",
+        "this_plant_no_longer_exists": "Tanaman ini sudah tidak ada?",
+        "house_not_found": "Rumah tidak ditemukan",
+        "you_dont_have_enough_resealable_bags": "Kantong plastik klip-mu tidak cukup"
+    },
+    "text": {
+        "sort": "Jenis:",
+        "harvest_plant": "Tekan ~g~E~w~ untuk memanen tanaman.",
+        "nutrition": "Nutrisi:",
+        "health": "Kesehatan:",
+        "harvesting_plant": "Memanen tanaman",
+        "planting": "Menanam",
+        "feeding_plant": "Memberi pupuk",
+        "the_plant_has_been_harvested": "Tanaman sudah dipanen",
+        "removing_the_plant": "Mencabut tanaman"
+    }
+}

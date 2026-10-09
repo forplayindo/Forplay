@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_paycheck</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="panel" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo">💼</span><div><h1>Paycheck</h1><small id="sub">Kantor Gaji</small></div></div>
+            <button class="icon-btn close" id="close">✕</button>
+        </header>
+
+        <section class="body">
+            <div class="hero">
+                <small>Diterima setelah pajak</small>
+                <strong id="net">Rp 0</strong>
+            </div>
+
+            <div class="rows">
+                <div class="row"><span>Total paycheck</span><b id="gross">Rp 0</b></div>
+                <div class="row tax"><span>Potongan pajak (<i id="rate">5</i>%)</span><b id="tax">- Rp 0</b></div>
+                <div class="row sum"><span>Bisa ditarik</span><b id="net2">Rp 0</b></div>
+            </div>
+
+            <div id="empty" class="empty hidden">Belum ada paycheck tersimpan.<small>Gaji masuk otomatis selama kamu bekerja.</small></div>
+
+            <div class="methods">
+                <button data-method="cash" class="active">💵 Cash</button>
+                <button data-method="bank">📱 Transfer</button>
+            </div>
+            <div id="msg" class="msg hidden"></div>
+            <button id="withdraw" class="primary">Ambil Uang</button>
+        </section>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

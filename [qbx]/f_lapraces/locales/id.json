@@ -1,0 +1,56 @@
+{
+    "error": {
+        "toofast": "Kamu tidak boleh terlalu cepat",
+        "nocheckpoints": "Kamu belum memasang checkpoint..",
+        "atleast10checkp": "Minimal harus ada 10 checkpoint",
+        "higherthan15": "Tidak boleh lebih dari 15",
+        "lowerthan2": "Tidak boleh kurang dari 2",
+        "mustbeinveh": "Kamu harus berada di dalam kendaraan",
+        "pressagain": "Tekan [9] lagi untuk konfirmasi",
+        "editorcancelled": "Editor balapan dibatalkan!",
+        "alreadymaking": "Kamu sedang membuat balapan.",
+        "alreadyinrace": "Kamu sudah ikut balapan..",
+        "notinarace": "Kamu tidak sedang ikut balapan..",
+        "playerfinished": "%s finis: posisi ke-%s",
+        "gobackorkick": "Kembali ke garis start atau kamu dikeluarkan dari balapan: %s detik",
+        "namealreadyused": "Sudah ada balapan dengan nama ini.",
+        "notauthorized": "Kamu tidak punya izin untuk %{to}.",
+        "raceended": "Kamu satu-satunya peserta, balapan diakhiri",
+        "alreadyrunning": "Balapan sudah berjalan",
+        "notexist": "Balapan ini tidak ada :(",
+        "stoppingrace": "Menghentikan balapan: %s",
+        "racenotopen": "Balapan belum dibuka: %s",
+        "notcreator": "Kamu bukan pembuat balapan ini..",
+        "notstarted": "Balapan ini belum dimulai.",
+        "nomoreraces": "Tidak bisa membuat balapan lagi!"
+    },
+    "success": {
+        "savedrace": "Balapan %s disimpan!",
+        "finishedbest": "Balapan selesai dalam %s, lap terbaik: %s",
+        "finished": "Balapan selesai dalam: %s",
+        "start": "MULAI!",
+        "cancreate": "Balapan bisa dibuat lagi!"
+    },
+    "primary": {
+        "LeaveRace": "Kamu sudah menyelesaikan balapan!",
+        "startinten": "Balapan dimulai dalam 10 detik"
+    },
+    "general": {
+        "CheckL": "Checkpoint Kiri",
+        "CheckR": "Checkpoint Kanan",
+        "DNF": "DNF",
+        "unknown": "Tidak diketahui",
+        "dothis": "melakukan ini",
+        "createraces": " membuat balapan"
+    },
+    "phonenotif": {
+        "wonWR": "Kamu merebut rekor dunia dari %s dengan waktu: %s!",
+        "wonWR2": "Kamu memecahkan rekor dunia %s dengan waktu: %s!",
+        "joinedrace": "%s. %s bergabung ke balapan!",
+        "LeaveRace": "%s. %s keluar dari balapan!"
+    },
+    "commands": {
+        "cancelrace": "Batalkan balapan yang sedang berjalan..",
+        "togglesetup": "Nyalakan / matikan pengaturan balapan"
+    }
+}

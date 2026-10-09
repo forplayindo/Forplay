@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>f_mechanicjob</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Panel Periksa Kendaraan -->
+<div class="panel hidden" id="diag">
+    <header>
+        <div class="brand">
+            <span class="logo">🔧</span>
+            <div><div class="kicker">Diagnosa Bengkel</div><h1 id="vehname"></h1></div>
+        </div>
+        <div class="head-right">
+            <span id="state" class="state-pill"></span>
+            <button class="icon-btn" id="diag-close" title="Tutup (ESC)">✕</button>
+        </div>
+    </header>
+    <div class="main">
+        <div class="left">
+            <div class="fluids" id="fluids"></div>
+            <div class="stage" id="stage">
+                <svg class="links" id="links"></svg>
+                <div class="carbox" id="carbox"></div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="tabs">
+                <button class="tab on" data-tab="cond">Kondisi</button>
+                <button class="tab" data-tab="custom">Kustom <span class="badge hidden" id="custom-badge"></span></button>
+                <button class="tab" data-tab="bill">Tagihan <span class="badge hidden" id="bill-badge"></span></button>
+            </div>
+            <div class="tabpane" id="tab-cond">
+                <div class="cards" id="cards"></div>
+                <div class="list" id="list"></div>
+                <footer>
+                    <button id="btn-tyres"><span>Ganti Semua Ban</span><small id="tyres-sub"></small></button>
+                    <button id="btn-all" class="all"><span>Perbaiki Semua</span><small id="all-sub"></small></button>
+                </footer>
+            </div>
+            <div class="tabpane hidden" id="tab-custom">
+                <div class="list" id="custom"></div>
+                <footer class="one hidden" id="custom-foot">
+                    <button class="all" id="btn-custom"><span>Setujui &amp; Pasang</span><small id="custom-sub"></small></button>
+                </footer>
+            </div>
+            <div class="tabpane hidden" id="tab-bill">
+                <div class="list" id="bill"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toko bengkel -->
+<div class="panel shop hidden" id="shop">
+    <header>
+        <div class="brand">
+            <span class="logo">🧰</span>
+            <div><h1 id="sh-title">Toko Bengkel</h1><small id="sh-sub"></small></div>
+        </div>
+        <button class="icon-btn" id="sh-close" title="Tutup (ESC)">✕</button>
+    </header>
+    <div class="sh-body" id="sh-body"></div>
+    <div class="sh-foot hidden" id="sh-foot"></div>
+</div>
+
+<!-- Kasir bengkel -->
+<div class="panel kasir hidden" id="kasir">
+    <header>
+        <div class="brand">
+            <span class="logo">💳</span>
+            <div><div class="kicker" id="ks-kicker">Kasir Bengkel</div><h1 id="ks-title">Tagihan Kamu</h1></div>
+        </div>
+        <div class="head-right">
+            <span id="ks-pills"></span>
+            <button class="icon-btn" id="ks-close" title="Tutup (ESC)">✕</button>
+        </div>
+    </header>
+    <div class="ks-body" id="ks-body"></div>
+</div>
+
+<script src="app.js"></script>
+<script src="shop.js"></script>
+<script src="kasir.js"></script>
+</body>
+</html>

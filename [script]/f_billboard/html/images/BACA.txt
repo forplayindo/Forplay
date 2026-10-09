@@ -1,0 +1,9 @@
+Taruh gambar/video billboard di folder ini, lalu restart resource f_billboard.
+
+Format: png, jpg, jpeg, webp, gif, mp4, webm
+Nama file: hanya huruf, angka, _ dan - (tanpa spasi), contoh: iklan_cafe.png
+
+Di editor billboard, isi URL media dengan:  images/iklan_cafe.png
+
+File di folder ini ikut didownload semua pemain saat join, jadi kompres dulu
+(gambar idealnya < 500 KB, video sependek mungkin).

@@ -1,0 +1,60 @@
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-500.css';
+import '@fontsource/inter/latin-600.css';
+import '@fontsource/inter/latin-700.css';
+import '@fontsource/inter/latin-800.css';
+import '@fontsource/inter/latin-900.css';
+
+import '@fontsource/great-vibes/latin-400.css';
+import '@fontsource/great-vibes/latin-ext-400.css';
+import '@fontsource/great-vibes/cyrillic-400.css';
+import '@fontsource/great-vibes/greek-ext-400.css';
+import '@fontsource/great-vibes/vietnamese-400.css';
+
+import { App } from './App';
+import { ErrorBoundary } from '@/shell/ErrorBoundary';
+import { useMocks } from '@/core/demo';
+import { initTileCheck } from '@/apps/maps/tileCheck';
+import { installScrollGuard } from '@/core/scrollGuard';
+import './index.css';
+
+initTileCheck();
+installScrollGuard();
+
+// Chromium's benign "ResizeObserver loop" notice: an observer's setState re-laid out the page in
+// the same frame, so the rest were deferred a frame. Nothing breaks; keep it out of the F8 console.
+window.addEventListener('error', e => {
+    if (typeof e.message === 'string' && e.message.startsWith('ResizeObserver loop')) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+    }
+});
+
+document.addEventListener('mousedown', e => {
+    if ((e.target as HTMLElement | null)?.closest?.('.select-text')) return;
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed) return;
+    const anchor = sel.anchorNode;
+    const host = anchor instanceof HTMLElement ? anchor : anchor?.parentElement;
+    if (host?.isContentEditable) return;
+    sel.removeAllRanges();
+});
+
+// Seeded only when absent, so clearing a key replays that flow on reload
+// (the website demo's "Replay setup" button relies on this) instead of
+// having the seed stomp it straight back.
+if (useMocks) {
+    if (!localStorage.getItem('f_phone:setup:v1')) localStorage.setItem('f_phone:setup:v1', JSON.stringify({ completed: true, theme: 'light', wallpaper: 'lockscreen.jpg' }));
+    if (!localStorage.getItem('f_phone:cookie:v1')) localStorage.setItem('f_phone:cookie:v1', JSON.stringify({ cookies: 25040, earned: 25040, owned: { cursor: 8, grandma: 4 }, achievements: ['a100', 'a1k', 'a10k', 'cps5'], rainOn: true }));
+}
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+        <ErrorBoundary>
+            <App />
+        </ErrorBoundary>
+    </React.StrictMode>,
+);

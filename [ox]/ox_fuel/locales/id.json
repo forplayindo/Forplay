@@ -1,0 +1,20 @@
+{
+	"tank_full": "Tangki kendaraan ini sudah penuh",
+	"petrolcan_cannot_afford": "Uangmu tidak cukup untuk membeli jerigen",
+	"refuel_cannot_afford": "Uangmu tidak cukup untuk mengisi bensin",
+	"vehicle_far": "Kendaraanmu terlalu jauh",
+	"pump_fuel_with_can": "Simpan jerigenmu dulu sebelum mengisi dari pompa",
+	"fuel_help": "Tekan ~INPUT_C2939D45~ untuk mengisi bensin",
+	"petrolcan_help": "Tekan ~INPUT_C2939D45~ untuk membeli atau mengisi jerigen",
+	"leave_vehicle": "Keluar dari kendaraan untuk mulai mengisi bensin",
+	"start_fueling": "Isi bensin",
+	"petrolcan_buy_or_refill": "Beli atau isi ulang jerigen",
+	"fuel_station_blip": "SPBU",
+	"not_enough_money": "Uang tidak cukup! Kurang Rp %s",
+	"fuel_success": "Bensin terisi %s - Rp %s",
+	"petrolcan_refill": "Membayar Rp %s untuk isi ulang jerigen",
+	"petrolcan_buy": "Membayar Rp %s untuk sebuah jerigen",
+	"petrolcan_cannot_carry": "Kamu tidak bisa membawa jerigen ini",
+	"petrolcan_not_enough_fuel": "Bensin di jerigenmu tidak cukup",
+	"petrolcan_not_equipped": "Kamu harus memegang jerigen dulu"
+}

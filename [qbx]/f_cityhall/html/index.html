@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_cityhall</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- LAYANAN WARGA -->
+    <div id="services" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo" id="s-logo">🏛️</span><div><h1 id="s-title">Layanan</h1><small id="s-sub"></small></div></div>
+            <div class="head-actions">
+                <button id="cart-btn" class="icon-btn" title="Keranjang">
+                    <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM6.2 6l.9 2H20a1 1 0 0 1 .9 1.4l-3.2 6A2 2 0 0 1 16 16.5H8.1a2 2 0 0 1-1.8-1.2L3.4 4H2V2h2.7a1 1 0 0 1 .9.6L6.2 6Z"/></svg>
+                    <span id="cart-count" class="badge hidden">0</span>
+                </button>
+                <button class="icon-btn close" data-close>✕</button>
+            </div>
+        </header>
+        <div id="s-banner" class="banner hidden"></div>
+        <nav class="tabs" id="s-tabs">
+            <button data-tab="all" class="active">Semua</button>
+            <button data-tab="license">Dokumen</button>
+            <button data-tab="vehicle">Kendaraan</button>
+            <button data-tab="redeem" class="hidden">Penebusan</button>
+        </nav>
+        <main id="grid" class="grid"></main>
+
+        <aside id="cart" class="cart hidden">
+            <div class="cart-head"><h2>Keranjang</h2><button class="icon-btn" id="cart-close">✕</button></div>
+            <div id="cart-list" class="cart-list"></div>
+            <div class="cart-foot">
+                <div class="total"><span>Total Bayar</span><strong id="cart-total">Rp 0</strong></div>
+                <div class="methods">
+                    <button data-method="cash" class="active">💵 Cash</button>
+                    <button data-method="transfer">📱 Transfer</button>
+                </div>
+                <div id="cart-msg" class="msg hidden"></div>
+                <button id="order-btn" class="primary">Ajukan &amp; Bayar</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- MEJA PETUGAS -->
+    <div id="staff" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo">🗂️</span><div><h1 id="t-title">Daftar Permohonan</h1><small id="t-sub"></small></div></div>
+            <div class="head-actions">
+                <button class="pill hidden" id="t-duty">Selesai Bertugas</button>
+                <button class="icon-btn" id="t-refresh" title="Refresh">⟳</button>
+                <button class="icon-btn close" data-close>✕</button>
+            </div>
+        </header>
+        <nav class="tabs" id="t-tabs">
+            <button data-tab="requests" class="active">Permohonan</button>
+            <button data-tab="tickets" id="t-tickets-tab" class="hidden">Tilang</button>
+            <button data-tab="prices" id="t-prices-tab" class="hidden">Atur Harga</button>
+        </nav>
+        <main id="t-list" class="requests"></main>
+        <section id="t-tickets" class="tickets hidden">
+            <nav class="filters" id="k-filters">
+                <button data-filter="all" class="active">Semua</button>
+                <button data-filter="sim">SIM belum diambil</button>
+                <button data-filter="stnk">STNK belum diambil</button>
+                <button data-filter="vehicle">Kendaraan belum diambil</button>
+                <button data-filter="fine">Belum bayar denda</button>
+            </nav>
+            <main id="k-list" class="requests"></main>
+        </section>
+        <main id="t-prices" class="prices hidden"></main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

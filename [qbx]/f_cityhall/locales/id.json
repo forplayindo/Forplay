@@ -1,0 +1,44 @@
+{
+    "error": {
+        "not_enough_money": "Uangmu tidak cukup...",
+        "invalid_type": "Jenis dokumen tidak valid...",
+        "invalid_job": "Pekerjaan tidak valid...",
+        "staff_on_duty": "Ada petugas yang sedang bertugas. Silakan ke meja layanan dan minta petugas memproses dokumenmu.",
+        "not_eligible": "Kamu tidak memenuhi syarat untuk dokumen ini.",
+        "cooldown": "Tunggu sebentar sebelum menerbitkan dokumen lagi.",
+        "applicant_too_far": "Pemohon terlalu jauh.",
+        "applicant_declined": "Pemohon menolak permintaan.",
+        "applicant_no_money": "Uang pemohon tidak cukup untuk membayar biaya.",
+        "no_applicants": "Tidak ada pemohon di dekatmu.",
+        "must_be_on_duty": "Kamu harus on duty untuk menerbitkan dokumen."
+    },
+    "success": {
+        "item_recieved": "Kamu menerima ",
+        "item_renewed": "Kamu memperpanjang ",
+        "new_job": "Selamat atas pekerjaan barumu!",
+        "issued": "%s diterbitkan untuk %s.",
+        "issued_paid": "%s diterbitkan untuk %s. Rp %s masuk ke rekening organisasi.",
+        "on_duty": "Kamu sekarang on duty.",
+        "off_duty": "Kamu sekarang off duty."
+    },
+    "info": {
+        "cityhall": "Balai Kota",
+        "open_cityhall": "[E] Buka Balai Kota",
+        "target_open_cityhall": "Buka Balai Kota",
+        "open_office": "[E] %s",
+        "open_issue_desk": "[E] Meja Dokumen",
+        "identity": "Identitas",
+        "employment": "Pekerjaan",
+        "obtain_license_identity": "Urus lisensimu",
+        "select_job": "Pilih pekerjaan baru",
+        "price": "Harga: Rp %s",
+        "served_by_staff": "Dilayani petugas yang bertugas - silakan ke meja layanan",
+        "issue_desk": "Meja Dokumen",
+        "issue_desc": "Terbitkan dokumen ini untuk warga di dekatmu",
+        "issue_to": "Terbitkan %s",
+        "waiting_applicant": "Menunggu konfirmasi pemohon...",
+        "go_on_duty": "Mulai Bertugas",
+        "go_off_duty": "Selesai Bertugas",
+        "confirm_issue": "Petugas **%s** ingin menerbitkan **%s** untukmu.  \nBiaya: **Rp %s**  \n\nKamu setuju?"
+    }
+}

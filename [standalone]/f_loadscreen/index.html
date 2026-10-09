@@ -1,0 +1,2866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Loading</title>
+    <link rel="stylesheet" href="assets/fonts/app-font.css">
+    <link rel="stylesheet" href="assets/lucide/lucide.css">
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --lr-ease: cubic-bezier(.16, 1, .3, 1);
+            --lr-ease-in: cubic-bezier(.4, 0, 1, 1);
+            --lr-dur-fast: 120ms;
+            --lr-dur: 220ms;
+            --lr-dur-slow: 420ms;
+            --lr-radius-sm: 6px;
+            --lr-radius-md: 12px;
+            --lr-radius-lg: 18px;
+            --lr-radius-pill: 999px;
+            --lr-space-1: 4px;
+            --lr-space-2: 8px;
+            --lr-space-3: 12px;
+            --lr-space-4: 16px;
+            --lr-space-5: 20px;
+            --lr-space-6: 24px;
+            --lr-space-8: 32px;
+            --lr-shadow-1: 0 1px 2px rgba(0, 0, 0, .30), 0 2px 8px rgba(0, 0, 0, .24);
+            --lr-shadow-2: 0 8px 24px rgba(0, 0, 0, .38), 0 2px 6px rgba(0, 0, 0, .28);
+            --lr-accent: var(--accent);
+            --lr-focus-ring: 0 0 0 2px rgba(255, 255, 255, .9), 0 0 0 4px var(--lr-accent);
+
+            --bg: #06080d;
+            --accent: #f3b354;
+            --accent-2: #a78bfa;
+            --accent-3: #f472b6;
+            --accent-soft: rgba(95, 224, 255, 0.16);
+            --accent-glow: rgba(95, 224, 255, 0.4);
+            --text: #f4f7fb;
+            --muted: #a8b0c2;
+            --faint: #6f7891;
+            --line: rgba(255, 255, 255, 0.08);
+            --line-strong: rgba(255, 255, 255, 0.16);
+            --ok: #34d399;
+            --shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body { width: 100%; height: 100%; overflow: hidden; }
+
+        body {
+            font-family: "Inter", system-ui, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            -webkit-font-smoothing: antialiased;
+            user-select: none;
+            cursor: default;
+            position: relative;
+        }
+
+        [class^="icon-"], [class*=" icon-"] { display: inline-block; line-height: 1; }
+
+        button:focus-visible,
+        a:focus-visible,
+        [role="button"]:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible,
+        [tabindex]:focus-visible {
+            outline: none;
+            box-shadow: var(--lr-focus-ring);
+        }
+
+        /* ===== Layers ===== */
+        #bg {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            background-color: var(--bg);
+        }
+
+        #bgVideo {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: none;
+            background: transparent;
+        }
+        #bgVideo.playing { display: block; }
+        #bgVideo.hidden { display: none; }
+
+        #bgSlides {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+        #bgSlides .slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            background-position: 50% 50%;
+            background-repeat: no-repeat;
+            background-size: cover;
+            will-change: opacity, transform;
+        }
+        #bgSlides .slide.kb { animation: kenburns 28s ease-in-out infinite alternate; }
+        @keyframes kenburns {
+            from { transform: scale(1.05); }
+            to   { transform: scale(1.16) translate(-1.6%, -1.2%); }
+        }
+
+        #pattern {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+        #pattern.masked {
+            mask-image: radial-gradient(ellipse 95% 80% at 50% 50%, #000 28%, transparent 92%);
+            -webkit-mask-image: radial-gradient(ellipse 95% 80% at 50% 50%, #000 28%, transparent 92%);
+        }
+
+        #scrim {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        #particles {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: block;
+        }
+
+        #grain {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        /* ===== Corner brackets ===== */
+        .corners {
+            position: absolute;
+            inset: 14px;
+            pointer-events: none;
+        }
+        .corners span {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-color: var(--accent);
+            border-style: solid;
+            border-width: 0;
+            filter: drop-shadow(0 0 6px var(--accent-glow));
+        }
+        .corners .tl { top: 0; left: 0; border-top-width: 2px; border-left-width: 2px; }
+        .corners .tr { top: 0; right: 0; border-top-width: 2px; border-right-width: 2px; }
+        .corners .bl { bottom: 0; left: 0; border-bottom-width: 2px; border-left-width: 2px; }
+        .corners .br { bottom: 0; right: 0; border-bottom-width: 2px; border-right-width: 2px; }
+
+        /* ===== Glass panel — same soft frosted look as f_hud (glass.css) =====
+           Light blur only: a big radius + saturate is re-computed every frame
+           over the playing video and fights the game for the GPU. */
+        .panel {
+            position: relative;
+            background: rgba(140, 160, 182, 0.16);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: var(--lr-radius-lg);
+        }
+        @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+            .panel { background: rgba(140, 160, 182, 0.30); }
+        }
+
+        /* ===== Stage ===== */
+        #stage {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: clamp(28px, 3.4vw, 56px);
+        }
+
+        @keyframes riseIn {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: none; }
+        }
+
+        @keyframes riseInCentered {
+            from { opacity: 0; transform: translateY(calc(-50% + 14px)); }
+            to   { opacity: 1; transform: translateY(-50%); }
+        }
+
+        .a1 { opacity: 0; animation: riseIn 0.7s 0.15s var(--lr-ease) forwards; }
+        .a2 { opacity: 0; animation: riseIn 0.7s 0.28s var(--lr-ease) forwards; }
+        .a3 { opacity: 0; animation: riseIn 0.7s 0.4s  var(--lr-ease) forwards; }
+        .a4 { opacity: 0; animation: riseIn 0.75s 0.52s var(--lr-ease) forwards; }
+
+        /* ===== Top bar ===== */
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--lr-space-6);
+        }
+
+        .wordmark { display: flex; flex-direction: column; gap: var(--lr-space-3); }
+        .logo {
+            display: none;
+            align-self: flex-start;
+            height: 84px;
+            width: auto;
+            max-width: min(46vw, 520px);
+            object-fit: contain;
+            margin-bottom: 2px;
+        }
+        .logo.on { display: block; }
+        .logo.glow { filter: drop-shadow(0 0 18px var(--accent-glow)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.55)); }
+        .wordmark .pre {
+            display: flex; align-items: center; gap: var(--lr-space-3);
+            font-family: "JetBrains Mono", monospace;
+            font-size: 11px;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+        .wordmark .pre::before {
+            content: "";
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+        .wordmark h1 {
+            font-family: "Saira Condensed", sans-serif;
+            font-weight: 800;
+            font-size: clamp(44px, 5.6vw, 80px);
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            line-height: 0.88;
+            color: var(--text);
+            text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
+        }
+        .wordmark .ln { display: flex; align-items: center; gap: 14px; }
+        .wordmark .ln::before {
+            content: "";
+            width: clamp(34px, 3.4vw, 58px);
+            height: 2px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+        .wordmark .ln span {
+            font-size: clamp(11px, 1.1vw, 14px);
+            letter-spacing: 0.42em;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .chip {
+            display: flex; align-items: center; gap: 14px;
+            padding: var(--lr-space-3) 18px;
+            border-radius: var(--lr-radius-md);
+            font-size: 14px;
+            letter-spacing: 0.01em;
+        }
+        .chip .grp { display: flex; align-items: center; gap: var(--lr-space-2); color: var(--text); }
+        .chip i { font-size: 17px; color: var(--muted); }
+        .chip b { font-weight: 700; font-size: 14px; }
+        .chip small { color: var(--faint); font-weight: 400; }
+        .chip .div { width: 1px; height: var(--lr-space-4); background: var(--line-strong); }
+
+        .dot {
+            position: relative;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--ok);
+            box-shadow: 0 0 8px var(--ok);
+        }
+        .dot::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1px solid var(--ok);
+            opacity: 0;
+            animation: ping 2.4s var(--lr-ease) infinite;
+        }
+        @keyframes ping {
+            0%        { transform: scale(1);   opacity: 0.5; }
+            70%, 100% { transform: scale(3.2); opacity: 0; }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1);    opacity: 1; }
+            50%      { transform: scale(0.82); opacity: 0.55; }
+        }
+
+        /* ===== Side info panel ===== */
+        .info {
+            position: absolute;
+            right: clamp(28px, 3.4vw, 56px);
+            top: 50%;
+            transform: translateY(-50%);
+            width: clamp(330px, 27vw, 410px);
+            padding: var(--lr-space-2);
+            overflow: hidden;
+        }
+        /* riseIn ends on `transform: none`, which would drop the centering the
+           panel is positioned with — it keeps its own version of the keyframe. */
+        .info.a3 { animation-name: riseInCentered; }
+        .tabs {
+            display: flex; gap: var(--lr-space-1);
+            padding: 5px;
+            border-radius: var(--lr-radius-md);
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--line);
+        }
+        .tab {
+            flex: 1; border: 0; cursor: pointer;
+            background: transparent;
+            color: var(--muted);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 10px;
+            border-radius: var(--lr-radius-sm);
+            transition: background var(--lr-dur-fast) var(--lr-ease), color var(--lr-dur-fast) var(--lr-ease);
+        }
+        .tab:hover { color: var(--text); }
+        .tab.on {
+            background: var(--accent-soft);
+            color: var(--accent);
+            box-shadow: inset 0 0 0 1px rgba(95, 224, 255, 0.3);
+        }
+        .tabbody { padding: 18px var(--lr-space-4) 14px; }
+        .pane { display: none; flex-direction: column; gap: var(--lr-space-3); }
+        .pane.on { display: flex; }
+
+        .rule {
+            display: flex; gap: 14px;
+            font-size: 14.5px; line-height: 1.4;
+            color: var(--muted);
+            align-items: flex-start;
+        }
+        .rule .n {
+            flex: none;
+            width: var(--lr-space-6); height: var(--lr-space-6);
+            border-radius: var(--lr-radius-sm);
+            display: grid; place-items: center;
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 700;
+            font-size: 11px;
+            color: var(--accent);
+            background: var(--accent-soft);
+            border: 1px solid rgba(95, 224, 255, 0.25);
+        }
+
+        .staff-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+        }
+        .staff-card {
+            position: relative;
+            padding: 14px 13px;
+            border-radius: var(--lr-radius-md);
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--line);
+            transition: background var(--lr-dur) var(--lr-ease), border-color var(--lr-dur) var(--lr-ease), transform var(--lr-dur) var(--lr-ease);
+            overflow: hidden;
+        }
+        .staff-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--tint, transparent), transparent 60%);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        .staff-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--line-strong);
+            transform: translateY(-1px);
+        }
+        .staff-head { display: flex; align-items: center; gap: 11px; position: relative; }
+        .staff-av {
+            width: 34px; height: 34px;
+            border-radius: var(--lr-radius-md);
+            flex: none;
+            display: grid; place-items: center;
+            font-family: "Saira Condensed", sans-serif;
+            font-weight: 800; font-size: 15px;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--line-strong);
+        }
+        .staff-nm { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.1; }
+        .staff-ro { font-size: 11px; color: var(--faint); letter-spacing: 0.04em; margin-top: 2px; }
+        .staff-bdg {
+            position: relative;
+            display: inline-block;
+            margin-top: 10px;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            padding: var(--lr-space-1) 9px;
+            border-radius: var(--lr-radius-pill);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--line);
+            color: var(--muted);
+        }
+
+        .staff-card.t-owner { --tint: rgba(244, 114, 182, 0.22); }
+        .staff-card.t-owner .staff-av  { color: #ffd0e6; background: rgba(244, 114, 182, 0.14); border-color: rgba(244, 114, 182, 0.4); }
+        .staff-card.t-owner .staff-bdg { color: #ffb3d8; background: rgba(244, 114, 182, 0.1); border-color: rgba(244, 114, 182, 0.32); }
+
+        .staff-card.t-admin { --tint: rgba(167, 139, 250, 0.22); }
+        .staff-card.t-admin .staff-av  { color: #d6c8ff; background: rgba(167, 139, 250, 0.14); border-color: rgba(167, 139, 250, 0.4); }
+        .staff-card.t-admin .staff-bdg { color: #c4b3ff; background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.32); }
+
+        .staff-card.t-dev { --tint: rgba(94, 234, 212, 0.22); }
+        .staff-card.t-dev .staff-av  { color: #bff7ec; background: rgba(94, 234, 212, 0.14); border-color: rgba(94, 234, 212, 0.4); }
+        .staff-card.t-dev .staff-bdg { color: #97ecda; background: rgba(94, 234, 212, 0.1); border-color: rgba(94, 234, 212, 0.32); }
+
+        .staff-card.t-mod { --tint: rgba(95, 224, 255, 0.22); }
+        .staff-card.t-mod .staff-av  { color: #c2efff; background: rgba(95, 224, 255, 0.14); border-color: rgba(95, 224, 255, 0.4); }
+        .staff-card.t-mod .staff-bdg { color: #95ddf6; background: rgba(95, 224, 255, 0.1); border-color: rgba(95, 224, 255, 0.32); }
+
+        /* ===== Bottom ===== */
+        .bottom { display: flex; flex-direction: column; gap: clamp(16px, 2vh, 26px); }
+        .headline { display: flex; flex-direction: column; gap: var(--lr-space-3); }
+
+        .welcome {
+            font-family: "Saira Condensed", sans-serif;
+            font-weight: 800;
+            font-size: clamp(36px, 4.6vw, 66px);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            line-height: 0.92;
+            color: var(--text);
+            text-shadow: 0 2px 26px rgba(0, 0, 0, 0.6);
+        }
+        .welcome b {
+            font-weight: 800;
+            color: var(--accent);
+            text-shadow: 0 0 22px var(--accent-glow);
+        }
+
+        .tip { display: flex; align-items: center; gap: var(--lr-space-3); color: var(--muted); font-size: 15px; }
+        .tip i { font-size: 18px; color: var(--accent); }
+        .tip .k {
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-size: 11px;
+            color: var(--accent);
+        }
+        #tipText { transition: opacity var(--lr-dur-slow) var(--lr-ease); }
+
+        .bar { padding: var(--lr-space-5) 26px; display: flex; align-items: center; gap: clamp(18px, 2.4vw, 36px); }
+
+        .bar .progress { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+        .pmeta { display: flex; justify-content: space-between; align-items: baseline; gap: var(--lr-space-4); }
+        .pmeta-left { display: flex; flex-direction: column; gap: var(--lr-space-1); min-width: 0; flex: 1; }
+
+        #stageLabel {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--faint);
+            font-weight: 700;
+        }
+        #status {
+            font-size: 14px; font-weight: 600;
+            color: var(--text);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            letter-spacing: 0.02em;
+        }
+        #status .bk { color: var(--accent); animation: bk 1.1s steps(2) infinite; }
+        @keyframes bk { 50% { opacity: 0.25; } }
+
+        #pct {
+            font-family: "Saira Condensed", sans-serif;
+            font-weight: 800;
+            font-size: clamp(34px, 3.6vw, 52px);
+            letter-spacing: 0.02em;
+            color: var(--accent);
+            text-shadow: 0 0 16px var(--accent-glow);
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+        #pct small { font-size: 0.5em; color: var(--faint); font-weight: 700; margin-left: 2px; text-shadow: none; }
+
+        .track {
+            position: relative;
+            height: var(--lr-space-3);
+            border-radius: var(--lr-radius-pill);
+            background: rgba(255, 255, 255, 0.06);
+            overflow: hidden;
+            border: 1px solid var(--line);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5), inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+        }
+        .track-marks {
+            position: absolute; inset: 0;
+            display: flex; justify-content: space-between;
+            padding: 0 25%;
+            pointer-events: none;
+        }
+        .track-marks span { width: 1px; background: rgba(255, 255, 255, 0.18); align-self: stretch; }
+        .fill {
+            position: absolute; inset: 0 auto 0 0;
+            width: 0%;
+            border-radius: var(--lr-radius-pill);
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 50%),
+                linear-gradient(90deg, var(--accent) 0%, #b6f0ff 60%, var(--accent-2) 100%);
+            box-shadow: 0 0 14px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            transition: width var(--lr-dur) var(--lr-ease);
+            overflow: hidden;
+        }
+        .fill::before {
+            content: "";
+            position: absolute; inset: 0 -18px 0 -18px;
+            background-image: linear-gradient(45deg,
+                rgba(255, 255, 255, 0.18) 25%, transparent 25%,
+                transparent 50%, rgba(255, 255, 255, 0.18) 50%,
+                rgba(255, 255, 255, 0.18) 75%, transparent 75%);
+            background-size: 18px 18px;
+            animation: stripes 1.2s linear infinite;
+            opacity: 0.7;
+            will-change: transform;
+        }
+        .fill::after {
+            content: "";
+            position: absolute; top: 0; bottom: 0;
+            width: 30%; left: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+            animation: sheen 2.4s ease-in-out infinite;
+            will-change: transform;
+        }
+        @keyframes stripes { to { transform: translateX(18px); } }
+        @keyframes sheen   { 0% { transform: translateX(-467%); } 100% { transform: translateX(0); } }
+
+        .vline { width: 1px; align-self: stretch; background: var(--line-strong); flex: none; }
+
+        /* ===== Music ===== */
+        .music { position: relative; display: flex; align-items: center; gap: 14px; flex: none; }
+        .cover {
+            position: relative;
+            width: 54px; height: 54px;
+            flex: none;
+            border-radius: var(--lr-radius-md);
+            overflow: hidden;
+            background: rgba(95, 224, 255, 0.12);
+            border: 1px solid rgba(95, 224, 255, 0.32);
+        }
+        /* The cover art is the spectrum: a canvas the analyser drives directly.
+           It keeps drawing on a synthetic signal when the audio cannot be
+           tapped, so the panel never sits there dead while music is audibly
+           playing. */
+        .cover canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+        .minfo { display: flex; flex-direction: column; min-width: 120px; max-width: 180px; }
+        .minfo canvas { width: 100%; height: 16px; display: block; margin-top: 4px; opacity: 0.9; }
+        .minfo .now {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--faint);
+            font-weight: 700;
+        }
+        .minfo .trk {
+            font-size: 14.5px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+        .mctrl { display: flex; align-items: center; gap: 5px; }
+        .mbtn {
+            width: 34px; height: 34px;
+            border: 1px solid var(--line);
+            border-radius: var(--lr-radius-md);
+            cursor: pointer;
+            display: grid; place-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            transition: background var(--lr-dur-fast) var(--lr-ease), border-color var(--lr-dur-fast) var(--lr-ease);
+        }
+        .mbtn i { font-size: 17px; }
+        .mbtn:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--line-strong); }
+        .mbtn.play, .mbtn.on {
+            background: var(--accent-soft);
+            border-color: rgba(95, 224, 255, 0.45);
+            color: var(--accent);
+            box-shadow: 0 0 12px rgba(95, 224, 255, 0.25);
+        }
+        .mbtn.play:hover, .mbtn.on:hover { background: rgba(95, 224, 255, 0.28); }
+        .music.off .mctrl, .music.off .vol { opacity: 0.4; pointer-events: none; }
+
+        .vol { display: flex; align-items: center; gap: 9px; margin-left: 2px; color: var(--faint); }
+        .vol i { font-size: 16px; }
+        .vbar {
+            position: relative;
+            width: 64px; height: var(--lr-space-1);
+            border-radius: var(--lr-radius-pill);
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+        .vbar .lv {
+            position: absolute; inset: 0 auto 0 0;
+            width: 50%;
+            border-radius: var(--lr-radius-pill);
+            background: var(--accent);
+            box-shadow: 0 0 6px var(--accent-glow);
+        }
+        .vbar .kn {
+            position: absolute; top: 50%; left: 50%;
+            width: 11px; height: 11px;
+            border-radius: 50%;
+            background: #fff;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        .socials { display: flex; gap: 9px; flex: none; }
+        .s {
+            width: 42px; height: 42px;
+            border-radius: var(--lr-radius-md);
+            display: grid; place-items: center;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--line);
+            color: var(--muted);
+            transition: color var(--lr-dur-fast) var(--lr-ease), background var(--lr-dur-fast) var(--lr-ease), border-color var(--lr-dur-fast) var(--lr-ease), transform var(--lr-dur-fast) var(--lr-ease);
+            text-decoration: none;
+        }
+        .s i { font-size: 19px; }
+        .s:hover {
+            color: var(--accent);
+            background: var(--accent-soft);
+            border-color: rgba(95, 224, 255, 0.4);
+            transform: translateY(-1px);
+        }
+        .s.copied {
+            color: var(--ok);
+            background: rgba(52, 211, 153, 0.14);
+            border-color: rgba(52, 211, 153, 0.45);
+        }
+
+        .foot {
+            position: absolute;
+            left: 0; right: 0; bottom: 9px;
+            text-align: center;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: var(--faint);
+            pointer-events: none;
+        }
+
+        #dock {
+            position: absolute;
+            right: 14px; top: 14px;
+            display: none;
+            gap: var(--lr-space-2); align-items: center;
+            padding: 6px 10px;
+            border-radius: var(--lr-radius-md);
+            background: rgba(6, 8, 13, 0.6);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--line-strong);
+            box-shadow: var(--lr-shadow-2);
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px;
+            letter-spacing: 0.16em;
+            color: var(--faint);
+            text-transform: uppercase;
+        }
+        #dock.on { display: flex; }
+        #dock button {
+            cursor: pointer;
+            border: 1px solid var(--line-strong);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            padding: 6px 11px;
+            border-radius: var(--lr-radius-sm);
+            transition: background var(--lr-dur-fast) var(--lr-ease);
+            text-transform: uppercase;
+        }
+        #dock button:hover { background: rgba(255, 255, 255, 0.12); }
+
+        /* ===== Scrollable regions ===== */
+        .plist-b::-webkit-scrollbar,
+        .gate-body::-webkit-scrollbar,
+        #news::-webkit-scrollbar { width: 6px; }
+        .plist-b::-webkit-scrollbar-track,
+        .gate-body::-webkit-scrollbar-track,
+        #news::-webkit-scrollbar-track { background: transparent; }
+        .plist-b::-webkit-scrollbar-thumb,
+        .gate-body::-webkit-scrollbar-thumb,
+        #news::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.16);
+            border-radius: var(--lr-radius-pill);
+        }
+
+        /* ===== Playlist ===== */
+        .plist {
+            position: absolute;
+            left: 0;
+            bottom: calc(100% + 18px);
+            width: 300px;
+            max-width: 78vw;
+            flex-direction: column;
+            padding: var(--lr-space-2);
+            display: none;
+            z-index: 6;
+            /* Near-solid rather than the shared glass: it floats over the
+               welcome line, which is the brightest text on the screen. */
+            background: rgba(9, 12, 19, 0.97);
+        }
+        .plist.on { display: flex; }
+        .plist-h {
+            display: flex; align-items: center; gap: var(--lr-space-2);
+            padding: 6px var(--lr-space-2) 10px;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--faint);
+        }
+        .plist-h i { font-size: 14px; color: var(--accent); }
+        .plist-h .n { margin-left: auto; }
+        .plist-b {
+            display: flex; flex-direction: column; gap: 2px;
+            max-height: 210px;
+            overflow-y: auto;
+        }
+        .ptrack {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 10px;
+            border: 0;
+            border-radius: var(--lr-radius-sm);
+            background: transparent;
+            color: var(--muted);
+            font-family: inherit;
+            font-size: 13.5px;
+            text-align: left;
+            cursor: pointer;
+            transition: background var(--lr-dur-fast) var(--lr-ease), color var(--lr-dur-fast) var(--lr-ease);
+        }
+        .ptrack:hover { background: rgba(255, 255, 255, 0.06); color: var(--text); }
+        .ptrack .i {
+            flex: none;
+            width: 18px;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--faint);
+        }
+        .ptrack .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .ptrack.on { background: var(--accent-soft); color: var(--accent); }
+        .ptrack.on .i { color: var(--accent); }
+
+        /* ===== News ===== */
+        /* Capped so a long patch note scrolls inside the panel instead of
+           growing it into the progress bar. */
+        #news { gap: 10px; max-height: 36vh; overflow-y: auto; padding-right: var(--lr-space-1); }
+        .news {
+            padding: 12px 13px;
+            border-radius: var(--lr-radius-md);
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--line);
+        }
+        .news-h { display: flex; align-items: center; gap: var(--lr-space-2); margin-bottom: 7px; }
+        .news-tag {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 9.5px; font-weight: 700;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: var(--lr-radius-pill);
+            color: var(--accent);
+            background: var(--accent-soft);
+            border: 1px solid rgba(95, 224, 255, 0.25);
+        }
+        .news-date {
+            margin-left: auto;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            color: var(--faint);
+        }
+        .news-t { font-size: 14.5px; font-weight: 700; line-height: 1.25; color: var(--text); }
+        .news-b { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
+        .news-b li {
+            position: relative;
+            padding-left: 14px;
+            font-size: 13.5px;
+            line-height: 1.45;
+            color: var(--muted);
+        }
+        .news-b li::before {
+            content: "";
+            position: absolute;
+            left: 3px; top: 8px;
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0.8;
+        }
+
+        /* ===== Rules gate ===== */
+        #gate {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(20px, 4vh, 60px);
+            background: rgba(4, 6, 10, 0.72);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity var(--lr-dur-slow) var(--lr-ease);
+        }
+        #gate.on { opacity: 1; visibility: visible; pointer-events: auto; }
+        .gate-card {
+            width: min(720px, 100%);
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: var(--lr-space-4);
+            padding: clamp(20px, 2.4vw, 30px);
+        }
+        #gate.on .gate-card { animation: riseIn 0.5s var(--lr-ease) both; }
+        .gate-head { display: flex; align-items: flex-start; gap: 14px; }
+        .gate-head > i {
+            font-size: 26px;
+            margin-top: 2px;
+            color: var(--accent);
+            filter: drop-shadow(0 0 10px var(--accent-glow));
+        }
+        .gate-tt { flex: 1; min-width: 0; }
+        .gate-t {
+            font-family: "Saira Condensed", sans-serif;
+            font-weight: 800;
+            font-size: clamp(24px, 2.4vw, 34px);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            line-height: 1;
+            color: var(--text);
+        }
+        .gate-s { margin-top: 7px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+        .gate-v {
+            flex: none;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--faint);
+            padding: 5px 10px;
+            border: 1px solid var(--line);
+            border-radius: var(--lr-radius-pill);
+        }
+        .gate-body {
+            flex: 1;
+            min-height: 0;
+            max-height: 42vh;
+            overflow-y: auto;
+            display: flex; flex-direction: column; gap: var(--lr-space-3);
+            padding: var(--lr-space-4);
+            border-radius: var(--lr-radius-md);
+            background: rgba(0, 0, 0, 0.28);
+            border: 1px solid var(--line);
+        }
+        .gate-foot { display: flex; align-items: center; gap: var(--lr-space-4); flex-wrap: wrap; }
+        .gate-hint {
+            flex: 1;
+            min-width: 170px;
+            display: flex; align-items: center; gap: var(--lr-space-2);
+            font-size: 12.5px;
+            color: var(--faint);
+        }
+        .gate-hint i { font-size: 15px; }
+        .gate-hint.ready { color: var(--ok); }
+        .gate-btns { display: flex; gap: var(--lr-space-2); }
+        .gbtn {
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 13px 22px;
+            border-radius: var(--lr-radius-md);
+            border: 1px solid var(--line-strong);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            transition: background var(--lr-dur-fast) var(--lr-ease), border-color var(--lr-dur-fast) var(--lr-ease), opacity var(--lr-dur-fast) var(--lr-ease);
+        }
+        .gbtn:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--line-strong); }
+        .gbtn.accept {
+            background: var(--accent-soft);
+            border-color: rgba(95, 224, 255, 0.45);
+            color: var(--accent);
+            box-shadow: 0 0 16px rgba(95, 224, 255, 0.18);
+        }
+        .gbtn.accept:hover { background: rgba(95, 224, 255, 0.26); }
+        .gbtn:disabled { opacity: 0.4; cursor: default; }
+        .gbtn:disabled:hover { background: rgba(255, 255, 255, 0.05); }
+        .gbtn.accept:disabled:hover { background: var(--accent-soft); }
+
+        @media (max-width: 960px) {
+            .info { position: static; transform: none; width: 100%; margin: 14px 0; }
+            .bar { flex-wrap: wrap; justify-content: center; }
+            .vline { display: none; }
+            .music, .socials { flex: 1 1 100%; justify-content: center; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 1ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 1ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="bg">
+    <div id="bgSlides"></div>
+    <video id="bgVideo" autoplay muted loop playsinline></video>
+    <div id="pattern"></div>
+</div>
+
+<div id="scrim"></div>
+<canvas id="particles"></canvas>
+<div id="grain"></div>
+
+<div class="corners" id="corners">
+    <span class="tl"></span><span class="tr"></span>
+    <span class="bl"></span><span class="br"></span>
+</div>
+
+<div id="stage">
+
+    <div class="top">
+        <div class="wordmark a1">
+            <img class="logo" id="logo" alt="">
+            <span class="pre" id="preTitle"></span>
+            <h1 id="title"></h1>
+            <div class="ln"><span id="subtitle"></span></div>
+        </div>
+        <div class="chip panel a1" id="statusChip"></div>
+    </div>
+
+    <div class="info panel a3" id="infoPanel">
+        <div class="tabs" id="tabs"></div>
+        <div class="tabbody" id="tabbody"></div>
+    </div>
+
+    <div class="bottom">
+        <div class="headline a2">
+            <div class="welcome"><span id="welcomeText"></span> <b id="player"></b></div>
+            <div class="tip" id="tipRow">
+                <i class="icon-lightbulb" aria-hidden="true"></i>
+                <span class="k" id="tipLabel"></span>
+                <span id="tipText"></span>
+            </div>
+        </div>
+
+        <div class="bar panel a4">
+            <div class="music" id="music">
+                <div class="cover">
+                    <canvas id="vizBars"></canvas>
+                </div>
+                <div class="minfo">
+                    <span class="now" id="nowPlaying"></span>
+                    <span class="trk" id="trk"></span>
+                    <canvas id="vizWave"></canvas>
+                </div>
+                <div class="mctrl">
+                    <button class="mbtn" id="prev"><i class="icon-skip-back" aria-hidden="true"></i></button>
+                    <button class="mbtn play" id="play"><i class="icon-play" id="playIc" aria-hidden="true"></i></button>
+                    <button class="mbtn" id="next"><i class="icon-skip-forward" aria-hidden="true"></i></button>
+                    <button class="mbtn" id="listBtn"><i class="icon-list-music" aria-hidden="true"></i></button>
+                </div>
+                <div class="vol">
+                    <i class="icon-volume-2" aria-hidden="true"></i>
+                    <div class="vbar" id="vbar">
+                        <div class="lv" id="lv"></div>
+                        <div class="kn" id="kn"></div>
+                    </div>
+                </div>
+
+                <div class="plist panel" id="plist">
+                    <div class="plist-h">
+                        <i class="icon-list-music" aria-hidden="true"></i>
+                        <span id="plistTitle"></span>
+                        <span class="n" id="plistCount"></span>
+                    </div>
+                    <div class="plist-b" id="plistBody"></div>
+                </div>
+            </div>
+
+            <div class="vline" id="vline1"></div>
+
+            <div class="progress">
+                <div class="pmeta">
+                    <div class="pmeta-left">
+                        <div id="stageLabel"></div>
+                        <div id="status"></div>
+                    </div>
+                    <div id="pct">0<small>%</small></div>
+                </div>
+                <div class="track">
+                    <div class="fill" id="fill"></div>
+                    <div class="track-marks"><span></span><span></span><span></span></div>
+                </div>
+            </div>
+
+            <div class="vline" id="vline2"></div>
+
+            <div class="socials" id="socials"></div>
+        </div>
+    </div>
+</div>
+
+<div class="foot" id="footer"></div>
+
+<div id="gate">
+    <div class="gate-card panel">
+        <div class="gate-head">
+            <i class="icon-scroll-text" aria-hidden="true"></i>
+            <div class="gate-tt">
+                <div class="gate-t" id="gateTitle"></div>
+                <div class="gate-s" id="gateIntro"></div>
+            </div>
+            <span class="gate-v" id="gateVersion"></span>
+        </div>
+        <div class="gate-body" id="gateBody"></div>
+        <div class="gate-foot">
+            <span class="gate-hint" id="gateHint"></span>
+            <div class="gate-btns">
+                <button class="gbtn" id="gateDecline"></button>
+                <button class="gbtn accept" id="gateAccept" disabled></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="dock">
+    <span>Preview</span>
+    <button id="replay">Replay</button>
+</div>
+
+<audio id="audio" preload="auto"></audio>
+
+<script>
+(() => {
+    const CFG = window.LR_CONFIG || {};
+    let booted = false;
+
+    /// The resource this page belongs to, read off its own URL.
+    const RESOURCE = (() => {
+        const h = (location.hostname || '').replace(/^cfx-nui-/, '');
+        if (h && h.indexOf('.') < 0 && h !== 'game' && h !== 'loadingScreen') return h;
+        try {
+            if (typeof window.GetParentResourceName === 'function') {
+                const n = window.GetParentResourceName();
+                if (n && n !== 'loadingScreen' && n !== 'game') return n;
+            }
+        } catch {}
+        return 'lastresort_loading';
+    })();
+
+    /* ============================================================
+     * Connect handover
+     * What bridge/server.lua attached to the connection before this
+     * page existed: the player's name, the counts, the server name,
+     * the newest news and tips. It is here on the very first frame,
+     * while the client script that pushes the live numbers is still
+     * waiting for the resources to finish downloading — so the first
+     * paint is real data rather than a placeholder waiting to be
+     * corrected. Everything in it is replaced by the client script's
+     * push the moment that arrives.
+     * ============================================================ */
+    const HANDOVER = (() => {
+        let h = null;
+        try { h = window.nuiHandoverData || null; } catch {}
+        return (h && typeof h === 'object') ? h : {};
+    })();
+
+    // Seeded into the same variables the client script's messages write, so
+    // there is exactly one path from data to screen and nothing renders twice.
+    function seedFromHandover() {
+        const players = Number(HANDOVER.players);
+        const max = Number(HANDOVER.maxPlayers);
+        if (Number.isFinite(players) || Number.isFinite(max)) {
+            lastStats = { players: players, maxPlayers: max };
+        }
+        if (typeof HANDOVER.name === 'string' && HANDOVER.name.trim()) {
+            pendingName = HANDOVER.name.trim();
+        }
+        if (Array.isArray(HANDOVER.news) && HANDOVER.news.length) serverNews = HANDOVER.news;
+        if (Array.isArray(HANDOVER.tips) && HANDOVER.tips.length) serverTips = HANDOVER.tips;
+        if (typeof HANDOVER.serverName === 'string') liveServerName = HANDOVER.serverName.trim();
+    }
+
+    /* ============================================================
+     * Channel back to the client script
+     * A loading screen is only ever talked to one way, so the page
+     * opens the way back itself and keeps knocking until
+     * bridge/handover.lua answers. Nothing answers in a plain
+     * browser preview, and nothing here depends on an answer.
+     * ============================================================ */
+    const NUI = (() => {
+        let alive = false;
+        // The URL is asked FIRST. `GetParentResourceName()` answers with the
+        // frame's name inside a loading screen — `loadingScreen` — not the
+        // resource's, and every callback posted to that host is thrown away
+        // in silence. The document sits at `https://cfx-nui-<resource>/`, so
+        // its own hostname is the answer.
+        const host = RESOURCE;
+        function post(name, data) {
+            return fetch(`https://${host}/${name}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+                body: JSON.stringify(data || {})
+            }).then(r => {
+                if (!r.ok) throw new Error(String(r.status));
+                alive = true;
+                return r;
+            });
+        }
+        return { post, isAlive: () => alive };
+    })();
+
+    // The client script may still be starting when the page is already up, so
+    // the greeting is repeated until it lands. Everything the bridge knows —
+    // name, stored volume, server content, a pending rules gate — is replayed
+    // onto the page in the answer.
+    function openChannel() {
+        let tries = 0;
+        const knock = () => {
+            NUI.post('lrlHello').catch(() => {
+                if (++tries < 40) setTimeout(knock, 750);
+            });
+        };
+        knock();
+    }
+
+    /* ============================================================
+     * Locale
+     * ============================================================ */
+    let L = {};
+    function lookup(obj, path) {
+        return path.split('.').reduce((o, k) => (o && o[k] != null ? o[k] : undefined), obj);
+    }
+    function t(key, fallback) {
+        const v = lookup(L, key);
+        return v == null ? (fallback != null ? fallback : key) : v;
+    }
+    async function loadLocale(name) {
+        try {
+            const r = await fetch(`locales/${name}.json`, { cache: 'no-store' });
+            if (!r.ok) throw 0;
+            return await r.json();
+        } catch {
+            if (name !== CFG.fallbackLocale) return loadLocale(CFG.fallbackLocale);
+            return {};
+        }
+    }
+
+    /* ============================================================
+     * Theme → CSS vars
+     * ============================================================ */
+    function applyTheme() {
+        const r = document.documentElement.style;
+        const T = CFG.theme || {};
+        const map = {
+            '--bg': T.bg, '--accent': T.accent, '--accent-2': T.accent2, '--accent-3': T.accent3,
+            '--accent-soft': T.accentSoft, '--accent-glow': T.accentGlow,
+            '--text': T.text, '--muted': T.muted, '--faint': T.faint,
+            '--line': T.line, '--line-strong': T.lineStrong, '--ok': T.ok
+        };
+        for (const k in map) if (map[k]) r.setProperty(k, map[k]);
+    }
+
+    /* ============================================================
+     * Background gradient + pattern + scrim + grain + corners
+     * ============================================================ */
+    function applyBackground() {
+        const bg = document.getElementById('bg');
+        const B = CFG.background || {};
+        bg.style.backgroundColor = B.baseColor || '#06080d';
+        if (Array.isArray(B.gradients) && B.gradients.length) {
+            bg.style.backgroundImage = B.gradients.join(', ');
+        }
+    }
+
+    function applyPattern() {
+        const el = document.getElementById('pattern');
+        const P = CFG.pattern || {};
+        if (!P.enabled || P.type === 'none') { el.style.display = 'none'; return; }
+        el.style.opacity = P.opacity != null ? P.opacity : 0.07;
+        const c = P.color || 'rgba(255,255,255,0.55)';
+
+        if (P.type === 'stripes') {
+            const a = P.stripeAngle != null ? P.stripeAngle : 35;
+            const sp = P.stripeSpacing != null ? P.stripeSpacing : 6;
+            const th = P.stripeThickness != null ? P.stripeThickness : 1;
+            el.style.backgroundImage =
+                `repeating-linear-gradient(${a}deg, transparent 0, transparent ${sp - th}px, ${c} ${sp - th}px, ${c} ${sp}px)`;
+        } else if (P.type === 'dots') {
+            const s = P.dotSize != null ? P.dotSize : 1;
+            const sp = P.dotSpacing != null ? P.dotSpacing : 22;
+            el.style.backgroundImage = `radial-gradient(${c} ${s}px, transparent ${s + 0.5}px)`;
+            el.style.backgroundSize = `${sp}px ${sp}px`;
+        } else if (P.type === 'grid') {
+            const sp = P.gridSpacing != null ? P.gridSpacing : 28;
+            const th = P.gridThickness != null ? P.gridThickness : 1;
+            el.style.backgroundImage =
+                `linear-gradient(${c} ${th}px, transparent ${th}px), linear-gradient(90deg, ${c} ${th}px, transparent ${th}px)`;
+            el.style.backgroundSize = `${sp}px ${sp}px`;
+        } else if (P.type === 'hex') {
+            const stroke = encodeURIComponent(P.hexAccent || c);
+            const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='56' height='48' viewBox='0 0 56 48'><g fill='none' stroke='${stroke}' stroke-width='0.7' stroke-linejoin='round'><path d='M14,-8 L28,0 L28,16 L14,24 L0,16 L0,0 Z'/><path d='M42,-8 L56,0 L56,16 L42,24 L28,16 L28,0 Z'/><path d='M28,16 L42,24 L42,40 L28,48 L14,40 L14,24 Z'/></g></svg>`;
+            el.style.backgroundImage = `url("data:image/svg+xml;utf8,${svg.replace(/"/g, '%22')}")`;
+            el.style.backgroundSize = '56px 48px';
+        }
+        if (P.maskEdges) el.classList.add('masked');
+    }
+
+    function applyScrim() {
+        const el = document.getElementById('scrim');
+        const S = CFG.scrim || {};
+        if (!S.enabled) { el.style.display = 'none'; return; }
+        const layers = [
+            `linear-gradient(180deg, rgba(6,8,13,${S.topDark}) 0%, rgba(6,8,13,${S.midDark}) 30%, rgba(6,8,13,${S.midDark}) 60%, rgba(6,8,13,${S.bottomDark}) 100%)`,
+            `radial-gradient(120% 80% at 50% 50%, transparent 50%, rgba(6,8,13,${S.vignette}) 100%)`,
+            `linear-gradient(0deg, ${S.tintTop || 'transparent'}, ${S.tintBottom || 'transparent'})`
+        ];
+        el.style.background = layers.join(', ');
+    }
+
+    function applyGrain() {
+        const el = document.getElementById('grain');
+        const G = CFG.grain || {};
+        if (!G.enabled) { el.style.display = 'none'; return; }
+        el.style.opacity = G.opacity != null ? G.opacity : 0.035;
+    }
+
+    function applyCorners() {
+        const el = document.getElementById('corners');
+        const C = CFG.corners || {};
+        if (!C.enabled) { el.style.display = 'none'; return; }
+        el.style.inset = (C.inset != null ? C.inset : 14) + 'px';
+        const size = (C.size != null ? C.size : 22) + 'px';
+        const t = (C.thickness != null ? C.thickness : 2) + 'px';
+        for (const s of el.querySelectorAll('span')) {
+            s.style.width = size; s.style.height = size;
+            if (C.color) s.style.borderColor = C.color;
+            s.style.borderTopWidth = s.classList.contains('tl') || s.classList.contains('tr') ? t : '0';
+            s.style.borderBottomWidth = s.classList.contains('bl') || s.classList.contains('br') ? t : '0';
+            s.style.borderLeftWidth = s.classList.contains('tl') || s.classList.contains('bl') ? t : '0';
+            s.style.borderRightWidth = s.classList.contains('tr') || s.classList.contains('br') ? t : '0';
+        }
+    }
+
+    /* ============================================================
+     * Brand strings, status chip, info panel, socials
+     * ============================================================ */
+    function applyBrand() {
+        const B = CFG.brand || {};
+        document.getElementById('preTitle').textContent = B.preTitle != null ? B.preTitle : t('preTitle', 'Loading');
+        document.getElementById('title').textContent    = wantsLiveTitle()
+            ? (liveServerName || (B.title != null ? B.title : t('title', 'Server')))
+            : B.title;
+        document.getElementById('subtitle').textContent = B.subtitle != null ? B.subtitle : t('subtitle', '');
+        document.getElementById('footer').textContent   = B.footer   != null ? B.footer   : t('footer', '');
+        document.getElementById('tipLabel').textContent = t('tipLabel', 'Tip');
+        document.getElementById('nowPlaying').textContent = t('nowPlaying', 'Now Playing');
+
+        const welcomeEl = document.getElementById('welcomeText');
+        const playerEl  = document.getElementById('player');
+        function renderWelcome(name) {
+            if (name && name.trim()) {
+                welcomeEl.textContent = t('welcome', 'Welcome back,');
+                playerEl.textContent = name.trim();
+            } else {
+                welcomeEl.textContent = t('welcomeAnon', 'Welcome');
+                playerEl.textContent = '';
+            }
+        }
+        renderWelcome(pendingName != null ? pendingName : (CFG.playerName || ''));
+        window.__lrrSetName = renderWelcome;
+    }
+
+    // The bridge starts pushing names and stats the moment the page exists,
+    // which is before the locale fetch resolves and the panels are built —
+    // both are held here and replayed by the render step that owns them.
+    let chipRefs = null, lastStats = null, pendingName = null;
+    // sv_projectName, as the server itself reports it. Only ever drawn where
+    // config.js left the title empty — a configured brand is never overwritten.
+    let liveServerName = '';
+    function wantsLiveTitle() {
+        const B = CFG.brand || {};
+        return B.title == null || String(B.title).trim() === '';
+    }
+    // Lucide is a glyph font: the icon is a class, so an unknown name renders
+    // nothing instead of a broken box, and anything but [a-z0-9-] is dropped
+    // before it can reach a class attribute.
+    function makeIcon(name) {
+        const i = document.createElement('i');
+        i.className = 'icon-' + String(name || '').replace(/^icon-/, '').replace(/[^a-zA-Z0-9-]/g, '');
+        i.setAttribute('aria-hidden', 'true');
+        return i;
+    }
+    function chipGroup(icon) {
+        const grp = document.createElement('span');
+        grp.className = 'grp';
+        grp.appendChild(makeIcon(icon));
+        return grp;
+    }
+    function applyStatusChip() {
+        const chip = document.getElementById('statusChip');
+        const S = CFG.status || {};
+        if (!S.show) { chip.style.display = 'none'; return; }
+        chip.textContent = '';
+        const grpOnline = document.createElement('span');
+        grpOnline.className = 'grp';
+        if (S.online) {
+            const dot = document.createElement('span'); dot.className = 'dot';
+            grpOnline.appendChild(dot);
+        }
+        const onlineLabel = document.createElement('b');
+        onlineLabel.textContent = S.online ? t('online', 'Online') : t('offline', 'Offline');
+        grpOnline.appendChild(onlineLabel);
+        chip.appendChild(grpOnline);
+
+        const d1 = document.createElement('span'); d1.className = 'div'; chip.appendChild(d1);
+
+        const grpPlayers = chipGroup('users');
+        const playersVal = document.createElement('b');
+        playersVal.textContent = S.playersCurrent;
+        const playersMax = document.createElement('small');
+        playersMax.textContent = t('playersSlash', '/') + S.playersMax;
+        grpPlayers.appendChild(playersVal);
+        grpPlayers.appendChild(playersMax);
+        chip.appendChild(grpPlayers);
+
+        const d2 = document.createElement('span'); d2.className = 'div'; chip.appendChild(d2);
+
+        const grpPing = chipGroup('wifi');
+        const pingVal = document.createElement('b');
+        pingVal.textContent = S.ping;
+        const pingUnit = document.createElement('small');
+        pingUnit.textContent = t('msUnit', 'ms');
+        grpPing.appendChild(pingVal);
+        grpPing.appendChild(pingUnit);
+        chip.appendChild(grpPing);
+
+        chipRefs = { players: playersVal, max: playersMax, ping: pingVal };
+        if (lastStats) updateStatusChip(lastStats);
+    }
+    function updateStatusChip(d) {
+        if (!chipRefs || !d) return;
+        const players = Number(d.players);
+        const max = Number(d.maxPlayers);
+        const ping = Number(d.ping);
+        if (Number.isFinite(players)) chipRefs.players.textContent = players;
+        if (Number.isFinite(max)) chipRefs.max.textContent = t('playersSlash', '/') + max;
+        if (Number.isFinite(ping)) chipRefs.ping.textContent = ping;
+    }
+
+    // Rebuilt whenever the server sends news, so the tab the player is reading
+    // is remembered instead of snapping back to the default underneath them.
+    let activeTab = null;
+
+    function applyInfoPanel() {
+        const T = CFG.tabs || {};
+        const panel = document.getElementById('infoPanel');
+        const tabs = document.getElementById('tabs');
+        const body = document.getElementById('tabbody');
+        const wantRules = T.rules !== false;
+        const wantStaff = T.staff !== false;
+        // The News tab only exists once there is something in it — a server
+        // that publishes nothing shows the panel exactly as it always did.
+        const wantNews = T.news !== false && newsItems().length > 0;
+        if (!wantRules && !wantStaff && !wantNews) { panel.style.display = 'none'; return; }
+        panel.style.display = '';
+
+        // A defaultTab naming a disabled — or misspelled — tab would leave the
+        // panel with nothing selected, so it only counts when it is really there.
+        const available = [];
+        if (wantRules) available.push('rules');
+        if (wantNews) available.push('news');
+        if (wantStaff) available.push('staff');
+        const def = available.indexOf(T.defaultTab) !== -1 ? T.defaultTab : available[0];
+        const sel = available.indexOf(activeTab) !== -1 ? activeTab : def;
+        tabs.innerHTML = '';
+        body.innerHTML = '';
+
+        if (wantRules) {
+            tabs.appendChild(makeTab('rules', t('rulesTab', 'Rules'), sel === 'rules'));
+            body.appendChild(makeRulesPane(sel === 'rules'));
+        }
+        if (wantNews) {
+            tabs.appendChild(makeTab('news', t('newsTab', 'News'), sel === 'news'));
+            body.appendChild(makeNewsPane(sel === 'news'));
+        }
+        if (wantStaff) {
+            tabs.appendChild(makeTab('staff', t('staffTab', 'Staff'), sel === 'staff'));
+            body.appendChild(makeStaffPane(sel === 'staff'));
+        }
+        tabs.querySelectorAll('.tab').forEach(b => {
+            b.onclick = () => {
+                tabs.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+                body.querySelectorAll('.pane').forEach(x => x.classList.remove('on'));
+                b.classList.add('on');
+                activeTab = b.dataset.pane;
+                document.getElementById(b.dataset.pane).classList.add('on');
+            };
+        });
+    }
+    function makeTab(id, label, on) {
+        const b = document.createElement('button');
+        b.className = 'tab' + (on ? ' on' : '');
+        b.dataset.pane = id;
+        b.textContent = label;
+        return b;
+    }
+    function makeRulesPane(on) {
+        const div = document.createElement('div');
+        div.className = 'pane' + (on ? ' on' : '');
+        div.id = 'rules';
+        const list = Array.isArray(CFG.rules) ? CFG.rules : (L.rules || []);
+        list.forEach((text, i) => {
+            const row = document.createElement('div');
+            row.className = 'rule';
+            row.innerHTML = `<span class="n">${String(i + 1).padStart(2, '0')}</span>${text}`;
+            div.appendChild(row);
+        });
+        return div;
+    }
+    /* ============================================================
+     * Server news / patch notes
+     * The list the server pushes wins over the one in config.js, so
+     * the owner publishes a patch note without touching the resource
+     * and the config array is what a fresh install falls back to.
+     * ============================================================ */
+    let serverNews = null, serverTips = null;
+
+    function normalizeNews(list) {
+        const out = [];
+        (Array.isArray(list) ? list : []).forEach(raw => {
+            if (typeof raw === 'string') {
+                const s = raw.trim();
+                if (s) out.push({ title: '', date: '', tag: '', body: [s] });
+                return;
+            }
+            if (!raw || typeof raw !== 'object') return;
+            const src = raw.body != null ? raw.body : raw.text;
+            const lines = (Array.isArray(src) ? src : (typeof src === 'string' ? src.split('\n') : []))
+                .map(x => String(x == null ? '' : x).trim())
+                .filter(Boolean);
+            const title = raw.title != null ? String(raw.title).trim() : '';
+            if (!title && !lines.length) return;
+            out.push({
+                title: title,
+                date: raw.date != null ? String(raw.date).trim() : '',
+                tag: raw.tag != null ? String(raw.tag).trim() : '',
+                body: lines
+            });
+        });
+        return out;
+    }
+
+    function newsItems() {
+        const N = CFG.news || {};
+        const items = normalizeNews((serverNews && serverNews.length) ? serverNews : (N.items || []));
+        const max = Number(N.maxItems);
+        return (Number.isFinite(max) && max > 0) ? items.slice(0, max) : items;
+    }
+
+    function makeNewsPane(on) {
+        const div = document.createElement('div');
+        div.className = 'pane' + (on ? ' on' : '');
+        div.id = 'news';
+        newsItems().forEach(item => {
+            const card = document.createElement('article');
+            card.className = 'news';
+            if (item.tag || item.date) {
+                const head = document.createElement('div');
+                head.className = 'news-h';
+                if (item.tag) {
+                    const tag = document.createElement('span');
+                    tag.className = 'news-tag';
+                    tag.textContent = item.tag;
+                    head.appendChild(tag);
+                }
+                if (item.date) {
+                    const date = document.createElement('span');
+                    date.className = 'news-date';
+                    date.textContent = item.date;
+                    head.appendChild(date);
+                }
+                card.appendChild(head);
+            }
+            if (item.title) {
+                const h = document.createElement('div');
+                h.className = 'news-t';
+                h.textContent = item.title;
+                card.appendChild(h);
+            }
+            if (item.body.length) {
+                const ul = document.createElement('ul');
+                ul.className = 'news-b';
+                item.body.forEach(line => {
+                    const li = document.createElement('li');
+                    li.textContent = line;
+                    ul.appendChild(li);
+                });
+                card.appendChild(ul);
+            }
+            div.appendChild(card);
+        });
+        return div;
+    }
+
+    function makeStaffPane(on) {
+        const div = document.createElement('div');
+        div.className = 'pane' + (on ? ' on' : '');
+        div.id = 'staff';
+        const grid = document.createElement('div');
+        grid.className = 'staff-grid';
+        const defaults = CFG.staffDefaults || {};
+        (CFG.staff || []).forEach(s => {
+            const card = document.createElement('div');
+            card.className = 'staff-card t-' + (s.tone || 'mod');
+            const role = s.role != null ? s.role : t(lookup(defaults, s.tone + '.roleKey') || '', '');
+            const badge = s.badge != null ? s.badge : t(lookup(defaults, s.tone + '.badgeKey') || '', '');
+            card.innerHTML = `
+                <div class="staff-head">
+                    <div class="staff-av">${s.avatar || (s.name || '?').charAt(0)}</div>
+                    <div>
+                        <div class="staff-nm">${s.name || ''}</div>
+                        <div class="staff-ro">${role || ''}</div>
+                    </div>
+                </div>
+                <span class="staff-bdg">${badge || ''}</span>`;
+            grid.appendChild(card);
+        });
+        div.appendChild(grid);
+        return div;
+    }
+
+    // A loading screen has no tab to open into, so `target="_blank"` does
+    // nothing here: the URL goes to the game's own browser instead, and lands
+    // on the clipboard when that is unavailable (plain browser preview).
+    function openExternal(url) {
+        if (!url) return 'none';
+        try {
+            if (typeof window.invokeNative === 'function') {
+                window.invokeNative('openUrl', url);
+                return 'native';
+            }
+        } catch {}
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url);
+                return 'copied';
+            }
+        } catch {}
+        try {
+            const ta = document.createElement('textarea');
+            ta.value = url;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            return 'copied';
+        } catch {}
+        return 'none';
+    }
+
+    function applySocials() {
+        const wrap = document.getElementById('socials');
+        wrap.innerHTML = '';
+        (CFG.socials || []).forEach(s => {
+            const a = document.createElement('a');
+            a.className = 's';
+            a.href = s.url || '#';
+            a.rel = 'noopener';
+            a.title = s.url || '';
+            a.appendChild(makeIcon(s.icon));
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                if (openExternal(s.url) !== 'copied') return;
+                a.classList.add('copied');
+                setTimeout(() => a.classList.remove('copied'), 1200);
+            });
+            wrap.appendChild(a);
+        });
+        if (!wrap.children.length) wrap.style.display = 'none';
+    }
+
+    /* ============================================================
+     * Server logo — only shown once the file has really decoded, so
+     * a wrong path costs the logo and nothing else.
+     * ============================================================ */
+    function applyLogo() {
+        const G = CFG.logo || {};
+        const img = document.getElementById('logo');
+        if (!G.enabled || !G.src) return;
+        const title = document.getElementById('title');
+        img.style.height = (G.height != null ? G.height : 84) + 'px';
+        if (G.glow !== false) img.classList.add('glow');
+        img.alt = title.textContent || '';
+        img.addEventListener('load', () => {
+            img.classList.add('on');
+            if (G.placement === 'replace') title.style.display = 'none';
+        });
+        img.addEventListener('error', () => {
+            img.classList.remove('on');
+            title.style.display = '';
+        });
+        img.src = G.src;
+    }
+
+    /* ============================================================
+     * Background image / slideshow — one source is a static
+     * background, several cross-fade. Drawn under the video layer,
+     * so it also covers a video that never decodes.
+     * ============================================================ */
+    function applyImage() {
+        const wrap = document.getElementById('bgSlides');
+        const I = CFG.image || {};
+        const list = Array.isArray(I.sources) ? I.sources.filter(s => typeof s === 'string' && s) : [];
+        if (!I.enabled || !list.length) { wrap.style.display = 'none'; return; }
+        const opacity = I.opacity != null ? I.opacity : 1;
+        const fade = I.fadeMs != null ? I.fadeMs : 1200;
+        if (I.blurPx) wrap.style.filter = `blur(${I.blurPx}px)`;
+        const slides = list.map((src, i) => {
+            const d = document.createElement('div');
+            d.className = 'slide' + (I.kenBurns !== false ? ' kb' : '');
+            d.style.backgroundImage = `url("${String(src).replace(/["\\]/g, '')}")`;
+            d.style.backgroundSize = I.objectFit === 'contain' ? 'contain' : 'cover';
+            d.style.transition = `opacity ${fade}ms ease`;
+            d.style.animationDelay = `-${i * 4}s`;
+            if (i === 0) d.style.opacity = opacity;
+            wrap.appendChild(d);
+            return d;
+        });
+        if (slides.length < 2) return;
+        let cur = 0;
+        setInterval(() => {
+            const next = (cur + 1) % slides.length;
+            slides[cur].style.opacity = 0;
+            slides[next].style.opacity = opacity;
+            cur = next;
+        }, Math.max(1200, I.intervalMs != null ? I.intervalMs : 9000));
+    }
+
+    /* ============================================================
+     * Background video — local webm/mp4 with fallback chain.
+     * If nothing decodes, the element stays hidden and the gradient
+     * background is what the player sees.
+     * ============================================================ */
+    const DEAD_CONTAINER = /\.(avi|wmv|flv|mpg|mpeg|m2ts|mov)(\?.*)?$/i;
+    // Matroska is the container WebM is a profile of, and CEF demuxes it with
+    // the same code — an .mkv holding VP8 / VP9 / H.264 plays. One holding
+    // HEVC or AC-3 does not, so the .webm and .mp4 of the same name are queued
+    // behind it rather than in place of it: the file is tried first and the
+    // chain still has somewhere to go if its codec is the one CEF lacks.
+    const MAYBE_CONTAINER = /\.(mkv|ogv)(\?.*)?$/i;
+
+    // Containers CEF can never demux are swapped for the .webm and .mp4 of the
+    // same name instead of being requested and failing.
+    function videoSources(list) {
+        const out = [];
+        const add = src => { if (out.indexOf(src) < 0) out.push(src); };
+        list.forEach(src => {
+            if (typeof src !== 'string' || !src) return;
+            if (DEAD_CONTAINER.test(src)) {
+                const base = src.replace(DEAD_CONTAINER, '');
+                add(base + '.webm');
+                add(base + '.mp4');
+                return;
+            }
+            add(src);
+            if (MAYBE_CONTAINER.test(src)) {
+                const base = src.replace(MAYBE_CONTAINER, '');
+                add(base + '.webm');
+                add(base + '.mp4');
+            }
+        });
+        return out;
+    }
+
+    function applyVideo() {
+        const v = document.getElementById('bgVideo');
+        const V = CFG.video || {};
+        const sources = (V.enabled && Array.isArray(V.sources)) ? videoSources(V.sources) : [];
+        if (!sources.length) {
+            v.classList.add('hidden');
+            return;
+        }
+        startLocalVideo(v, V, sources);
+    }
+
+    function startLocalVideo(v, V, sources) {
+        v.classList.remove('hidden');
+        v.loop = V.loop !== false;
+        v.muted = V.muted !== false;
+        v.autoplay = V.autoplay !== false;
+        v.playsInline = true;
+        v.style.objectFit = V.objectFit || 'cover';
+        v.style.opacity = V.opacity != null ? V.opacity : 1;
+        if (V.blurPx) v.style.filter = `blur(${V.blurPx}px)`;
+
+        const STALL_MS = 6000;
+        let i = 0, probe = null, current = '', decoded = false, exhausted = false;
+
+        function arm() {
+            clearTimeout(probe);
+            // A source that never errors but never decodes must not stall the
+            // chain. Bytes arriving re-arm it, so a large or slow stream that is
+            // genuinely still loading is never cut off for taking its time.
+            probe = setTimeout(() => {
+                console.warn('[lastresort_loading] video timed out: ' + current);
+                tryNext();
+            }, STALL_MS);
+        }
+        function tryNext() {
+            clearTimeout(probe);
+            decoded = false;
+            v.classList.remove('playing');
+            if (i >= sources.length) {
+                // A late error from a source already given up on lands here too,
+                // and the list is only ever declared dead once.
+                if (exhausted) return;
+                exhausted = true;
+                v.classList.add('hidden');
+                console.warn('[lastresort_loading] no background video decoded — falling back to the image or gradient layer.');
+                return;
+            }
+            current = sources[i++];
+            v.src = current;
+            v.load();
+            arm();
+            const p = v.play();
+            if (p && typeof p.catch === 'function') p.catch(() => {});
+        }
+        v.addEventListener('error', () => {
+            const err = v.error;
+            console.warn('[lastresort_loading] video source failed: ' + current
+                + (err ? ' (code ' + err.code + ')' : ''));
+            tryNext();
+        });
+        v.addEventListener('progress', () => { if (!decoded) arm(); });
+        v.addEventListener('loadeddata', () => {
+            decoded = true;
+            clearTimeout(probe);
+            v.classList.add('playing');
+            console.info('[lastresort_loading] background video: ' + current);
+        });
+        tryNext();
+    }
+
+    /* ============================================================
+     * Music — one playlist of files this resource ships, played by
+     * the page's own <audio>.
+     * ============================================================ */
+    let audioEl, tracks, ti = 0, musicPlaying = false, userVolume = 50, shuffleOrder = null;
+    let deadTracks = 0;
+    let rememberVolume = true, volumeTouched = false, volumeSaveTimer = null;
+
+    // The volume the player set last is theirs, not the config's. It is kept in
+    // the page's own storage and mirrored into client KVP by the bridge, so it
+    // survives a cleared browser cache as well as a rejoin.
+    const VOLUME_KEY = 'lastresort_loading:volume';
+
+    function readStoredVolume() {
+        try {
+            const raw = localStorage.getItem(VOLUME_KEY);
+            if (raw == null) return null;
+            const v = Number(raw);
+            return Number.isFinite(v) ? Math.max(0, Math.min(100, Math.round(v))) : null;
+        } catch { return null; }
+    }
+    function storeVolume(v) {
+        try { localStorage.setItem(VOLUME_KEY, String(v)); } catch {}
+        clearTimeout(volumeSaveTimer);
+        volumeSaveTimer = setTimeout(() => { NUI.post('lrlVolume', { volume: v }).catch(() => {}); }, 350);
+    }
+    function setVolume(v, persist) {
+        if (!Number.isFinite(v)) return;
+        userVolume = Math.max(0, Math.min(100, Math.round(v)));
+        applyVolume(userVolume);
+        const lv = document.getElementById('lv');
+        const kn = document.getElementById('kn');
+        if (lv) lv.style.width = userVolume + '%';
+        if (kn) kn.style.left = userVolume + '%';
+        if (persist && rememberVolume) storeVolume(userVolume);
+    }
+    function applyVolume(v) {
+        if (audioEl) audioEl.volume = Math.max(0, Math.min(1, v / 100));
+    }
+
+    function normalizeTracks(list) {
+        const out = [];
+        for (const raw of (Array.isArray(list) ? list : [])) {
+            if (!raw) continue;
+            const src = typeof raw === 'string' ? raw : raw.src;
+            if (!src) continue;
+            out.push({
+                title: (typeof raw === 'object' && raw.title) ? raw.title : '',
+                src: String(src)
+            });
+        }
+        return out;
+    }
+
+    function applyMusic() {
+        const M = CFG.music || {};
+        const wrap = document.getElementById('music');
+        const vline1 = document.getElementById('vline1');
+        if (!M.showUI || !M.enabled) {
+            wrap.style.display = 'none';
+            if (!M.showUI) vline1.style.display = 'none';
+            if (!M.enabled) return;
+        }
+        const useVideo = !!M.useVideoAudio;
+        audioEl = document.getElementById(useVideo ? 'bgVideo' : 'audio');
+        tracks = useVideo ? [] : normalizeTracks(M.tracks);
+        rememberVolume = M.rememberVolume !== false;
+        const vol = Number(M.volume != null ? M.volume : 50);
+        const stored = rememberVolume ? readStoredVolume() : null;
+        setVolume(stored != null ? stored : (isFinite(vol) ? vol : 50), false);
+
+        // Nothing to draw into on a hidden panel — the music still plays.
+        if (M.showUI) Visualizer.start();
+
+        if (useVideo) { wireVideoSound(M); return; }
+
+        const trk = document.getElementById('trk');
+        if (!tracks.length) {
+            trk.textContent = t('noTrack', 'No tracks');
+            document.getElementById('listBtn').style.display = 'none';
+            disableMusicControls();
+            return;
+        }
+        if (M.shuffle) shuffleOrder = makeShuffle(tracks.length);
+        wireMusicControls();
+        loadTrack(0);
+        if (M.autoplay) tryPlay();
+        if (M.showPlaylist === false) {
+            document.getElementById('listBtn').style.display = 'none';
+        } else {
+            buildPlaylist();
+        }
+    }
+
+    /* ============================================================
+     * Visualizer
+     * The <audio> is routed through an AnalyserNode and the cover art
+     * IS the spectrum. Where the browser will not hand the page a
+     * running audio context the same bars are driven by a synthetic
+     * signal instead — the panel reads as alive either way, which is
+     * the whole point of having it on a loading screen.
+     * ============================================================ */
+    const Visualizer = (() => {
+        let barsCv, waveCv, barsCtx, waveCtx;
+        let audioCtx = null, analyser = null, srcNode = null;
+        let freq = null, wave = null;
+        let levels = [], phases = [];
+        let raf = null, started = false, attachTried = false;
+
+        function cfg() {
+            const V = (CFG.music || {}).visualizer || {};
+            return {
+                enabled: V.enabled !== false,
+                bars: Math.max(4, Math.min(48, Number(V.bars) || 14)),
+                wave: V.wave !== false,
+                analyse: V.analyse !== false,
+                smoothing: V.smoothing != null ? Number(V.smoothing) : 0.72,
+                sensitivity: V.sensitivity != null ? Number(V.sensitivity) : 1.0
+            };
+        }
+        const V = () => cfg();
+
+        function sizeCanvas(cv) {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const w = cv.clientWidth || 1, h = cv.clientHeight || 1;
+            cv.width = Math.max(1, Math.round(w * dpr));
+            cv.height = Math.max(1, Math.round(h * dpr));
+            const ctx = cv.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            return ctx;
+        }
+
+        // The element is only ever re-routed through the graph once the context
+        // is known to be running. A suspended context that already owns the
+        // element would mean silent music, which is far worse than flat bars.
+        function attach() {
+            const c = V();
+            if (!c.analyse || analyser || attachTried || !audioEl) return;
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) { attachTried = true; return; }
+            let ctx;
+            try { ctx = new AC(); } catch { attachTried = true; return; }
+            const finish = () => {
+                if (ctx.state !== 'running') { try { ctx.close(); } catch {} return; }
+                try {
+                    srcNode = ctx.createMediaElementSource(audioEl);
+                    analyser = ctx.createAnalyser();
+                    analyser.fftSize = 256;
+                    analyser.smoothingTimeConstant = Math.max(0, Math.min(0.95, c.smoothing));
+                    srcNode.connect(analyser);
+                    analyser.connect(ctx.destination);
+                    freq = new Uint8Array(analyser.frequencyBinCount);
+                    wave = new Uint8Array(analyser.fftSize);
+                    audioCtx = ctx;
+                    attachTried = true;
+                } catch (e) {
+                    analyser = null;
+                    try { ctx.close(); } catch {}
+                    attachTried = true;
+                }
+            };
+            if (ctx.state === 'suspended') {
+                const p = ctx.resume();
+                if (p && p.then) p.then(finish).catch(() => { try { ctx.close(); } catch {} });
+                else finish();
+            } else {
+                finish();
+            }
+        }
+
+        function synthetic(i, n, now) {
+            // Three detuned oscillators per bar plus a slow envelope: no two
+            // bars ever line up, so it never reads as a looping animation.
+            const p = phases[i];
+            const s = Math.sin(now * 0.0042 + p) * 0.5
+                    + Math.sin(now * 0.0113 + p * 2.3) * 0.32
+                    + Math.sin(now * 0.0007 + p * 0.7) * 0.18;
+            const tilt = 1 - (i / n) * 0.45;          // highs sit lower, like real music
+            return Math.max(0.06, Math.min(1, (0.52 + s * 0.48) * tilt));
+        }
+
+        function readBars(n, now) {
+            const out = new Array(n);
+            if (analyser && musicPlaying) {
+                analyser.getByteFrequencyData(freq);
+                // Logarithmic buckets: an even split puts everything audible
+                // into the first two bars and leaves the rest permanently flat.
+                const bins = freq.length;
+                let sum = 0;
+                for (let i = 0; i < n; i++) {
+                    const lo = Math.floor(Math.pow(i / n, 1.7) * bins);
+                    const hi = Math.max(lo + 1, Math.floor(Math.pow((i + 1) / n, 1.7) * bins));
+                    let acc = 0;
+                    for (let b = lo; b < hi && b < bins; b++) acc += freq[b];
+                    const v = (acc / (hi - lo)) / 255;
+                    out[i] = Math.max(0, Math.min(1, v * V().sensitivity * (1 + i / n)));
+                    sum += out[i];
+                }
+                // A track that decodes to digital silence would leave the panel
+                // looking broken; fall through to the synthetic signal instead.
+                if (sum > 0.02) return out;
+            }
+            if (!musicPlaying) { for (let i = 0; i < n; i++) out[i] = 0.05; return out; }
+            for (let i = 0; i < n; i++) out[i] = synthetic(i, n, now);
+            return out;
+        }
+
+        function accent() {
+            return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#5fe0ff';
+        }
+
+        function draw(now) {
+            raf = requestAnimationFrame(draw);
+            const c = V();
+            const n = c.bars;
+            const target = readBars(n, now);
+            for (let i = 0; i < n; i++) {
+                const prev = levels[i] || 0;
+                // Fast attack, slow release — the shape a VU meter has.
+                const k = target[i] > prev ? 0.55 : 0.12;
+                levels[i] = prev + (target[i] - prev) * k;
+            }
+
+            if (barsCtx) {
+                const w = barsCv.clientWidth, h = barsCv.clientHeight;
+                barsCtx.clearRect(0, 0, w, h);
+                const pad = 5;
+                const inner = w - pad * 2;
+                const gap = Math.max(1, inner / n * 0.32);
+                const bw = (inner - gap * (n - 1)) / n;
+                const col = accent();
+                barsCtx.fillStyle = col;
+                barsCtx.shadowColor = col;
+                barsCtx.shadowBlur = 6;
+                for (let i = 0; i < n; i++) {
+                    const bh = Math.max(1.5, levels[i] * (h - pad * 2));
+                    const x = pad + i * (bw + gap);
+                    barsCtx.globalAlpha = 0.35 + levels[i] * 0.65;
+                    barsCtx.fillRect(x, h - pad - bh, bw, bh);
+                }
+                barsCtx.globalAlpha = 1;
+                barsCtx.shadowBlur = 0;
+            }
+
+            if (waveCtx) {
+                const w = waveCv.clientWidth, h = waveCv.clientHeight;
+                waveCtx.clearRect(0, 0, w, h);
+                waveCtx.beginPath();
+                const mid = h / 2;
+                const useReal = analyser && musicPlaying;
+                if (useReal) analyser.getByteTimeDomainData(wave);
+                const steps = Math.max(24, Math.min(160, Math.round(w / 2)));
+                for (let i = 0; i <= steps; i++) {
+                    const p = i / steps;
+                    let v;
+                    if (useReal) {
+                        v = (wave[Math.floor(p * (wave.length - 1))] - 128) / 128;
+                    } else if (musicPlaying) {
+                        const amp = levels[Math.floor(p * (n - 1))] || 0;
+                        v = Math.sin(p * 18 + now * 0.006) * amp * 0.9;
+                    } else {
+                        v = 0;
+                    }
+                    const y = mid - v * (mid - 1) * V().sensitivity;
+                    if (i === 0) waveCtx.moveTo(0, y); else waveCtx.lineTo(p * w, y);
+                }
+                waveCtx.strokeStyle = accent();
+                waveCtx.globalAlpha = musicPlaying ? 0.75 : 0.28;
+                waveCtx.lineWidth = 1.4;
+                waveCtx.stroke();
+                waveCtx.globalAlpha = 1;
+            }
+        }
+
+        function start() {
+            const c = cfg();
+            barsCv = document.getElementById('vizBars');
+            waveCv = document.getElementById('vizWave');
+            if (!c.enabled) {
+                if (barsCv) barsCv.style.display = 'none';
+                if (waveCv) waveCv.style.display = 'none';
+                return;
+            }
+            if (started) return;
+            started = true;
+            if (!c.wave && waveCv) { waveCv.style.display = 'none'; waveCv = null; }
+            for (let i = 0; i < 48; i++) { levels[i] = 0.05; phases[i] = i * 1.7 + Math.random() * 6.28; }
+            const resize = () => {
+                if (barsCv) barsCtx = sizeCanvas(barsCv);
+                if (waveCv) waveCtx = sizeCanvas(waveCv);
+            };
+            resize();
+            window.addEventListener('resize', resize);
+            // A browser that would not give us a running audio context before
+            // the player touched anything will give us one after they did.
+            const retry = () => {
+                document.removeEventListener('pointerdown', retry, true);
+                document.removeEventListener('keydown', retry, true);
+                if (!analyser) { attachTried = false; attach(); }
+            };
+            document.addEventListener('pointerdown', retry, true);
+            document.addEventListener('keydown', retry, true);
+            raf = requestAnimationFrame(draw);
+        }
+
+        return {
+            start,
+            attach,
+            stop() { cancelAnimationFrame(raf); raf = null; }
+        };
+    })();
+
+    /* ============================================================
+     * Playlist — the whole queue, not just the track that happens
+     * to be playing. Clicking a row jumps straight to it.
+     * ============================================================ */
+    function trackTitle(i) {
+        const t0 = tracks[actualIndex(i)];
+        if (!t0) return '';
+        if (t0.title) return t0.title;
+        return decodeURIComponent(String(t0.src || '').split('/').pop().replace(/\.[a-z0-9]+$/i, ''));
+    }
+    function buildPlaylist() {
+        const body = document.getElementById('plistBody');
+        body.innerHTML = '';
+        for (let i = 0; i < tracks.length; i++) {
+            const row = document.createElement('button');
+            row.className = 'ptrack';
+            row.dataset.i = i;
+            const n = document.createElement('span');
+            n.className = 'i';
+            n.textContent = String(i + 1).padStart(2, '0');
+            const label = document.createElement('span');
+            label.className = 't';
+            label.textContent = trackTitle(i);
+            row.appendChild(n);
+            row.appendChild(label);
+            row.onclick = () => {
+                loadTrack(i);
+                playCurrent();
+                togglePlaylist(false);
+            };
+            body.appendChild(row);
+        }
+        document.getElementById('plistTitle').textContent = t('playlist', 'Playlist');
+        markPlaylist();
+    }
+    function markPlaylist() {
+        const body = document.getElementById('plistBody');
+        if (!body || !tracks) return;
+        body.querySelectorAll('.ptrack').forEach(el => {
+            el.classList.toggle('on', Number(el.dataset.i) === ti);
+        });
+        const count = document.getElementById('plistCount');
+        if (count && tracks.length) {
+            count.textContent = t('trackCount', '{n} / {total}')
+                .replace('{n}', String(ti + 1).padStart(2, '0'))
+                .replace('{total}', String(tracks.length).padStart(2, '0'));
+        }
+    }
+    function togglePlaylist(force) {
+        const el = document.getElementById('plist');
+        const btn = document.getElementById('listBtn');
+        if (!el || !btn) return;
+        const on = force != null ? force : !el.classList.contains('on');
+        el.classList.toggle('on', on);
+        btn.classList.toggle('on', on);
+    }
+    function playCurrent() {
+        if (!audioEl) return;
+        Visualizer.attach();
+        const p = audioEl.play();
+        if (p && p.then) p.then(() => { musicPlaying = true; refreshPlayBtn(); }).catch(() => {});
+    }
+    function makeShuffle(n) {
+        const a = Array.from({ length: n }, (_, i) => i);
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+    function actualIndex(i) { return shuffleOrder ? shuffleOrder[i % shuffleOrder.length] : (i % tracks.length); }
+
+    function loadTrack(i) {
+        if (!tracks.length) return;
+        ti = (i + tracks.length) % tracks.length;
+        const t0 = tracks[actualIndex(ti)];
+        const wantPlaying = musicPlaying;
+        audioEl.src = t0.src;
+        if (wantPlaying) { const p = audioEl.play(); if (p && p.catch) p.catch(() => {}); }
+        document.getElementById('trk').textContent = trackTitle(ti) || t('loadingTrack', '…');
+        markPlaylist();
+    }
+    // The step next/prev and an ended track all take, so `loop: false` is
+    // honoured in exactly one place.
+    function advance(step) {
+        step = step || 1;
+        if (step > 0 && ti === tracks.length - 1 && CFG.music && CFG.music.loop === false) {
+            musicPlaying = false;
+            refreshPlayBtn();
+            return;
+        }
+        loadTrack(ti + step);
+    }
+    function tryPlay() {
+        Visualizer.attach();
+        const p = audioEl.play();
+        if (p && p.catch) {
+            p.then(() => { musicPlaying = true; refreshPlayBtn(); }).catch(() => {
+                // Autoplay blocked — fall back to first interaction.
+                const unlock = () => {
+                    document.removeEventListener('pointerdown', unlock, true);
+                    document.removeEventListener('keydown', unlock, true);
+                    Visualizer.attach();
+                    playCurrent();
+                };
+                document.addEventListener('pointerdown', unlock, true);
+                document.addEventListener('keydown', unlock, true);
+            });
+        } else {
+            musicPlaying = true;
+            refreshPlayBtn();
+        }
+    }
+    function refreshPlayBtn() {
+        document.getElementById('playIc').className = musicPlaying ? 'icon-pause' : 'icon-play';
+        document.getElementById('music').classList.toggle('playing', musicPlaying);
+    }
+    function disableMusicControls() {
+        ['prev', 'play', 'next', 'listBtn'].forEach(id => { const e = document.getElementById(id); if (e) e.disabled = true; });
+        document.getElementById('music').classList.add('off');
+    }
+    function wireMusicControls() {
+        document.getElementById('play').onclick = () => {
+            if (!tracks.length) return;
+            if (audioEl.paused) {
+                playCurrent();
+            } else {
+                audioEl.pause();
+                musicPlaying = false;
+                refreshPlayBtn();
+            }
+        };
+        document.getElementById('next').onclick = () => advance(1);
+        document.getElementById('prev').onclick = () => loadTrack(ti - 1);
+        document.getElementById('listBtn').onclick = () => togglePlaylist();
+        document.addEventListener('pointerdown', e => {
+            const el = document.getElementById('plist');
+            const btn = document.getElementById('listBtn');
+            if (!el || !el.classList.contains('on')) return;
+            if (el.contains(e.target) || btn.contains(e.target)) return;
+            togglePlaylist(false);
+        });
+        audioEl.addEventListener('ended', () => advance(1));
+        audioEl.addEventListener('play', () => {
+            musicPlaying = true; refreshPlayBtn(); Visualizer.attach();
+            deadTracks = 0;
+        });
+        audioEl.addEventListener('pause', () => {
+            musicPlaying = false; refreshPlayBtn();
+        });
+        // A source that 404s or is in a container the game's browser cannot
+        // decode used to leave the panel stuck on a track that never starts.
+        // Skipping alone is not enough: a one-entry playlist had nothing to
+        // skip to, and a list where every entry fails would cycle forever.
+        audioEl.addEventListener('error', () => {
+            console.warn('[lastresort_loading] track could not be played:', audioEl.src);
+            deadTracks += 1;
+            if (deadTracks >= tracks.length) {
+                musicPlaying = false;
+                refreshPlayBtn();
+                document.getElementById('trk').textContent = t('noTrack', 'No tracks');
+                return;
+            }
+            advance(1);
+        });
+
+        wireVolumeBar();
+    }
+
+    /* ============================================================
+     * Video sound — the background video's soundtrack is the music.
+     * The video keeps looping muted no matter what; the play button
+     * only flips its sound on and off.
+     * ============================================================ */
+    function wireVideoSound(M) {
+        ['prev', 'next', 'listBtn'].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = 'none'; });
+        document.getElementById('trk').textContent = M.videoTitle || '';
+
+        const sync = () => {
+            musicPlaying = !audioEl.muted && !audioEl.paused;
+            refreshPlayBtn();
+        };
+        const mute = () => {
+            audioEl.muted = true;
+            const p = audioEl.play();
+            if (p && p.catch) p.catch(() => {});
+            sync();
+        };
+        let gestureArmed = false;
+        const armGesture = () => {
+            if (gestureArmed) return;
+            gestureArmed = true;
+            const unlock = () => {
+                document.removeEventListener('pointerdown', unlock, true);
+                document.removeEventListener('keydown', unlock, true);
+                gestureArmed = false;
+                if (audioEl.muted && M.autoplay) unmute();
+            };
+            document.addEventListener('pointerdown', unlock, true);
+            document.addEventListener('keydown', unlock, true);
+        };
+        // A browser that refuses sound without a gesture pauses the video
+        // instead of rejecting — so fall back to muted playback, never a frozen
+        // background, and retry on the first click / key press.
+        const unmute = () => {
+            Visualizer.attach();
+            audioEl.muted = false;
+            const p = audioEl.play();
+            if (p && p.catch) p.catch(() => { mute(); armGesture(); });
+            setTimeout(() => {
+                if (!audioEl.muted && audioEl.paused) { mute(); armGesture(); }
+                sync();
+            }, 300);
+            sync();
+        };
+
+        document.getElementById('play').onclick = () => {
+            if (audioEl.muted) unmute(); else mute();
+        };
+        audioEl.addEventListener('volumechange', sync);
+        audioEl.addEventListener('play', sync);
+        audioEl.addEventListener('pause', sync);
+        wireVolumeBar();
+
+        if (M.autoplay) unmute(); else sync();
+    }
+
+    function wireVolumeBar() {
+        const vbar = document.getElementById('vbar');
+        const setVol = e => {
+            const r = vbar.getBoundingClientRect();
+            let p = (e.clientX - r.left) / r.width;
+            p = Math.max(0, Math.min(1, p));
+            volumeTouched = true;
+            setVolume(p * 100, true);
+        };
+        let drag = false;
+        vbar.addEventListener('mousedown', e => { drag = true; setVol(e); });
+        window.addEventListener('mousemove', e => { if (drag) setVol(e); });
+        window.addEventListener('mouseup', () => drag = false);
+    }
+
+    /* ============================================================
+     * Tips rotator
+     * A tip list from the server replaces the config / locale one
+     * the moment it arrives, so the owner can rotate tips live
+     * without the page ever having heard of them.
+     * ============================================================ */
+    let tipTimer = null, tipKey = null;
+
+    function tipSources() {
+        if (serverTips && serverTips.length) return serverTips;
+        const T = CFG.tips || {};
+        if (T.override && T.override.length) return T.override;
+        return L.tips || [];
+    }
+
+    function applyTips() {
+        const T = CFG.tips || {};
+        const row = document.getElementById('tipRow');
+        if (!T.enabled) { row.style.display = 'none'; return; }
+        const list = tipSources().map(x => String(x == null ? '' : x).trim()).filter(Boolean);
+        const key = list.join('\n');
+        if (key === tipKey) return;
+        tipKey = key;
+        clearInterval(tipTimer);
+        tipTimer = null;
+        if (!list.length) { row.style.display = 'none'; return; }
+        row.style.display = '';
+        const el = document.getElementById('tipText');
+        const interval = T.intervalMs || 5000;
+        const fade = T.fadeMs || 400;
+        el.style.transition = `opacity ${fade}ms`;
+        el.style.opacity = 1;
+        let i = 0;
+        el.textContent = list[0];
+        if (list.length < 2) return;
+        tipTimer = setInterval(() => {
+            el.style.opacity = 0;
+            setTimeout(() => {
+                i = (i + 1) % list.length;
+                el.textContent = list[i];
+                el.style.opacity = 1;
+            }, fade);
+        }, interval);
+    }
+
+    /* ============================================================
+     * Rules acceptance gate
+     * Shown only when bridge/server.lua says this identifier still
+     * owes an acceptance for the current rules version, and the
+     * screen is held open by the client bridge until it is answered.
+     * ============================================================ */
+    let gateShown = false, gateAnswered = false, pendingGate = null;
+
+    function gateRules() {
+        const list = Array.isArray(CFG.rules) ? CFG.rules : (L.rules || []);
+        return list.map(x => String(x == null ? '' : x).trim()).filter(Boolean);
+    }
+
+    function showGate(version) {
+        if (gateShown || gateAnswered) return;
+        if (!booted) { pendingGate = version == null ? '' : version; return; }
+        const G = CFG.rulesGate || {};
+        const el = document.getElementById('gate');
+        const body = document.getElementById('gateBody');
+        const accept = document.getElementById('gateAccept');
+        const decline = document.getElementById('gateDecline');
+        const hint = document.getElementById('gateHint');
+        gateShown = true;
+
+        document.getElementById('gateTitle').textContent = t('gateTitle', 'Server rules');
+        document.getElementById('gateIntro').textContent =
+            t('gateIntro', 'Read the rules through and accept them to finish joining.');
+        const versionEl = document.getElementById('gateVersion');
+        const vs = String(version == null ? '' : version).trim();
+        if (vs) {
+            versionEl.textContent = t('gateVersion', 'Version {v}').replace('{v}', vs);
+        } else {
+            versionEl.style.display = 'none';
+        }
+
+        body.innerHTML = '';
+        gateRules().forEach((text, i) => {
+            const row = document.createElement('div');
+            row.className = 'rule';
+            const n = document.createElement('span');
+            n.className = 'n';
+            n.textContent = String(i + 1).padStart(2, '0');
+            row.appendChild(n);
+            row.appendChild(document.createTextNode(text));
+            body.appendChild(row);
+        });
+
+        accept.textContent = t('gateAccept', 'I accept');
+        decline.textContent = t('gateDecline', 'Decline');
+        if (G.showDecline === false) decline.style.display = 'none';
+
+        const dim = Number(G.dim);
+        if (Number.isFinite(dim)) {
+            el.style.background = `rgba(4, 6, 10, ${Math.max(0, Math.min(1, dim))})`;
+        }
+
+        const requireScroll = G.requireScroll !== false;
+        let unlocked = !requireScroll;
+        function paintHint() {
+            hint.textContent = '';
+            hint.appendChild(makeIcon(unlocked ? 'check' : 'arrow-down'));
+            hint.appendChild(document.createTextNode(unlocked
+                ? t('gateReadyHint', 'Rules read — you can accept now.')
+                : t('gateScrollHint', 'Scroll to the end of the rules to continue.')));
+            hint.classList.toggle('ready', unlocked);
+            accept.disabled = !unlocked;
+        }
+        paintHint();
+        if (requireScroll) {
+            body.addEventListener('scroll', () => {
+                if (unlocked) return;
+                if (body.scrollTop + body.clientHeight >= body.scrollHeight - 8) {
+                    unlocked = true;
+                    paintHint();
+                }
+            });
+            // A rules list short enough to fit has already been read in full.
+            requestAnimationFrame(() => {
+                if (!unlocked && body.scrollHeight <= body.clientHeight + 8) {
+                    unlocked = true;
+                    paintHint();
+                }
+            });
+        }
+
+        // A post that never lands hands the buttons back rather than leaving
+        // the player on a dead panel.
+        function retryable(btn, label) {
+            return () => {
+                btn.disabled = false;
+                btn.textContent = label;
+                if (btn === accept) decline.disabled = false;
+            };
+        }
+        accept.onclick = () => {
+            if (accept.disabled) return;
+            const label = accept.textContent;
+            accept.disabled = true;
+            decline.disabled = true;
+            accept.textContent = t('gateSaving', 'Saving…');
+            NUI.post('lrlRulesAccept', { version: vs }).catch(retryable(accept, label));
+        };
+        decline.onclick = () => {
+            const label = decline.textContent;
+            decline.disabled = true;
+            NUI.post('lrlRulesDecline', { locale: CFG.locale || 'en' }).catch(retryable(decline, label));
+        };
+
+        el.classList.add('on');
+    }
+
+    function hideGate() {
+        gateAnswered = true;
+        pendingGate = null;
+        const el = document.getElementById('gate');
+        if (el) el.classList.remove('on');
+    }
+
+    /* ============================================================
+     * Progress (real + simulated)
+     * ============================================================ */
+    let displayed = 0, target = 0, rafId = null, simTimer = null, realProgress = false;
+    let handoverAt = 0, handoverFrom = 0, statusHoldUntil = 0, lastFrameAt = 0;
+    function getStages() {
+        return (L.stages && L.stages.length) ? L.stages : ['Loading'];
+    }
+    // The bar redraws on every animation frame while the map streams, so the
+    // rows it touches are built once and then written through text nodes: no
+    // parsing, no element churn, and nothing is written when the value has not
+    // actually changed.
+    let ui = null, lastWidth = '', lastPct = -1, lastStage = '', lastStatus = '';
+    function progressUI() {
+        if (ui) return ui;
+        const pct = document.getElementById('pct');
+        const status = document.getElementById('status');
+        const pctValue = document.createTextNode('0');
+        const pctUnit = document.createElement('small');
+        pctUnit.textContent = '%';
+        pct.textContent = '';
+        pct.appendChild(pctValue);
+        pct.appendChild(pctUnit);
+        const statusValue = document.createTextNode('');
+        const caret = document.createElement('span');
+        caret.className = 'bk';
+        caret.textContent = '…';
+        status.textContent = '';
+        status.appendChild(statusValue);
+        status.appendChild(caret);
+        ui = {
+            fill: document.getElementById('fill'),
+            stage: document.getElementById('stageLabel'),
+            pct: pctValue,
+            status: statusValue
+        };
+        return ui;
+    }
+    // A game log line owns the status row for holdMs, otherwise the next
+    // animation frame would overwrite it with the stage name before it can be
+    // read. The stage name simply resumes when the hold expires.
+    function setStatus(text, holdMs) {
+        if (!holdMs && performance.now() < statusHoldUntil) return;
+        const s = String(text);
+        if (s !== lastStatus) {
+            progressUI().status.nodeValue = s;
+            lastStatus = s;
+        }
+        if (holdMs) statusHoldUntil = performance.now() + holdMs;
+    }
+    function renderProgress(frac) {
+        const u = progressUI();
+        const f = Math.max(0, Math.min(1, frac));
+        const width = (f * 100).toFixed(2) + '%';
+        if (width !== lastWidth) { u.fill.style.width = width; lastWidth = width; }
+        const intPct = Math.round(f * 100);
+        if (intPct !== lastPct) { u.pct.nodeValue = intPct; lastPct = intPct; }
+        const stages = getStages();
+        const idx = Math.min(stages.length - 1, Math.floor(f * stages.length));
+        const stageNum = String(idx + 1).padStart(2, '0');
+        const total = String(stages.length).padStart(2, '0');
+        const label = f >= 1 ? t('ready', 'Ready') : t('stageOf', 'Stage {n} / {total}')
+            .replace('{n}', stageNum).replace('{total}', total);
+        if (label !== lastStage) { u.stage.textContent = label; lastStage = label; }
+        if (f >= 1) statusHoldUntil = 0;
+        setStatus(f >= 1 ? t('ready', 'Ready') : stages[idx]);
+    }
+    // Eased with the real frame delta rather than a fixed per-frame share, so a
+    // client rendering at 30 fps reaches the target in the same wall-clock time
+    // as one at 144.
+    function tick(now) {
+        const dt = lastFrameAt ? Math.min(100, now - lastFrameAt) : 16.67;
+        lastFrameAt = now;
+        const diff = target - displayed;
+        if (Math.abs(diff) < 0.0005) {
+            displayed = target;
+            renderProgress(displayed);
+            rafId = null;
+            lastFrameAt = 0;
+            return;
+        }
+        displayed += diff * (1 - Math.pow(0.92, dt / 16.67));
+        renderProgress(displayed);
+        rafId = requestAnimationFrame(tick);
+    }
+    function setTarget(v) {
+        target = Math.max(target, Math.max(0, Math.min(1, v)));
+        if (rafId === null) { lastFrameAt = 0; rafId = requestAnimationFrame(tick); }
+    }
+    // The simulation only fills the bar until the game reports for real. On the
+    // first loadProgress the travel that is left is remapped onto the real
+    // fraction, so control passes over without the bar ever jumping backwards.
+    function takeOverProgress(fraction) {
+        realProgress = true;
+        clearInterval(simTimer);
+        handoverAt = target;
+        handoverFrom = Math.max(0, Math.min(1, Number(fraction) || 0));
+    }
+    function realToBar(fraction) {
+        const f = Math.max(0, Math.min(1, Number(fraction) || 0));
+        if (handoverAt >= 1 || handoverFrom >= 1) return 1;
+        return handoverAt + (Math.max(f, handoverFrom) - handoverFrom) * (1 - handoverAt) / (1 - handoverFrom);
+    }
+    function startSimulation() {
+        const P = CFG.progress || {};
+        cancelAnimationFrame(rafId); rafId = null; lastFrameAt = 0;
+        displayed = 0; target = 0;
+        handoverAt = 0; handoverFrom = 0;
+        renderProgress(0);
+        clearInterval(simTimer);
+        if (!P.simulate) return;
+        simTimer = setInterval(() => {
+            if (target >= 0.999) { clearInterval(simTimer); return; }
+            const step = (P.stepMin || 0.02) + Math.random() * ((P.stepMax || 0.07) - (P.stepMin || 0.02));
+            setTarget(Math.min(1, target + step));
+        }, P.intervalMs || 380);
+    }
+    window.addEventListener('message', e => {
+        const d = e.data || {};
+        if (d.eventName === 'loadProgress') {
+            if (!realProgress) takeOverProgress(d.loadFraction);
+            setTarget(realToBar(d.loadFraction));
+        } else if (d.eventName === 'onLogLine' && d.message) {
+            const P = CFG.progress || {};
+            setStatus(d.message, P.logHoldMs != null ? P.logHoldMs : 2500);
+        } else if (d.eventName === 'serverStats') {
+            lastStats = d;
+            updateStatusChip(d);
+            const sn = typeof d.serverName === 'string' ? d.serverName.trim() : '';
+            if (sn && sn !== liveServerName) {
+                liveServerName = sn;
+                if (booted && wantsLiveTitle()) guard(applyBrand);
+            }
+        } else if (d.eventName === 'setPlayerName') {
+            pendingName = d.name || '';
+            if (typeof window.__lrrSetName === 'function') window.__lrrSetName(pendingName);
+        } else if (d.eventName === 'serverContent') {
+            if (Array.isArray(d.news)) serverNews = d.news;
+            if (Array.isArray(d.tips)) serverTips = d.tips;
+            if (booted) { guard(applyInfoPanel); guard(applyTips); }
+        } else if (d.eventName === 'rulesGate') {
+            guard(() => showGate(d.version));
+        } else if (d.eventName === 'rulesAccepted' || d.eventName === 'rulesGateOff') {
+            guard(hideGate);
+        } else if (d.eventName === 'storedVolume') {
+            if (rememberVolume && !volumeTouched) guard(() => setVolume(Number(d.volume), false));
+        } else if (d.eventName === 'fadeOut') {
+            fadeOut(Number(d.durationMs) > 0 ? Number(d.durationMs) : 600);
+        }
+    });
+
+    /* ============================================================
+     * Fade out — sent by bridge/handover.lua right before the screen
+     * is shut down (loadscreen_manual_shutdown). The page dims and the
+     * music ramps to silence, so the NUI is already gone visually by
+     * the time it is destroyed.
+     * ============================================================ */
+    let fading = false;
+    function fadeOut(ms) {
+        if (fading) return;
+        fading = true;
+        clearInterval(simTimer);
+        document.body.style.transition = `opacity ${ms}ms var(--lr-ease-in)`;
+        document.body.style.opacity = '0';
+        const video = document.getElementById('bgVideo');
+        const from = userVolume;
+        const t0 = performance.now();
+        const ramp = () => {
+            const k = Math.min(1, (performance.now() - t0) / ms);
+            applyVolume(Math.max(0, from * (1 - k)));
+            if (k < 1) { requestAnimationFrame(ramp); return; }
+            if (audioEl) audioEl.pause();
+            try { video.pause(); } catch {}
+        };
+        requestAnimationFrame(ramp);
+    }
+
+    /* ============================================================
+     * Particles canvas (rising dots)
+     * ============================================================ */
+    function startParticles() {
+        const P = CFG.particles || {};
+        const canvas = document.getElementById('particles');
+        if (!P.enabled) { canvas.style.display = 'none'; return; }
+        const ctx = canvas.getContext('2d');
+        const palette = P.palette || [
+            { r: 220, g: 232, b: 248, weight: 0.65 },
+            { r: 150, g: 220, b: 255, weight: 0.25 },
+            { r: 200, g: 180, b: 255, weight: 0.10 }
+        ];
+        const totalWeight = palette.reduce((s, c) => s + (c.weight || 0), 0) || 1;
+
+        // Every dot is the same picture at a different size and opacity, so each
+        // palette colour is drawn once into an offscreen canvas and blitted from
+        // there. Building the gradient per dot per frame is what used to cost
+        // thousands of allocations a second while the map streams in.
+        const sizeMax = P.sizeMax || 1.5;
+        const haloMul = P.haloMultiplier || 3.5;
+        const haloOpacity = P.haloOpacity != null ? P.haloOpacity : 0.45;
+        const SUPERSAMPLE = 4;
+        const spriteRadius = Math.max(1, Math.ceil(sizeMax * haloMul * SUPERSAMPLE));
+        const sprites = palette.map(c => {
+            const s = document.createElement('canvas');
+            s.width = s.height = spriteRadius * 2;
+            const sctx = s.getContext('2d');
+            const mid = spriteRadius;
+            const grad = sctx.createRadialGradient(mid, mid, 0, mid, mid, spriteRadius);
+            grad.addColorStop(0, `rgba(${c.r},${c.g},${c.b},${haloOpacity})`);
+            grad.addColorStop(1, `rgba(${c.r},${c.g},${c.b},0)`);
+            sctx.fillStyle = grad;
+            sctx.fillRect(0, 0, s.width, s.height);
+            sctx.fillStyle = `rgb(${c.r},${c.g},${c.b})`;
+            sctx.beginPath();
+            sctx.arc(mid, mid, spriteRadius / haloMul, 0, Math.PI * 2);
+            sctx.fill();
+            return s;
+        });
+        function pickSprite() {
+            const r = Math.random() * totalWeight;
+            let acc = 0;
+            for (let i = 0; i < palette.length; i++) {
+                acc += (palette[i].weight || 0);
+                if (r <= acc) return sprites[i];
+            }
+            return sprites[0];
+        }
+
+        let w = 0, h = 0, dpr = 1, parts = [];
+
+        function resize() {
+            dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+            w = canvas.clientWidth || window.innerWidth;
+            h = canvas.clientHeight || window.innerHeight;
+            canvas.width = Math.round(w * dpr);
+            canvas.height = Math.round(h * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            const target = Math.round((w * h) / (P.density || 32000));
+            const count = Math.max(P.minCount || 30, Math.min(P.maxCount || 60, target));
+            parts = [];
+            for (let i = 0; i < count; i++) parts.push(spawn(true));
+        }
+        function spawn(initial) {
+            return {
+                x: Math.random() * w,
+                y: initial ? Math.random() * h : h + Math.random() * 30,
+                r: (P.sizeMin || 0.5) + Math.random() * ((P.sizeMax || 1.5) - (P.sizeMin || 0.5)),
+                vy: (P.speedMin || 0.12) + Math.random() * ((P.speedMax || 0.47) - (P.speedMin || 0.12)),
+                drift: (Math.random() - 0.5) * 0.12,
+                phase: Math.random() * Math.PI * 2,
+                wob: 0.2 + Math.random() * 0.4,
+                life: 0,
+                ttl: 800 + Math.random() * 1200,
+                sprite: pickSprite(),
+                alpha: (P.alphaMin || 0.18) + Math.random() * ((P.alphaMax || 0.6) - (P.alphaMin || 0.18))
+            };
+        }
+        let last = performance.now();
+        function step(now) {
+            const dt = Math.min(2.5, (now - last) / 16.67);
+            last = now;
+            ctx.clearRect(0, 0, w, h);
+            for (let i = 0; i < parts.length; i++) {
+                const p = parts[i];
+                p.life += dt;
+                p.phase += 0.008 * dt;
+                p.y -= p.vy * dt;
+                p.x += (Math.sin(p.phase) * p.wob * 0.25 + p.drift) * dt;
+                const tin = Math.min(1, p.life / 60);
+                const tout = Math.min(1, (p.ttl - p.life) / 100);
+                const yfade = Math.min(1, p.y / (h * 0.18));
+                const a = p.alpha * tin * Math.max(0, tout) * yfade;
+                if (a > 0.002) {
+                    const halo = p.r * haloMul;
+                    ctx.globalAlpha = a;
+                    ctx.drawImage(p.sprite, p.x - halo, p.y - halo, halo * 2, halo * 2);
+                }
+                if (p.y < -10 || p.life > p.ttl) parts[i] = spawn(false);
+            }
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(step);
+        }
+        window.addEventListener('resize', resize);
+        requestAnimationFrame(() => { resize(); requestAnimationFrame(step); });
+    }
+
+    /* ============================================================
+     * Dev dock (replay)
+     * ============================================================ */
+    function applyDevDock() {
+        const d = document.getElementById('dock');
+        if (!CFG.devDock) return;
+        d.classList.add('on');
+        document.getElementById('replay').onclick = () => {
+            document.querySelectorAll('.a1,.a2,.a3,.a4').forEach(el => {
+                el.style.animation = 'none'; void el.offsetHeight; el.style.animation = '';
+            });
+            realProgress = false;
+            startSimulation();
+        };
+    }
+
+    /* ============================================================
+     * Boot
+     * Every step is isolated: one bad config key may cost its own
+     * feature, never the whole loading screen.
+     * ============================================================ */
+    function guard(fn) {
+        try { fn(); } catch (e) { console.error('[lastresort_loading]', fn.name || 'step', e); }
+    }
+
+    (async function boot() {
+        guard(seedFromHandover);
+        guard(openChannel);
+        guard(applyTheme);
+        guard(applyBackground);
+        guard(applyPattern);
+        guard(applyScrim);
+        guard(applyGrain);
+        guard(applyCorners);
+        // The welcome line and the status chip are painted BEFORE the locale
+        // fetch resolves, on the built-in English fallbacks. The bridge starts
+        // pushing the player name and the live player count within the first
+        // frames, and a chip that does not exist yet has nowhere to put them —
+        // that is what used to make the numbers show up late, or not at all.
+        guard(applyBrand);
+        guard(applyStatusChip);
+        L = await loadLocale(CFG.locale || 'en');
+        guard(applyBrand);
+        guard(applyLogo);
+        guard(applyStatusChip);
+        guard(applyInfoPanel);
+        guard(applySocials);
+        guard(applyImage);
+        guard(applyVideo);
+        guard(applyMusic);
+        guard(applyTips);
+        guard(applyDevDock);
+        guard(startParticles);
+        booted = true;
+        if (pendingGate !== null) guard(() => showGate(pendingGate));
+        if (!realProgress) guard(startSimulation);
+    })();
+})();
+</script>
+</body>
+</html>

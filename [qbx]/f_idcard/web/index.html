@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="um-idcard" class="anim">
+        <div id="badge">
+            <img id="badgeimg" src="">
+            <span id="badgegrade"></span>
+        </div>
+
+        <div class="seal"></div>
+        <div class="temp-watermark" aria-hidden="true">SEMENTARA</div>
+        <div class="expired-stamp" id="expired-stamp">Kedaluwarsa</div>
+
+        <div class="topline">
+            <div class="brand">
+                <span class="brand-mark"></span>
+                <span id="lang_header" class="brand-name"></span>
+            </div>
+            <div class="doc-tag">
+                <span id="tier" class="tier-tag">Dokumen Resmi</span>
+                <span class="flag-id" aria-hidden="true"></span>
+            </div>
+        </div>
+
+        <div class="title-block">
+            <span id="cardtype" class="doc-title"></span>
+            <span id="subtitle" class="doc-subtitle"></span>
+        </div>
+
+        <div class="content">
+            <div class="icon">
+                <div class="photo-frame">
+                    <img id="mugshot" src="">
+                </div>
+                <span id="sign" class="signature"></span>
+            </div>
+            <div class="text">
+                <ul>
+                    <li>
+                        <span id="lang_firstname"></span>
+                        <span id="name" class="info"></span>
+                    </li>
+                    <li>
+                        <span id="lang_lastname"></span>
+                        <span id="lastname" class="info"></span>
+                    </li>
+                    <li>
+                        <span id="lang_dob"></span>
+                        <span id="dob" class="info"></span>
+                    </li>
+                    <li>
+                        <span id="lang_sex"></span>
+                        <span id="sex" class="info"></span>
+                    </li>
+                    <li>
+                        <span id="lang_job"></span>
+                        <span id="job" class="info"></span>
+                    </li>
+                    <li>
+                        <span id="lang_expired"></span>
+                        <span id="expired" class="info"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bar">
+            <span class="disclaimer">Kartu wajib ditunjukkan atas permintaan pihak berwenang</span>
+        </div>
+    </div>
+    <script type="module" defer src="js/main.js"></script>
+</body>
+</html>

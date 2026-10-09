@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup Pilih Karakter v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --text: #f1f3f7;
+    --muted: rgba(241, 243, 247, .55);
+    --field: rgba(255, 255, 255, .07);
+    --field-hover: rgba(255, 255, 255, .12);
+    --accent: #3f6fb5;
+    --accent-hi: #4b80cc;
+    --male: #4aa3c7;
+    --female: #d47aa6;
+    --shadow: 0 2px 10px rgba(0, 0, 0, .55);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; user-select: none; }
+body { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; color: var(--text); background: #0b0d12; }
+button, input { font: inherit; color: inherit; border: none; background: none; outline: none; }
+button { cursor: pointer; }
+
+/* ---- hanya mockup: tiruan pemandangan game + karakter ---- */
+.scene { position: fixed; inset: 0; background:
+    radial-gradient(ellipse at 50% 35%, #5d6a78 0%, #333b47 40%, #1b2028 75%),
+    #1b2028; }
+.scene::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 34%; background: linear-gradient(180deg, #6b5a40 0%, #4a3d2b 100%); opacity: .8; }
+.ped { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 420px; height: 78vh; }
+.ped .head { width: 150px; height: 190px; border-radius: 46% 46% 42% 42%; background: #b98b70; margin: 0 auto; }
+.ped .neck { width: 70px; height: 40px; background: #a87c62; margin: -6px auto 0; }
+.ped .body { width: 420px; height: 100%; border-radius: 120px 120px 0 0; background: linear-gradient(90deg, #8d8d8d 0 17%, #2a2fa0 17% 83%, #8d8d8d 83%); }
+.demo { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 9; background: #000b; padding: 6px; border-radius: 10px; font-size: 12px; font-family: 'Segoe UI', Arial; }
+.demo span { padding: 5px 4px; opacity: .7; }
+.demo button { padding: 5px 10px; border-radius: 7px; background: #ffffff14; }
+.demo button.on { background: #e7c36a; color: #1a1406; font-weight: 700; }
+/* --------------------------------------------------------- */
+
+/* gelap di pinggir layar supaya teks terbaca (CSS saja, ringan) */
+.vignette { position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 55%, transparent 45%, rgba(0, 0, 0, .55) 100%),
+                linear-gradient(180deg, rgba(0, 0, 0, .45) 0%, transparent 28%); }
+
+/* ---------- slot karakter (atas) ---------- */
+.slots { position: fixed; top: 9vh; left: 0; right: 0; display: flex; justify-content: center; gap: 7vw; }
+.slot { min-width: 200px; text-align: center; opacity: .5; transition: opacity .2s, transform .2s; text-shadow: var(--shadow); }
+.slot:hover { opacity: .8; }
+.slot.active { opacity: 1; }
+.slot .first { display: block; font-size: 30px; font-weight: 300; letter-spacing: 1px; line-height: 1.1; text-transform: uppercase; }
+.slot .last { display: block; font-size: 44px; font-weight: 700; letter-spacing: 1px; line-height: 1.05; text-transform: uppercase; }
+.slot .sex { display: inline-block; margin-top: 10px; font-size: 20px; color: var(--male); }
+.slot .sex.f { color: var(--female); }
+.slot.plus { display: grid; place-items: center; height: 120px; }
+.slot.plus .p { width: 52px; height: 52px; border-radius: 10px; background: rgba(0, 0, 0, .35); display: grid; place-items: center; font-size: 30px; font-weight: 300; }
+.slot.plus.active .p { background: rgba(255, 255, 255, .12); }
+
+/* ---------- kiri: info detail ---------- */
+.side { position: fixed; top: 50%; transform: translateY(-38%); width: 300px; }
+.side.left { left: 5vw; }
+.side.right { right: 5vw; }
+.title { font-size: 14px; font-weight: 600; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 16px; text-shadow: var(--shadow); }
+.side.right .title { text-align: right; }
+
+.info { display: flex; flex-direction: column; gap: 8px; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 6px; background: var(--field); font-size: 13px; }
+.row span { color: var(--muted); }
+.row b { font-weight: 500; text-align: right; }
+.row b.money { color: #7ee2a0; }
+
+/* ---------- kanan: lokasi spawn / form ---------- */
+.locs { display: flex; flex-direction: column; gap: 8px; }
+.loc { display: flex; align-items: center; gap: 10px; padding: 10px 12px 10px 14px; border-radius: 6px; background: var(--field); text-align: left; transition: background .15s; }
+.loc:hover { background: var(--field-hover); }
+.loc.active { background: var(--accent); }
+.loc .txt { flex: 1; min-width: 0; }
+.loc b { display: block; font-size: 13px; font-weight: 500; }
+.loc small { display: block; font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.loc.active small { color: rgba(255, 255, 255, .75); }
+.ico { width: 38px; height: 38px; border-radius: 6px; background: rgba(0, 0, 0, .25); display: grid; place-items: center; font-size: 16px; flex-shrink: 0; }
+
+.btn { display: block; margin: 22px 0 0 auto; padding: 12px 40px; border-radius: 6px; background: var(--field-hover); font-size: 14px; font-weight: 500; transition: background .15s; }
+.btn:hover { background: var(--accent-hi); }
+
+.form { display: flex; flex-direction: column; gap: 10px; }
+.field { display: flex; gap: 8px; }
+.field input, .field .seg { flex: 1; padding: 11px 14px; border-radius: 6px; background: var(--field); font-size: 13px; }
+.field input::placeholder { color: var(--muted); }
+.field .ico { width: 44px; height: 44px; background: var(--field); }
+.seg { display: flex; padding: 0 !important; background: none !important; gap: 8px; }
+.seg button { flex: 1; padding: 11px; border-radius: 6px; font-size: 13px; color: var(--muted); }
+.seg button.on { background: var(--accent); color: var(--text); }
+.hint { font-size: 11px; color: var(--muted); text-align: right; margin-top: 6px; text-shadow: var(--shadow); }
+</style>
+</head>
+<body>
+<div class="scene"></div>
+<div class="ped"><div class="head"></div><div class="neck"></div><div class="body"></div></div>
+<div class="vignette"></div>
+
+<div class="slots" id="slots"></div>
+<div class="side left" id="left"></div>
+<div class="side right" id="right"></div>
+
+<div class="demo">
+    <span>Mockup:</span>
+    <button data-mode="player1" class="on">Pemain (punya karakter)</button>
+    <button data-mode="player0">Pemain baru</button>
+    <button data-mode="admin">Admin (3 slot)</button>
+</div>
+
+<script>
+const CHARS = [
+    { cid: 'ED3UIWMB', first: 'Sora', last: 'Damn', sex: 'm', birth: '12-04-1998', nat: 'Indonesia', job: 'Mekanik', grade: 'Karyawan', gang: 'crew_1', bank: 1250000, cash: 85000, phone: '0812-3456-7890', lastLoc: 'Alta St, Pillbox Hill', house: 'Rumah Vinewood 12' },
+    { cid: 'K96OT27X', first: 'Ayu', last: 'Lestari', sex: 'f', birth: '30-09-2001', nat: 'Indonesia', job: 'EMS', grade: 'Perawat', gang: '-', bank: 320000, cash: 15000, phone: '0813-1111-2222', lastLoc: 'Great Ocean Hwy, Paleto Bay', house: null },
+];
+const SPAWNS = [{ label: 'Legion Square', area: 'Vespucci Blvd, Pillbox Hill' }, { label: 'Paleto Bay', area: 'Paleto Blvd, Paleto Bay' }];
+const rp = (n) => 'Rp ' + n.toLocaleString('id-ID');
+let mode = 'player1', sel = 0, loc = 0, sex = 'm';
+
+function own() { return mode === 'player0' ? [] : mode === 'player1' ? CHARS.slice(0, 1) : CHARS; }
+function maxSlots() { return mode === 'admin' ? 3 : 1; }
+
+function renderSlots() {
+    const list = own(), max = maxSlots();
+    let html = list.map((c, i) => `<button class="slot ${i === sel ? 'active' : ''}" data-i="${i}">
+        <span class="first">${c.first}</span><span class="last">${c.last}</span>
+        <span class="sex ${c.sex === 'f' ? 'f' : ''}">${c.sex === 'f' ? '♀' : '♂'}</span></button>`).join('');
+    for (let i = list.length; i < max; i++) html += `<button class="slot plus ${i === sel ? 'active' : ''}" data-i="${i}"><span class="p">+</span></button>`;
+    document.getElementById('slots').innerHTML = html;
+}
+
+function renderSides() {
+    const c = own()[sel];
+    const L = document.getElementById('left'), R = document.getElementById('right');
+    if (!c) {
+        L.innerHTML = '';
+        R.innerHTML = `<div class="title">Karakter Baru</div>
+        <div class="form">
+            <div class="field"><div class="seg"><button data-sex="m" class="${sex === 'm' ? 'on' : ''}">Laki-laki</button><button data-sex="f" class="${sex === 'f' ? 'on' : ''}">Perempuan</button></div><div class="ico">⚥</div></div>
+            <div class="field"><input placeholder="Nama depan"><div class="ico">👤</div></div>
+            <div class="field"><input placeholder="Nama belakang"><div class="ico">👤</div></div>
+            <div class="field"><input placeholder="dd/mm/yyyy"><div class="ico">📅</div></div>
+            <div class="field"><input placeholder="Kewarganegaraan" value="Indonesia"><div class="ico">🌐</div></div>
+        </div>
+        <button class="btn">Buat Karakter</button>
+        <div class="hint">Karakter baru langsung muncul di City Hall</div>`;
+        return;
+    }
+    L.innerHTML = `<div class="title">Informasi</div>
+        <div class="info">
+            <div class="row"><span>Citizen ID</span><b>${c.cid}</b></div>
+            <div class="row"><span>Tanggal Lahir</span><b>${c.birth}</b></div>
+            <div class="row"><span>Kewarganegaraan</span><b>${c.nat}</b></div>
+            <div class="row"><span>Pekerjaan</span><b>${c.job} · ${c.grade}</b></div>
+            <div class="row"><span>Gang</span><b>${c.gang}</b></div>
+            <div class="row"><span>Telepon</span><b>${c.phone}</b></div>
+            <div class="row"><span>Bank</span><b class="money">${rp(c.bank)}</b></div>
+            <div class="row"><span>Cash</span><b class="money">${rp(c.cash)}</b></div>
+        </div>`;
+    const locs = [{ label: 'Lokasi Terakhir', area: c.lastLoc, ic: '📍' }, ...SPAWNS.map((s) => ({ ...s, ic: '🏙️' }))];
+    if (c.house) locs.push({ label: c.house, area: 'Rumah milikmu', ic: '🏠' });
+    if (loc >= locs.length) loc = 0;
+    R.innerHTML = `<div class="title">Lokasi Spawn</div>
+        <div class="locs">${locs.map((l, i) => `<button class="loc ${i === loc ? 'active' : ''}" data-l="${i}"><div class="txt"><b>${l.label}</b><small>${l.area}</small></div><div class="ico">${l.ic}</div></button>`).join('')}</div>
+        <button class="btn">Main</button>`;
+}
+
+function render() { renderSlots(); renderSides(); }
+
+document.getElementById('slots').addEventListener('click', (e) => {
+    const b = e.target.closest('.slot'); if (!b) return;
+    sel = Number(b.dataset.i); loc = 0; render();
+});
+document.getElementById('right').addEventListener('click', (e) => {
+    const l = e.target.closest('.loc'); if (l) { loc = Number(l.dataset.l); renderSides(); return; }
+    const s = e.target.closest('[data-sex]'); if (s) { sex = s.dataset.sex; renderSides(); }
+});
+document.querySelector('.demo').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    mode = b.dataset.mode; sel = 0; loc = 0;
+    document.querySelectorAll('.demo button').forEach((x) => x.classList.toggle('on', x === b));
+    render();
+});
+render();
+</script>
+</body>
+</html>

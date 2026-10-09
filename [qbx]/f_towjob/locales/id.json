@@ -1,0 +1,40 @@
+{
+    "error": {
+        "finish_work": "Selesaikan semua pekerjaanmu dulu",
+        "vehicle_not_correct": "Ini bukan kendaraan yang benar",
+        "failed": "Kamu gagal",
+        "not_towing_vehicle": "Kamu harus berada di truk derekmu",
+        "too_far_away": "Kamu terlalu jauh",
+        "no_work_done": "Kamu belum mengerjakan apa pun",
+        "no_deposit": "Butuh deposit Rp %s"
+    },
+    "success": {
+        "paid_with_cash": "Deposit Rp %s dibayar tunai",
+        "paid_with_bank": "Deposit Rp %s dibayar dari bank",
+        "refund_to_cash": "Deposit Rp %s dikembalikan tunai",
+        "you_earned": "Kamu mendapat Rp %s"
+    },
+    "menu": {
+        "header": "Truk Tersedia",
+        "close_menu": "⬅ Tutup Menu"
+    },
+    "mission": {
+        "delivered_vehicle": "Kamu sudah mengantar kendaraan",
+        "get_new_vehicle": "Kendaraan baru bisa dijemput",
+        "towing_vehicle": "Menaikkan kendaraan...",
+        "goto_depot": "Bawa kendaraan ke Depo Hayes",
+        "vehicle_towed": "Kendaraan sudah diderek",
+        "untowing_vehicle": "Turunkan kendaraan",
+        "vehicle_takenoff": "Kendaraan sudah diturunkan"
+    },
+    "info": {
+        "tow": "Naikkan mobil ke bak truk derekmu",
+        "toggle_npc": "Nyalakan/matikan job NPC",
+        "skick": "Percobaan exploit"
+    },
+    "label": {
+        "payslip": "Slip Gaji",
+        "vehicle": "Kendaraan",
+        "npcz": "Zona NPC"
+    }
+}

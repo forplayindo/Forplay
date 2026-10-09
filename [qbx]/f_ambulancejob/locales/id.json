@@ -1,0 +1,89 @@
+{
+    "error": {
+        "canceled": "Dibatalkan",
+        "impossible": "Tidak bisa dilakukan...",
+        "no_player": "Tidak ada pemain di dekatmu",
+        "no_firstaid": "Kamu butuh First Aid Kit",
+        "no_bandage": "Kamu butuh perban",
+        "beds_taken": "Semua kasur sedang terisi...",
+        "possessions_taken": "Semua barangmu telah diambil...",
+        "cant_help": "Kamu tidak bisa menolong orang ini...",
+        "not_ems": "Kamu bukan EMS atau belum on duty"
+    },
+    "success": {
+        "revived": "Kamu menghidupkan seseorang",
+        "healthy_player": "Pemain dalam kondisi sehat",
+        "helped_player": "Kamu menolong orang itu",
+        "being_helped": "Kamu sedang ditolong..."
+    },
+    "info": {
+        "bill_paid": "Biaya administrasi Rp %s dibayar ke %s. Cek email untuk rincian tagihan.",
+        "civ_died": "Warga Meninggal",
+        "civ_down": "Warga Tumbang",
+        "civ_call": "Panggilan Warga",
+        "ems_down": "Dokter %s Tumbang",
+        "respawn_txt": "RESPAWN DALAM: ~r~%s~s~ DETIK",
+        "respawn_revive": "TAHAN [~r~E~s~] SELAMA %s DETIK UNTUK RESPAWN SEHARGA Rp ~r~%s~s~",
+        "bleed_out": "KAMU KEHABISAN DARAH DALAM: ~r~%s~s~ DETIK",
+        "bleed_out_help": "KAMU KEHABISAN DARAH DALAM: ~r~%s~s~ DETIK, KAMU MASIH BISA DITOLONG",
+        "request_help": "TEKAN [~r~G~s~] UNTUK MINTA BANTUAN",
+        "help_requested": "PETUGAS EMS SUDAH DIBERI TAHU",
+        "amb_plate": "AMBU",
+        "heli_plate": "LIFE",
+        "status": "Cek Kondisi",
+        "is_status": "Sedang %s",
+        "healthy": "Kamu sudah sehat sepenuhnya!",
+        "safe": "Brankas Rumah Sakit",
+        "ems_alert": "Peringatan EMS - %s",
+        "mr": "Bpk.",
+        "mrs": "Ibu",
+        "dr_needed": "Dokter dibutuhkan di Rumah Sakit Pillbox",
+        "dr_alert": "Dokter sudah diberi tahu",
+        "ems_report": "Laporan EMS",
+        "message_sent": "Pesan yang akan dikirim",
+        "check_health": "Cek Kesehatan Pemain",
+        "heal_player": "Obati Pemain",
+        "revive_player": "Hidupkan Pemain"
+    },
+    "mail": {
+        "sender": "Rumah Sakit Pillbox",
+        "subject": "Biaya Rumah Sakit",
+        "message": "Yth. %s %s, <br /><br />Berikut rincian biaya kunjungan terakhir Anda ke rumah sakit.<br />Total biaya: <strong>Rp %s</strong><br /><br />Semoga lekas sembuh!"
+    },
+    "menu": {
+        "amb_vehicles": "Kendaraan Ambulans",
+        "status": "Kondisi Kesehatan"
+    },
+    "text": {
+        "pstash_button": "[E] - Penyimpanan pribadi",
+        "pstash": "Penyimpanan pribadi",
+        "onduty_button": "[E] - Mulai Bertugas",
+        "offduty_button": "[E] - Selesai Bertugas",
+        "duty": "Mulai/Selesai Bertugas",
+        "armory_button": "[E] - Gudang Peralatan",
+        "armory": "Gudang Peralatan",
+        "veh_button": "[E] - Ambil / Simpan Kendaraan",
+        "elevator_roof": "[E] - Naik lift ke atap",
+        "elevator_main": "[E] - Turun lift",
+        "el_roof": "Naik lift ke atap",
+        "el_main": "Turun lift ke lantai utama",
+        "call_doc": "[E] - Panggil dokter",
+        "call": "Panggil",
+        "check_in": "[E] Daftar",
+        "check": "Daftar",
+        "lie_bed": "[E] - Berbaring di kasur",
+        "bed": "Berbaring di kasur",
+        "put_bed": "Baringkan warga di kasur",
+        "bed_out": "[E] - Bangun dari kasur..",
+        "bed_out_paid": "[E] - Bangun dari kasur (biaya administrasi Rp %s)",
+        "alert": "Peringatan!"
+    },
+    "progress": {
+        "ifaks": "Memakai ifak...",
+        "bandage": "Memakai perban...",
+        "painkillers": "Minum obat pereda nyeri...",
+        "revive": "Menghidupkan orang...",
+        "healing": "Mengobati luka...",
+        "checking_in": "Mendaftar..."
+    }
+}

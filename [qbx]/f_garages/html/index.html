@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_garages</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="panel" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo">🅿️</span><div><h1>Kelola Garasi</h1><small id="sub"></small></div></div>
+            <div class="head-actions">
+                <button class="pill accent" id="add-btn">＋ Garasi Baru</button>
+                <button class="icon-btn close" data-close>✕</button>
+            </div>
+        </header>
+
+        <div class="toolbar">
+            <nav class="tabs" id="tabs">
+                <button data-tab="all" class="active">Semua</button>
+                <button data-tab="editor">Buatan Editor</button>
+                <button data-tab="builtin">Bawaan</button>
+            </nav>
+            <input id="search" placeholder="Cari nama garasi / job / gang...">
+        </div>
+        <div id="msg" class="banner hidden"></div>
+        <main id="list" class="list"></main>
+
+        <aside id="sheet" class="sheet hidden">
+            <div class="sheet-head"><h2 id="sheet-title">Garasi Baru</h2><button class="icon-btn" id="sheet-close">✕</button></div>
+            <div class="sheet-body">
+                <label>Nama garasi</label>
+                <input id="f-label" maxlength="40" placeholder="Contoh: Parkiran Mirror Park">
+
+                <label>Jenis kendaraan</label>
+                <div class="seg" id="f-vtype">
+                    <button data-v="car" class="active">🚗 Mobil</button>
+                    <button data-v="air">🚁 Udara</button>
+                    <button data-v="sea">🚤 Laut</button>
+                </div>
+
+                <label>Fungsi</label>
+                <div class="seg" id="f-depot">
+                    <button data-v="0" class="active">Garasi</button>
+                    <button data-v="1">Tempat Sitaan</button>
+                </div>
+                <small class="hint" id="depot-hint">Garasi: parkir & ambil kendaraan sendiri.</small>
+
+                <label>Pemilik</label>
+                <div class="seg" id="f-gtype">
+                    <button data-v="public" class="active">Umum</button>
+                    <button data-v="job">Job</button>
+                    <button data-v="gang">Gang</button>
+                </div>
+                <select id="f-group" class="hidden"></select>
+                <div id="grade-box" class="hidden">
+                    <label>Grade minimal</label>
+                    <div class="seg grades" id="f-grade"></div>
+                </div>
+                <div id="shared-row" class="check hidden">
+                    <input type="checkbox" id="f-shared"><label for="f-shared">Kendaraan bersama (semua anggota bisa ambil semua kendaraan)</label>
+                </div>
+
+                <label>Tinggi zona (meter)</label>
+                <input id="f-height" type="number" min="2" max="40" step="0.5">
+
+                <div class="mark">
+                    <div><b>Area garasi</b><small id="area-info">Belum ditandai</small></div>
+                    <button class="pill" id="mark-area">Tandai Area</button>
+                </div>
+                <div class="mark">
+                    <div><b>Titik keluar kendaraan</b><small id="spawn-info">Belum ditandai</small></div>
+                    <button class="pill" id="mark-spawn">Tandai Titik Keluar</button>
+                </div>
+                <div class="note">Area: jalan ke tiap sudut lalu tekan <b>E</b>, atau bidik dan <b>klik kiri</b>. Titik keluar: parkir kendaraan menghadap arah keluar lalu tekan <b>G</b>.</div>
+            </div>
+            <div class="sheet-foot">
+                <div id="sheet-msg" class="msg hidden"></div>
+                <button id="save-btn" class="primary">Simpan &amp; Aktifkan</button>
+            </div>
+        </aside>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

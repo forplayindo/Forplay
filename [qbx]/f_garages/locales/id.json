@@ -1,0 +1,32 @@
+{
+    "error": {
+        "no_space": "Semua tempat keluar kendaraan sedang terisi, tunggu sebentar.",
+        "no_access": "Kamu tidak punya akses ke garasi ini",
+        "no_vehicles": "Kamu tidak punya kendaraan di lokasi ini...",
+        "not_impound": "Kendaraanmu tidak sedang disita",
+        "not_owned": "Kendaraan ini tidak bisa disimpan",
+        "not_correct_type": "Jenis kendaraan ini tidak bisa disimpan di sini",
+        "not_enough": "Uang tidak cukup",
+        "vehicle_occupied": "Kendaraan ini tidak bisa disimpan karena masih ada penumpang",
+        "in_vehicle": "Kamu sudah di dalam kendaraan...",
+        "spawn_failed": "Terjadi kesalahan saat mengeluarkan kendaraan",
+        "spawn_in_progress": "Tunggu, kendaraanmu sedang diantar..."
+    },
+    "success": {
+        "vehicle_parked": "Kendaraan disimpan"
+    },
+    "menu": {
+        "information": "Informasi",
+        "description": "Nama: %s\nPlat: %s\nBiaya tebus: Rp %s",
+        "body": "Bodi",
+        "engine": "Mesin",
+        "fuel": "Bensin",
+        "take_out": "Keluarkan",
+        "veh_impounded": "Kendaraanmu disita oleh polisi"
+    },
+    "info": {
+        "car_e": "E - Buka Garasi",
+        "park_e": "E - Simpan Kendaraan",
+        "impound_e": "E - Buka Penyitaan"
+    }
+}

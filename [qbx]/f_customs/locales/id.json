@@ -1,0 +1,96 @@
+{
+    "notifications": {
+        "success": {
+            "repaired": "Kendaraan sudah diperbaiki!",
+            "paid": "Kamu membayar Rp %s dari rekening bank"
+        },
+        "error": {
+            "money": "Uangmu tidak cukup!",
+            "alreadyInstalled": "Modifikasi ini sudah terpasang"
+        },
+        "inform": {
+            "carNoPerformanceUpgrades": "Kendaraan ini tidak punya upgrade performa"
+        },
+        "props": {
+            "installTitle": "Bengkel Modifikasi"
+        }
+    },
+    "dragCam": {
+        "zoomIn": "Perbesar",
+        "zoomOut": "Perkecil",
+        "toggleDoors": "Buka/tutup pintu",
+        "changeView": "Tampilan orang pertama"
+    },
+    "textUI": {
+        "tune":  "Tekan [E] untuk memodifikasi mobilmu"
+    },
+    "menus": {
+        "main": {
+            "title": "Popcorn Customs",
+            "repair": "Perbaiki",
+            "performance": "Performa",
+            "parts": "Kosmetik - Part",
+            "colors": "Kosmetik - Warna",
+            "extras": "Extra"
+        },
+        "colors": {
+            "primary": "Cat utama",
+            "secondary": "Cat kedua",
+            "neon": "Neon",
+            "cosmetics_colors": "Kosmetik - Warna"
+        },
+        "neon": {
+            "title": "Neon",
+            "neon": "Neon %s%s",
+            "color": "Warna neon",
+            "installed": "Neon %s terpasang"
+        },
+        "paint": {
+            "title": "Kosmetik - Warna",
+            "primary": "Cat utama",
+            "secondary": "Cat kedua"
+        },
+        "parts": {
+            "title": "Kosmetik - Part",
+            "wheels": "Velg"
+        },
+        "performance": {
+            "title": "Performa",
+            "turbo": "Turbo"
+        },
+        "wheels": {
+            "title": "Velg",
+            "bikeRear": "Velg belakang motor",
+            "installed": "%s %s terpasang"
+        },
+        "options": {
+            "interior": "Interior",
+            "livery": "Livery",
+            "pearlescent": "Pearl",
+            "plateIndex": {
+                "title": "Gaya Plat",
+                "installed": "Plat %s terpasang"
+            },
+            "tyreSmoke": "Asap ban",
+            "wheelColor": "Warna velg",
+            "windowTint": {
+                "title": "Kaca Film",
+                "installed": "Kaca film %s terpasang"
+            },
+            "xenon": {
+                "title": "Xenon",
+                "installed": "Xenon %s terpasang"
+            }
+        },
+        "general": {
+            "stock": "Standar",
+            "enabled": "Aktif",
+            "disabled": "Nonaktif",
+            "installed": "%s terpasang",
+            "applied": "%s diterapkan"
+        }
+    },
+    "general": {
+        "payReason": "Modifikasi"
+    }
+}

@@ -1,0 +1,72 @@
+{
+    "notify": {
+        "no_access": "Tidak punya akses.",
+        "someone_at_door": "Ada orang di depan pintumu!",
+        "keyholder": " ditambahkan sebagai pemegang kunci.",
+        "added_as_keyholder": "Kamu ditambahkan sebagai pemegang kunci.",
+        "removed_as_keyholder": " dihapus dari pemegang kunci."
+    },
+    "alert": {
+        "give_keys": "Berikan kunci ke orang ini?",
+        "apartment_selection": "Pilih Apartemen",
+        "are_you_sure": "Yakin ingin mengambil %s?",
+        "want_remove_keys": "Cabut kunci dari orang ini?",
+        "want_let_person_in": "Izinkan orang ini masuk?",
+        "property_name": "Nama Properti",
+        "property_name_description": "Nama singkat properti",
+        "price": "Harga",
+        "price_description": "Harga beli atau biaya sewa yang dipotong",
+        "rent_interval": "Interval sewa",
+        "rent_interval_description": "Interval pemotongan biaya sewa dalam jam (membuat properti disewakan, bukan dijual)",
+        "add_garage": "Tambah Garasi"
+    },
+    "menu": {
+        "add_keyholder": "Tambah Pemegang Kunci",
+        "people_inside": "Orang di Dalam",
+        "keyholders": "Pemegang Kunci",
+        "doorbell_ringers": "Yang Membunyikan Bel",
+        "manage_keys": "Kelola Kunci",
+        "doorbell": "Bel Pintu",
+        "manage_property": "Kelola Properti",
+        "enter": "Masuk",
+        "ring_doorbell": "Bunyikan Bel",
+        "properties": "Properti",
+        "retrieve_properties": "Lihat Properti Milikmu",
+        "show_owned_properties": "Hanya tampilkan properti milikmu",
+        "interior_preview": "Pratinjau Interior",
+        "start_decorating": "Mulai Mendekorasi",
+        "decorating_categories": "Kategori"
+    },
+    "instructButtons": {
+        "up": "Naik",
+        "down": "Turun",
+        "submit": "Simpan"
+    },
+    "keyMappings": {
+        "gizmo_translation": "Mode geser",
+        "gizmo_rotation": "Mode putar",
+        "gizmo_select": "Pilih objek yang disorot",
+        "gizmo_local": "Gizmo mengikuti arah objek"
+    },
+    "drawtext": {
+        "stash": "[E] - Penyimpanan",
+        "exit": "[E] - Keluar | [G] - Kelola",
+        "clothing": "[E] - Pakaian | [G] - Outfit",
+        "logout": "[E] - Logout",
+        "view_property": "[E] - Lihat Properti"
+    },
+    "logs": {
+        "create_property": "Mencoba membuat properti.",
+        "property_created": "Properti %s berhasil dibuat.",
+        "enter_property": "Pemain %s masuk ke properti %s.",
+        "exit_property": "Pemain %s keluar dari properti id %s.",
+        "apartment_selected": "Pemain %s memilih apartemen %s %s.",
+        "added_keyholder": "%s ditambahkan sebagai pemegang kunci properti %s.",
+        "removed_keyholder": "%s dihapus dari pemegang kunci properti %s.",
+        "rent_property": "Pemain %s menyewa properti %s.",
+        "buy_property": "Pemain %s membeli properti %s.",
+        "stop_renting": "Pemain %s berhenti menyewa properti %s.",
+        "add_decoration": "Pemain %s menambahkan dekorasi %s ke properti %s.",
+        "remove_decoration": "Pemain %s menghapus dekorasi %s dari properti %s."
+    }
+}

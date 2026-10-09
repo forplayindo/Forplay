@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_cafe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- MENU PELANGGAN -->
+    <div id="menu" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo">☕</span><div><h1 id="m-title">Cafe</h1><small id="m-sub">Pilih menu favoritmu</small></div></div>
+            <div class="head-actions">
+                <button id="cart-btn" class="icon-btn" title="Keranjang">
+                    <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM6.2 6l.9 2H20a1 1 0 0 1 .9 1.4l-3.2 6A2 2 0 0 1 16 16.5H8.1a2 2 0 0 1-1.8-1.2L3.4 4H2V2h2.7a1 1 0 0 1 .9.6L6.2 6Z"/></svg>
+                    <span id="cart-count" class="badge hidden">0</span>
+                </button>
+                <button class="icon-btn close" data-close>✕</button>
+            </div>
+        </header>
+        <div id="m-banner" class="banner hidden"></div>
+        <nav class="tabs" id="tabs">
+            <button data-tab="all" class="active">All</button>
+            <button data-tab="promo">Promo</button>
+            <button data-tab="food">Makanan</button>
+            <button data-tab="drink">Minuman</button>
+        </nav>
+        <main id="grid" class="grid"></main>
+
+        <aside id="cart" class="cart hidden">
+            <div class="cart-head"><h2>Keranjang</h2><button class="icon-btn" id="cart-close">✕</button></div>
+            <div id="cart-list" class="cart-list"></div>
+            <div class="cart-foot">
+                <div class="total"><span>Total</span><strong id="cart-total">Rp 0</strong></div>
+                <div class="methods">
+                    <button data-method="cash" class="active">💵 Cash</button>
+                    <button data-method="transfer">📱 Transfer</button>
+                </div>
+                <div id="cart-msg" class="msg hidden"></div>
+                <button id="order-btn" class="primary">Order</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- LIST PEMESANAN KARYAWAN -->
+    <div id="orders" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo">🧾</span><div><h1>List Pemesanan</h1><small id="o-sub">Pesanan yang sudah dibayar</small></div></div>
+            <div class="head-actions">
+                <button class="icon-btn" id="o-refresh" title="Refresh">⟳</button>
+                <button class="icon-btn close" data-close>✕</button>
+            </div>
+        </header>
+        <main id="o-list" class="orders"></main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

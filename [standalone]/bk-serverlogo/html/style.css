@@ -1,0 +1,45 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    background: transparent;
+}
+
+#server-logo {
+    position: fixed;
+    top: 2.5vh;
+    right: 1.0vw;
+
+    width: 80px;
+    height: 80px;
+
+    display: none;
+
+    z-index: 9999;
+    pointer-events: none;
+}
+
+#server-logo img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    animation: serverLogoSpin 6s linear infinite;
+
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes serverLogoSpin {
+    from {
+        transform: rotateY(0deg);
+    }
+
+    to {
+        transform: rotateY(360deg);
+    }
+}

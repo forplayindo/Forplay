@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Tab Kustom</title>
+<link rel="stylesheet" href="../html/style.css">
+<style>
+/* mockup: latar dunia game */
+html, body { height: 100%; background: radial-gradient(ellipse at 50% 60%, #333d48 0%, #1a2129 50%, #0b0f14 100%); }
+
+/* tab kustom (akan masuk ke html/style.css) */
+.order { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.order .top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.order .code { font-weight: 800; color: var(--accent); }
+.order .who { flex: 1; font-weight: 600; }
+.order .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.order .meta div { background: #0b1219; border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; }
+.order .meta small { display: block; text-transform: uppercase; letter-spacing: .08em; font-size: 9.5px; }
+.plate { font-family: Consolas, monospace; font-weight: 700; font-size: 11px; padding: 1px 6px; background: #f3f4f6; color: #111; border-radius: 4px; border: 2px solid #1e3a8a; }
+.mod { display: flex; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.mod .ic { width: 28px; height: 28px; border-radius: 8px; background: #0b1219; border: 1px solid var(--line); display: grid; place-items: center; font-size: 14px; }
+.mod .tx { flex: 1; } .mod .tx b { display: block; font-size: 12.5px; } .mod .tx small { display: block; }
+.mod .arrow { color: var(--muted); font-size: 11px; }
+.mod .arrow b { color: var(--accent); }
+.mod .sw { width: 14px; height: 14px; border-radius: 4px; display: inline-block; vertical-align: -2px; box-shadow: inset 0 0 0 1px #fff3; margin-left: 4px; }
+.mod.done { border-color: rgba(34,197,94,.35); } .mod.done .ic { border-color: rgba(34,197,94,.4); }
+.warnbox { padding: 10px 12px; border-radius: 10px; font-size: 12px; border: 1px solid; }
+.warnbox.orange { background: rgba(249,115,22,.08); border-color: rgba(249,115,22,.35); color: #fdba74; }
+.warnbox.blue { background: rgba(59,130,246,.08); border-color: rgba(59,130,246,.35); color: #93c5fd; }
+.warnbox b { display: block; margin-bottom: 2px; }
+.req { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+.req div { display: flex; gap: 8px; align-items: center; } .req .ok { color: var(--c1); } .req .no { color: #fca5a5; }
+.tag { font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 5px; text-transform: uppercase; letter-spacing: .06em; }
+.tag.paid { background: rgba(34,197,94,.14); color: #86efac; }
+.tag.unpaid { background: rgba(249,115,22,.14); color: #fdba74; }
+.tag.wait { background: rgba(59,130,246,.15); color: #93c5fd; }
+footer.one { grid-template-columns: 1fr; }
+
+/* simulasi progressbar ox_lib (in-game) */
+.prog { position: absolute; left: 50%; bottom: 9%; transform: translateX(-50%); width: 340px; text-align: center; }
+.prog .lbl { font-weight: 600; margin-bottom: 6px; text-shadow: 0 1px 3px #000; }
+.prog .bar { height: 8px; border-radius: 4px; background: rgba(15,23,32,.85); overflow: hidden; border: 1px solid var(--line); }
+.prog .bar div { height: 100%; width: 0; background: var(--accent); }
+.prog small { display: block; margin-top: 6px; text-shadow: 0 1px 3px #000; }
+.world-note { position: absolute; left: 50%; top: 42%; transform: translate(-50%,-50%); text-align: center; color: var(--muted); max-width: 520px; }
+.world-note b { color: var(--text); font-size: 15px; display: block; margin-bottom: 6px; }
+.notify { position: absolute; top: 24px; right: 24px; background: var(--card); border: 1px solid var(--line2); border-left: 4px solid var(--c1); border-radius: 10px; padding: 10px 14px; min-width: 260px; }
+.notify b { display: block; }
+
+.demo { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); display: flex; gap: 6px; padding: 6px 8px; font-size: 11px; background: rgba(15,23,32,.94); border: 1px solid var(--line); border-radius: 10px; z-index: 9; }
+.demo button { padding: 5px 9px; border-radius: 7px; background: var(--card); border: 1px dashed var(--line2); color: var(--muted); }
+.demo button.on { color: var(--c2); border-color: var(--c2); }
+</style>
+</head>
+<body>
+
+<div class="demo">
+    <small style="align-self:center">MOCKUP:</small>
+    <button data-s="paid" class="on">Ada order lunas</button>
+    <button data-s="none">Tidak ada order lunas</button>
+    <button id="dZone" class="on">Di area bengkel</button>
+</div>
+
+<div class="panel" id="diag">
+    <header>
+        <div class="brand">
+            <span class="logo">🔧</span>
+            <div><div class="kicker">Diagnosa Bengkel</div><h1>Karin Sultan</h1></div>
+        </div>
+        <div class="head-right">
+            <span class="state-pill lift">Di Lift 2</span>
+            <button class="icon-btn" title="Tutup (ESC)">✕</button>
+        </div>
+    </header>
+    <div class="main">
+        <div class="left">
+            <div class="fluids">
+                <div class="fluid"><div class="tube"><div style="height:82%;background:#eab308"></div></div><div><b>82%</b><small>Oli Mesin</small></div></div>
+                <div class="fluid"><div class="tube"><div style="height:90%;background:#22c55e"></div></div><div><b>90%</b><small>Coolant</small></div></div>
+                <div class="fluid"><div class="tube"><div style="height:74%;background:#f97316"></div></div><div><b>74%</b><small>Minyak Rem</small></div></div>
+                <div class="fluid"><div class="tube"><div style="height:95%;background:#22c55e"></div></div><div><b>95%</b><small>Oli Transmisi</small></div></div>
+            </div>
+            <div class="stage"><div class="carbox"><img src="https://docs.fivem.net/vehicles/sultan.webp" alt="" onerror="this.remove()"></div></div>
+        </div>
+        <div class="right">
+            <div class="tabs">
+                <button class="tab" data-tab="cond">Kondisi</button>
+                <button class="tab on" data-tab="custom">Kustom <span class="badge" id="badge">6</span></button>
+                <button class="tab" data-tab="bill">Tagihan</button>
+            </div>
+            <div class="tabpane" id="pane"></div>
+        </div>
+    </div>
+</div>
+
+<div class="hidden" id="world">
+    <div class="world-note"><b>🎬 Animasi in-game (15 detik)</b>
+        Mekanik jalan ke sisi kendaraan → emote <i>mechanic</i> (pakai kunci pas) + kap mesin terbuka.<br>
+        Kendaraan dibekukan, tidak bisa dikendarai. Suara bor / ratchet di sekitar.<br>
+        <small>Gerak / batal (X) → modifikasi TIDAK dipasang, order tetap Lunas, bisa diulang.</small></div>
+    <div class="prog"><div class="lbl">Memasang modifikasi (6 item)…</div><div class="bar"><div id="pbar"></div></div><small>[X] Batalkan</small></div>
+</div>
+<div class="notify hidden" id="notify"><b>Modifikasi terpasang</b><small>Order #1042 selesai · F 1234 R</small></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const money = n => '$' + n.toLocaleString('id-ID');
+let state = 'paid', inZone = true;
+
+const ORDER = { id: 1042, cust: 'Budi Santoso', plate: 'F 1234 R', total: 10750, method: 'Cash', paidAt: '14:33', mods: [
+    { ic: '🔧', cat: 'Performa', n: 'Mesin', from: 'Standar', to: 'EMS Lv.3' },
+    { ic: '🌀', cat: 'Performa', n: 'Turbo', from: 'Mati', to: 'Turbo' },
+    { ic: '🎨', cat: 'Cat', n: 'Warna Utama', from: 'Hitam', to: 'Merah', sw: '#b3121b' },
+    { ic: '🎨', cat: 'Cat', n: 'Jenis Cat', from: 'Metalik', to: 'Matte' },
+    { ic: '💡', cat: 'Lampu', n: 'Neon', from: 'Mati', to: 'Kiri, Kanan' },
+    { ic: '🕶️', cat: 'Lainnya', n: 'Kaca Film', from: 'Tanpa', to: 'Gelap' },
+]};
+
+function render() {
+    const pane = $('#pane');
+    $('#badge').classList.toggle('hidden', state !== 'paid');
+    if (state === 'none') {
+        pane.innerHTML = `<div class="list"><div class="note" style="text-align:center;padding:40px 10px">🧰<br>Tidak ada order kustom yang sudah lunas untuk kendaraan ini.<br><small>Order muncul di sini setelah pelanggan membayar di kasir.</small></div></div>`;
+        return;
+    }
+    const tag = `<span class="tag paid">Lunas · ${ORDER.method}</span>`;
+    const canGo = inZone;
+    pane.innerHTML = `
+    <div class="list">
+        <div class="order">
+            <div class="top"><span class="code">#${ORDER.id}</span><span class="who">${ORDER.cust}</span>${tag}</div>
+            <div class="meta">
+                <div><small>Plat</small><span class="plate">${ORDER.plate}</span></div>
+                <div><small>Total</small><b>${money(ORDER.total)}</b></div>
+                <div><small>Dibayar</small><b>${ORDER.paidAt}</b></div>
+                <div><small>Item</small><b>${ORDER.mods.length} modifikasi</b></div>
+            </div>
+        </div>
+        <h3>Daftar modifikasi</h3>
+        ${ORDER.mods.map(m => `<div class="mod"><span class="ic">${m.ic}</span>
+            <span class="tx"><b>${m.n}</b><small>${m.cat}</small></span>
+            <span class="arrow">${m.from} → <b>${m.to}</b>${m.sw ? `<span class="sw" style="background:${m.sw}"></span>` : ''}</span></div>`).join('')}
+        <h3>Syarat</h3>
+        <div class="req">
+            <div class="${inZone ? 'ok' : 'no'}">${inZone ? '✔' : '✘'} Kendaraan di area bengkel</div>
+            <div class="ok">✔ Kendaraan kosong (tidak ada pengemudi)</div>
+        </div>
+    </div>
+    <footer class="one"><button class="all" id="go" ${canGo ? '' : 'disabled'}><span>Setujui &amp; Pasang</span><small>15 detik · ${ORDER.mods.length} item</small></button></footer>`;
+    const go = $('#go');
+    go.onclick = () => {
+        if (!canGo) return;
+        $('#diag').classList.add('hidden'); $('#world').classList.remove('hidden');
+        const bar = $('#pbar'); let t = 0;
+        const iv = setInterval(() => {
+            t += 0.1; bar.style.width = Math.min(t / 15 * 100, 100) + '%';
+            if (t >= 15) {
+                clearInterval(iv); $('#world').classList.add('hidden'); $('#notify').classList.remove('hidden');
+                setTimeout(() => { $('#notify').classList.add('hidden'); $('#diag').classList.remove('hidden'); state = 'none'; setDemo(); render(); }, 2500);
+            }
+        }, 100);
+    };
+}
+
+function setDemo() { document.querySelectorAll('[data-s]').forEach(b => b.classList.toggle('on', b.dataset.s === state)); }
+document.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { state = b.dataset.s; setDemo(); render(); });
+$('#dZone').onclick = () => { inZone = !inZone; $('#dZone').classList.toggle('on', inZone); render(); };
+render();
+</script>
+</body>
+</html>

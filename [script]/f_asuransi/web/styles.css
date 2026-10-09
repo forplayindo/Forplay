@@ -1,0 +1,286 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    color: #e0e0e0;
+}
+
+.fixed-container {
+    position: fixed;
+    margin: 16px;
+}
+
+.info-box {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.logo {
+    max-width: 64px;
+    max-height: 64px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.description-timer {
+    display: flex;
+    flex-direction: column;
+}
+
+.description {
+    font-size: 1.125rem;
+    font-weight: bold;
+}
+
+.timer {
+    font-size: 1rem;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease; 
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #e0e0e0;
+    text-align: center;
+    font-weight: bold;
+}
+
+.timer-warning {
+    border-color: yellow; 
+    background-color: rgba(255, 0, 0, 0.1); 
+    color: yellow; 
+}
+
+.timer-finall {
+    border-color: red; 
+    background-color: rgba(255, 0, 0, 0.1);
+    color: red;
+}
+
+.timer-warning.tada {
+    -webkit-animation-duration: 0.6s; 
+    animation-duration: 0.6s;
+}
+
+
+.description-son {
+    font-size: clamp(0.75rem, 1vw + 0.5rem, 1rem);
+    font-weight: inherit;
+    font-style: italic;
+    padding-bottom: 3%;
+    max-width: 100%; 
+    white-space: normal;
+}
+
+.style1 {
+    background-color: rgba(31, 41, 55, 0.7);
+    border: 1px solid #2d3748;
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+}
+
+.style2 {
+    background-color: rgba(18, 18, 18, 0.9);
+    border: 1px solid #333333;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace;
+    text-shadow: 2px 2px 5px #000000;
+}
+
+.style3 {
+    background-color: rgba(240, 240, 240, 0.9);
+    border: 1px solid #dcdcdc;
+    color: #000000;
+    font-family: 'Verdana', sans-serif;
+}
+
+.style4 {
+    background-color: rgba(255, 0, 0, 0.7);
+    border: 1px solid #ff0000;
+    color: #ffffff;
+    font-family: 'Impact', sans-serif;
+    text-shadow: 2px 2px 8px #ff0000;
+}
+
+.style5 {
+    background-color: rgba(10, 10, 10, 0.8);
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
+}
+
+.red {
+    background-color: rgba(255, 0, 0, 0.7);
+}
+
+.red .logo {
+    filter: drop-shadow(0px 0px 7px #ff0000);
+}
+
+.blue {
+    background-color: rgba(0, 0, 255, 0.7);
+}
+
+.blue .logo {
+    filter: drop-shadow(0px 0px 7px #0000ff);
+}
+
+.pink {
+    background-color: rgba(255, 192, 203, 0.7);
+}
+
+.pink .logo {
+    filter: drop-shadow(0px 0px 7px #ff69b4);
+}
+
+.green {
+    background-color: rgba(0, 255, 0, 0.7);
+}
+
+.green .logo {
+    filter: drop-shadow(0px 0px 7px #00ff00);
+}
+
+.dark {
+    background-color: rgba(18, 18, 18, 0.9);
+}
+
+.dark .logo {
+    filter: drop-shadow(0px 0px 7px #333333);
+}
+
+.white {
+    background-color: rgba(236, 230, 230, 0.7);
+}
+
+.white .logo {
+    filter: drop-shadow(0px 0px 7px #ffff);
+}
+
+.tada {
+    -webkit-animation-name: tada;
+    animation-name: tada;
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
+
+@-webkit-keyframes tada {
+    0% {
+        -webkit-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+    }
+    10%, 20% {
+        -webkit-transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg);
+        transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg);
+    }
+    30%, 50%, 70%, 90% {
+        -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
+        transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
+    }
+    40%, 60%, 80% {
+        -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
+        transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
+    }
+    100% {
+        -webkit-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+    }
+}
+
+@keyframes tada {
+    0% {
+        -webkit-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+    }
+    10%, 20% {
+        -webkit-transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg);
+        transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg);
+    }
+    30%, 50%, 70%, 90% {
+        -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
+        transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
+    }
+    40%, 60%, 80% {
+        -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
+        transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
+    }
+    100% {
+        -webkit-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+    }
+} 
+
+
+
+.zoomIn {
+    -webkit-animation-name: zoomIn;
+    animation-name: zoomIn;
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
+@-webkit-keyframes zoomIn {
+    0% {
+        opacity: 0;
+        -webkit-transform: scale3d(.3, .3, .3);
+        transform: scale3d(.3, .3, .3);
+    }
+    50% {
+        opacity: 1; 
+    }
+}
+@keyframes zoomIn {
+    0% {
+        opacity: 0;
+        -webkit-transform: scale3d(.3, .3, .3);
+        transform: scale3d(.3, .3, .3);
+    }
+    50% {
+        opacity: 1;
+    }
+} 
+
+.zoomOut {
+    -webkit-animation-name: zoomOut;
+    animation-name: zoomOut;
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
+@-webkit-keyframes zoomOut {
+    0% {
+        opacity: 1;
+    }
+    
+    50% {
+        opacity: 0;
+        -webkit-transform: scale3d(.3, .3, .3);
+        transform: scale3d(.3, .3, .3);
+    }
+    100% {
+        opacity: 0;
+    }
+}
+@keyframes zoomOut {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+        -webkit-transform: scale3d(.3, .3, .3);
+        transform: scale3d(.3, .3, .3);
+    }
+    100% {
+        opacity: 0;
+    }
+} 

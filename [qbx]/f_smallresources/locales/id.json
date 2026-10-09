@@ -1,0 +1,46 @@
+{
+   "error": {
+      "canceled": "Dibatalkan..",
+      "cruise_control_disabled": "Cruise control dimatikan",
+      "cruise_control_unavailable": "Cruise control tidak tersedia",
+      "deleted_recording": "Rekaman dihapus!",
+      "later_aligator": "Sampai jumpa!",
+      "stress_gain": "Kamu merasa makin stres!",
+      "no_vehicle_nearby": "Tidak ada kendaraan di dekatmu untuk dibalikkan.",
+      "is_handcuffed": "Kamu sedang diborgol.",
+      "is_fastened": "Kamu sedang memakai sabuk pengaman.",
+      "vehicle_radio_off": "Radio kendaraan dimatikan"
+   },
+   "success": {
+      "cruise_control_enabled": "Cruise control dinyalakan",
+      "started_recording": "Mulai merekam!",
+      "stopped_recording": "Berhenti merekam!",
+      "saved_recording": "Rekaman disimpan!",
+      "stress_relief": "Kamu merasa lebih rileks!",
+      "flipped_car": "Kendaraan berhasil dibalikkan!",
+      "vehicle_radio_on": "Radio kendaraan dinyalakan"
+   },
+   "progress": {
+      "eating": "Makan..",
+      "drinking": "Minum..",
+      "drinking_liquor": "Minum minuman keras..",
+      "quick_sniff": "Menghirup..",
+      "smoking_crack": "Mengisap crack..",
+      "popping_pills": "Menelan pil..",
+      "healing": "Mengobati..",
+      "smoking_meth": "Mengisap meth..",
+      "lighting_joint": "Menyalakan lintingan..",
+      "flipping_car": "Membalikkan kendaraan..."
+   },
+   "info": {
+      "minutes": "menit",
+      "seconds": "detik..",
+      "shuffleSeat": "Pindah kursi",
+      "teleport_level_select": "Ke Lantai #%s",
+      "teleport_current_level_indication": "(Kamu di sini)"
+   },
+   "actions": {
+      "push_vehicle": "Tekan [~g~SHIFT~w~] dan [~g~E~w~] untuk mendorong kendaraan sampai [~g~SHIFT~w~] dilepas",
+      "toggle_cruise_control": "Nyalakan/matikan Cruise Control"
+   }
+}

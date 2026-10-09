@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_karakter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="panel" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo">🗃️</span><div><h1>Kelola Karakter</h1><small>Hapus karakter pemain yang sudah tidak aktif</small></div></div>
+            <div class="head-actions">
+                <button class="icon-btn" id="refresh" title="Refresh">⟳</button>
+                <button class="icon-btn close" id="close">✕</button>
+            </div>
+        </header>
+        <div class="banner">Hapus bersifat <b>permanen</b>: karakter, kendaraan, rumah, inventory, data phone, peliharaan, dll. Catatan resmi (MDT polisi, tilang, transaksi bank, tagihan) tetap disimpan.</div>
+        <div class="toolbar">
+            <input id="search" type="text" maxlength="40" placeholder="Cari nama / citizen ID / akun...">
+            <nav class="filters" id="days">
+                <button data-days="7">&gt; 7 hari</button>
+                <button data-days="30">&gt; 30 hari</button>
+                <button data-days="60">&gt; 60 hari</button>
+                <button data-days="90">&gt; 90 hari</button>
+                <button data-days="0">Semua</button>
+            </nav>
+        </div>
+        <main id="list" class="list"></main>
+        <footer id="foot"></footer>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

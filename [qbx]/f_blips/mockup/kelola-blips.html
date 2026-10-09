@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Mockup - Kelola Blips</title>
+<style>
+:root {
+    --bg: #111827; --card: #1a2233; --card2: #222c40; --line: #2e3a52;
+    --text: #e8edf6; --muted: #93a0b8; --accent: #5b9dff; --accent-dark: #3f82ea;
+    --gold: #e7c36a; --green: #4ade80; --red: #f87171; --radius: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; user-select: none; }
+body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; color: var(--text); font-size: 14px;
+       background: radial-gradient(circle at 30% 20%, #3b4a3a, #1d2620 60%, #121812); }
+button { font: inherit; color: inherit; border: none; background: none; cursor: pointer; }
+input, select { font: inherit; }
+.hidden { display: none !important; }
+
+.panel { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: min(1000px, 94vw); height: min(640px, 90vh); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 20px; display: flex; flex-direction: column;
+    overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,.5); }
+header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+.brand { display: flex; gap: 12px; align-items: center; }
+.logo { font-size: 26px; width: 46px; height: 46px; display: grid; place-items: center; background: var(--card2); border-radius: 12px; }
+h1 { font-size: 20px; font-weight: 700; }
+small { color: var(--muted); }
+.head-actions { display: flex; gap: 8px; align-items: center; }
+.icon-btn { width: 40px; height: 40px; border-radius: 10px; background: var(--card); display: grid; place-items: center; font-size: 16px; }
+.icon-btn:hover { background: var(--card2); }
+.icon-btn.close:hover { background: #4a2323; }
+.pill { height: 40px; padding: 0 16px; border-radius: 10px; background: var(--card); font-weight: 700; font-size: 13px; }
+.pill.accent { background: var(--accent); color: #0b1220; }
+.pill.accent:hover { background: var(--accent-dark); }
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 22px 4px; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tabs button { padding: 8px 14px; border-radius: 999px; background: var(--card); color: var(--muted); font-weight: 600; font-size: 13px; }
+.tabs button.active { background: var(--accent); color: #0b1220; }
+#search { width: 240px; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--text); outline: none; }
+#search:focus { border-color: var(--accent); }
+
+.pending { margin: 10px 22px 0; padding: 10px 14px; border-radius: 10px; background: #3a2a14; border: 1px solid #6a5122;
+    color: var(--gold); font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.pending button { padding: 7px 14px; border-radius: 8px; background: var(--gold); color: #1b1408; font-weight: 800; font-size: 12px; }
+
+.list { flex: 1; overflow-y: auto; padding: 14px 22px 22px; display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; align-content: start; scrollbar-width: thin; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.card.off { opacity: .5; }
+.card .head { display: flex; gap: 12px; align-items: center; }
+.card .head .info { flex: 1; min-width: 0; }
+.card .head b { font-size: 15px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card .dist { font-size: 12px; color: var(--accent); font-weight: 700; white-space: nowrap; }
+.bicon { width: 40px; height: 40px; border-radius: 10px; background: var(--card2); display: grid; place-items: center; font-size: 20px; flex-shrink: 0; position: relative; }
+.bicon i { position: absolute; right: -3px; bottom: -3px; width: 13px; height: 13px; border-radius: 50%; border: 2px solid var(--card); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: var(--card2); color: var(--muted); }
+.chip.cat { background: #1d2a44; color: var(--accent); }
+.chip.off { background: #3a1f1f; color: var(--red); }
+.chip.new { background: #3a2a14; color: var(--gold); }
+.meta { color: var(--muted); font-size: 12px; background: var(--card2); border-radius: 10px; padding: 8px 10px; font-family: Consolas, monospace; }
+.actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.actions button { padding: 8px 4px; border-radius: 10px; background: var(--card2); font-weight: 700; font-size: 12px; }
+.actions button:hover { background: var(--line); }
+.actions .del { background: #3a1f1f; color: var(--red); }
+.empty { color: var(--muted); text-align: center; padding: 40px 0; grid-column: 1 / -1; }
+
+.sheet { position: absolute; top: 0; right: 0; bottom: 0; width: 400px; background: var(--card); border-left: 1px solid var(--line); display: flex; flex-direction: column; }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+.sheet-head h2 { font-size: 18px; }
+.sheet-body { flex: 1; overflow-y: auto; padding: 14px 20px; display: flex; flex-direction: column; gap: 8px; scrollbar-width: thin; }
+.sheet-body > label { font-size: 12px; font-weight: 700; color: var(--muted); margin-top: 6px; }
+.sheet-body input[type=text], .sheet-body select { width: 100%; padding: 9px 11px; border-radius: 10px; border: 1px solid var(--line); background: var(--card2); color: var(--text); outline: none; }
+.sheet-body input:focus, .sheet-body select:focus { border-color: var(--accent); }
+.note { padding: 9px 12px; border-radius: 10px; background: #1d2a44; border: 1px solid #34507e; color: var(--accent); font-size: 12px; font-family: Consolas, monospace; display: flex; justify-content: space-between; align-items: center; }
+.note button { font-family: 'Segoe UI', sans-serif; font-size: 11px; font-weight: 800; padding: 5px 10px; border-radius: 8px; background: var(--accent); color: #0b1220; }
+.sprites { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-height: 190px; overflow-y: auto; scrollbar-width: thin; }
+.sprites button { aspect-ratio: 1; border-radius: 10px; background: var(--card2); border: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 20px; }
+.sprites button small { font-size: 9px; }
+.sprites button.active { border-color: var(--accent); background: #1d2a44; }
+.colors { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+.colors button { aspect-ratio: 1; border-radius: 8px; border: 2px solid transparent; }
+.colors button.active { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
+.range { display: flex; gap: 10px; align-items: center; }
+.range input { flex: 1; accent-color: var(--accent); }
+.range b { width: 34px; text-align: right; }
+.switch { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding: 10px 12px; background: var(--card2); border-radius: 10px; font-weight: 700; font-size: 13px; }
+.switch input { width: 18px; height: 18px; accent-color: var(--accent); }
+.preview { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; background: #0d1420; border: 1px dashed var(--line); margin-top: 4px; }
+.preview .pin { display: grid; place-items: center; border-radius: 50%; }
+.preview span { background: rgba(0,0,0,.6); padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+.sheet-foot { padding: 16px 20px; border-top: 1px solid var(--line); }
+.primary { width: 100%; padding: 13px; border-radius: 12px; background: var(--accent); color: #0b1220; font-weight: 800; font-size: 15px; }
+.primary:hover { background: var(--accent-dark); }
+.mock-tag { position: fixed; left: 12px; bottom: 10px; font-size: 12px; color: #cfd8c8; opacity: .7; }
+</style>
+</head>
+<body>
+<div class="panel">
+    <header>
+        <div class="brand"><span class="logo">📍</span><div><h1>Kelola Blips</h1><small id="sub"></small></div></div>
+        <div class="head-actions">
+            <button class="pill accent" id="add-btn">＋ Tambah di Posisi Saya</button>
+            <button class="icon-btn close">✕</button>
+        </div>
+    </header>
+    <div class="toolbar">
+        <nav class="tabs" id="tabs"></nav>
+        <input id="search" placeholder="Cari nama blip...">
+    </div>
+    <div id="pending" class="pending hidden">
+        <span id="pending-text"></span>
+    </div>
+    <main id="list" class="list"></main>
+
+    <aside id="sheet" class="sheet hidden">
+        <div class="sheet-head"><h2 id="sheet-title">Tambah Blip</h2><button class="icon-btn" id="sheet-close">✕</button></div>
+        <div class="sheet-body">
+            <label>Koordinat</label>
+            <div class="note"><span id="f-coords"></span><button id="use-pos">Pakai posisi saya</button></div>
+
+            <label>Nama (tampil di peta)</label>
+            <input type="text" id="f-label" maxlength="40" placeholder="Contoh: Bean Machine Cafe">
+
+            <label>Kategori</label>
+            <select id="f-cat"></select>
+
+            <label>Ikon</label>
+            <div class="sprites" id="f-sprite"></div>
+
+            <label>Warna</label>
+            <div class="colors" id="f-color"></div>
+
+            <label>Ukuran</label>
+            <div class="range"><input type="range" id="f-scale" min="0.5" max="1.2" step="0.1"><b id="scale-val"></b></div>
+
+            <div class="switch"><span>Aktif (tampil di peta)</span><input type="checkbox" id="f-active"></div>
+
+            <label>Pratinjau</label>
+            <div class="preview"><div class="pin" id="pv-pin"></div><span id="pv-label"></span></div>
+        </div>
+        <div class="sheet-foot"><button class="primary" id="save-btn">Simpan</button></div>
+    </aside>
+</div>
+<div class="mock-tag">MOCKUP · data contoh · tombol tidak terhubung ke game</div>
+
+<script>
+const CATS = ['Layanan Publik', 'Pekerjaan', 'Toko', 'Garasi', 'Kendaraan', 'Lainnya'];
+// Sprite GTA yang umum dipakai (id asli GTA). Di script asli memakai gambar ikon resmi, di mockup pakai emoji.
+const SPRITES = [
+    { id: 419, n: 'Cityhall', e: '🏛️' }, { id: 108, n: 'Bank', e: '🏦' }, { id: 52, n: 'Toko', e: '🛒' },
+    { id: 73, n: 'Baju', e: '👕' }, { id: 71, n: 'Barber', e: '💈' }, { id: 75, n: 'Tato', e: '🖋️' },
+    { id: 361, n: 'Bensin', e: '⛽' }, { id: 357, n: 'Garasi', e: '🅿️' }, { id: 68, n: 'Impound', e: '🚧' },
+    { id: 326, n: 'Dealer', e: '🚘' }, { id: 446, n: 'Bengkel', e: '🔧' }, { id: 100, n: 'Cuci mobil', e: '🧽' },
+    { id: 93, n: 'Bar/Cafe', e: '☕' }, { id: 106, n: 'Makanan', e: '🍔' }, { id: 431, n: 'Pawnshop', e: '💍' },
+    { id: 467, n: 'Recycle', e: '♻️' }, { id: 380, n: 'Scrapyard', e: '🔩' }, { id: 513, n: 'Bus', e: '🚌' },
+    { id: 198, n: 'Taxi', e: '🚕' }, { id: 477, n: 'Truk', e: '🚚' }, { id: 318, n: 'Sampah', e: '🗑️' },
+    { id: 459, n: 'Berita', e: '📰' }, { id: 85, n: 'Kebun', e: '🍇' }, { id: 597, n: 'Diving', e: '🤿' },
+    { id: 475, n: 'Apartemen', e: '🏢' }, { id: 51, n: 'Apotek', e: '💊' }, { id: 498, n: 'Asuransi', e: '📄' },
+    { id: 315, n: 'Balapan', e: '🏁' }, { id: 110, n: 'Senjata', e: '🔫' }, { id: 1, n: 'Titik', e: '⚪' }
+];
+// Warna blip GTA (id asli GTA)
+const COLORS = [
+    { id: 0, h: '#fefefe' }, { id: 1, h: '#e03232' }, { id: 2, h: '#71cb71' }, { id: 3, h: '#5db6e5' },
+    { id: 5, h: '#eec64e' }, { id: 7, h: '#9c6eaf' }, { id: 8, h: '#fe7ac3' }, { id: 17, h: '#f0a050' },
+    { id: 25, h: '#3a8a3a' }, { id: 26, h: '#7ac7ff' }, { id: 27, h: '#ab3cc9' }, { id: 38, h: '#2c6db8' },
+    { id: 40, h: '#555555' }, { id: 46, h: '#ecca2f' }, { id: 47, h: '#ff8a1e' }, { id: 59, h: '#c43535' }
+];
+const me = { x: -630.4, y: 233.1, z: 81.9 };
+
+let blips = [
+    { id: 1, label: 'Balai Kota', cat: 'Layanan Publik', sprite: 419, color: 0, scale: 0.8, active: true, c: [-542.3, -208.6, 37.6] },
+    { id: 2, label: 'Fleeca Bank', cat: 'Layanan Publik', sprite: 108, color: 2, scale: 0.7, active: true, c: [149.9, -1040.2, 29.4] },
+    { id: 3, label: 'Bean Machine Cafe', cat: 'Pekerjaan', sprite: 93, color: 47, scale: 0.7, active: true, c: [-628.0, 238.5, 81.9] },
+    { id: 4, label: 'Garasi Umum Legion', cat: 'Garasi', sprite: 357, color: 3, scale: 0.7, active: true, c: [215.8, -810.1, 30.7] },
+    { id: 5, label: 'Impound', cat: 'Garasi', sprite: 68, color: 1, scale: 0.7, active: true, c: [409.2, -1623.5, 29.3] },
+    { id: 6, label: 'Premium Deluxe Motorsport', cat: 'Kendaraan', sprite: 326, color: 3, scale: 0.8, active: true, c: [-56.7, -1098.9, 26.4] },
+    { id: 7, label: 'Bengkel', cat: 'Pekerjaan', sprite: 446, color: 47, scale: 0.7, active: true, c: [-337.4, -136.9, 39.0] },
+    { id: 8, label: '24/7 Supermarket', cat: 'Toko', sprite: 52, color: 2, scale: 0.6, active: true, c: [25.7, -1347.3, 29.5] },
+    { id: 9, label: 'Toko Baju', cat: 'Toko', sprite: 73, color: 0, scale: 0.6, active: false, c: [72.3, -1399.1, 29.4] },
+    { id: 10, label: 'Pom Bensin', cat: 'Lainnya', sprite: 361, color: 1, scale: 0.6, active: true, c: [-70.2, -1761.8, 29.5] }
+];
+let pending = 0, tab = 'Semua', editing = null, form = null;
+
+const $ = s => document.querySelector(s);
+const sprite = id => SPRITES.find(s => s.id === id) || SPRITES[SPRITES.length - 1];
+const color = id => (COLORS.find(c => c.id === id) || COLORS[0]).h;
+const dist = c => Math.round(Math.hypot(c[0] - me.x, c[1] - me.y));
+const fmt = c => c.map(v => v.toFixed(1)).join(', ');
+
+function renderTabs() {
+    $('#tabs').innerHTML = ['Semua', ...CATS].map(t =>
+        `<button class="${t === tab ? 'active' : ''}" data-t="${t}">${t}</button>`).join('');
+}
+function renderList() {
+    const q = $('#search').value.toLowerCase();
+    const rows = blips.filter(b => (tab === 'Semua' || b.cat === tab) && b.label.toLowerCase().includes(q))
+        .sort((a, b) => dist(a.c) - dist(b.c));
+    $('#sub').textContent = `${blips.length} blip · ${blips.filter(b => b.active).length} aktif`;
+    $('#list').innerHTML = rows.length ? rows.map(b => `
+        <div class="card ${b.active ? '' : 'off'}">
+            <div class="head">
+                <div class="bicon">${sprite(b.sprite).e}<i style="background:${color(b.color)}"></i></div>
+                <div class="info"><b>${b.label}</b><small>Ikon #${b.sprite} · Ukuran ${b.scale.toFixed(1)}</small></div>
+                <span class="dist">${dist(b.c)} m</span>
+            </div>
+            <div class="chips">
+                <span class="chip cat">${b.cat}</span>
+                ${b.active ? '' : '<span class="chip off">Nonaktif</span>'}
+                ${b.dirty ? '<span class="chip new">Belum diterapkan</span>' : ''}
+            </div>
+            <div class="meta">${fmt(b.c)}</div>
+            <div class="actions">
+                <button data-a="edit" data-id="${b.id}">Edit</button>
+                <button data-a="move" data-id="${b.id}">Pindah</button>
+                <button data-a="tp" data-id="${b.id}">Teleport</button>
+                <button class="del" data-a="del" data-id="${b.id}">Hapus</button>
+            </div>
+        </div>`).join('') : '<div class="empty">Tidak ada blip.</div>';
+    $('#pending').classList.toggle('hidden', !pending);
+    $('#pending-text').textContent = `${pending} perubahan tersimpan ke config. Berlaku setelah "ensure f_blips" — lakukan saat maintenance / server sepi pemain.`;
+}
+function markDirty(b) { if (b) b.dirty = true; pending++; renderList(); }
+
+function openSheet(b) {
+    editing = b;
+    form = b ? { ...b, c: [...b.c] } : { label: '', cat: CATS[0], sprite: 52, color: 0, scale: 0.7, active: true, c: [me.x, me.y, me.z] };
+    $('#sheet-title').textContent = b ? 'Edit Blip' : 'Tambah Blip';
+    $('#f-label').value = form.label;
+    $('#f-cat').innerHTML = CATS.map(c => `<option ${c === form.cat ? 'selected' : ''}>${c}</option>`).join('');
+    $('#f-scale').value = form.scale;
+    $('#f-active').checked = form.active;
+    renderForm();
+    $('#sheet').classList.remove('hidden');
+}
+function renderForm() {
+    $('#f-coords').textContent = fmt(form.c);
+    $('#f-sprite').innerHTML = SPRITES.map(s =>
+        `<button class="${s.id === form.sprite ? 'active' : ''}" data-s="${s.id}" title="#${s.id}">${s.e}<small>${s.n}</small></button>`).join('');
+    $('#f-color').innerHTML = COLORS.map(c =>
+        `<button class="${c.id === form.color ? 'active' : ''}" data-c="${c.id}" style="background:${c.h}" title="#${c.id}"></button>`).join('');
+    $('#scale-val').textContent = (+form.scale).toFixed(1);
+    const px = 18 + form.scale * 22;
+    $('#pv-pin').style.cssText = `width:${px}px;height:${px}px;font-size:${px * .6}px;background:${color(form.color)}33;border:2px solid ${color(form.color)}`;
+    $('#pv-pin').textContent = sprite(form.sprite).e;
+    $('#pv-label').textContent = $('#f-label').value || 'Nama blip';
+}
+
+$('#tabs').onclick = e => { if (e.target.dataset.t) { tab = e.target.dataset.t; renderTabs(); renderList(); } };
+$('#search').oninput = renderList;
+$('#add-btn').onclick = () => openSheet(null);
+$('#sheet-close').onclick = () => $('#sheet').classList.add('hidden');
+$('#use-pos').onclick = () => { form.c = [me.x, me.y, me.z]; renderForm(); };
+$('#f-label').oninput = renderForm;
+$('#f-scale').oninput = e => { form.scale = +e.target.value; renderForm(); };
+$('#f-sprite').onclick = e => { const b = e.target.closest('button'); if (b) { form.sprite = +b.dataset.s; renderForm(); } };
+$('#f-color').onclick = e => { const b = e.target.closest('button'); if (b) { form.color = +b.dataset.c; renderForm(); } };
+$('#save-btn').onclick = () => {
+    form.label = $('#f-label').value.trim();
+    if (!form.label) return $('#f-label').focus();
+    form.cat = $('#f-cat').value; form.active = $('#f-active').checked;
+    if (editing) Object.assign(editing, form);
+    else { form.id = Date.now(); blips.push(form); }
+    $('#sheet').classList.add('hidden');
+    markDirty(editing || form);
+};
+$('#list').onclick = e => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    const b = blips.find(x => x.id == btn.dataset.id);
+    if (btn.dataset.a === 'edit') openSheet(b);
+    if (btn.dataset.a === 'move') { b.c = [me.x, me.y, me.z]; markDirty(b); }
+    if (btn.dataset.a === 'del') {
+        if (btn.dataset.armed) { blips = blips.filter(x => x !== b); markDirty(null); }
+        else { btn.dataset.armed = 1; btn.textContent = 'Yakin?'; }
+    }
+};
+
+renderTabs(); renderList();
+</script>
+</body>
+</html>

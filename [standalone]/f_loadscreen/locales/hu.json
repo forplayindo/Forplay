@@ -1,0 +1,79 @@
+{
+    "preTitle": "Betöltés · 24. szezon",
+    "title": "Last Resort",
+    "subtitle": "Roleplay",
+    "footer": "lastresort_loading · v3.3",
+
+    "online": "Online",
+    "offline": "Offline",
+    "playersSlash": "/",
+    "msUnit": "ms",
+
+    "welcome": "Üdv újra,",
+    "welcomeAnon": "Üdvözlünk",
+    "tipLabel": "Tipp",
+    "nowPlaying": "Most szól",
+    "noTrack": "Nincs beállított zene",
+    "loadingTrack": "Betöltés…",
+
+    "rulesTab": "Szabályok",
+    "staffTab": "Stáb",
+    "newsTab": "Hírek",
+
+    "playlist": "Lejátszási lista",
+    "trackCount": "{n} / {total}",
+
+    "gateTitle": "Szerver szabályzat",
+    "gateIntro": "Olvasd végig a szabályokat, és fogadd el őket a csatlakozáshoz.",
+    "gateVersion": "{v}. verzió",
+    "gateScrollHint": "Görgess a szabályok végéig a folytatáshoz.",
+    "gateReadyHint": "Végigolvastad — most már elfogadhatod.",
+    "gateAccept": "Elfogadom",
+    "gateDecline": "Elutasítom",
+    "gateSaving": "Mentés…",
+    "gateDeclined": "A szerver szabályzatának elfogadása nélkül nem tudsz játszani.",
+
+    "stageOf": "{n}. / {total}. szakasz",
+    "starting": "Indítás",
+    "ready": "Kész — csatlakozás",
+
+    "roles": {
+        "founder": "Alapító",
+        "management": "Menedzsment",
+        "scripting": "Fejlesztő",
+        "support": "Support"
+    },
+    "badges": {
+        "owner": "Tulaj",
+        "admin": "Admin",
+        "dev": "Dev",
+        "mod": "Mod"
+    },
+
+    "rules": [
+        "Maradj végig karakterben.",
+        "RDM és VDM szigorúan tilos.",
+        "Tiszteld a többi játékost és a stábot.",
+        "Tilos a csalás, mod és exploit használata.",
+        "Tilos a powergaming és metagaming."
+    ],
+
+    "tips": [
+        "Nyomd meg az F1-et a telefon megnyitásához.",
+        "A /help paranccsal kilistázod az elérhető parancsokat.",
+        "Csatlakozz a Discordunkhoz az újdonságokért.",
+        "Bármelyik ATM-nél fel tudod venni a fizetésed.",
+        "Tartsd be a KRESZ-t — a rendőrök figyelnek.",
+        "Új vagy? Látogass el a munkaügyi központba."
+    ],
+
+    "stages": [
+        "Térkép adatok betöltése",
+        "Resource-ok szinkronizálása",
+        "Asset-ek csatolása",
+        "Játék adatok betöltése",
+        "Világ streamelése",
+        "Kapcsolódás a szerverhez",
+        "Mindjárt kész"
+    ]
+}

@@ -1,0 +1,69 @@
+{
+  "preTitle": "Carregando · Sessão 24",
+  "title": "Last Resort",
+  "subtitle": "Roleplay",
+  "footer": "lastresort_loading · v3.3",
+  "online": "Online",
+  "offline": "Offline",
+  "playersSlash": "/",
+  "msUnit": "ms",
+  "welcome": "Bem-vindo de volta,",
+  "welcomeAnon": "Bem-vindo",
+  "tipLabel": "Dica",
+  "nowPlaying": "Tocando agora",
+  "noTrack": "Nenhuma faixa configurada",
+  "loadingTrack": "Carregando…",
+  "rulesTab": "Regras",
+  "staffTab": "Staff",
+  "newsTab": "Novidades",
+  "playlist": "Playlist",
+  "trackCount": "{n} / {total}",
+  "gateTitle": "Regras do servidor",
+  "gateIntro": "Leia as regras até o fim e aceite-as para concluir a entrada.",
+  "gateVersion": "Versão {v}",
+  "gateScrollHint": "Role até o fim das regras para continuar.",
+  "gateReadyHint": "Regras lidas — você já pode aceitar.",
+  "gateAccept": "Eu aceito",
+  "gateDecline": "Recusar",
+  "gateSaving": "Salvando…",
+  "gateDeclined": "Você precisa aceitar as regras do servidor para jogar aqui.",
+  "stageOf": "Etapa {n} / {total}",
+  "starting": "Iniciando",
+  "ready": "Pronto — conectando",
+  "roles": {
+    "founder": "Fundador",
+    "management": "Direção",
+    "scripting": "Desenvolvimento",
+    "support": "Suporte"
+  },
+  "badges": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "dev": "Dev",
+    "mod": "Mod"
+  },
+  "rules": [
+    "Mantenha-se em personagem o tempo todo.",
+    "RDM e VDM são estritamente proibidos.",
+    "Respeite os outros jogadores e a staff.",
+    "Sem cheats, mods ou exploits.",
+    "Sem powergaming ou metagaming."
+  ],
+  "tips": [
+    "Pressione F1 para abrir seu celular.",
+    "Use /help para listar todos os comandos disponíveis.",
+    "Entre no nosso Discord para novidades e eventos.",
+    "Saque seu salário em qualquer caixa eletrônico.",
+    "Respeite as leis de trânsito — a polícia observa.",
+    "Novo aqui? Visite a agência de empregos para começar."
+  ],
+  "stages": [
+    "Carregando dados do mapa",
+    "Sincronizando recursos",
+    "Montando assets",
+    "Carregando dados do jogo",
+    "Transmitindo mundo",
+    "Conectando ao servidor",
+    "Quase lá"
+  ]
+}

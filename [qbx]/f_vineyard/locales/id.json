@@ -1,0 +1,22 @@
+{
+    "error": {
+        "invalid_items": "Kamu tidak punya bahan yang dibutuhkan!"
+    },
+    "progress": {
+        "pick_grapes": "Memetik anggur ..",
+        "process_wine": "Mengolah wine",
+        "process_juice": "Mengolah jus anggur"
+    },
+    "task": {
+        "start_task": "[E] Mulai",
+        "vineyard_processing": "[E] Pengolahan Kebun Anggur",
+        "cancel_task": "Kamu membatalkan tugas"
+    },
+    "menu": {
+        "title": "Pengolahan Kebun Anggur",
+        "process_wine_title": "Olah Wine",
+        "process_juice_title": "Olah Jus Anggur",
+        "wine_items_needed": "Bahan: Jus Anggur\nJumlah dibutuhkan: %s",
+        "juice_items_needed": "Bahan: Anggur\nJumlah dibutuhkan: %s"
+    }
+}

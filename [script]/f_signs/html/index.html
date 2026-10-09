@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="panel" class="hidden">
+        <header>
+            <h1 id="title">Papan Nama</h1>
+            <button id="btn-close" class="icon" title="Tutup">&#x2715;</button>
+        </header>
+
+        <section id="view-list">
+            <div class="row">
+                <input id="search" type="text" placeholder="Cari tulisan / #id">
+                <button id="btn-new" class="primary">+ Baru</button>
+            </div>
+            <div id="list"></div>
+        </section>
+
+        <section id="view-form" class="hidden">
+            <label>Tulisan <span id="count" class="badge"></span>
+                <input data-f="text" type="text" spellcheck="false">
+            </label>
+
+            <div class="field">
+                <span>Gaya</span>
+                <div class="seg" id="seg-style">
+                    <button data-style="led">LED / Akrilik</button>
+                    <button data-style="neon">Neon</button>
+                </div>
+                <div class="hint" id="style-hint"></div>
+            </div>
+
+            <div class="field">
+                <span>Warna</span>
+                <div class="swatches" id="swatches"></div>
+                <div class="row color-row">
+                    <input data-f="color" type="color">
+                    <span id="color-hex"></span>
+                </div>
+            </div>
+
+            <label>Tinggi huruf: <b id="val-height"></b> m
+                <input data-f="height" type="range" step="0.01">
+            </label>
+
+            <label><span id="depth-label">Tebal huruf</span>: <b id="val-depth"></b> cm
+                <input data-f="depth" type="range" min="0" step="1">
+            </label>
+
+            <label>Jarak terlihat: <b id="val-renderDistance"></b> m
+                <input data-f="renderDistance" type="range" step="5">
+            </label>
+
+            <label class="check"><input data-f="alwaysOn" type="checkbox"> Nyala 24 jam (siang juga menyala)</label>
+            <label class="check"><input data-f="active" type="checkbox"> Aktif</label>
+            <label class="check preview"><input data-f="previewNight" type="checkbox"> Preview malam (hanya di layar kamu)</label>
+
+            <div class="actions">
+                <button id="btn-place">Atur posisi</button>
+                <button id="btn-save" class="primary">Simpan</button>
+                <button id="btn-cancel">Batal</button>
+            </div>
+        </section>
+
+        <div id="toast"></div>
+    </div>
+
+    <div id="confirm" class="hidden">
+        <div class="box">
+            <p id="confirm-text"></p>
+            <div class="actions">
+                <button id="confirm-yes" class="danger">Hapus</button>
+                <button id="confirm-no">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

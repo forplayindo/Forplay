@@ -1,0 +1,16 @@
+{
+    "error": {
+        "not_standing_up": "Kamu harus berdiri di tanah yang padat untuk memakai ini...",
+        "need_otube": "Oksigenmu harus diisi ulang! Cari tabung udara pengganti!",
+        "underwater": "Kamu tidak bisa melakukan ini di dalam air..."
+    },
+    "success": {
+        "took_out": "Kamu sudah melepas perlengkapan selam!",
+        "tube_filled": "Tabung udaramu berhasil diisi ulang!"
+    },
+    "info": {
+        "put_suit": "Memakai baju selam...",
+        "pullout_suit": "Melepas baju selam...",
+        "filling_air": "Mengisi udara..."
+    }
+}

@@ -1,0 +1,115 @@
+/* ============================================================
+   Renewed-Banking · Soft Blur (same concept as 0r-hud-v3 / nx_chat)
+   Loaded AFTER build/bundle.css, so the original bundle is untouched.
+   Flat translucent panels, no heavy borders / drop shadows.
+   blur.js draws the real blurred game frame under the main window,
+   popups, notification and loading box.
+   NOTE: the .svelte-xxxx hashes belong to this build. If you rebuild
+   the Svelte source, update them here.
+   ============================================================ */
+:root {
+  --sb-panel: rgba(16, 20, 28, 0.62);      /* no-blur fallback */
+  --sb-card: rgba(255, 255, 255, 0.07);
+  --sb-card-hover: rgba(255, 255, 255, 0.11);
+  --sb-line: rgba(255, 255, 255, 0.12);
+  --sb-input: rgba(255, 255, 255, 0.08);
+  --sb-dim: rgba(235, 240, 248, 0.68);
+  --sb-radius: 18px;
+  --sb-radius-sm: 11px;
+}
+html.rb-blur-on {
+  --sb-panel: rgba(16, 20, 28, 0.34);
+  --sb-card: rgba(255, 255, 255, 0.08);
+  --sb-line: rgba(255, 255, 255, 0.15);
+}
+
+/* ---------- main window ---------- */
+.main.svelte-1mww25k {
+  background-color: var(--sb-panel);
+  border: 1px solid var(--sb-line);
+  border-radius: var(--sb-radius);
+}
+h5.svelte-1mww25k { color: var(--sb-dim); }
+
+/* layout fix: long account lists used to spill under the wallet line on
+   shorter screens -> the account column now scrolls inside the window */
+section.svelte-1mww25k { height: calc(100% - 3.2rem); }
+aside.svelte-1jrs5kj {
+  overflow-y: auto; overflow-x: hidden; max-height: 100%;
+  padding-right: .6rem; scrollbar-width: none;
+}
+aside.svelte-1jrs5kj::-webkit-scrollbar { display: none; }
+
+/* ---------- inputs ---------- */
+.acc-search.svelte-1jrs5kj,
+.transactions-search.svelte-1henvca.svelte-1henvca,
+.form-row.svelte-1ynylej input.svelte-1ynylej {
+  background-color: var(--sb-input);
+  border: 1px solid var(--sb-line);
+  border-radius: var(--sb-radius-sm);
+  color: #fff;
+}
+.acc-search.svelte-1jrs5kj::placeholder,
+.transactions-search.svelte-1henvca::placeholder,
+.form-row.svelte-1ynylej input.svelte-1ynylej::placeholder { color: var(--sb-dim); }
+.acc-search.svelte-1jrs5kj:focus,
+.transactions-search.svelte-1henvca:focus,
+.form-row.svelte-1ynylej input.svelte-1ynylej:focus { border-color: rgba(255, 255, 255, 0.32); }
+
+/* ---------- account cards ---------- */
+.account.svelte-cfi317.svelte-cfi317 {
+  background-color: var(--sb-card);
+  border: 1px solid var(--sb-line);
+  border-radius: 14px;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+.account.svelte-cfi317.svelte-cfi317:hover { background-color: var(--sb-card-hover); border-color: rgba(255, 255, 255, 0.24); }
+
+/* ---------- transactions ---------- */
+.transaction.svelte-1wevdpb.svelte-1wevdpb {
+  background-color: var(--sb-card);
+  border: 1px solid var(--sb-line);
+  border-radius: 14px;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+}
+.transaction.svelte-1wevdpb h5.svelte-1wevdpb { border-bottom: 1px solid var(--sb-line); }
+.transaction.svelte-1wevdpb h6.svelte-1wevdpb { color: var(--sb-dim); }
+.title-container.svelte-1wevdpb > p.svelte-1wevdpb,
+.trans_id.svelte-1wevdpb.svelte-1wevdpb { border-radius: 8px; }
+
+/* ---------- buttons: flat, no black hover ---------- */
+.btn { border-radius: var(--sb-radius-sm); border-width: 1px; }
+.btn-grey { background-color: rgba(255, 255, 255, 0.12); border-color: var(--sb-line); }
+.btn-grey:is(:hover, :focus, :focus-within) { background-color: rgba(255, 255, 255, 0.2); color: #fff; }
+.btn-orange:is(:hover, :focus, :focus-within),
+.btn-green:is(:hover, :focus, :focus-within) { background-color: inherit; color: rgb(243, 243, 243); filter: brightness(1.12); }
+.btn-orange:is(:hover, :focus, :focus-within) { background-color: var(--clr-orange); }
+.btn-green:is(:hover, :focus, :focus-within) { background-color: var(--clr-green); }
+
+/* ---------- popup / loading / notification ---------- */
+.popup-container.svelte-1ynylej.svelte-1ynylej { background-color: rgba(0, 0, 0, 0.35); }
+html.rb-blur-on .popup-container.svelte-1ynylej.svelte-1ynylej { background-color: rgba(0, 0, 0, 0.5); }
+.popup-content.svelte-1ynylej.svelte-1ynylej,
+.loading-content.svelte-1ao9gz5.svelte-1ao9gz5,
+.notificaion-content.svelte-aywcjm {
+  background-color: var(--sb-panel);
+  border: 1px solid var(--sb-line);
+  border-radius: var(--sb-radius);
+}
+
+/* Dialogs stacked ON TOP of the bank window: blur only sees the game,
+   not the bank window behind, so these stay dense enough to hide it. */
+.popup-content.svelte-1ynylej.svelte-1ynylej,
+.loading-content.svelte-1ao9gz5.svelte-1ao9gz5,
+html.rb-blur-on .popup-content.svelte-1ynylej.svelte-1ynylej,
+html.rb-blur-on .loading-content.svelte-1ao9gz5.svelte-1ao9gz5 { background-color: rgba(16, 20, 28, 0.82); }
+.popup-content .btns-group { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin-top: .6rem; }
+
+/* keep text crisp over a bright blurred background */
+html.rb-blur-on .main.svelte-1mww25k,
+html.rb-blur-on .popup-content.svelte-1ynylej,
+html.rb-blur-on .notificaion-content.svelte-aywcjm { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); }
+html.rb-blur-on .btn, html.rb-blur-on .title-container p, html.rb-blur-on .trans_id { text-shadow: none; }

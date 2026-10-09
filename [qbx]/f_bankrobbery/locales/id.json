@@ -1,0 +1,31 @@
+{
+    "success": {
+        "success_message": "Berhasil",
+        "fuses_are_blown": "Sekringnya sudah putus",
+        "door_has_opened": "Pintunya terbuka"
+    },
+    "error": {
+        "cancel_message": "Dibatalkan",
+        "safe_too_strong": "Sepertinya kunci brankas ini terlalu kuat...",
+        "missing_item": "Ada barang yang kurang...",
+        "bank_already_open": "Bank ini sudah terbuka...",
+        "minimum_police_required": "Butuh minimal %s polisi",
+        "security_lock_active": "Kunci keamanan aktif, pintu belum bisa dibuka",
+        "wrong_type": "%s did not receive the right type for argument '%s'\nreceived type: %s\nreceived value: %s\n expected type: %s",
+        "fuses_already_blown": "Sekringnya sudah putus...",
+        "event_trigger_wrong": "%s%s was triggered when some conditions weren't met, source: %s",
+        "missing_ignition_source": "Kamu tidak punya alat penyulut"
+    },
+    "general": {
+        "breaking_open_safe": "Membobol brankas...",
+        "connecting_hacking_device": "Menghubungkan alat peretas...",
+        "fleeca_robbery_alert": "Percobaan perampokan Bank Fleeca",
+        "paleto_robbery_alert": "Percobaan perampokan Bank Blaine County Savings",
+        "pacific_robbery_alert": "Percobaan perampokan Pacific Standard Bank",
+        "break_safe_open_option_target": "Bobol Brankas",
+        "break_safe_open_option_drawtext": "[E] Bobol brankas",
+        "validating_bankcard": "Memverifikasi kartu...",
+        "thermite_detonating_in_seconds": "Thermite meledak dalam %s detik",
+        "bank_robbery_police_call": "10-90: Perampokan Bank"
+    }
+}

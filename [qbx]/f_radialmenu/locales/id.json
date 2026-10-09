@@ -1,0 +1,57 @@
+{
+  "error": {
+    "no_people_nearby": "Tidak ada pemain di dekatmu.",
+    "no_vehicle_nearby": "Tidak ada kendaraan di dekatmu untuk dibalikkan.",
+    "no_vehicle_found": "Kendaraan tidak ditemukan.",
+    "extra_deactivated": "Extra %s dinonaktifkan.",
+    "extra_not_present": "Extra %s tidak ada di kendaraan ini.",
+    "not_driver": "Kamu bukan pengemudi kendaraan ini.",
+    "vehicle_driving_fast": "Kendaraan ini melaju terlalu cepat.",
+    "seat_occupied": "Kursi ini sudah terisi.",
+    "race_harness_on": "Kamu memakai harness balap. Tidak bisa pindah kursi.",
+    "obj_not_found": "Gagal membuat objek yang diminta.",
+    "not_near_ambulance": "Kamu tidak berada di dekat ambulans.",
+    "far_away": "Kamu terlalu jauh.",
+    "not_kidnapped": "Kamu tidak sedang menculik orang ini.",
+    "trunk_closed": "Bagasinya tertutup.",
+    "cant_enter_trunk": "Kamu tidak bisa masuk ke bagasi ini.",
+    "already_in_trunk": "Kamu sudah di dalam bagasi.",
+    "someone_in_trunk": "Sudah ada orang di dalam bagasi.",
+    "cancel_task": "Dibatalkan"
+  },
+  "progress": {
+    "flipping_car": "Membalikkan kendaraan..."
+  },
+  "success": {
+    "extra_activated": "Extra %s diaktifkan.",
+    "entered_trunk": "Kamu berada di dalam bagasi.",
+    "flipped_car": "Kendaraan berhasil dibalikkan!"
+  },
+  "info": {
+    "no_variants": "Sepertinya tidak ada varian untuk ini.",
+    "wrong_ped": "Model karakter ini tidak mendukung opsi ini.",
+    "nothing_to_remove": "Tidak ada yang bisa dilepas.",
+    "already_wearing": "Kamu sudah memakainya.",
+    "switched_seats": "Kamu sekarang di %s."
+  },
+  "general": {
+    "command_description": "Buka Menu Radial",
+    "get_out_trunk_button": "[E] Keluar dari Bagasi",
+    "close_trunk_button": "[G] Tutup Bagasi",
+    "open_trunk_button": "[G] Buka Bagasi",
+    "getintrunk_command_desc": "Masuk ke Bagasi",
+    "putintrunk_command_desc": "Masukkan Pemain ke Bagasi",
+    "gang_radial": "Geng",
+    "job_radial": "Pekerjaan"
+  },
+  "options": {
+    "flip": "Balikkan Kendaraan",
+    "vehicle": "Kendaraan",
+    "emergency_button": "Tombol Darurat",
+    "driver_seat": "Kursi Pengemudi",
+    "passenger_seat": "Kursi Penumpang",
+    "other_seats": "Kursi Lain",
+    "rear_left_seat": "Kursi Belakang Kiri",
+    "rear_right_seat": "Kursi Belakang Kanan"
+  }
+}

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economy Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="app" class="hidden">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1><i class="fa-solid fa-chart-line"></i> Economy Dashboard</h1>
+                <span class="framework-badge" id="frameworkBadge">Loading...</span>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-icon close-btn" id="closeBtn" title="Close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="overview">
+                <span class="tab-icon"><i class="fa-solid fa-gauge-high"></i></span>
+                <span class="tab-text">Overview</span>
+            </button>
+            <button class="tab-btn" data-tab="faucets">
+                <span class="tab-icon"><i class="fa-solid fa-arrow-trend-up"></i></span>
+                <span class="tab-text">Faucets</span>
+            </button>
+            <button class="tab-btn" data-tab="sinks">
+                <span class="tab-icon"><i class="fa-solid fa-arrow-trend-down"></i></span>
+                <span class="tab-text">Sinks</span>
+            </button>
+            <button class="tab-btn" data-tab="analytics">
+                <span class="tab-icon"><i class="fa-solid fa-chart-pie"></i></span>
+                <span class="tab-text">Analytics</span>
+            </button>
+            <button class="tab-btn" data-tab="players">
+                <span class="tab-icon"><i class="fa-solid fa-users"></i></span>
+                <span class="tab-text">Players</span>
+            </button>
+            <button class="tab-btn" data-tab="alerts">
+                <span class="tab-icon"><i class="fa-solid fa-bell"></i></span>
+                <span class="tab-text">Alerts</span>
+                <span class="alert-badge hidden" id="alertBadge">0</span>
+            </button>
+            <button class="tab-btn" data-tab="admin">
+                <span class="tab-icon"><i class="fa-solid fa-gear"></i></span>
+                <span class="tab-text">Admin</span>
+            </button>
+        </nav>
+
+        <!-- Tab Content -->
+        <main class="tab-content">
+            <!-- Overview Tab -->
+            <section id="overview" class="tab-panel active">
+                <!-- Economy Health Score -->
+                <div class="health-score-container" style="margin-bottom: 20px;">
+                    <div class="health-score-card" id="healthScoreCard" style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 149, 0, 0.1)); border: 2px solid var(--accent-cyan); border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 30px;">
+                        <div class="score-circle" id="scoreCircle" style="width: 100px; height: 100px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: conic-gradient(var(--accent-cyan) 0deg, var(--bg-darker) 0deg); position: relative;">
+                            <span id="healthScore" style="font-size: 2rem; font-weight: 700; color: var(--accent-cyan);">--</span>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">/ 100</span>
+                        </div>
+                        <div class="score-details" style="flex: 1;">
+                            <h3 style="color: var(--accent-cyan); margin: 0 0 5px 0; font-size: 1.2rem;">Economy Health</h3>
+                            <p id="healthStatus" style="color: var(--text-secondary); margin: 0 0 10px 0; font-size: 0.9rem;">Calculating...</p>
+                            <div class="score-breakdown" id="scoreBreakdown" style="display: flex; gap: 15px; flex-wrap: wrap;">
+                                <span class="breakdown-item" style="font-size: 0.8rem; color: var(--text-muted);">Flow: <span id="flowScoreVal">--</span></span>
+                                <span class="breakdown-item" style="font-size: 0.8rem; color: var(--text-muted);">Distribution: <span id="giniScoreVal">--</span></span>
+                                <span class="breakdown-item" style="font-size: 0.8rem; color: var(--text-muted);">Velocity: <span id="velocityScoreVal">--</span></span>
+                                <span class="breakdown-item" style="font-size: 0.8rem; color: var(--text-muted);">Activity: <span id="activityScoreVal">--</span></span>
+                            </div>
+                        </div>
+                        <div class="week-comparison" style="text-align: right;">
+                            <div style="margin-bottom: 8px;">
+                                <span style="color: var(--text-muted); font-size: 0.75rem;">vs Last Week</span>
+                            </div>
+                            <div id="faucetTrend" style="font-size: 0.85rem; margin-bottom: 4px;">
+                                <span style="color: var(--text-muted);">Faucets:</span> <span class="trend-value">--</span>
+                            </div>
+                            <div id="sinkTrend" style="font-size: 0.85rem;">
+                                <span style="color: var(--text-muted);">Sinks:</span> <span class="trend-value">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Server Totals -->
+                <div class="card-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-dollar-sign"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Cash</span>
+                            <span class="stat-value" id="totalCash">Rp 0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏦</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Bank</span>
+                            <span class="stat-value" id="totalBank">Rp 0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💎</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Dirty Money</span>
+                            <span class="stat-value" id="totalDirty">Rp 0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card highlight">
+                        <div class="stat-icon">🌐</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Wealth</span>
+                            <span class="stat-value" id="totalWealth">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Flow with Trends -->
+                <div class="section-header">
+                    <h2>Today's Economy Flow</h2>
+                </div>
+                <div class="card-grid cols-3">
+                    <div class="stat-card positive">
+                        <div class="stat-icon"><i class="fa-solid fa-arrow-down"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Money In (Faucets)</span>
+                            <span class="stat-value" id="todayFaucets">Rp 0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card negative">
+                        <div class="stat-icon">📤</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Money Out (Sinks)</span>
+                            <span class="stat-value" id="todaySinks">Rp 0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card" id="netFlowCard">
+                        <div class="stat-icon"><i class="fa-solid fa-chart-bar"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Net Flow</span>
+                            <span class="stat-value" id="todayNetFlow">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3>30-Day Money Flow</h3>
+                        <canvas id="flowChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Wealth Distribution</h3>
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Player Stats -->
+                <div class="card-grid cols-2">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Players</span>
+                            <span class="stat-value" id="totalPlayers">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🟢</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Online Now</span>
+                            <span class="stat-value" id="onlinePlayers">0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Faucets Tab -->
+            <section id="faucets" class="tab-panel">
+                <div class="section-header">
+                    <h2>Money Sources (Faucets)</h2>
+                    <div class="date-filter">
+                        <select id="faucetCategoryFilter" class="form-select" style="min-width: 150px;">
+                            <option value="">All Categories</option>
+                        </select>
+                        <input type="date" id="faucetStartDate" class="date-input">
+                        <span>to</span>
+                        <input type="date" id="faucetEndDate" class="date-input">
+                        <button class="btn btn-primary" id="filterFaucetsBtn">Filter</button>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-card wide">
+                        <h3>Faucet Categories</h3>
+                        <canvas id="faucetPieChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Subcategory</th>
+                                <th>Total Amount</th>
+                                <th>Transactions</th>
+                                <th>Avg/Transaction</th>
+                            </tr>
+                        </thead>
+                        <tbody id="faucetTableBody">
+                            <tr><td colspan="5" class="loading">Loading faucet data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Sinks Tab -->
+            <section id="sinks" class="tab-panel">
+                <div class="section-header">
+                    <h2>Money Drains (Sinks)</h2>
+                    <div class="date-filter">
+                        <select id="sinkCategoryFilter" class="form-select" style="min-width: 150px;">
+                            <option value="">All Categories</option>
+                        </select>
+                        <input type="date" id="sinkStartDate" class="date-input">
+                        <span>to</span>
+                        <input type="date" id="sinkEndDate" class="date-input">
+                        <button class="btn btn-primary" id="filterSinksBtn">Filter</button>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-card wide">
+                        <h3>Sink Categories</h3>
+                        <canvas id="sinkPieChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Subcategory</th>
+                                <th>Total Amount</th>
+                                <th>Transactions</th>
+                                <th>Avg/Transaction</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sinkTableBody">
+                            <tr><td colspan="5" class="loading">Loading sink data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Analytics Tab -->
+            <section id="analytics" class="tab-panel">
+                <div class="section-header">
+                    <h2><i class="fa-solid fa-chart-line"></i> Economy Analytics</h2>
+                </div>
+
+                <!-- Wealth Distribution -->
+                <div class="analytics-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div class="analytics-card" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px;">
+                        <h3 style="color: var(--accent-cyan); margin-bottom: 15px;"><i class="fa-solid fa-coins"></i> Wealth Distribution</h3>
+                        <div class="gini-display" style="text-align: center; margin-bottom: 15px;">
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Gini Coefficient</span>
+                            <div id="giniValue" style="font-size: 2.5rem; font-weight: 700; color: var(--accent-gold);">--</div>
+                            <span id="giniInterpretation" style="font-size: 0.8rem; color: var(--text-secondary);">Loading...</span>
+                        </div>
+                        <div class="wealth-percentiles" style="margin-top: 15px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: var(--text-muted);">Top 1% owns:</span>
+                                <span id="top1Percent" style="color: #f87171; font-weight: 600;">--</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="color: var(--text-muted);">Top 10% owns:</span>
+                                <span id="top10Percent" style="color: #fb923c; font-weight: 600;">--</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted);">Top 50% owns:</span>
+                                <span id="top50Percent" style="color: #4ade80; font-weight: 600;">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px;">
+                        <h3 style="color: var(--accent-cyan); margin-bottom: 15px;"><i class="fa-solid fa-layer-group"></i> Wealth Brackets</h3>
+                        <canvas id="wealthBracketsChart" style="max-height: 250px;"></canvas>
+                    </div>
+                </div>
+
+                <!-- Leaderboards -->
+                <div class="leaderboards-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                    <!-- Richest Players -->
+                    <div class="leaderboard-card" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px;">
+                        <h3 style="color: var(--accent-gold); margin-bottom: 15px;">🏆 Richest Players</h3>
+                        <div id="topRichestList" class="leaderboard-list">
+                            <p class="loading">Loading...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Earners (7 days) -->
+                    <div class="leaderboard-card" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px;">
+                        <h3 style="color: #4ade80; margin-bottom: 15px;"><i class="fa-solid fa-ranking-star"></i> Top Earners (7d)</h3>
+                        <div id="topEarnersList" class="leaderboard-list">
+                            <p class="loading">Loading...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Spenders (7 days) -->
+                    <div class="leaderboard-card" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px;">
+                        <h3 style="color: #f87171; margin-bottom: 15px;">📤 Top Spenders (7d)</h3>
+                        <div id="topSpendersList" class="leaderboard-list">
+                            <p class="loading">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inflation Tracking -->
+                <div class="section-header" style="margin-top: 30px;">
+                    <h2><i class="fa-solid fa-chart-line"></i> Inflation Tracking</h2>
+                </div>
+                <div class="analytics-grid" style="display: grid; grid-template-columns: 1fr 1.5fr 1.5fr; gap: 20px;">
+                    <!-- CPI Display -->
+                    <div class="analytics-card" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px;">
+                        <h3 style="color: var(--accent-cyan); margin-bottom: 15px;"><i class="fa-solid fa-percent"></i> Consumer Price Index</h3>
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div id="cpiValue" style="font-size: 3rem; font-weight: 700; color: var(--accent-gold);">100</div>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Base = 100</span>
+                        </div>
+                        <div id="inflationRate" style="text-align: center; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px;">
+                            <span style="color: var(--text-muted);">Inflation Rate: </span>
+                            <span id="inflationRateValue" style="font-weight: 600; color: var(--accent-cyan);">0%</span>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+                                CPI measures the cost of a basket of goods vs base prices.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Price Basket -->
+                    <div class="analytics-card" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3 style="color: var(--accent-cyan); margin: 0;">🛒 Price Basket</h3>
+                            <button class="btn btn-primary btn-sm" id="updatePricesBtn" style="padding: 6px 12px; font-size: 0.8rem;">Update Prices</button>
+                        </div>
+                        <div id="priceBasketList" style="max-height: 220px; overflow-y: auto;">
+                            <p class="loading">Loading basket items...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Price Changes -->
+                    <div class="analytics-card" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px;">
+                        <h3 style="color: var(--accent-cyan); margin-bottom: 15px;">📜 Recent Price Changes</h3>
+                        <div id="priceHistoryList" style="max-height: 220px; overflow-y: auto;">
+                            <p style="color: var(--text-muted); text-align: center; padding: 15px; font-size: 0.85rem;">No price changes recorded yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Update Modal (hidden by default) -->
+                <div id="priceUpdateModal" class="modal hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+                    <div style="background: var(--bg-secondary); border: 1px solid var(--accent-cyan); border-radius: 8px; padding: 25px; max-width: 500px; width: 90%;">
+                        <h3 style="color: var(--accent-cyan); margin-bottom: 20px;"><i class="fa-solid fa-pen-to-square"></i> Update Current Prices</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Enter the current market prices for each item:</p>
+                        <div id="priceInputList" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
+                            <!-- Price inputs will be populated here -->
+                        </div>
+                        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button class="btn btn-secondary" id="cancelPricesBtn">Cancel</button>
+                            <button class="btn btn-success" id="savePricesBtn">Save Prices</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Players Tab -->
+            <section id="players" class="tab-panel">
+                <div class="section-header">
+                    <h2>Player Lookup</h2>
+                    <div class="search-box">
+                        <input type="text" id="playerSearchInput" placeholder="Search by name or citizen ID..." class="search-input">
+                        <button class="btn btn-primary" id="playerSearchBtn">Search</button>
+                    </div>
+                </div>
+
+                <div id="playerSearchResults" class="player-results">
+                    <p class="hint-text">Enter a name or citizen ID to search for players.</p>
+                </div>
+
+                <!-- Player Profile Modal (inline) -->
+                <div id="playerProfilePanel" class="profile-panel hidden">
+                    <div class="profile-header">
+                        <h3 id="profileName">Player Name</h3>
+                        <button class="btn btn-icon" id="closeProfileBtn"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="profile-content">
+                        <!-- Current Balance Section -->
+                        <div class="profile-balance-section" id="profileBalanceSection" style="display: none; margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 149, 0, 0.1)); border: 1px solid var(--accent-cyan); border-radius: 8px;">
+                            <h4 style="color: var(--accent-cyan); margin-bottom: 12px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;"><i class="fa-solid fa-wallet"></i> Current Balance</h4>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                                <div style="text-align: center;">
+                                    <span style="display: block; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Cash</span>
+                                    <span id="profileCash" style="color: #4ade80; font-size: 1.2rem; font-weight: 600;">Rp 0</span>
+                                </div>
+                                <div style="text-align: center;">
+                                    <span style="display: block; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Bank</span>
+                                    <span id="profileBank" style="color: #60a5fa; font-size: 1.2rem; font-weight: 600;">Rp 0</span>
+                                </div>
+                                <div style="text-align: center;">
+                                    <span style="display: block; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Dirty</span>
+                                    <span id="profileDirty" style="color: #f87171; font-size: 1.2rem; font-weight: 600;">Rp 0</span>
+                                </div>
+                            </div>
+                            <div style="text-align: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color);">
+                                <span style="color: var(--text-muted); font-size: 0.75rem;">TOTAL WEALTH</span>
+                                <span id="profileTotalWealth" style="display: block; color: var(--accent-gold); font-size: 1.4rem; font-weight: 700;">Rp 0</span>
+                            </div>
+                            <p id="profileOnlineStatus" style="text-align: center; margin-top: 8px; font-size: 0.75rem; color: var(--text-muted);"></p>
+                        </div>
+                        
+                        <div class="profile-stats">
+                            <div class="profile-stat">
+                                <span class="label">Citizen ID</span>
+                                <span class="value" id="profileCitizenId">-</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="label">Total Earned</span>
+                                <span class="value positive" id="profileEarned">Rp 0</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="label">Total Spent</span>
+                                <span class="value negative" id="profileSpent">Rp 0</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="label">Primary Income</span>
+                                <span class="value" id="profileIncome">-</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="label">Primary Expense</span>
+                                <span class="value" id="profileExpense">-</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="label">Flag Status</span>
+                                <span class="value" id="profileFlag">None</span>
+                            </div>
+                        </div>
+                        <div class="profile-transactions">
+                            <h4>Recent Transactions</h4>
+                            <div class="transaction-list" id="profileTransactions">
+                                <p class="loading">Loading transactions...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Alerts Tab -->
+            <section id="alerts" class="tab-panel">
+                <div class="section-header">
+                    <h2>Economy Alerts</h2>
+                    <div class="filter-buttons">
+                        <button class="btn btn-filter active" data-status="new">New</button>
+                        <button class="btn btn-filter" data-status="reviewed">Reviewed</button>
+                        <button class="btn btn-filter" data-status="resolved">Resolved</button>
+                        <button class="btn btn-filter" data-status="dismissed">Dismissed</button>
+                    </div>
+                </div>
+
+                <div id="alertsList" class="alerts-list">
+                    <p class="loading">Loading alerts...</p>
+                </div>
+            </section>
+
+            <!-- Admin Tab -->
+            <section id="admin" class="tab-panel">
+                <div class="admin-grid">
+                    <!-- Balance Management -->
+                    <div class="admin-card">
+                        <h3><i class="fa-solid fa-money-bill-transfer"></i> Balance Management</h3>
+                        
+                        <!-- Player Search -->
+                        <div class="form-group">
+                            <label>Search Player</label>
+                            <div class="search-box" style="display: flex; gap: 8px;">
+                                <input type="text" id="adminPlayerSearch" placeholder="Search by name..." class="form-input" style="flex: 1;">
+                                <button class="btn btn-secondary" id="adminSearchBtn">🔍</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Player Results Dropdown -->
+                        <div id="adminPlayerResults" class="admin-player-results" style="display: none; max-height: 150px; overflow-y: auto; background: var(--bg-darker); border: 1px solid var(--border-color); margin-bottom: 14px; border-radius: 4px;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Selected Player (Citizen ID)</label>
+                            <input type="text" id="adminCitizenId" placeholder="Enter citizen ID or search above" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Money Type</label>
+                            <select id="adminMoneyType" class="form-select">
+                                <option value="cash">Cash</option>
+                                <option value="bank">Bank</option>
+                                <option value="crypto">Dirty Money</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="number" id="adminAmount" placeholder="Enter amount" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Reason</label>
+                            <input type="text" id="adminReason" placeholder="Reason for change" class="form-input">
+                        </div>
+                        <div class="button-group">
+                            <button class="btn btn-success" id="adminAddBtn">Add Money</button>
+                            <button class="btn btn-danger" id="adminRemoveBtn">Remove Money</button>
+                            <button class="btn btn-warning" id="adminSetBtn">Set Money</button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="admin-card">
+                        <h3>⚡ Quick Actions</h3>
+                        <button class="btn btn-full btn-secondary" id="exportPlayersBtn">
+                            <i class="fa-solid fa-file-export"></i> Export All Player Balances
+                        </button>
+                        <button class="btn btn-full btn-secondary" id="testWebhookBtn">
+                            🔔 Test Discord Webhook
+                        </button>
+                        <div class="warning-box">
+                            <h4><i class="fa-solid fa-triangle-exclamation"></i> Dangerous Actions</h4>
+                            <button class="btn btn-full btn-danger" id="bulkWipeDirtyBtn">
+                                Wipe All Dirty Money (Online)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Log -->
+                <div class="section-header">
+                    <h2>📋 Admin Audit Log</h2>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Admin</th>
+                                <th>Action</th>
+                                <th>Target</th>
+                                <th>Amount</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditLogBody">
+                            <tr><td colspan="6" class="loading">Loading audit log...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <!-- Toast Notifications -->
+        <div id="toastContainer" class="toast-container"></div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Mockup Apotek, Kasir &amp; Gudang EMS</title>
+<link rel="stylesheet" href="../html/style.css">
+<style>
+/* ---- khusus mockup ---- */
+html, body { background: #cdb79a; overflow: auto; }
+.mock-nav { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 50; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+    background: #fff7ec; border: 1px solid var(--line); border-radius: 12px; padding: 6px; box-shadow: 0 6px 20px rgba(80,50,20,.25); }
+.mock-nav button { padding: 7px 12px; border-radius: 8px; font-weight: 700; color: var(--muted); }
+.mock-nav button.on { background: var(--accent); color: #fff; }
+.mock-note { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 50; max-width: 900px; font-size: 12px;
+    background: #fff7ec; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; color: var(--muted); text-align: center; }
+.screen { display: none; }
+.screen.on { display: block; }
+.panel { top: calc(50% + 18px); }
+
+/* ---- komponen baru ---- */
+.ks-panel { width: min(1000px, 96vw); height: min(640px, 88vh); }
+.ks-tabs { display: flex; gap: 6px; padding: 14px 22px 0; flex-wrap: wrap; }
+.ks-tabs button { padding: 9px 14px; border-radius: 10px; background: var(--card); border: 1px solid var(--line); font-weight: 700; color: var(--muted); }
+.ks-tabs button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.ks-tabs button .badge { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 4px; border-radius: 9px; background: var(--red); color: #fff; font-size: 11px; }
+.ks-tabs button.lock { opacity: .55; }
+.ks-body { flex: 1; overflow-y: auto; padding: 14px 22px 18px; display: flex; flex-direction: column; gap: 10px; }
+.ks-body::-webkit-scrollbar { width: 6px; }
+.ks-body::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+.view { display: none; flex-direction: column; gap: 10px; }
+.view.on { display: flex; }
+
+.bill { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.bill .top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bill .code { font-weight: 800; color: var(--accent); }
+.bill .who { flex: 1; font-weight: 700; min-width: 140px; }
+.bill .who span { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+.bill ul { list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.bill li { display: flex; justify-content: space-between; color: var(--muted); }
+.bill li.tot { color: var(--text); font-weight: 800; border-top: 1px dashed var(--line); padding-top: 6px; margin-top: 2px; }
+.bill .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.bill .acts .primary { flex: 1; padding: 10px; font-size: 14px; }
+.bill .acts .ghost { padding: 10px 14px; }
+.btn-warn { padding: 10px 14px; border-radius: 12px; background: #fde7c2; color: #a35d00; font-weight: 800; }
+.tag { font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: var(--card2); color: var(--muted); }
+.tag.apotek { background: #e6efff; color: var(--accent); }
+.tag.operasi { background: #efe1fb; color: #7a3fb5; }
+.tag.tindakan { background: #fde7c2; color: #a35d00; }
+.feedback { padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; }
+.feedback.no { background: #fbe0dc; color: var(--red); }
+.feedback.ok { background: #d5efdc; color: var(--green); }
+
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.card-sum { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.card-sum small { display: block; }
+.card-sum b { font-size: 20px; }
+
+table.list { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+table.list th, table.list td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); }
+table.list th { background: var(--card2); color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+table.list tr:last-child td { border-bottom: 0; }
+table.list td.n, table.list th.n { text-align: right; font-variant-numeric: tabular-nums; }
+table.list input { width: 110px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: #fff; font: inherit; color: var(--text); text-align: right; }
+table.list input:disabled { background: var(--bg); color: var(--muted); }
+.stock-low { color: var(--red); font-weight: 800; }
+.stock-ok { color: var(--green); font-weight: 800; }
+.buyqty { display: inline-flex; align-items: center; gap: 4px; }
+.buyqty button { width: 26px; height: 26px; border-radius: 7px; background: var(--card2); font-weight: 800; }
+.buyqty b { min-width: 30px; text-align: center; }
+.cart-bar { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: var(--card2); }
+.cart-bar .sum { flex: 1; }
+.cart-bar strong { font-size: 20px; color: var(--accent); }
+.lock-note { padding: 10px 12px; border-radius: 10px; background: #e6efff; color: var(--accent-dark); font-size: 12px; }
+
+.set-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); }
+.set-row .name { flex: 1; }
+.set-row .name span { display: block; color: var(--muted); font-size: 12px; }
+.set-row input { width: 70px; padding: 8px; border-radius: 8px; border: 1px solid var(--line); font: inherit; text-align: center; background: #fff; color: var(--text); }
+
+.ph-item .stockline { font-size: 12px; color: var(--muted); }
+.ph-item.out { opacity: .55; }
+.ph-item.out .stockline { color: var(--red); font-weight: 700; }
+.banner { padding: 10px 14px; border-radius: 12px; font-size: 13px; }
+.banner.info { background: #e6efff; color: var(--accent-dark); }
+.banner.warn { background: #fde7c2; color: #a35d00; }
+.banner.ok { background: #d5efdc; color: var(--green); }
+
+.arm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.arm-item { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.arm-item .img { height: 80px; border-radius: 10px; background: var(--card2); display: grid; place-items: center; font-size: 40px; }
+.arm-item h3 { color: var(--text); text-transform: none; letter-spacing: 0; font-size: 15px; }
+.arm-item p { color: var(--muted); font-size: 12px; min-height: 32px; }
+.arm-item .primary:disabled { opacity: .6; }
+
+.choose { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.choose button { padding: 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); text-align: left; display: flex; flex-direction: column; gap: 3px; }
+.choose button b { font-size: 15px; }
+.choose button span { color: var(--muted); font-size: 12px; }
+.choose button.on { border-color: var(--accent); background: #e6efff; }
+</style>
+</head>
+<body>
+
+<div class="mock-nav" id="nav">
+    <button data-s="apotek" class="on">1. Apotek (pemain)</button>
+    <button data-s="kasir-p">2. Kasir (pasien)</button>
+    <button data-s="kasir-s">3. Kasir (petugas)</button>
+    <button data-s="cek">4. Cek Pasien · Tagihan</button>
+    <button data-s="armory">5. Armory</button>
+</div>
+
+<!-- =============================== 1. APOTEK =============================== -->
+<div class="screen on" id="s-apotek">
+<div class="panel ph-panel">
+    <header>
+        <div class="brand"><span class="logo">💊</span><div><h1>Apotek Foreplay Hospital</h1><small>Pesan obat, bayar di kasir</small></div></div>
+        <button class="icon-btn">✕</button>
+    </header>
+    <div class="ph-body">
+        <div class="banner info">🟢 Ada <b>2 petugas EMS</b> bertugas · maksimal <b>10 obat</b> per pesanan · setelah bayar, obat diserahkan petugas di kasir.</div>
+        <div class="ph-grid">
+            <div class="ph-item">
+                <div class="img">🩹</div><h3>Bandage</h3><p>Luka ringan &amp; pendarahan ringan · berlaku 3 hari</p>
+                <div class="price">Rp 8.000</div><div class="stockline">Stok tersedia</div>
+                <div class="qty"><button>−</button><b>4</b><button>+</button></div>
+            </div>
+            <div class="ph-item">
+                <div class="img">💊</div><h3>Painkillers</h3><p>Menahan rasa nyeri sementara · berlaku 3 hari</p>
+                <div class="price">Rp 12.000</div><div class="stockline">Stok tersedia</div>
+                <div class="qty"><button>−</button><b>2</b><button>+</button></div>
+            </div>
+            <div class="ph-item out">
+                <div class="img">🧠</div><h3>Calming Pills</h3><p>Obat penenang, menurunkan stres · berlaku 3 hari</p>
+                <div class="price">Rp 20.000</div><div class="stockline">Stok habis</div>
+                <div class="qty"><button disabled>−</button><b>0</b><button disabled>+</button></div>
+            </div>
+        </div>
+        <div class="banner warn">⚠️ Contoh saat <b>tidak ada EMS bertugas</b>: maksimal <b>5 obat</b>, lalu tidak bisa memesan lagi selama <b>1 jam</b> (atau sampai ada EMS bertugas). Obat langsung masuk tas setelah dibayar di kasir.</div>
+        <div class="ph-status">
+            <h2>Contoh setelah pesan: Pesanan #A27 · Rp 56.000</h2>
+            <small>Silakan menuju <b>Kasir Rumah Sakit</b> untuk membayar. Pesanan batal otomatis dalam <b>30 menit</b> kalau belum dibayar, dan stok dikembalikan.</small>
+            <small>Kamu belum bisa memesan lagi sampai pesanan ini lunas atau batal.</small>
+        </div>
+    </div>
+    <footer class="ph-foot">
+        <div class="sum"><small>6 / 10 obat</small><strong>Rp 56.000</strong></div>
+        <button class="primary">Pesan &amp; Bayar di Kasir</button>
+    </footer>
+</div>
+</div>
+
+<!-- =============================== 2. KASIR PASIEN =============================== -->
+<div class="screen" id="s-kasir-p">
+<div class="panel ks-panel">
+    <header>
+        <div class="brand"><span class="logo">🧾</span><div><h1>Kasir Rumah Sakit</h1><small>Tagihan atas nama Budi Santoso</small></div></div>
+        <button class="icon-btn">✕</button>
+    </header>
+    <div class="ks-body">
+        <div class="bill">
+            <div class="top"><span class="code">#A27</span><span class="tag apotek">Apotek</span><div class="who">Pesanan obat<span>dipesan 14:02 · batal otomatis 14:32</span></div></div>
+            <ul>
+                <li><span>4× Bandage</span><span>Rp 32.000</span></li>
+                <li><span>2× Painkillers</span><span>Rp 24.000</span></li>
+                <li class="tot"><span>Total</span><span>Rp 56.000</span></li>
+            </ul>
+            <div class="choose" id="pay-a27">
+                <button class="on" data-m="cash"><b>💵 Cash</b><span>Dipotong dari uang tunai di tas</span></button>
+                <button data-m="transfer"><b>📱 Transfer</b><span>Invoice dikirim ke HP, bayar dari Bank</span></button>
+            </div>
+            <div class="acts"><button class="primary">Bayar Rp 56.000</button></div>
+        </div>
+
+        <div class="bill">
+            <div class="top"><span class="code">#T114</span><span class="tag operasi">Operasi</span><div class="who">Operasi oleh dr. Sari<span>13:40 · Ruang Operasi 1</span></div></div>
+            <ul>
+                <li><span>Operasi</span><span>Rp 400.000</span></li>
+                <li><span>Transfusi darah</span><span>Rp 75.000</span></li>
+                <li class="tot"><span>Total</span><span>Rp 475.000</span></li>
+            </ul>
+            <div class="choose">
+                <button><b>💵 Cash</b><span>Dipotong dari uang tunai di tas</span></button>
+                <button class="on"><b>📱 Transfer</b><span>Invoice dikirim ke HP, bayar dari Bank</span></button>
+            </div>
+            <div class="acts"><button class="primary">Kirim Invoice ke HP</button></div>
+        </div>
+
+        <div class="bill">
+            <div class="top"><span class="code">#A21</span><span class="tag apotek">Apotek</span><div class="who">Sudah dibayar · menunggu obat<span>Tidak ada EMS bertugas: ambil sendiri</span></div></div>
+            <ul><li><span>3× Bandage</span><span>lunas</span></li></ul>
+            <div class="feedback no">🎒 Tas kamu penuh. Kosongkan tas lalu tekan Ambil Obat.</div>
+            <div class="acts"><button class="primary">🎒 Ambil Obat</button></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- =============================== 3. KASIR PETUGAS =============================== -->
+<div class="screen" id="s-kasir-s">
+<div class="panel ks-panel">
+    <header>
+        <div class="brand"><span class="logo">🏥</span><div><h1>Kasir EMS</h1><small>dr. Sari · Doctor · bertugas</small></div></div>
+        <button class="icon-btn">✕</button>
+    </header>
+    <div class="ks-tabs" id="ks-tabs">
+        <button data-v="approval" class="on">✅ Approval <span class="badge">2</span></button>
+        <button data-v="unpaid">⏳ Belum Dibayar <span class="badge">3</span></button>
+        <button data-v="gudang">📦 Stok Gudang</button>
+        <button data-v="supplier" class="lock">🔒 Supplier</button>
+        <button data-v="harga" class="lock">🔒 Daftar Harga</button>
+        <button data-v="setting">⚙️ Pengaturan</button>
+    </div>
+    <div class="ks-body">
+
+        <!-- Approval -->
+        <div class="view on" data-view="approval">
+            <div class="lock-note">Tagihan yang <b>sudah dibayar</b>. Pasien harus berdiri dekat kamu. Kalau tas pasien penuh, tekan Approve lagi setelah tasnya dikosongkan.</div>
+            <div class="bill">
+                <div class="top"><span class="code">#A27</span><span class="tag apotek">Apotek</span><div class="who">Budi Santoso<span>lunas 14:05 · cash</span></div><span class="chip ok">Di dekatmu</span></div>
+                <ul><li><span>4× Bandage</span><span></span></li><li><span>2× Painkillers</span><span></span></li></ul>
+                <div class="feedback no" id="appr-msg">🎒 Tas pasien penuh, obat belum terkirim. Minta pasien mengosongkan tas, lalu Approve lagi.</div>
+                <div class="acts"><button class="primary" id="appr-btn">✅ Approve &amp; Serahkan Obat</button></div>
+            </div>
+            <div class="bill">
+                <div class="top"><span class="code">#T109</span><span class="tag tindakan">Tindakan</span><div class="who">Rina Wulandari<span>lunas 13:51 · transfer</span></div><span class="chip no">Jauh</span></div>
+                <ul><li><span>Revive di lapangan</span><span></span></li><li><span>Obati luka ringan ×2</span><span></span></li></ul>
+                <div class="acts"><button class="primary" disabled>Pasien harus dekat kamu</button></div>
+            </div>
+        </div>
+
+        <!-- Belum dibayar -->
+        <div class="view" data-view="unpaid">
+            <div class="cards">
+                <div class="card-sum"><small>Belum dibayar</small><b>3</b></div>
+                <div class="card-sum"><small>Menunggu transfer</small><b>1</b></div>
+                <div class="card-sum"><small>Total belum masuk</small><b style="color:var(--accent)">Rp 731.000</b></div>
+            </div>
+            <table class="list">
+                <thead><tr><th>#</th><th>Jenis</th><th>Pasien</th><th>Waktu</th><th>Status</th><th class="n">Total</th><th></th></tr></thead>
+                <tbody>
+                    <tr><td><b>#T114</b></td><td><span class="tag operasi">Operasi</span></td><td>Budi Santoso</td><td>13:40<br><small>dr. Sari</small></td><td><span class="chip info">Menunggu transfer</span></td><td class="n"><b>Rp 475.000</b></td>
+                        <td><div class="acts" style="display:flex;gap:6px"><button class="ghost">Batal</button><button class="btn-warn">Tagih Paksa</button></div></td></tr>
+                    <tr><td><b>#T112</b></td><td><span class="tag tindakan">Tindakan</span></td><td>Andi Wijaya</td><td>12:58<br><small>Paramedic Joko</small></td><td><span class="chip no">Belum bayar</span></td><td class="n"><b>Rp 200.000</b></td>
+                        <td><div class="acts" style="display:flex;gap:6px"><button class="ghost">Batal</button><button class="btn-warn">Tagih Paksa</button></div></td></tr>
+                    <tr><td><b>#A27</b></td><td><span class="tag apotek">Apotek</span></td><td>Budi Santoso</td><td>14:02<br><small>batal otomatis 14:32</small></td><td><span class="chip no">Belum bayar</span></td><td class="n"><b>Rp 56.000</b></td>
+                        <td><div class="acts" style="display:flex;gap:6px"><button class="ghost">Batal</button></div></td></tr>
+                </tbody>
+            </table>
+            <div class="lock-note"><b>Tagih Paksa</b> memotong <b>saldo bank</b> pasien (online maupun offline, boleh sampai minus) lalu mengirim email pemberitahuan. Pesanan apotek tidak bisa ditagih paksa karena batal otomatis dalam 30 menit. <b>Batal</b> bisa dipakai semua grade; pesanan apotek yang dibatalkan mengembalikan stok.</div>
+        </div>
+
+        <!-- Stok gudang -->
+        <div class="view" data-view="gudang">
+            <div class="lock-note">Stok hanya bisa <b>dilihat</b>. Dipotong otomatis oleh pembelian apotek, tindakan Cek Pasien, operasi, dan transfusi. Tidak ada masa berlaku di gudang.</div>
+            <table class="list">
+                <thead><tr><th>Item</th><th>Dipakai untuk</th><th class="n">Stok</th></tr></thead>
+                <tbody>
+                    <tr><td>🩹 Bandage</td><td>apotek, luka ringan, pendarahan ringan, perban operasi</td><td class="n stock-ok">142</td></tr>
+                    <tr><td>💊 Painkillers</td><td>apotek, pereda nyeri</td><td class="n stock-ok">60</td></tr>
+                    <tr><td>🧠 Calming Pills</td><td>apotek</td><td class="n stock-low">0</td></tr>
+                    <tr><td>🧻 Hemostatic Gauze</td><td>pendarahan berat</td><td class="n stock-ok">35</td></tr>
+                    <tr><td>🦴 Splint</td><td>luka berat tangan/kaki</td><td class="n stock-ok">24</td></tr>
+                    <tr><td>🧵 Suture Kit</td><td>luka berat kepala/badan, jahit operasi</td><td class="n stock-ok">30</td></tr>
+                    <tr><td>⛑️ First Aid Kit</td><td>revive</td><td class="n stock-ok">18</td></tr>
+                    <tr><td>🩼 Crutch</td><td>diberikan ke pasien pemulihan</td><td class="n stock-ok">8</td></tr>
+                    <tr><td>💉 Anesthetic</td><td>bius operasi</td><td class="n stock-ok">6</td></tr>
+                    <tr><td>🔪 Jatah Operasi (Surgical Kit)</td><td>1 operasi = 1 jatah · 1 kit = 10 jatah</td><td class="n stock-ok">20</td></tr>
+                    <tr><td>🩸 Blood Bag</td><td>transfusi · hanya dari donor darah</td><td class="n stock-ok">4</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Supplier (boss) -->
+        <div class="view" data-view="supplier">
+            <div class="lock-note">🔒 Hanya <b>Boss</b>. Dibayar dari <b>rekening organisasi EMS</b> · saldo saat ini <b>Rp 12.480.000</b>. Barang langsung masuk Stok Gudang.</div>
+            <table class="list">
+                <thead><tr><th>Item</th><th class="n">Harga (HPP)</th><th class="n">Stok</th><th class="n">Beli</th></tr></thead>
+                <tbody>
+                    <tr><td>🩹 Bandage</td><td class="n">Rp 3.000</td><td class="n">142</td><td class="n"><span class="buyqty"><button>−</button><b>50</b><button>+</button></span></td></tr>
+                    <tr><td>💊 Painkillers</td><td class="n">Rp 4.000</td><td class="n">60</td><td class="n"><span class="buyqty"><button>−</button><b>0</b><button>+</button></span></td></tr>
+                    <tr><td>🧠 Calming Pills</td><td class="n">Rp 7.000</td><td class="n stock-low">0</td><td class="n"><span class="buyqty"><button>−</button><b>30</b><button>+</button></span></td></tr>
+                    <tr><td>🧻 Hemostatic Gauze</td><td class="n">Rp 6.000</td><td class="n">35</td><td class="n"><span class="buyqty"><button>−</button><b>0</b><button>+</button></span></td></tr>
+                    <tr><td>🦴 Splint</td><td class="n">Rp 8.000</td><td class="n">24</td><td class="n"><span class="buyqty"><button>−</button><b>0</b><button>+</button></span></td></tr>
+                    <tr><td>🧵 Suture Kit</td><td class="n">Rp 10.000</td><td class="n">30</td><td class="n"><span class="buyqty"><button>−</button><b>0</b><button>+</button></span></td></tr>
+                    <tr><td>⛑️ First Aid Kit</td><td class="n">Rp 15.000</td><td class="n">18</td><td class="n"><span class="buyqty"><button>−</button><b>10</b><button>+</button></span></td></tr>
+                    <tr><td>🩼 Crutch</td><td class="n">Rp 15.000</td><td class="n">8</td><td class="n"><span class="buyqty"><button>−</button><b>0</b><button>+</button></span></td></tr>
+                    <tr><td>💉 Anesthetic</td><td class="n">Rp 30.000</td><td class="n">6</td><td class="n"><span class="buyqty"><button>−</button><b>0</b><button>+</button></span></td></tr>
+                    <tr><td>🔪 Surgical Kit (+10 jatah operasi)</td><td class="n">Rp 200.000</td><td class="n">20</td><td class="n"><span class="buyqty"><button>−</button><b>0</b><button>+</button></span></td></tr>
+                </tbody>
+            </table>
+            <div class="cart-bar"><div class="sum"><small>3 jenis item · 90 pcs</small><br><strong>Rp 510.000</strong></div><button class="primary" style="padding:11px 18px">Beli ke Supplier</button></div>
+        </div>
+
+        <!-- Daftar harga (boss) -->
+        <div class="view" data-view="harga">
+            <div class="lock-note">🔒 Hanya <b>Boss</b> yang bisa mengubah. Petugas lain hanya melihat. Harga tindakan adalah harga normal; petugas tetap bisa memberi diskon di tab Tagihan Cek Pasien.</div>
+            <table class="list">
+                <thead><tr><th>Apotek</th><th class="n">Default</th><th class="n">Harga</th></tr></thead>
+                <tbody>
+                    <tr><td>🩹 Bandage</td><td class="n">Rp 8.000</td><td class="n"><input value="8000"></td></tr>
+                    <tr><td>💊 Painkillers</td><td class="n">Rp 12.000</td><td class="n"><input value="12000"></td></tr>
+                    <tr><td>🧠 Calming Pills</td><td class="n">Rp 20.000</td><td class="n"><input value="20000"></td></tr>
+                </tbody>
+            </table>
+            <table class="list">
+                <thead><tr><th>Tindakan &amp; operasi</th><th class="n">Default</th><th class="n">Harga</th></tr></thead>
+                <tbody>
+                    <tr><td>Obati luka ringan (per area)</td><td class="n">Rp 10.000</td><td class="n"><input value="10000"></td></tr>
+                    <tr><td>Hentikan pendarahan</td><td class="n">Rp 20.000</td><td class="n"><input value="20000"></td></tr>
+                    <tr><td>Obati luka berat (per area)</td><td class="n">Rp 30.000</td><td class="n"><input value="30000"></td></tr>
+                    <tr><td>Painkiller</td><td class="n">Rp 10.000</td><td class="n"><input value="10000"></td></tr>
+                    <tr><td>Revive di lapangan</td><td class="n">Rp 150.000</td><td class="n"><input value="150000"></td></tr>
+                    <tr><td>Transfusi darah</td><td class="n">Rp 75.000</td><td class="n"><input value="75000"></td></tr>
+                    <tr><td>Pemberian crutch</td><td class="n">Rp 30.000</td><td class="n"><input value="30000"></td></tr>
+                    <tr><td>Operasi</td><td class="n">Rp 400.000</td><td class="n"><input value="400000"></td></tr>
+                </tbody>
+            </table>
+            <div class="cart-bar"><div class="sum"><small>Belum ada perubahan</small></div><button class="primary" style="padding:11px 18px">Simpan Harga</button></div>
+        </div>
+
+        <!-- Pengaturan -->
+        <div class="view" data-view="setting">
+            <div class="set-row"><div class="name"><b>Maksimal obat per pesanan · ada EMS bertugas</b><span>Obat diserahkan petugas lewat Approval</span></div><input value="10"><button class="primary small" style="padding:9px 14px">Simpan</button></div>
+            <div class="set-row"><div class="name"><b>Maksimal obat per pesanan · tanpa EMS bertugas</b><span>Setelah membeli, pemain menunggu 1 jam atau sampai ada EMS bertugas</span></div><input value="5"><button class="primary small" style="padding:9px 14px">Simpan</button></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- =============================== 4. CEK PASIEN TAGIHAN =============================== -->
+<div class="screen" id="s-cek">
+<div class="panel" style="width:min(620px,96vw);height:auto;max-height:88vh">
+    <header>
+        <div class="brand"><span class="logo">🩺</span><div><h1>Cek Pasien · Tagihan</h1><small>Rina Wulandari · tab Tagihan</small></div></div>
+        <button class="icon-btn">✕</button>
+    </header>
+    <div class="content">
+        <div class="lock-note">Tindakan memakai stok <b>Gudang</b>. Syaratnya, petugas membawa <b>Tas Emergency</b> yang masih berlaku.</div>
+        <div class="bill-row"><input type="checkbox" checked><div class="name"><b>Revive di lapangan</b><span>Paramedic Joko · 13:48 · normal Rp 150.000</span></div><div class="price">Rp<input value="150000"></div></div>
+        <div class="bill-row"><input type="checkbox" checked><div class="name"><b>Obati luka ringan</b><span>Lengan kiri · normal Rp 10.000</span></div><div class="price">Rp<input value="10000"></div></div>
+        <div class="bill-row"><input type="checkbox" checked><div class="name"><b>Obati luka ringan</b><span>Kaki kanan · normal Rp 10.000</span></div><div class="price">Rp<input value="10000"></div></div>
+        <div class="bill-total"><span>Total</span><strong>Rp 170.000</strong></div>
+        <div class="choose">
+            <button class="on"><b>📱 Bayar Langsung</b><span>Invoice langsung ke HP pasien</span></button>
+            <button><b>🧾 Bayar di Kasir</b><span>Tagihan muncul di Kasir Rumah Sakit</span></button>
+        </div>
+        <button class="primary">Kirim Tagihan</button>
+        <div class="msg">Contoh kalau stok habis: <b>Stok Hemostatic Gauze di gudang habis.</b> Hubungi Boss untuk restock.</div>
+        <div class="msg">Contoh tanpa tas: <b>Kamu tidak membawa Tas Emergency</b> (ambil di Armory).</div>
+    </div>
+</div>
+</div>
+
+<!-- =============================== 5. ARMORY =============================== -->
+<div class="screen" id="s-armory">
+<div class="panel ph-panel" style="height:auto">
+    <header>
+        <div class="brand"><span class="logo">🎒</span><div><h1>Armory EMS</h1><small>Ambil perlengkapan bertugas · setiap petugas membawa tasnya sendiri</small></div></div>
+        <button class="icon-btn">✕</button>
+    </header>
+    <div class="ph-body">
+        <div class="arm-grid">
+            <div class="arm-item"><div class="img">🎒</div><h3>Tas Emergency</h3><p>Wajib untuk tindakan di Cek Pasien · tidak bisa dipakai lagi setelah <b>2 hari</b> di tas</p><button class="primary small">Ambil</button></div>
+            <div class="arm-item"><div class="img">🧳</div><h3>Tas Operasi</h3><p>Wajib untuk operasi · khusus <b>Doctor ke atas</b> · tidak bisa dipakai lagi setelah <b>24 jam</b> di tas</p><button class="primary small">Ambil</button></div>
+            <div class="arm-item"><div class="img">🩸</div><h3>Blood Bag (kosong)</h3><p>Untuk donor darah · tidak kedaluwarsa · darah hasil donor masuk Stok Gudang</p><button class="primary small">Ambil</button></div>
+            <div class="arm-item"><div class="img">📻</div><h3>Radio</h3><p>Perlengkapan bertugas (tetap seperti sekarang)</p><button class="primary small">Ambil</button></div>
+            <div class="arm-item"><div class="img">🔦</div><h3>Senter</h3><p>Perlengkapan bertugas (tetap seperti sekarang)</p><button class="primary small">Ambil</button></div>
+            <div class="arm-item"><div class="img">🧯</div><h3>Pemadam Api</h3><p>Perlengkapan bertugas (tetap seperti sekarang)</p><button class="primary small">Ambil</button></div>
+        </div>
+        <div class="banner info">Setiap petugas membawa tasnya sendiri, jadi beberapa dokter bisa membawa Tas Operasi bersamaan. Tas yang sudah kedaluwarsa tidak bisa dipakai dan otomatis diganti tas baru saat mengambil lagi. Obat-obatan tidak ada lagi di armory; semuanya diambil dari Stok Gudang.</div>
+        <div class="msg">Contoh saat masih membawa tas yang berlaku: <b>Kamu sudah membawa Tas Operasi.</b></div>
+    </div>
+</div>
+</div>
+
+<div class="mock-note">Mockup · angka contoh · harga dari daftar final (Rp). Tombol tidak tersambung ke server.</div>
+
+<script>
+document.querySelectorAll('#nav button').forEach(function (b) {
+    b.addEventListener('click', function () {
+        document.querySelectorAll('#nav button').forEach(function (x) { x.classList.remove('on'); });
+        document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('on'); });
+        b.classList.add('on');
+        document.getElementById('s-' + b.dataset.s).classList.add('on');
+    });
+});
+document.querySelectorAll('#ks-tabs button').forEach(function (b) {
+    b.addEventListener('click', function () {
+        document.querySelectorAll('#ks-tabs button').forEach(function (x) { x.classList.remove('on'); });
+        document.querySelectorAll('.view').forEach(function (v) { v.classList.toggle('on', v.dataset.view === b.dataset.v); });
+        b.classList.add('on');
+    });
+});
+document.querySelectorAll('.choose').forEach(function (g) {
+    g.querySelectorAll('button').forEach(function (b) {
+        b.addEventListener('click', function () {
+            g.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
+            b.classList.add('on');
+        });
+    });
+});
+// Approve: klik pertama gagal (tas penuh), klik kedua berhasil
+(function () {
+    var tries = 0, btn = document.getElementById('appr-btn'), msg = document.getElementById('appr-msg');
+    btn.addEventListener('click', function () {
+        tries++;
+        if (tries < 2) { msg.className = 'feedback no'; msg.textContent = '🎒 Tas pasien masih penuh, obat belum terkirim.'; return; }
+        msg.className = 'feedback ok'; msg.textContent = '✅ Obat terkirim ke tas pasien. Tagihan hilang dari daftar Approval.';
+        btn.disabled = true;
+    });
+})();
+</script>
+</body>
+</html>

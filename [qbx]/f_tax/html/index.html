@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_tax</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo">🏛️</span><div><h1 id="title">Audit Pajak</h1><small id="sub"></small></div></div>
+            <div class="head-actions">
+                <button class="icon-btn" id="refresh" title="Refresh">⟳</button>
+                <button class="icon-btn close" id="close">✕</button>
+            </div>
+        </header>
+
+        <div id="ratebar" class="banner hidden">
+            <span>Tarif pajak perusahaan</span>
+            <div class="rate-edit">
+                <input id="rate" type="number" step="0.1">
+                <b>%</b>
+                <button id="rate-save" class="add">Simpan</button>
+            </div>
+        </div>
+
+        <div id="citizen" class="banner citizen hidden">
+            <div><b>Pajak Warga</b><small>Potongan paycheck · sudah masuk ke rekening pemerintah</small></div>
+            <div class="citizen-stats">
+                <div><small>Pencairan</small><b id="cz-count">0</b></div>
+                <div><small>Total pajak</small><strong id="cz-total">Rp 0</strong></div>
+            </div>
+        </div>
+
+        <main id="grid" class="orders"></main>
+
+        <aside id="hist" class="cart hidden">
+            <div class="cart-head"><div><h2>Riwayat Pajak</h2><small id="hist-sub"></small></div><button class="icon-btn" id="hist-close">✕</button></div>
+            <div id="hist-list" class="cart-list"></div>
+        </aside>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>f_chat — preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@400;500;600;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --page:#0C0F15;
+  --card:#141922;
+  --edge:rgba(255,255,255,.09);
+  --ink:#E7EBF3;
+  --soft:#939DB1;
+  --mark:#E0A458;
+}
+:root:not([data-theme="light"]){ color-scheme:dark; }
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --page:#EFF1F5; --card:#FFFFFF; --edge:rgba(16,20,28,.12);
+    --ink:#161B24; --soft:#5C6678; color-scheme:light;
+  }
+}
+:root[data-theme="dark"]{ --page:#0C0F15; --card:#141922; --edge:rgba(255,255,255,.09); --ink:#E7EBF3; --soft:#939DB1; color-scheme:dark; }
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+body{
+  margin:0; background:var(--page); color:var(--ink);
+  font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+}
+*,*::before,*::after{box-sizing:border-box}
+img{max-width:100%}
+
+.wrap{max-width:1180px;margin:0 auto;padding:22px 18px 60px}
+
+header.top{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+header.top h1{
+  font-family:'Barlow Semi Condensed',sans-serif;
+  font-size:clamp(26px,4.4vw,40px); font-weight:600; letter-spacing:-.01em; margin:0; line-height:1;
+}
+header.top h1 em{font-style:normal;color:var(--mark)}
+header.top p{margin:0;color:var(--soft);font-size:14px;max-width:46ch;line-height:1.5}
+
+.stage{
+  position:relative; width:100%; aspect-ratio:16/9; min-height:380px;
+  border:1px solid var(--edge); border-radius:14px; overflow:hidden;
+  background:#8FB8D9;
+}
+@media (max-width:620px){ .stage{aspect-ratio:3/4} }
+.stage svg.scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage .vignette{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 40%,transparent 40%,rgba(0,0,0,.28));pointer-events:none}
+
+/* chat lives inside the stage, not the viewport */
+.stage #chat{position:absolute}
+
+/* floating 3d bubble mock */
+.bubble{
+  position:absolute; left:50%; transform:translateX(-50%);
+  font-family:'Barlow Semi Condensed',sans-serif; font-size:13px; font-weight:500;
+  text-align:center; text-shadow:0 1px 3px rgba(0,0,0,.85),0 0 10px rgba(0,0,0,.5);
+  white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .4s ease;
+}
+.bubble[data-on="true"]{opacity:1}
+
+.rail{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin-top:16px}
+.panel{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:13px 14px}
+.panel h2{
+  font-family:'Barlow Semi Condensed',sans-serif;font-size:14px;font-weight:600;
+  margin:0 0 9px;color:var(--soft)
+}
+.panel .btns{display:flex;flex-wrap:wrap;gap:6px}
+.panel button{
+  font:inherit;font-size:13px;padding:6px 11px;border-radius:7px;cursor:pointer;
+  border:1px solid var(--edge);background:transparent;color:var(--ink);
+}
+.panel button:hover{border-color:var(--mark);color:var(--mark)}
+.panel button[data-on="true"]{background:color-mix(in srgb,var(--mark) 16%,transparent);border-color:var(--mark);color:var(--mark)}
+.panel p{margin:8px 0 0;font-size:12.5px;color:var(--soft);line-height:1.5}
+:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
+
+.notes{margin-top:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+.notes section h3{
+  font-family:'Barlow Semi Condensed',sans-serif;font-size:17px;font-weight:600;margin:0 0 7px
+}
+.notes section p, .notes section li{font-size:14px;line-height:1.6;color:var(--soft);margin:0 0 7px}
+.notes ul{margin:0;padding-left:18px}
+.notes code{
+  font-family:ui-monospace,monospace;font-size:12.5px;
+  background:var(--card);border:1px solid var(--edge);border-radius:4px;padding:1px 5px;color:var(--ink)
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+/* ==== f_chat stylesheet ==== */
+/*{{CSS}}*/
+
+/* ==== preview-only: anchor the chat to the stage, not the viewport ==== */
+.stage #chat{position:absolute;inset:0}
+.stage #feed{top:16px;left:16px;width:min(360px,58%)}
+.stage #chat[data-position='right'] #feed{left:auto;right:16px}
+.stage #chat[data-idle='true']{opacity:.32}
+@media (max-width:620px){ .stage #feed{width:calc(100% - 32px)} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>f_chat <em>/</em> preview</h1>
+    <p>Chat yang sama persis dengan yang jalan di server — hanya backdrop-nya tiruan. Klik tombol di bawah untuk menguji tiap fitur.</p>
+  </header>
+
+  <div class="stage" id="stage">
+    <svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#5E93C4"/><stop offset="55%" stop-color="#A6C6DF"/><stop offset="100%" stop-color="#DCD3BC"/>
+        </linearGradient>
+        <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#C8B896"/><stop offset="100%" stop-color="#9A8A6C"/>
+        </linearGradient>
+        <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#B9B5AC"/><stop offset="100%" stop-color="#8E8B84"/>
+        </linearGradient>
+      </defs>
+      <rect width="1600" height="900" fill="url(#sky)"/>
+      <circle cx="1240" cy="150" r="56" fill="#FFF3D6" opacity=".75"/>
+      <ellipse cx="300" cy="170" rx="150" ry="34" fill="#fff" opacity=".45"/>
+      <ellipse cx="420" cy="150" rx="110" ry="27" fill="#fff" opacity=".35"/>
+      <ellipse cx="1050" cy="205" rx="180" ry="30" fill="#fff" opacity=".3"/>
+      <path d="M0 470 L230 330 L380 430 L520 350 L700 470 Z" fill="#7C8CA0" opacity=".85"/>
+      <path d="M620 470 L820 320 L980 440 L1120 360 L1320 470 Z" fill="#6E7F94" opacity=".9"/>
+      <path d="M1180 470 L1380 350 L1600 470 Z" fill="#7C8CA0" opacity=".8"/>
+      <rect y="468" width="1600" height="432" fill="url(#ground)"/>
+      <path d="M620 468 L980 468 L1340 900 L260 900 Z" fill="url(#road)"/>
+      <path d="M798 470 L802 470 L830 900 L770 900 Z" fill="#E8E2D0" opacity=".5"/>
+      <g fill="#4E5A42" opacity=".9">
+        <rect x="150" y="440" width="7" height="60"/><path d="M153 442c-30-16-52-6-58 8 18-4 34 0 46 10zM153 442c30-16 52-6 58 8-18-4-34 0-46 10z"/>
+        <rect x="1440" y="430" width="8" height="70"/><path d="M1444 432c-34-18-58-7-65 9 20-5 38 0 52 11zM1444 432c34-18 58-7 65 9-20-5-38 0-52 11z"/>
+      </g>
+      <g opacity=".75" fill="#5C6B4E">
+        <ellipse cx="380" cy="560" rx="46" ry="12"/><ellipse cx="1240" cy="600" rx="60" ry="14"/><ellipse cx="520" cy="760" rx="70" ry="16"/>
+      </g>
+      <!-- character from behind -->
+      <g transform="translate(800 470)">
+        <ellipse cx="0" cy="368" rx="52" ry="11" fill="#000" opacity=".25"/>
+        <rect x="-26" y="190" width="22" height="170" rx="9" fill="#5C6B84"/>
+        <rect x="4" y="190" width="22" height="170" rx="9" fill="#54627A"/>
+        <rect x="-32" y="80" width="64" height="120" rx="17" fill="#232A33"/>
+        <rect x="-46" y="92" width="18" height="86" rx="9" fill="#232A33"/>
+        <rect x="28" y="92" width="18" height="86" rx="9" fill="#232A33"/>
+        <circle cx="0" cy="56" r="24" fill="#B98A67"/>
+        <path d="M-24 52a24 24 0 0 1 48 0z" fill="#2C3440"/>
+      </g>
+    </svg>
+    <div class="vignette"></div>
+    <div class="bubble" id="bubble" style="top:52%"></div>
+
+    <!--{{CHAT}}-->
+  </div>
+
+  <div class="rail">
+    <div class="panel">
+      <h2>Lalu lintas chat</h2>
+      <div class="btns">
+        <button data-demo="scene">Putar percakapan</button>
+        <button data-demo="one">Satu pesan</button>
+        <button data-demo="mention">Sebut nama saya</button>
+        <button data-demo="clear">Bersihkan</button>
+      </div>
+      <p>Percakapan berjalan otomatis lewat beberapa channel sekaligus.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Buka & ketik</h2>
+      <div class="btns">
+        <button data-demo="open">Buka composer</button>
+        <button data-demo="typing">Orang lain mengetik</button>
+        <button data-demo="bubble">Bubble /me di kepala</button>
+      </div>
+      <p>Composer terbuka: ketik <code>/</code> untuk daftar perintah, <code>↑</code> pesan terakhir, <code>Esc</code> tutup.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Hak akses</h2>
+      <div class="btns">
+        <button data-demo="staff" data-on="false">Mode staff</button>
+        <button data-demo="job">Masuk kerja: police</button>
+      </div>
+      <p>Channel muncul dan hilang sesuai job, grade, dan izin staff.</p>
+    </div>
+  </div>
+
+  <div class="notes">
+    <section>
+      <h3>Yang bisa kamu coba di sini</h3>
+      <ul>
+        <li>Ganti tema dan warna aksen lewat ikon gerigi di composer — ada pemilih hex bebas.</li>
+        <li>Arahkan kursor ke sebuah pesan untuk reaksi emoji dan hapus (kalau mode staff aktif).</li>
+        <li>Ketik <code>/</code> untuk autocomplete perintah.</li>
+        <li>Dua tab di atas pesan: <strong>Global</strong> (semua channel selain OOC) dan <strong>OOC</strong>.</li>
+        <li>Ubah sudut, kerapatan, sisi layar, ukuran, dan font — semuanya tersimpan per pemain.</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Yang hanya jalan di dalam game</h3>
+      <ul>
+        <li>Radius suara: chat lokal (langsung ketik, tanpa perintah) 22 m, <code>/me</code> dan <code>/do</code> 18 m, dihitung di server.</li>
+        <li>Bubble 3D asli yang menempel di kepala karakter dan ikut bergerak.</li>
+        <li>Job dan grade dibaca dari <code>qbx_core</code>, mute dan log Discord jalan di server.</li>
+      </ul>
+    </section>
+  </div>
+
+</div>
+
+<script>
+/*{{APP}}*/
+</script>
+<script>
+/* ---------- demo harness ---------- */
+(function () {
+  const CHANNELS = [
+    { id:'local', label:'Local', tag:'LOCAL', command:'local', color:'#C8CEDA', icon:'speech', radius:22, default:true },
+    { id:'ooc',  label:'Out of character', tag:'OOC', command:'ooc', color:'#6E9BD8', icon:'globe' },
+    { id:'me',   label:'Action', tag:'ME', command:'me', color:'#A88BD8', icon:'hand', radius:18, italic:true },
+    { id:'do',   label:'Environment', tag:'DO', command:'do', color:'#8BB8D8', icon:'eye', radius:18, italic:true },
+    { id:'try',  label:'Attempt', tag:'TRY', command:'try', color:'#7FC7A8', icon:'dice', radius:18, italic:true },
+    { id:'ads',  label:'Advertisement', tag:'ADS', command:'ad', color:'#6FBF8B', icon:'megaphone' },
+    { id:'announce', label:'Announcement', tag:'ANNOUNCE', command:'announce', color:'#F2B705', icon:'megaphone' },
+    { id:'report', label:'Report', tag:'REPORT', command:'report', color:'#D9534F', icon:'flag' }
+  ];
+  const JOB = { id:'dispatch', label:'Dispatch', tag:'DISP', command:'dispatch', color:'#E2725B', icon:'radio' };
+  const STAFF = { id:'staff', label:'Staff', tag:'STAFF', command:'staff', color:'#E0A458', icon:'shield' };
+
+  const THEMES = [
+    { id:'dispatch', label:'Dispatch', accent:'#E0A458', bg:'#10141C' },
+    { id:'harbour',  label:'Harbour',  accent:'#5FB2C4', bg:'#0E1519' },
+    { id:'orchid',   label:'Orchid',   accent:'#B389D8', bg:'#14111C' },
+    { id:'moss',     label:'Moss',     accent:'#7FB069', bg:'#101610' },
+    { id:'ember',    label:'Ember',    accent:'#E2725B', bg:'#181110' },
+    { id:'slate',    label:'Slate',    accent:'#9FB0C9', bg:'#121418' },
+    { id:'daylight', label:'Daylight', accent:'#3B6EA5', bg:'#ECEEF2', light:true }
+  ];
+
+  const SUGGESTIONS = [
+    { name:'/ooc',   help:'Bicara di luar karakter' },
+    { name:'/me',    help:'Aksi yang kamu lakukan' },
+    { name:'/do',    help:'Keadaan di sekitarmu' },
+    { name:'/try',   help:'Coba sesuatu, hasilnya diundi' },
+    { name:'/ad',    help:'Iklan, jeda 60 detik' },
+    { name:'/announce', help:'Pengumuman ke seluruh server' },
+    { name:'/report',help:'Lapor ke staff' },
+    { name:'/me help', help:'Daftar semua perintah' }
+  ];
+
+  let clock = 0;
+  const now = () => {
+    const base = new Date(); base.setHours(14, 26 + clock, 0);
+    return base.toTimeString().slice(0, 5);
+  };
+  let id = 100;
+
+  function push(m) {
+    clock += Math.random() < .4 ? 1 : 0;
+    window.postMessage({ action:'message', data: Object.assign({ id: ++id, time: now() }, m) }, '*');
+  }
+
+  window.postMessage({ action:'init', data:{
+    channels: CHANNELS, themes: THEMES, fonts:['Inter','Barlow Semi Condensed','Rubik','System UI'],
+    staff:false, serverId:7, maxLength:220, suggestions:SUGGESTIONS,
+    defaults:{ preset:'dispatch', accent:'#E0A458', corners:'soft', density:'cosy', size:100,
+               position:'left', timestamps:true, sound:true, font:'Inter' }
+  } }, '*');
+  window.NXSTATE.myName = 'Rizky Pratama';
+
+  const SCRIPT = [
+    { ch:'local', name:'Dimas Aryo', text:'Bang, bengkelnya buka jam berapa?' },
+    { ch:'local', name:'Rizky Pratama', text:'Sepuluh pagi. Bawa aja mobilnya, nanti saya cek.' },
+    { ch:'me',    name:'Dimas Aryo', text:'mengetuk kap mobil dua kali, lalu mundur selangkah' },
+    { ch:'do',    name:'Dimas Aryo', text:'Kap mesin masih panas, ada bau oli terbakar' },
+    { ch:'ooc',   name:'Sinta W.',  text:'Ada yang tahu cara pasang plat custom?' },
+    { ch:'try',   name:'Dimas Aryo', text:'mencoba menyalakan mesin' },
+    { ch:'ads',   name:'Bengkel Tuna', text:'Servis rem dan ganti oli, diskon 20% sampai malam ini. Hubungi 0812-xxx.' },
+    { ch:'local', name:'Sinta W.',   text:'@Rizky boleh titip motor sampai sore?' , mention:true },
+    { ch:'report',name:'Dimas Aryo', text:'Ada pemain nabrak-nabrak di depan Legion Square.' }
+  ];
+
+  const find = (cid) => CHANNELS.concat([JOB, STAFF]).find((c) => c.id === cid);
+  function line(entry) {
+    const c = find(entry.ch);
+    push({ channel:c.id, tag:c.tag, color:c.color, icon:c.icon, italic:c.italic,
+           name:entry.name, text:entry.text, serverId: entry.name === 'Rizky Pratama' ? 7 : 12,
+           badge: entry.name === 'Bengkel Tuna' ? { label:'VIP', color:'#6FBF8B' } : undefined });
+  }
+
+  let running = null;
+  function playScene() {
+    clearInterval(running);
+    let i = 0;
+    line(SCRIPT[i++]);
+    running = setInterval(() => {
+      if (i >= SCRIPT.length) { clearInterval(running); return; }
+      line(SCRIPT[i++]);
+    }, 1100);
+  }
+
+  function showBubble(text, color) {
+    const el = document.getElementById('bubble');
+    el.style.color = color;
+    el.textContent = text;
+    el.dataset.on = 'true';
+    setTimeout(() => { el.dataset.on = 'false'; }, 6000);
+  }
+
+  window.NXDEMO = {
+    onSend(text, channel) {
+      const c = channel || CHANNELS[0];
+      push({ channel:c.id, tag:c.tag, color:c.color, icon:c.icon, italic:c.italic,
+             name:'Rizky Pratama', serverId:7, text });
+      if (['me','do','try'].includes(c.id)) showBubble(`${c.tag === 'DO' ? '' : 'Rizky Pratama '}${text}`, c.color);
+    }
+  };
+
+  let staffOn = false, jobOn = false;
+  function refreshChannels() {
+    const list = CHANNELS.slice();
+    if (jobOn) list.splice(5, 0, JOB);
+    if (staffOn) list.push(STAFF);
+    window.postMessage({ action:'channels', data:{ channels:list, staff:staffOn } }, '*');
+  }
+
+  document.querySelectorAll('[data-demo]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const what = btn.dataset.demo;
+      if (what === 'scene') playScene();
+      if (what === 'one') line(SCRIPT[Math.floor(Math.random() * SCRIPT.length)]);
+      if (what === 'mention') push({ channel:'ooc', tag:'OOC', color:'#6E9BD8', icon:'globe',
+        name:'Sinta W.', serverId:12, text:'@Rizky jangan lupa kunci bengkelnya ya' });
+      if (what === 'clear') window.postMessage({ action:'clear', data:{} }, '*');
+      if (what === 'open') window.postMessage({ action:'focus', data:{ open:true } }, '*');
+      if (what === 'typing') {
+        window.postMessage({ action:'typing', data:{ id:12, name:'Sinta W.', state:true } }, '*');
+        setTimeout(() => window.postMessage({ action:'typing', data:{ id:12, name:'Sinta W.', state:false } }, '*'), 4200);
+      }
+      if (what === 'bubble') showBubble('Rizky Pratama menyeka tangan dengan lap oli', '#A88BD8');
+      if (what === 'staff') { staffOn = !staffOn; btn.dataset.on = String(staffOn); refreshChannels(); }
+      if (what === 'job')   { jobOn = !jobOn;   btn.dataset.on = String(jobOn);   refreshChannels();
+        btn.textContent = jobOn ? 'Pulang kerja' : 'Masuk kerja: police'; }
+    });
+  });
+
+  setTimeout(playScene, 500);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "unlocked_door": "Pintu dibuka",
+  "locked_door": "Pintu dikunci",
+  "lock_door": "[E] Kunci pintu",
+  "unlock_door": "[E] Buka kunci pintu",
+  "door_lock": "Kunci pintu",
+  "passcode": "Kode sandi",
+  "lockpick_broke": "Lockpick-mu patah",
+  "pick_lock": "Bobol kunci",
+  "add_lock": "Tambah kunci pintu",
+  "edit_lock": "Ubah kunci pintu",
+  "remove_lock": "Hapus kunci pintu",
+  "cannot_unlock": "Pintu tidak bisa dibuka",
+  "cannot_lock": "Pintu tidak bisa dikunci",
+  "create_modify_lock": "Buat kunci pintu baru, atau ubah yang sudah ada",
+  "add_door_textui": "**Buat pintu baru**  \nPilih dengan [LMB]  \nBatal dengan [RMB]",
+  "command_closest": "Buka UI kunci pintu terdekat"
+}

@@ -1,0 +1,19 @@
+{
+    "error": {
+        "no_police": "Polisi tidak cukup (butuh %s)",
+        "process_canceled": "Proses dibatalkan..",
+        "lockpick_broken": "Lockpick-mu patah"
+    },
+    "text": {
+        "register_empty": "Mesin kasir kosong",
+        "try_combination": "~g~E~w~ - Coba Kombinasi",
+        "safe_opened": "Brankas terbuka",
+        "emptying_the_register": "Mengosongkan mesin kasir..",
+        "safe_code": "Kode brankas: ",
+        "value": "Nilai: Rp %s"
+    },
+    "alert": {
+        "register": "Seseorang sedang membongkar mesin kasir!",
+        "safe": "Seseorang sedang membobol brankas!"
+    }
+}

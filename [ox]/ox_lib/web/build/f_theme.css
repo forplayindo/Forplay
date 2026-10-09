@@ -1,0 +1,101 @@
+/* =========================================================================
+   f_patch · tambahan untuk tampilan redesign ox_lib
+   - Kaca transparan saat blur asli aktif (f_ui.js menggambar blur di belakangnya)
+   - Notifikasi bawah tengah, maksimal 4, di atas teks [E] & progress bar
+   - Radial: di tengah layar, tulisan kuning di bawah ikon
+   ========================================================================= */
+/* Kaca rata tanpa emboss, warna gelap sama dengan f_chat (tint 16,20,28).
+   Gradasi 158deg dibiarkan ada tapi transparan: f_ui.js memakainya sebagai penanda panel kaca. */
+:root {
+  --f-yellow: #f3b354;
+  --rim: 0 0 0 transparent;
+  --lift: 0 0 0 transparent;
+  --lift-sm: 0 0 0 transparent;
+  --glass-sheen: linear-gradient(158deg, transparent 0%, transparent 100%);
+  --glass-carrier: rgba(16, 20, 28, 0.46);
+  --glass-carrier-raised: rgba(16, 20, 28, 0.56);
+  --f-notify-bg: rgba(16, 20, 28, 0.46);
+}
+
+/* blur aktif (sama dengan html.nx-blur-on di f_chat): game di belakang sudah di-blur, lapisan gelap lebih tipis */
+.hud-blur-on {
+  --glass-carrier: rgba(16, 20, 28, 0.32);
+  --glass-carrier-raised: rgba(16, 20, 28, 0.40);
+  --f-notify-bg: rgba(16, 20, 28, 0.32);
+}
+
+/* ---------- notifikasi: desain "Rel Tipis" ---------- */
+.notifications-container { gap: 6px !important; }
+.notifications-container > .wrapper {
+  width: 300px !important;
+  max-width: 300px !important;
+  padding: 10px 14px 11px 25px !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+.notifications-container > .wrapper .rail {
+  left: 12px !important;
+  top: 11px !important;
+  bottom: 11px !important;
+  width: 2px !important;
+  border-radius: 2px !important;
+}
+.notifications-container > .wrapper .title {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  margin-bottom: 4px;
+}
+.notifications-container > .wrapper .description {
+  font-size: 13px;
+  line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- notifikasi: bawah tengah ----------
+   --f-notify-bottom dihitung f_ui.js dari teks [E] / progress bar yang sedang tampil. */
+.notifications-bottom {
+  bottom: var(--f-notify-bottom, 28px) !important;
+  padding: 0 !important;
+  transition: bottom 0.2s ease;
+}
+
+/* ---------- radial ---------- */
+.f-radial-menu {
+  right: auto !important;
+  left: 50% !important;
+}
+.f-radial-menu p { color: var(--f-yellow) !important; }
+/* radial tidak ikut blur asli (f_ui.js) -> pakai kaca gelap penuh walau blur aktif */
+.hud-blur-on .f-radial-menu {
+  --glass-carrier: rgba(16, 20, 28, 0.46);
+  --glass-carrier-raised: rgba(16, 20, 28, 0.56);
+}
+
+.f-radial-btn.f-radial-btn {
+  flex-direction: column;
+  gap: 5px;
+  width: 78px;
+  height: 70px;
+  margin: -6px 0 0 -10px;
+  padding: 6px 4px;
+  box-sizing: border-box;
+}
+.f-radial-label {
+  max-width: 70px;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--f-yellow);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  pointer-events: none;
+}
+.f-radial-btn:hover .f-radial-label { color: var(--on-y); }

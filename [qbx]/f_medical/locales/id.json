@@ -1,0 +1,53 @@
+{
+    "error": {
+        "bled_out": "Kamu kehabisan darah..."
+    },
+    "success": {
+        "wounds_healed": "Lukamu sudah sembuh!"
+    },
+    "info": {
+        "self_death": "Diri sendiri atau NPC",
+        "wep_unknown": "Tidak diketahui",
+        "status": "Cek Kondisi",
+        "healthy": "Kamu sudah sehat sepenuhnya!",
+        "pain_message": "%s kamu terasa %s",
+        "many_places": "Kamu merasa sakit di banyak bagian...",
+        "bleed_alert": "Kamu %s",
+        "revive_player_a": "Hidupkan pemain atau diri sendiri (khusus admin)",
+        "player_id": "ID pemain (boleh kosong)",
+        "pain_level": "Atur tingkat rasa sakit pemain atau diri sendiri (khusus admin)",
+        "kill": "Bunuh pemain atau diri sendiri (khusus admin)",
+        "heal_player_a": "Sembuhkan pemain atau diri sendiri (khusus admin)"
+    },
+    "states": {
+        "irritated": "perih",
+        "quite_painful": "cukup sakit",
+        "painful": "sakit",
+        "really_painful": "sangat sakit",
+        "little_bleed": "sedikit berdarah...",
+        "bleed": "berdarah...",
+        "lot_bleed": "berdarah cukup banyak...",
+        "big_bleed": "berdarah sangat banyak..."
+    },
+    "body": {
+        "head": "Kepala",
+        "neck": "Leher",
+        "spine": "Tulang belakang",
+        "upper_body": "Badan atas",
+        "lower_body": "Badan bawah",
+        "left_arm": "Lengan kiri",
+        "left_hand": "Tangan kiri",
+        "left_fingers": "Jari kiri",
+        "left_leg": "Kaki kiri",
+        "left_foot": "Telapak kaki kiri",
+        "right_arm": "Lengan kanan",
+        "right_hand": "Tangan kanan",
+        "right_fingers": "Jari kanan",
+        "right_leg": "Kaki kanan",
+        "right_foot": "Telapak kaki kanan"
+    },
+    "logs": {
+        "death_log_title": "%s (%s) tewas",
+        "death_log_message": "%s membunuh %s dengan **%s** (%s)"
+    }
+}

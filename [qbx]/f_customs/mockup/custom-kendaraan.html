@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bengkel Kustom</title>
+<style>
+:root {
+    --bg: #0b1118; --panel: #0f1720; --card: #15202c; --card2: #1b2938; --line: #233447; --line2: #2e445c;
+    --text: #e6eef7; --muted: #8ca0b6; --accent: #2dd4bf; --accent-dark: #14b8a6; --accent-ink: #062521;
+    --ok: #22c55e; --warn: #eab308; --bad: #ef4444;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; color: var(--text); font-size: 13px; line-height: 1.35; user-select: none; overflow: hidden; height: 100vh;
+    background: radial-gradient(ellipse at 50% 70%, #3a4552 0%, #1c232c 45%, #0c1015 100%); }
+button { font: inherit; color: inherit; border: none; background: none; cursor: pointer; outline: none; }
+small { color: var(--muted); font-size: 11px; }
+.hidden { display: none !important; }
+
+/* simulasi dunia game (mockup saja) */
+.world { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.world img { width: 46vw; max-width: 760px; filter: drop-shadow(0 30px 25px rgba(0,0,0,.6)); }
+.world .floor { position: absolute; bottom: 0; left: 0; right: 0; height: 32%; background: linear-gradient(180deg, transparent, rgba(0,0,0,.35)); }
+
+.glass { background: rgba(15,23,32,.94); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,.5); }
+
+/* panel kiri */
+.left { position: absolute; left: 24px; top: 24px; bottom: 24px; width: 400px; display: flex; flex-direction: column; overflow: hidden; }
+.head { padding: 14px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: center; }
+.logo { width: 40px; height: 40px; display: grid; place-items: center; font-size: 20px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+.kicker { font-size: 10px; letter-spacing: .18em; color: var(--muted); text-transform: uppercase; }
+h1 { font-size: 18px; font-weight: 700; }
+.plate { margin-left: auto; font-family: Consolas, monospace; font-weight: 700; font-size: 12px; padding: 4px 8px; background: #f3f4f6; color: #111; border-radius: 5px; border: 2px solid #1e3a8a; }
+
+.cats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 12px 14px 0; }
+.cat { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 2px; border-radius: 10px; background: var(--card); border: 1px solid var(--line); color: var(--muted); font-size: 10.5px; font-weight: 600; }
+.cat span { font-size: 18px; filter: grayscale(.6); }
+.cat:hover { border-color: var(--line2); }
+.cat.on { color: var(--accent); border-color: rgba(45,212,191,.5); background: rgba(45,212,191,.08); }
+.cat.on span { filter: none; }
+
+.crumb { padding: 12px 16px 6px; display: flex; align-items: center; gap: 8px; }
+.crumb button { width: 26px; height: 26px; border-radius: 7px; background: var(--card); border: 1px solid var(--line); }
+.crumb h3 { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+
+.list { flex: 1; overflow-y: auto; padding: 4px 14px 14px; display: flex; flex-direction: column; gap: 6px; }
+.list::-webkit-scrollbar { width: 6px; } .list::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 3px; }
+.row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: var(--card); border: 1px solid var(--line); text-align: left; width: 100%; }
+.row:hover { border-color: var(--line2); background: var(--card2); }
+.row .ic { font-size: 16px; width: 22px; text-align: center; }
+.row .tx { flex: 1; min-width: 0; }
+.row .tx b { display: block; font-size: 13px; }
+.row .tx small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .pr { font-weight: 700; color: var(--accent); font-size: 12px; }
+.row .chev { color: var(--muted); }
+.row.sel { border-color: rgba(45,212,191,.6); background: rgba(45,212,191,.07); }
+.row.cur .pr::after { content: ' • terpasang'; color: var(--muted); font-weight: 400; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(45,212,191,.2); }
+.lvl { display: flex; gap: 3px; } .lvl i { width: 14px; height: 5px; border-radius: 2px; background: var(--line2); } .lvl i.f { background: var(--accent); }
+
+/* warna */
+.sub-tabs { display: flex; gap: 6px; margin-bottom: 6px; }
+.sub-tabs button { flex: 1; padding: 7px; border-radius: 8px; background: var(--card); border: 1px solid var(--line); color: var(--muted); font-weight: 700; font-size: 11.5px; }
+.sub-tabs button.on { color: var(--accent); border-color: rgba(45,212,191,.45); background: rgba(45,212,191,.08); }
+.swatches { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+.sw { aspect-ratio: 1; border-radius: 8px; border: 2px solid transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
+.sw.on { border-color: var(--accent); transform: scale(1.08); }
+.lbl { font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 10px 0 6px; font-weight: 700; }
+.toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.tg { display: flex; justify-content: space-between; align-items: center; padding: 9px 11px; background: var(--card); border: 1px solid var(--line); border-radius: 9px; }
+.sw-tg { width: 34px; height: 18px; border-radius: 9px; background: var(--line2); position: relative; transition: .15s; }
+.sw-tg::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #cbd5e1; transition: .15s; }
+.tg.on .sw-tg { background: var(--accent-dark); } .tg.on .sw-tg::after { left: 18px; background: #fff; }
+
+/* panel kanan (keranjang) */
+.right { position: absolute; right: 24px; top: 24px; width: 340px; max-height: calc(100vh - 48px); display: flex; flex-direction: column; overflow: hidden; }
+.right .head h2 { font-size: 15px; }
+.mech { margin: 12px 14px 0; padding: 9px 12px; border-radius: 10px; display: flex; gap: 9px; align-items: center; font-size: 12px; font-weight: 600; border: 1px solid; }
+.mech.on { background: rgba(34,197,94,.08); border-color: rgba(34,197,94,.35); color: #86efac; }
+.mech.off { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.35); color: #fca5a5; }
+.mech small { display: block; font-weight: 400; color: inherit; opacity: .8; }
+.cart { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; min-height: 80px; }
+.ci { display: flex; align-items: center; gap: 10px; padding: 9px 11px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+.ci .tx { flex: 1; min-width: 0; } .ci b { display: block; font-size: 12.5px; } .ci small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ci .pr { font-weight: 700; font-size: 12.5px; }
+.ci .x { width: 24px; height: 24px; border-radius: 7px; color: var(--muted); border: 1px solid var(--line); }
+.ci .x:hover { color: #fca5a5; border-color: #5a2a31; background: #3a1f24; }
+.empty { text-align: center; padding: 26px 10px; color: var(--muted); }
+.empty span { font-size: 28px; display: block; margin-bottom: 6px; opacity: .6; }
+.foot { border-top: 1px solid var(--line); padding: 12px 14px 14px; }
+.sum { display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--muted); }
+.sum.total { color: var(--text); font-size: 17px; font-weight: 800; margin: 6px 0 12px; }
+.sum.total b { color: var(--accent); }
+.btn { width: 100%; padding: 11px; border-radius: 10px; font-weight: 800; letter-spacing: .02em; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { background: #5eead4; }
+.btn.primary:disabled { background: var(--card2); color: #5d7086; cursor: not-allowed; }
+.btn.ghost { margin-top: 6px; background: var(--card); border: 1px solid var(--line); color: var(--muted); font-weight: 700; }
+.btn.ghost:hover { color: var(--text); }
+.why { margin-top: 8px; text-align: center; font-size: 11px; color: #fca5a5; }
+
+/* kontrol kamera */
+.camera { position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; gap: 6px; padding: 8px; align-items: center; }
+.camera button { padding: 7px 12px; border-radius: 8px; background: var(--card); border: 1px solid var(--line); font-weight: 600; font-size: 12px; color: var(--muted); }
+.camera button.on, .camera button:hover { color: var(--accent); border-color: rgba(45,212,191,.45); }
+.camera .sep { width: 1px; height: 22px; background: var(--line); margin: 0 4px; }
+.camera small { padding: 0 6px; }
+
+/* modal */
+.overlay { position: absolute; inset: 0; background: rgba(5,9,13,.6); display: grid; place-items: center; }
+.modal { width: 420px; padding: 22px; text-align: center; }
+.modal .big { font-size: 40px; margin-bottom: 8px; }
+.modal h2 { font-size: 18px; margin-bottom: 6px; }
+.modal p { color: var(--muted); margin-bottom: 14px; }
+.modal .box { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; text-align: left; }
+.modal .box div { display: flex; justify-content: space-between; padding: 3px 0; }
+.modal .row2 { display: flex; gap: 8px; } .modal .row2 .btn { margin: 0; }
+
+/* banner order aktif */
+.blocked { margin: 12px 14px 0; padding: 12px; border-radius: 10px; background: rgba(234,179,8,.08); border: 1px solid rgba(234,179,8,.35); color: #fde68a; font-size: 12px; }
+.blocked b { display: block; margin-bottom: 3px; }
+
+/* demo switch (mockup saja) */
+.demo { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); display: flex; gap: 6px; padding: 6px 8px; font-size: 11px; }
+.demo button { padding: 5px 9px; border-radius: 7px; background: var(--card); border: 1px dashed var(--line2); color: var(--muted); }
+.demo button.on { color: var(--warn); border-color: var(--warn); }
+</style>
+</head>
+<body>
+
+<div class="world"><div class="floor"></div><img src="https://docs.fivem.net/vehicles/sultan.webp" alt="" onerror="this.remove()"></div>
+
+<div class="demo glass">
+    <small style="align-self:center">MOCKUP:</small>
+    <button id="dMech" class="on">Mekanik on duty</button>
+    <button id="dBlock">Ada order aktif</button>
+    <button id="dOwn">Mekanik + mobil sendiri</button>
+</div>
+
+<!-- PANEL KIRI -->
+<section class="left glass">
+    <div class="head">
+        <div class="logo">🛠️</div>
+        <div><div class="kicker">Bengkel Kustom</div><h1>Karin Sultan</h1></div>
+        <div class="plate">F 1234 R</div>
+    </div>
+    <div class="cats" id="cats"></div>
+    <div class="crumb"><button id="back" class="hidden">←</button><h3 id="crumbTitle"></h3></div>
+    <div class="list" id="list"></div>
+</section>
+
+<!-- PANEL KANAN -->
+<section class="right glass">
+    <div class="head"><div class="logo">🧾</div><div><div class="kicker">Daftar Modifikasi</div><h2 id="cartCount">0 item dipilih</h2></div></div>
+    <div id="mech"></div>
+    <div id="blocked" class="blocked hidden"><b>⚠ Kendaraan ini masih punya order kustom</b>Selesaikan order sebelumnya di kasir. Kalau ingin membatalkan, minta mekanik menghapus tagihannya.</div>
+    <div class="cart" id="cart"></div>
+    <div class="foot">
+        <div class="sum"><span>Subtotal</span><span id="sub">$0</span></div>
+        <div class="sum total"><span>Total</span><b id="tot">$0</b></div>
+        <button class="btn primary" id="submit">Selesai Modifikasi</button>
+        <button class="btn ghost" id="reset">Kembalikan Semua</button>
+        <div class="why hidden" id="why"></div>
+    </div>
+</section>
+
+<!-- KAMERA -->
+<div class="camera glass">
+    <button class="on">Bebas</button><button>Depan</button><button>Samping</button><button>Belakang</button><button>Velg</button><button>Mesin</button>
+    <div class="sep"></div><small>🖱 Geser = putar · Scroll = zoom · ESC = keluar</small>
+</div>
+
+<!-- MODAL -->
+<div class="overlay hidden" id="ov"><div class="modal glass" id="modal"></div></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const money = n => '$' + n.toLocaleString('id-ID');
+let mechOnDuty = true, hasOrder = false, mechOwn = false; // mechOwn: player mekanik on duty + kendaraan miliknya sendiri
+
+// data contoh; di script asli: label mod dari GetModLabel, harga dari Master Harga (server)
+const lv = (name, base, n = 4) => [{ l: 'Standar', p: 0 }, ...Array.from({ length: n }, (_, i) => ({ l: `${name} Lv.${i + 1}`, p: base * (i + 1) }))];
+const parts = (names, price) => [{ l: 'Standar', p: 0 }, ...names.map((l, i) => ({ l, p: price + i * Math.round(price / 4) }))];
+const COLORS = [['Hitam','#0d0d0f'],['Grafit','#2b2e33'],['Perak','#a7adb4'],['Putih','#f2f2f0'],['Merah','#b3121b'],['Merah Tua','#6b0f14'],['Oranye','#e2650f'],['Kuning','#f2c10f'],
+    ['Lime','#7cc417'],['Hijau','#165c2e'],['Tosca','#0f8c86'],['Biru Muda','#3a8ee6'],['Biru','#1640a8'],['Navy','#0e1d45'],['Ungu','#5b2a9c'],['Pink','#e04b98']];
+
+const CATS = [
+    { id: 'perf', icon: '⚙️', name: 'Performa', mods: [
+        { id: 11, icon: '🔧', name: 'Mesin', opts: lv('EMS', 1500), cur: 0, level: true },
+        { id: 12, icon: '🛑', name: 'Rem', opts: lv('Rem', 900, 3), cur: 1, level: true },
+        { id: 13, icon: '⛓️', name: 'Transmisi', opts: lv('Transmisi', 1100, 3), cur: 0, level: true },
+        { id: 15, icon: '🪜', name: 'Suspensi', opts: lv('Suspensi', 700), cur: 0, level: true },
+        { id: 16, icon: '🛡️', name: 'Armor', opts: lv('Armor', 1300, 5), cur: 0, level: true },
+        { id: 18, icon: '🌀', name: 'Turbo', opts: [{ l: 'Mati', p: 0 }, { l: 'Turbo', p: 4500 }], cur: 0 },
+    ]},
+    { id: 'body', icon: '🚗', name: 'Bodi', mods: [
+        { id: 0, icon: '🪽', name: 'Spoiler', opts: parts(['Lip Spoiler', 'Ducktail', 'GT Wing Karbon', 'Street Wing'], 600), cur: 0 },
+        { id: 1, icon: '⬅️', name: 'Bumper Depan', opts: parts(['Splitter', 'Race Bumper', 'Karbon Lip'], 550), cur: 0 },
+        { id: 2, icon: '➡️', name: 'Bumper Belakang', opts: parts(['Diffuser', 'Race Diffuser'], 500), cur: 0 },
+        { id: 3, icon: '↔️', name: 'Rok Samping', opts: parts(['Side Skirt', 'Karbon Skirt'], 400), cur: 0 },
+        { id: 4, icon: '💨', name: 'Knalpot', opts: parts(['Twin Tip', 'Titanium', 'Quad Exhaust'], 450), cur: 0 },
+        { id: 7, icon: '🔲', name: 'Kap Mesin', opts: parts(['Vented Hood', 'Karbon Hood'], 650), cur: 0 },
+        { id: 10, icon: '⬆️', name: 'Atap', opts: parts(['Roof Scoop', 'Karbon Roof'], 500), cur: 0 },
+        { id: 14, icon: '📯', name: 'Klakson', opts: parts(['Truk', 'Polisi', 'Badut', 'Musik'], 150), cur: 0 },
+    ]},
+    { id: 'paint', icon: '🎨', name: 'Cat', paint: true },
+    { id: 'wheel', icon: '🛞', name: 'Velg', mods: [
+        { id: 'wt', icon: '🏷️', name: 'Tipe Velg', opts: ['Sport', 'Muscle', 'Lowrider', 'SUV', 'Offroad', 'Tuner', 'High End'].map((l, i) => ({ l, p: i ? 0 : 0 })), cur: 0, free: true },
+        { id: 23, icon: '🛞', name: 'Model Velg', opts: parts(['Inferno', 'Deep Five', 'Lozspeed', 'Diamond Cut', 'Chrono', 'Feroci'], 800), cur: 0 },
+        { id: 'ts', icon: '🌫️', name: 'Asap Ban', opts: [{ l: 'Standar', p: 0 }, { l: 'Merah', p: 350 }, { l: 'Biru', p: 350 }, { l: 'Hitam', p: 350 }, { l: 'Custom RGB', p: 600 }], cur: 0 },
+        { id: 'bp', icon: '💪', name: 'Ban Anti Bocor', opts: [{ l: 'Tidak', p: 0 }, { l: 'Ya', p: 2500 }], cur: 0 },
+    ]},
+    { id: 'light', icon: '💡', name: 'Lampu', light: true },
+    { id: 'misc', icon: '✨', name: 'Lainnya', mods: [
+        { id: 'tint', icon: '🕶️', name: 'Kaca Film', opts: [{ l: 'Tanpa', p: 0 }, { l: 'Gelap Ringan', p: 200 }, { l: 'Gelap', p: 300 }, { l: 'Limo', p: 450 }, { l: 'Hijau', p: 300 }], cur: 0 },
+        { id: 'plate', icon: '🔖', name: 'Gaya Plat', opts: [{ l: 'Biru di Putih', p: 0 }, { l: 'Kuning di Hitam', p: 150 }, { l: 'Kuning di Biru', p: 150 }, { l: 'Klasik', p: 250 }], cur: 0 },
+        { id: 48, icon: '🖌️', name: 'Livery', opts: parts(['Racing Stripe', 'Sponsor', 'Flame', 'Camo'], 900), cur: 0 },
+    ]},
+];
+
+let cat = CATS[0], mod = null;
+const cart = new Map(); // key -> { key, cat, name, val, price }
+let paint = { tab: 'Utama', finish: 'Metalik', color: { Utama: 0, Kedua: 0, Pearl: null, Velg: null } };
+let light = { xenon: false, xcolor: 0, neon: { Kiri: false, Kanan: false, Depan: false, Belakang: false }, ncolor: 11 };
+
+function renderCats() {
+    $('#cats').innerHTML = CATS.map(c => `<button class="cat ${c === cat ? 'on' : ''}" data-c="${c.id}"><span>${c.icon}</span>${c.name}</button>`).join('');
+    document.querySelectorAll('.cat').forEach(b => b.onclick = () => { cat = CATS.find(c => c.id === b.dataset.c); mod = null; renderCats(); renderList(); });
+}
+
+function renderList() {
+    $('#back').classList.toggle('hidden', !mod);
+    $('#crumbTitle').textContent = mod ? `${cat.name} / ${mod.name}` : cat.name;
+    const el = $('#list');
+    if (cat.paint) return renderPaint(el);
+    if (cat.light) return renderLight(el);
+    if (!mod) {
+        el.innerHTML = cat.mods.map((m, i) => {
+            const c = cart.get(m.id); const label = c ? c.val : m.opts[m.cur].l;
+            return `<button class="row ${c ? 'sel' : ''}" data-i="${i}"><span class="ic">${m.icon}</span>
+                <span class="tx"><b>${m.name}</b><small>${label}</small></span>${c ? '<span class="dot"></span>' : ''}<span class="chev">›</span></button>`;
+        }).join('');
+        el.querySelectorAll('.row').forEach(b => b.onclick = () => { mod = cat.mods[+b.dataset.i]; renderList(); });
+        return;
+    }
+    const chosen = cart.get(mod.id);
+    el.innerHTML = mod.opts.map((o, i) => {
+        const isCur = i === mod.cur, isSel = chosen ? chosen.idx === i : isCur;
+        const bars = mod.level ? `<span class="lvl">${Array.from({ length: mod.opts.length - 1 }, (_, k) => `<i class="${k < i ? 'f' : ''}"></i>`).join('')}</span>` : '';
+        return `<button class="row ${isSel ? 'sel' : ''} ${isCur ? 'cur' : ''}" data-i="${i}">
+            <span class="tx"><b>${o.l}</b>${bars}</span><span class="pr">${isCur ? '' : (o.p ? money(o.p) : 'Gratis')}</span></button>`;
+    }).join('');
+    el.querySelectorAll('.row').forEach(b => b.onclick = () => {
+        if (hasOrder) return;
+        const i = +b.dataset.i;
+        if (i === mod.cur) cart.delete(mod.id);
+        else cart.set(mod.id, { key: mod.id, cat: cat.name, name: mod.name, val: mod.opts[i].l, price: mod.opts[i].p, idx: i, mod });
+        renderList(); renderCart();
+    });
+}
+
+function renderPaint(el) {
+    const tabs = ['Utama', 'Kedua', 'Pearl', 'Velg'];
+    const finishes = [['Metalik', 0], ['Matte', 250], ['Chrome', 1200], ['Metal', 300]];
+    const sel = paint.color[paint.tab];
+    el.innerHTML = `
+        <div class="sub-tabs">${tabs.map(t => `<button class="${t === paint.tab ? 'on' : ''}" data-t="${t}">${t}</button>`).join('')}</div>
+        ${paint.tab === 'Utama' || paint.tab === 'Kedua' ? `<div class="lbl">Jenis Cat</div>
+        <div class="sub-tabs">${finishes.map(([f, p]) => `<button class="${f === paint.finish ? 'on' : ''}" data-f="${f}" data-p="${p}">${f}${p ? `<br><small>+${money(p)}</small>` : ''}</button>`).join('')}</div>` : ''}
+        <div class="lbl">Warna ${paint.tab} · ${money(paint.tab === 'Pearl' ? 400 : paint.tab === 'Velg' ? 300 : 500)}</div>
+        <div class="swatches">${COLORS.map(([n, c], i) => `<button class="sw ${sel === i ? 'on' : ''}" title="${n}" style="background:${c}" data-i="${i}"></button>`).join('')}</div>
+        <div class="lbl">Custom RGB</div>
+        <div class="row" style="cursor:default"><span class="tx"><b>Pilih warna bebas</b><small>Hanya untuk warna Utama &amp; Kedua</small></span><input type="color" value="#2dd4bf" style="width:44px;height:28px;border:none;background:none"></div>`;
+    el.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { paint.tab = b.dataset.t; renderList(); });
+    el.querySelectorAll('[data-f]').forEach(b => b.onclick = () => {
+        if (hasOrder) return;
+        paint.finish = b.dataset.f;
+        const p = +b.dataset.p;
+        p ? cart.set('finish', { key: 'finish', cat: 'Cat', name: 'Jenis Cat', val: paint.finish, price: p }) : cart.delete('finish');
+        renderList(); renderCart();
+    });
+    el.querySelectorAll('.sw').forEach(b => b.onclick = () => {
+        if (hasOrder) return;
+        const i = +b.dataset.i; paint.color[paint.tab] = i;
+        const price = paint.tab === 'Pearl' ? 400 : paint.tab === 'Velg' ? 300 : 500;
+        cart.set('paint' + paint.tab, { key: 'paint' + paint.tab, cat: 'Cat', name: 'Warna ' + paint.tab, val: COLORS[i][0], price, swatch: COLORS[i][1] });
+        renderList(); renderCart();
+    });
+}
+
+function renderLight(el) {
+    el.innerHTML = `
+        <div class="lbl">Lampu Xenon · ${money(800)}</div>
+        <div class="toggles"><div class="tg ${light.xenon ? 'on' : ''}" data-x="1"><span>Xenon</span><span class="sw-tg"></span></div></div>
+        <div class="lbl">Warna Xenon</div>
+        <div class="swatches">${['#f8fafc','#93c5fd','#1d4ed8','#22d3ee','#86efac','#fde047','#fb923c','#ef4444','#f472b6','#a855f7','#6b21a8','#facc15','#e5e7eb'].slice(0, 8).map((c, i) => `<button class="sw ${light.xcolor === i ? 'on' : ''}" data-xc="${i}" style="background:${c}"></button>`).join('')}</div>
+        <div class="lbl">Neon · ${money(350)} per sisi</div>
+        <div class="toggles">${Object.keys(light.neon).map(k => `<div class="tg ${light.neon[k] ? 'on' : ''}" data-n="${k}"><span>${k}</span><span class="sw-tg"></span></div>`).join('')}</div>
+        <div class="lbl">Warna Neon</div>
+        <div class="swatches">${COLORS.map(([n, c], i) => `<button class="sw ${light.ncolor === i ? 'on' : ''}" title="${n}" data-nc="${i}" style="background:${c}"></button>`).join('')}</div>`;
+    el.querySelector('[data-x]').onclick = () => { if (hasOrder) return; light.xenon = !light.xenon; light.xenon ? cart.set('xenon', { key: 'xenon', cat: 'Lampu', name: 'Lampu Xenon', val: 'Aktif', price: 800 }) : cart.delete('xenon'); renderList(); renderCart(); };
+    el.querySelectorAll('[data-xc]').forEach(b => b.onclick = () => { light.xcolor = +b.dataset.xc; renderList(); });
+    el.querySelectorAll('[data-n]').forEach(b => b.onclick = () => {
+        if (hasOrder) return;
+        light.neon[b.dataset.n] = !light.neon[b.dataset.n];
+        const on = Object.keys(light.neon).filter(k => light.neon[k]);
+        on.length ? cart.set('neon', { key: 'neon', cat: 'Lampu', name: 'Neon', val: on.join(', '), price: 350 * on.length }) : cart.delete('neon');
+        renderList(); renderCart();
+    });
+    el.querySelectorAll('[data-nc]').forEach(b => b.onclick = () => { light.ncolor = +b.dataset.nc; renderList(); });
+}
+
+function renderCart() {
+    const items = [...cart.values()];
+    $('#cartCount').textContent = `${items.length} item dipilih`;
+    $('#mech').innerHTML = mechOwn
+        ? `<div class="mech on">🔧<div>Fasilitas mekanik<small>Kendaraan milikmu sendiri · modifikasi gratis &amp; langsung terpasang</small></div></div>`
+        : mechOnDuty
+        ?`<div class="mech on">🟢<div>2 mekanik sedang bertugas<small>Setelah bayar di kasir, mekanik akan memasang modifikasi</small></div></div>`
+        : `<div class="mech off">🔴<div>Tidak ada mekanik bertugas<small>Kamu tetap bisa mencoba modifikasi, tapi belum bisa diproses</small></div></div>`;
+    $('#blocked').classList.toggle('hidden', !hasOrder);
+    $('#cart').innerHTML = items.length ? items.map(it => `
+        <div class="ci">${it.swatch ? `<span style="width:16px;height:16px;border-radius:4px;background:${it.swatch};box-shadow:inset 0 0 0 1px #fff3"></span>` : ''}
+            <div class="tx"><b>${it.name}</b><small>${it.cat} · ${it.val}</small></div>
+            <span class="pr">${it.price ? money(it.price) : 'Gratis'}</span><button class="x" data-k="${it.key}" title="Hapus">✕</button></div>`).join('')
+        : `<div class="empty"><span>🧰</span>Belum ada modifikasi.<br><small>Pilih modifikasi di panel kiri, hasilnya langsung terlihat di kendaraan.</small></div>`;
+    document.querySelectorAll('.ci .x').forEach(b => b.onclick = () => {
+        const k = isNaN(b.dataset.k) ? b.dataset.k : +b.dataset.k;
+        cart.delete(k);
+        if (k === 'xenon') light.xenon = false;
+        if (k === 'neon') Object.keys(light.neon).forEach(n => light.neon[n] = false);
+        renderList(); renderCart();
+    });
+    const total = items.reduce((a, b) => a + b.price, 0);
+    $('#sub').textContent = money(total);
+    $('#tot').innerHTML = mechOwn ? `<s style="color:var(--muted);font-weight:400;font-size:13px">${money(total)}</s> $0` : money(total);
+    let why = '';
+    if (mechOwn) why = '';
+    else if (hasOrder) why = 'Order kustom sebelumnya belum selesai';
+    else if (!mechOnDuty) why = 'Tombol aktif jika ada mekanik bertugas';
+    $('#submit').textContent = mechOwn ? 'Pasang Sekarang (Gratis)' : 'Selesai Modifikasi';
+    $('#submit').disabled = !!why || !items.length;
+    $('#why').textContent = why; $('#why').classList.toggle('hidden', !why);
+}
+
+$('#back').onclick = () => { mod = null; renderList(); };
+$('#reset').onclick = () => { cart.clear(); light.xenon = false; Object.keys(light.neon).forEach(n => light.neon[n] = false); renderList(); renderCart(); };
+$('#submit').onclick = () => {
+    const items = [...cart.values()], total = items.reduce((a, b) => a + b.price, 0);
+    if (mechOwn) {
+        $('#modal').innerHTML = `<div class="big">🔧</div><h2>Modifikasi terpasang</h2>
+            <p>${items.length} item langsung dipasang di kendaraanmu. Gratis (fasilitas mekanik on duty).</p>
+            <button class="btn primary" id="mOk">Mengerti</button>`;
+        $('#ov').classList.remove('hidden');
+        $('#mOk').onclick = () => { $('#ov').classList.add('hidden'); cart.clear(); renderList(); renderCart(); };
+        return;
+    }
+    $('#modal').innerHTML = `<div class="big">🧾</div><h2>Kirim ke kasir?</h2>
+        <p>Kendaraan akan kembali ke tampilan semula. Modifikasi dipasang mekanik setelah tagihan lunas.</p>
+        <div class="box">${items.map(i => `<div><span>${i.name} <small>· ${i.val}</small></span><b>${money(i.price)}</b></div>`).join('')}
+        <div style="border-top:1px solid var(--line);margin-top:6px;padding-top:8px"><b>Total</b><b style="color:var(--accent)">${money(total)}</b></div></div>
+        <div class="row2"><button class="btn ghost" id="mNo">Kembali</button><button class="btn primary" id="mYes">Kirim Tagihan</button></div>`;
+    $('#ov').classList.remove('hidden');
+    $('#mNo').onclick = () => $('#ov').classList.add('hidden');
+    $('#mYes').onclick = () => {
+        $('#modal').innerHTML = `<div class="big">✅</div><h2>Tagihan terkirim</h2>
+            <p>Silakan menuju <b style="color:var(--text)">Kasir Bengkel</b> untuk membayar <b style="color:var(--accent)">${money(total)}</b>.<br>Bayar Cash atau Transfer, lalu tunggu mekanik memasang modifikasimu.</p>
+            <button class="btn primary" id="mOk">Mengerti</button>`;
+        $('#mOk').onclick = () => { $('#ov').classList.add('hidden'); hasOrder = true; $('#dBlock').classList.add('on'); $('#reset').click(); };
+    };
+};
+document.querySelectorAll('.camera button').forEach(b => b.onclick = () => { document.querySelectorAll('.camera button').forEach(x => x.classList.remove('on')); b.classList.add('on'); });
+$('#dMech').onclick = () => { mechOnDuty = !mechOnDuty; $('#dMech').classList.toggle('on', mechOnDuty); renderCart(); };
+$('#dBlock').onclick = () => { hasOrder = !hasOrder; $('#dBlock').classList.toggle('on', hasOrder); renderCart(); };
+$('#dOwn').onclick = () => { mechOwn = !mechOwn; $('#dOwn').classList.toggle('on', mechOwn); renderCart(); };
+
+renderCats(); renderList(); renderCart();
+</script>
+</body>
+</html>

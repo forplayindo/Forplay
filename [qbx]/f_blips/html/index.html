@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_blips</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="panel" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo">📍</span><div><h1>Kelola Blips</h1><small id="sub"></small></div></div>
+            <div class="head-actions">
+                <button class="pill accent" id="add-btn">＋ Tambah di Posisi Saya</button>
+                <button class="icon-btn close" data-close>✕</button>
+            </div>
+        </header>
+
+        <div class="toolbar">
+            <nav class="tabs" id="tabs"></nav>
+            <input id="search" placeholder="Cari nama blip...">
+        </div>
+        <div id="pending" class="pending hidden"></div>
+        <div id="msg" class="banner hidden"></div>
+        <main id="list" class="list"></main>
+
+        <aside id="sheet" class="sheet hidden">
+            <div class="sheet-head"><h2 id="sheet-title">Tambah Blip</h2><button class="icon-btn" id="sheet-close">✕</button></div>
+            <div class="sheet-body">
+                <label>Koordinat</label>
+                <div class="note"><span id="f-coords"></span><button id="use-pos">Pakai posisi saya</button></div>
+
+                <label>Nama (tampil di peta)</label>
+                <input type="text" id="f-label" maxlength="40" placeholder="Contoh: Bean Machine Cafe">
+
+                <label>Kategori</label>
+                <select id="f-cat"></select>
+
+                <div class="two">
+                    <div><label>Ikon (sprite ID)</label><input type="number" id="f-sprite" min="1"></div>
+                    <div><label>Warna (color ID)</label><input type="number" id="f-color" min="0"></div>
+                </div>
+                <small class="hint">Daftar ID: docs.fivem.net/docs/game-references/blips</small>
+                <div class="colors" id="f-palette"></div>
+
+                <label>Ukuran</label>
+                <div class="range"><input type="range" id="f-scale" step="0.1"><b id="scale-val"></b></div>
+
+                <div class="switch"><label for="f-active">Aktif (tampil di peta)</label><input type="checkbox" id="f-active"></div>
+
+                <div class="note info">Blip uji berkedip muncul di minimap kamu selama form ini terbuka.</div>
+            </div>
+            <div class="sheet-foot">
+                <div id="sheet-msg" class="msg hidden"></div>
+                <button id="save-btn" class="primary">Simpan</button>
+            </div>
+        </aside>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+    "text": {
+        "enter_house": "[E] - Masuk Rumah",
+        "enter_requirements": "Lockpick | Set Obeng",
+        "leave_house": "[E] - Keluar Rumah",
+        "search": "[E] - Geledah Sekitar",
+        "pickup": "[E] - Ambil %s"
+    },
+    "notify": {
+        "no_police": "Polisi tidak cukup (butuh %s)",
+        "fail_skillcheck": "Skillcheck gagal",
+        "success_skillcheck": "Skillcheck berhasil",
+        "busy": "Sudah ada orang lain yang mengerjakan",
+        "police_alert": "Aktivitas mencurigakan di dekat properti milik warga"
+    }
+}

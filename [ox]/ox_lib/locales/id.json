@@ -1,0 +1,33 @@
+{
+	"language": "Indonesian",
+	"ui": {
+		"cancel": "Batal",
+		"close": "Tutup",
+		"confirm": "Konfirmasi",
+		"more": "Lainnya...",
+		"settings": {
+			"locale": "Ganti bahasa",
+			"locale_description": "Bahasa saat ini: ${language} (%s)",
+			"notification_audio": "Suara notifikasi",
+			"notification_position": "Posisi notifikasi"
+		},
+		"position": {
+			"bottom": "Bawah",
+			"bottom-left": "Kiri bawah",
+			"bottom-right": "Kanan bawah",
+			"center-left": "Kiri tengah",
+			"center-right": "Kanan tengah",
+			"top": "Atas",
+			"top-left": "Kiri atas",
+			"top-right": "Kanan atas"
+		}
+	},
+	"open_radial_menu": "Buka menu radial",
+	"cancel_progress": "Batalkan progress bar",
+	"txadmin_announcement": "Pengumuman server dari %s",
+	"txadmin_dm": "Pesan pribadi dari %s",
+	"txadmin_warn": "Kamu mendapat peringatan dari %s",
+	"txadmin_warn_content": "%s  \nID Tindakan: %s",
+	"txadmin_scheduledrestart": "Restart Terjadwal",
+	"settings": "Pengaturan"
+}

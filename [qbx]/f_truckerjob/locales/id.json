@@ -1,0 +1,40 @@
+{
+    "error": {
+        "no_deposit": "Butuh deposit Rp %s",
+        "cancelled": "Dibatalkan",
+        "vehicle_not_correct": "Ini bukan kendaraan niaga!",
+        "no_driver": "Kamu harus menjadi pengemudi untuk melakukan ini",
+        "no_work_done": "Kamu belum mengantar apa pun",
+        "backdoors_not_open": "Pintu belakang kendaraan belum terbuka",
+        "get_out_vehicle": "Keluar dari kendaraan dulu untuk melakukan ini",
+        "too_far_from_trunk": "Ambil kotaknya dari bagasi kendaraanmu",
+        "too_far_from_delivery": "Kamu harus lebih dekat ke titik pengantaran",
+        "too_many_rents": "Kamu baru saja menyewa kendaraan, kembali lagi beberapa menit lagi"
+    },
+    "success": {
+        "paid_with_cash": "Deposit Rp %s dibayar tunai",
+        "paid_with_bank": "Deposit Rp %s dibayar dari bank",
+        "refund_to_cash": "Deposit Rp %s dikembalikan",
+        "you_earned": "Kamu mendapat Rp %s",
+        "payslip_time": "Kamu sudah mengunjungi semua toko. Saatnya ambil gaji!"
+    },
+    "menu": {
+        "header": "Kendaraan Tersedia",
+        "close_menu": "⬅ Tutup Menu"
+    },
+    "mission": {
+        "store_reached": "Sampai di toko. Ambil kotak dari bagasi dengan [E] lalu antar ke penanda.",
+        "take_box": "Ambil satu kotak barang",
+        "deliver_box": "Antar satu kotak barang",
+        "another_box": "Ambil kotak berikutnya",
+        "goto_next_point": "Semua barang sudah diantar, lanjut ke pengantaran berikutnya",
+        "return_to_station": "Semua barang sudah diantar. Kembali ke depo",
+        "job_completed": "Rutemu sudah selesai. Silakan ambil gajimu"
+    },
+    "info": {
+        "pickup_paycheck": "[E] - Ambil gaji",
+        "store_vehicle": "[E] - Simpan Kendaraan",
+        "vehicles": "[E] - Kendaraan",
+        "deliver_to_store": "Antar kotak ke toko"
+    }
+}

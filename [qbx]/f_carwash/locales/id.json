@@ -1,0 +1,11 @@
+{
+    "wash_prompt": "Cuci mobil seharga Rp %s",
+    "wash_prompt_dt": "~g~E~w~ - Cuci mobil seharga Rp %s",
+    "washing": "Kendaraan sedang dicuci...",
+    "canceled": "Dibatalkan...",
+    "not_dirty": "Kendaraan ini tidak kotor",
+    "not_available": "Tempat cuci mobil sedang tidak tersedia...",
+    "no_money": "Uangmu tidak cukup...",
+    "reason": "Cuci Mobil",
+    "label": "Cuci Mobil"
+}

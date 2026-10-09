@@ -1,0 +1,21 @@
+{
+    "error": {
+        "scrap_owned": "Kendaraan milik pemain tidak bisa dibongkar.",
+        "cannot_scrap": "Kendaraan ini tidak bisa dibongkar.",
+        "not_driver": "Kamu bukan pengemudinya",
+        "scrap_vehicle": "Kamu belum boleh membongkar kendaraan sekarang",
+        "canceled": "Dibatalkan"
+    },
+    "text": {
+        "disassemble_vehicle": "[E] - Bongkar Kendaraan",
+        "email_list": "[E] - Kirim Daftar Kendaraan via Email",
+        "email_list_target": "Kirim Daftar Kendaraan via Email",
+        "scrap_vehicle": "Membongkar kendaraan",
+        "email_sent": "Daftar akan dikirim ke email-mu dalam beberapa detik"
+    },
+    "email": {
+        "sender": "Turner's Auto Wrecking",
+        "subject": "Daftar Kendaraan",
+        "message": "Kamu hanya bisa membongkar kendaraan dalam jumlah terbatas..<br />Semua hasil bongkaran boleh kamu ambil, asal jangan merepotkan saya.<br /><br /><strong>Daftar Kendaraan:</strong><br />"
+    }
+}

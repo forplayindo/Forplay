@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="server-logo">
+        <img src="logo.png" alt="Server Logo">
+    </div>
+
+    <script>
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+
+            if (data.action === 'showLogo') {
+                document.getElementById('server-logo').style.display = 'block';
+            }
+
+            if (data.action === 'hideLogo') {
+                document.getElementById('server-logo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

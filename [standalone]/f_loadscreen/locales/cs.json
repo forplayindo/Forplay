@@ -1,0 +1,69 @@
+{
+  "preTitle": "Načítání · Sezóna 24",
+  "title": "Last Resort",
+  "subtitle": "Roleplay",
+  "footer": "lastresort_loading · v3.3",
+  "online": "Online",
+  "offline": "Offline",
+  "playersSlash": "/",
+  "msUnit": "ms",
+  "welcome": "Vítej zpět,",
+  "welcomeAnon": "Vítej",
+  "tipLabel": "Tip",
+  "nowPlaying": "Právě hraje",
+  "noTrack": "Žádné nakonfigurované skladby",
+  "loadingTrack": "Načítání…",
+  "rulesTab": "Pravidla",
+  "staffTab": "Tým",
+  "newsTab": "Novinky",
+  "playlist": "Playlist",
+  "trackCount": "{n} / {total}",
+  "gateTitle": "Pravidla serveru",
+  "gateIntro": "Přečti si pravidla až do konce a přijmi je, abys dokončil připojení.",
+  "gateVersion": "Verze {v}",
+  "gateScrollHint": "Pokračuj posunutím na konec pravidel.",
+  "gateReadyHint": "Pravidla přečtena — teď je můžeš přijmout.",
+  "gateAccept": "Přijímám",
+  "gateDecline": "Odmítnout",
+  "gateSaving": "Ukládání…",
+  "gateDeclined": "Bez přijetí pravidel serveru zde nemůžeš hrát.",
+  "stageOf": "Fáze {n} / {total}",
+  "starting": "Spouštění",
+  "ready": "Připraveno — připojuji",
+  "roles": {
+    "founder": "Zakladatel",
+    "management": "Vedení",
+    "scripting": "Vývoj",
+    "support": "Podpora"
+  },
+  "badges": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "dev": "Dev",
+    "mod": "Mod"
+  },
+  "rules": [
+    "Vždy zůstávej v roli své postavy.",
+    "RDM a VDM jsou přísně zakázány.",
+    "Respektuj ostatní hráče i tým.",
+    "Žádné cheaty, mody ani exploity.",
+    "Žádný powergaming a metagaming."
+  ],
+  "tips": [
+    "Stiskni F1 pro otevření telefonu.",
+    "Použij /help pro výpis dostupných příkazů.",
+    "Připoj se na náš Discord pro novinky a eventy.",
+    "Výplatu si vyber u jakéhokoli bankomatu.",
+    "Dodržuj pravidla silničního provozu — policie sleduje.",
+    "Jsi nový? Navštiv pracovní úřad a začni."
+  ],
+  "stages": [
+    "Načítání dat mapy",
+    "Synchronizace resourců",
+    "Připojování assetů",
+    "Načítání herních dat",
+    "Streamování světa",
+    "Připojování k serveru",
+    "Téměř hotovo"
+  ]
+}

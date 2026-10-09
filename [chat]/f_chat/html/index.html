@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>f_chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="chat" data-open="false" data-position="left" data-corners="soft" data-density="cosy">
+
+    <div id="feed">
+      <div id="tabs">
+        <button class="tab-btn" data-tab="announce">Pengumuman<span class="unread"></span></button>
+        <button class="tab-btn" data-tab="global" data-active="true">Global<span class="unread"></span></button>
+        <button class="tab-btn" data-tab="job" data-hidden="true">Job<span class="unread"></span></button>
+      </div>
+      <div id="chips"></div>
+
+      <div id="log" role="log" aria-live="polite"></div>
+      <div id="typing"></div>
+
+    <div id="dock">
+    <div id="stack">
+      <div class="pop" id="suggest-pop">
+        <div class="pop-title">Perintah</div>
+        <div id="suggest-list"></div>
+      </div>
+
+      <div class="pop" id="emoji-pop">
+        <div class="pop-title">Emoji</div>
+        <div id="emoji-grid"></div>
+      </div>
+
+      <div class="pop" id="settings">
+        <div class="pop-title">Tampilan</div>
+
+        <div class="group">
+          <div class="label">Tema</div>
+          <div class="swatches" id="theme-swatches"></div>
+        </div>
+
+        <div class="group">
+          <div class="label">Warna aksen</div>
+          <div class="swatches">
+            <input type="color" id="accent-picker" value="#E0A458">
+            <span id="accent-hex" style="font-size:.84em;color:var(--muted);align-self:center"></span>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="label">Sudut</div>
+          <div class="choices" data-setting="corners">
+            <button class="choice" data-value="sharp">Tajam</button>
+            <button class="choice" data-value="soft">Halus</button>
+            <button class="choice" data-value="round">Bulat</button>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="label">Jarak</div>
+          <div class="choices" data-setting="density">
+            <button class="choice" data-value="tight">Rapat</button>
+            <button class="choice" data-value="cosy">Sedang</button>
+            <button class="choice" data-value="loose">Longgar</button>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="label">Posisi pesan</div>
+          <div class="choices" data-setting="position">
+            <button class="choice" data-value="left">Kiri</button>
+            <button class="choice" data-value="right">Kanan</button>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="label">Ukuran <span id="size-value" style="color:var(--dim)"></span></div>
+          <div style="padding:0 5px"><input type="range" id="size-range" min="80" max="130" step="5"></div>
+        </div>
+
+        <div class="group">
+          <div class="label">Huruf</div>
+          <div class="choices" data-setting="font" id="font-choices"></div>
+        </div>
+
+        <div class="group">
+          <button class="toggle" data-setting="timestamps"><span>Tampilkan jam di setiap baris</span><span class="pill"></span></button>
+          <button class="toggle" data-setting="sound"><span>Bunyi saat ada yang menyebut namaku</span><span class="pill"></span></button>
+        </div>
+      </div>
+
+      <div id="composer">
+        <input id="input" type="text" autocomplete="off" spellcheck="false" placeholder="Ketik sesuatu…" maxlength="220">
+
+        <span id="count"></span>
+        <button class="tool" id="emoji-btn" title="Emoji">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0"/><circle cx="9" cy="10" r=".6" fill="currentColor"/><circle cx="15" cy="10" r=".6" fill="currentColor"/></svg>
+        </button>
+        <button class="tool" id="settings-btn" title="Tampilan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7.5 19l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 7.5l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 2.7-1.1V3a2 2 0 1 1 4 0v.1A1.6 1.6 0 0 0 16.5 4.6l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+        </button>
+        <button id="send" title="Kirim (Enter)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+    </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="blur.js"></script>
+</body>
+</html>

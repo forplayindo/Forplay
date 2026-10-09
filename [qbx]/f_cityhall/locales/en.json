@@ -1,0 +1,44 @@
+{
+    "error": {
+        "not_enough_money": "You don't have enough money...",
+        "invalid_type": "That is not a valid Id type...",
+        "invalid_job": "That is not a valid job...",
+        "staff_on_duty": "An officer is currently on duty. Please visit the service desk and ask them to process your document.",
+        "not_eligible": "You are not eligible for this document.",
+        "cooldown": "Please wait a moment before issuing another document.",
+        "applicant_too_far": "The applicant is too far away.",
+        "applicant_declined": "The applicant declined the request.",
+        "applicant_no_money": "The applicant cannot afford the fee.",
+        "no_applicants": "There is nobody near you to serve.",
+        "must_be_on_duty": "You must be on duty to issue documents."
+    },
+    "success": {
+        "item_recieved": "You have received your ",
+        "item_renewed": "You have renewed your ",
+        "new_job": "Congratulations on your new job!",
+        "issued": "%s issued to %s.",
+        "issued_paid": "%s issued to %s. $%s paid to the organization account.",
+        "on_duty": "You are now on duty.",
+        "off_duty": "You are now off duty."
+    },
+    "info": {
+        "cityhall": "Cityhall",
+        "open_cityhall": "[E] Open Cityhall",
+        "target_open_cityhall": "Open Cityhall",
+        "open_office": "[E] %s",
+        "open_issue_desk": "[E] Document Desk",
+        "identity": "Identity",
+        "employment": "Employment",
+        "obtain_license_identity": "Obtain your licenses",
+        "select_job": "Select a new job",
+        "price": "Price: $%s",
+        "served_by_staff": "Handled by on-duty staff - please visit the service desk",
+        "issue_desk": "Document Desk",
+        "issue_desc": "Issue this document to a nearby citizen",
+        "issue_to": "Issue %s",
+        "waiting_applicant": "Waiting for the applicant to confirm...",
+        "go_on_duty": "Go On Duty",
+        "go_off_duty": "Go Off Duty",
+        "confirm_issue": "Officer **%s** wants to issue you a **%s**.  \nFee: **$%s**  \n\nDo you accept?"
+    }
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/src/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NUI React Boilerplate</title>
+  <style>
+    html, body, #root,
+    html *, body * {
+      color-scheme: normal !important;
+    }
+    html, body, #root {
+      background: transparent !important;
+      background-color: transparent !important;
+    }
+
+    /*
+      The NUI page is an OVERLAY, not a document: it must never scroll.
+
+      There was no overflow rule here at all, so anything reaching past
+      the viewport -- a tooltip, a notification stack, the radial menu --
+      gave the page scroll room. Any scrollIntoView() then dragged the
+      whole interface sideways, which is what made the list menu appear
+      to jump left when you moved between rows.
+
+      Pinned to the viewport as well, so a stray margin cannot push the
+      body taller than the screen and reintroduce it.
+    */
+    html, body, #root {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden !important;
+      overscroll-behavior: none;
+    }
+    /* Kill Mantine dark-mode body bg injection */
+    body[style*="background"] {
+      background: transparent !important;
+      background-color: transparent !important;
+    }
+  </style>
+  <script type="module" crossorigin src="./assets/index-CIQDG8fd.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-Ce-a3gYh.css">
+  <link rel="stylesheet" href="./f_theme.css">
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="./f_ui.js"></script>
+</body>
+
+</html>

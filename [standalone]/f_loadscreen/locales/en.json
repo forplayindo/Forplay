@@ -1,0 +1,79 @@
+{
+    "preTitle": "Loading · Session 24",
+    "title": "Foreplay",
+    "subtitle": "Indonesia",
+    "footer": "lastresort_loading · v3.3",
+
+    "online": "Online",
+    "offline": "Offline",
+    "playersSlash": "/",
+    "msUnit": "ms",
+
+    "welcome": "Welcome back,",
+    "welcomeAnon": "Welcome",
+    "tipLabel": "Tip",
+    "nowPlaying": "Now Playing",
+    "noTrack": "No tracks configured",
+    "loadingTrack": "Loading…",
+
+    "rulesTab": "Rules",
+    "staffTab": "Staff",
+    "newsTab": "News",
+
+    "playlist": "Playlist",
+    "trackCount": "{n} / {total}",
+
+    "gateTitle": "Server rules",
+    "gateIntro": "Read the rules through and accept them to finish joining.",
+    "gateVersion": "Version {v}",
+    "gateScrollHint": "Scroll to the end of the rules to continue.",
+    "gateReadyHint": "Rules read — you can accept now.",
+    "gateAccept": "I accept",
+    "gateDecline": "Decline",
+    "gateSaving": "Saving…",
+    "gateDeclined": "You have to accept the server rules to play here.",
+
+    "stageOf": "Stage {n} / {total}",
+    "starting": "Starting",
+    "ready": "Ready — joining",
+
+    "roles": {
+        "founder": "Founder",
+        "management": "Management",
+        "scripting": "Scripting",
+        "support": "Support"
+    },
+    "badges": {
+        "owner": "Owner",
+        "admin": "Admin",
+        "dev": "Dev",
+        "mod": "Mod"
+    },
+
+    "rules": [
+        "Stay in character at all times.",
+        "RDM and VDM are strictly forbidden.",
+        "Respect other players and staff.",
+        "No cheats, mods or exploits.",
+        "No powergaming or metagaming."
+    ],
+
+    "tips": [
+        "Press F1 to open your phone.",
+        "Use /help to list all available commands.",
+        "Join our Discord for updates and events.",
+        "Withdraw your paycheck at any ATM.",
+        "Obey traffic laws — the police are watching.",
+        "New here? Visit the job center to get started."
+    ],
+
+    "stages": [
+        "Loading map data",
+        "Synchronizing resources",
+        "Mounting assets",
+        "Loading game data",
+        "Streaming world",
+        "Connecting to server",
+        "Almost there"
+    ]
+}

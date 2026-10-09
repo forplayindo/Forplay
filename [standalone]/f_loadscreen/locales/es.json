@@ -1,0 +1,69 @@
+{
+  "preTitle": "Cargando · Sesión 24",
+  "title": "Last Resort",
+  "subtitle": "Roleplay",
+  "footer": "lastresort_loading · v3.3",
+  "online": "En línea",
+  "offline": "Desconectado",
+  "playersSlash": "/",
+  "msUnit": "ms",
+  "welcome": "Bienvenido de nuevo,",
+  "welcomeAnon": "Bienvenido",
+  "tipLabel": "Consejo",
+  "nowPlaying": "Sonando ahora",
+  "noTrack": "Sin pistas configuradas",
+  "loadingTrack": "Cargando…",
+  "rulesTab": "Reglas",
+  "staffTab": "Staff",
+  "newsTab": "Novedades",
+  "playlist": "Lista de reproducción",
+  "trackCount": "{n} / {total}",
+  "gateTitle": "Reglas del servidor",
+  "gateIntro": "Lee las reglas hasta el final y acéptalas para terminar de entrar.",
+  "gateVersion": "Versión {v}",
+  "gateScrollHint": "Desplázate hasta el final de las reglas para continuar.",
+  "gateReadyHint": "Reglas leídas — ya puedes aceptar.",
+  "gateAccept": "Acepto",
+  "gateDecline": "Rechazar",
+  "gateSaving": "Guardando…",
+  "gateDeclined": "Tienes que aceptar las reglas del servidor para jugar aquí.",
+  "stageOf": "Fase {n} / {total}",
+  "starting": "Iniciando",
+  "ready": "Listo — conectando",
+  "roles": {
+    "founder": "Fundador",
+    "management": "Dirección",
+    "scripting": "Desarrollo",
+    "support": "Soporte"
+  },
+  "badges": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "dev": "Dev",
+    "mod": "Mod"
+  },
+  "rules": [
+    "Mantente en personaje en todo momento.",
+    "El RDM y VDM están estrictamente prohibidos.",
+    "Respeta a los demás jugadores y al staff.",
+    "Prohibido cheats, mods o exploits.",
+    "Prohibido el powergaming y metagaming."
+  ],
+  "tips": [
+    "Pulsa F1 para abrir tu teléfono.",
+    "Usa /help para ver todos los comandos disponibles.",
+    "Únete a nuestro Discord para novedades y eventos.",
+    "Retira tu sueldo en cualquier cajero.",
+    "Respeta el código de circulación — la policía vigila.",
+    "¿Eres nuevo? Visita la oficina de empleo para empezar."
+  ],
+  "stages": [
+    "Cargando datos del mapa",
+    "Sincronizando recursos",
+    "Montando assets",
+    "Cargando datos del juego",
+    "Transmitiendo mundo",
+    "Conectando al servidor",
+    "Casi listo"
+  ]
+}

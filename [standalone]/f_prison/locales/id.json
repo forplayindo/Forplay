@@ -1,0 +1,47 @@
+{
+    "notify":{
+        "freedom":"Bebas!",
+        "new_time_by_roster":"Masa Tahanan Baru",
+        "new_time_by_roster_description":"Masa tahananmu diatur menjadi %s bulan!",
+        "unjailed_by_roster":"Masa tahananmu diatur ke nol, kamu dibebaskan!",
+        "no_access":"Kamu tidak punya akses ke perintah ini!",
+        "updated_players_time":"Masa tahanan %s diubah menjadi %s bulan",
+        "player_sent":"%s dipenjara selama %s bulan",
+        "time_updated_description":"Masa tahananmu diatur menjadi %s bulan",
+        "time_updated":"Masa Tahanan Diperbarui",
+        "invalid_player":"Pemain tidak valid!",
+        "lost_job":"Kamu kehilangan pekerjaanmu!",
+        "confiscated":"Barang-barangmu disita!",
+        "returned_items":"Barang-barangmu dikembalikan!",
+        "player_released":"%s sudah dibebaskan!",
+        "lifer":"Kamu dipenjara seumur hidup!",
+        "jail_time":"Masa Tahanan",
+        "time_left":"Sisa masa tahananmu %s bulan.",
+        "no_time_left":"Masa tahananmu sudah habis!",
+        "time_remaining":"Sisa waktu: %s bulan",
+        "completed_hack":"Peretasan berhasil!",
+        "failed_hack":"Peretasan gagal!",
+        "escaped":"Kamu kabur dari penjara!",
+        "checkout":"Masa tahananmu sudah habis! Silakan keluar!",
+        "wait_before_check":"Tunggu sebentar sebelum mengecek masa tahananmu lagi!"
+    },
+
+    "commands":{
+        "jail":"Penjarakan Pemain",
+        "unjail":"Bebaskan Pemain",
+        "playerid":"ID Pemain",
+        "check_time":"Cek masa tahananmu",
+        "prisoners_roster":"Lihat dan kelola tahanan saat ini"
+    },
+
+    "input":{
+        "jail_player":"Penjarakan Pemain",
+        "playerid":"ID Server Pemain",
+        "jailtime":"Masa Tahanan",
+        "months":"Bulan ( Menit )",
+        "hack_gate":"Retas Gerbang Penjara",
+        "hacking":"Meretas terminal...",
+        "check_time":"Cek Waktu",
+        "prison_sentence":"**Hukuman Penjara:** %s  \n%s"
+    }
+}

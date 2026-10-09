@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>f_customs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app" class="hidden">
+    <div class="drag" id="drag"></div>
+
+    <section class="left glass">
+        <div class="head">
+            <div class="logo">🛠️</div>
+            <div><div class="kicker">Bengkel Kustom</div><h1 id="vname"></h1></div>
+            <div class="plate" id="vplate"></div>
+        </div>
+        <div class="cats" id="cats"></div>
+        <div class="crumb"><button id="back" class="hidden">←</button><h3 id="crumb"></h3></div>
+        <div class="list" id="list"></div>
+    </section>
+
+    <section class="right glass">
+        <div class="head"><div class="logo">🧾</div><div><div class="kicker">Daftar Modifikasi</div><h2 id="count">0 item dipilih</h2></div></div>
+        <div id="status"></div>
+        <div class="cart" id="cart"></div>
+        <div class="foot">
+            <div class="sum total"><span>Perkiraan Total</span><b id="total">Rp 0</b></div>
+            <button class="btn primary" id="submit">Selesai Modifikasi</button>
+            <button class="btn ghost" id="reset">Kembalikan Semua</button>
+            <button class="btn ghost" id="exit">Keluar (ESC)</button>
+            <div class="why hidden" id="why"></div>
+        </div>
+    </section>
+
+    <div class="camera glass" id="camera">
+        <button data-cam="free" class="on">Bebas</button><button data-cam="front">Depan</button><button data-cam="side">Samping</button>
+        <button data-cam="rear">Belakang</button><button data-cam="wheel">Velg</button><button data-cam="engine">Mesin</button>
+        <div class="sep"></div><small>🖱 Geser = putar · Scroll = zoom</small>
+    </div>
+
+    <div class="overlay hidden" id="ov"><div class="modal glass" id="modal"></div></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+{
+  "preTitle": "Laden · Sessie 24",
+  "title": "Last Resort",
+  "subtitle": "Roleplay",
+  "footer": "lastresort_loading · v3.3",
+  "online": "Online",
+  "offline": "Offline",
+  "playersSlash": "/",
+  "msUnit": "ms",
+  "welcome": "Welkom terug,",
+  "welcomeAnon": "Welkom",
+  "tipLabel": "Tip",
+  "nowPlaying": "Speelt nu",
+  "noTrack": "Geen tracks geconfigureerd",
+  "loadingTrack": "Laden…",
+  "rulesTab": "Regels",
+  "staffTab": "Staff",
+  "newsTab": "Nieuws",
+  "playlist": "Afspeellijst",
+  "trackCount": "{n} / {total}",
+  "gateTitle": "Serverregels",
+  "gateIntro": "Lees de regels helemaal door en accepteer ze om verbinding te maken.",
+  "gateVersion": "Versie {v}",
+  "gateScrollHint": "Scroll naar het einde van de regels om verder te gaan.",
+  "gateReadyHint": "Regels gelezen — je kunt nu accepteren.",
+  "gateAccept": "Ik accepteer",
+  "gateDecline": "Weigeren",
+  "gateSaving": "Opslaan…",
+  "gateDeclined": "Je moet de serverregels accepteren om hier te spelen.",
+  "stageOf": "Fase {n} / {total}",
+  "starting": "Starten",
+  "ready": "Klaar — verbinden",
+  "roles": {
+    "founder": "Oprichter",
+    "management": "Management",
+    "scripting": "Ontwikkeling",
+    "support": "Support"
+  },
+  "badges": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "dev": "Dev",
+    "mod": "Mod"
+  },
+  "rules": [
+    "Blijf altijd in karakter.",
+    "RDM en VDM zijn streng verboden.",
+    "Respecteer andere spelers en de staff.",
+    "Geen cheats, mods of exploits.",
+    "Geen powergaming of metagaming."
+  ],
+  "tips": [
+    "Druk op F1 om je telefoon te openen.",
+    "Gebruik /help om alle commando's te zien.",
+    "Word lid van onze Discord voor nieuws en events.",
+    "Neem je loon op bij elke pinautomaat.",
+    "Houd je aan de verkeersregels — de politie kijkt mee.",
+    "Nieuw? Bezoek het arbeidsbureau om te beginnen."
+  ],
+  "stages": [
+    "Kaartdata laden",
+    "Resources synchroniseren",
+    "Assets koppelen",
+    "Speldata laden",
+    "Wereld streamen",
+    "Verbinden met server",
+    "Bijna klaar"
+  ]
+}

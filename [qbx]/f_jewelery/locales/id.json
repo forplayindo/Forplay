@@ -1,0 +1,17 @@
+{
+    "text": {
+        "electrical": "[E] - Retas Kunci Pintu",
+        "electricalTarget": "Retas Kunci Pintu",
+        "cabinet": "[E] - Pecahkan Etalase",
+        "cabinetTarget": "Pecahkan Etalase"
+    },
+    "notify": {
+        "busy": "Sudah ada orang lain yang mengerjakan",
+        "cabinetdone": "Etalase ini sudah dikuras",
+        "noweapon": "Kamu tidak memegang senjata",
+        "noitem": "Kamu tidak membawa %s",
+        "police": "Laporan perampokan Toko Vangelico",
+        "nopolice": "Polisi tidak cukup (butuh %s)",
+        "reward_dropped": "Beberapa perhiasan terjatuh"
+    }
+}

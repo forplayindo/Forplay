@@ -1,0 +1,21 @@
+{
+  "error": {
+    "canceled": "Dibatalkan",
+    "no_coral": "Kamu tidak punya karang untuk dijual..."
+  },
+  "info": {
+    "collecting_coral": "Mengambil karang",
+    "diving_area": "Area Menyelam",
+    "collect_coral": "Ambil karang",
+    "collect_coral_dt": "[E] - Ambil karang",
+    "checking_pockets": "Memeriksa tas untuk karang yang bisa dijual...",
+    "sell_coral": "Jual karang",
+    "sell_coral_dt": "[E] - Jual karang"
+  },
+  "logs": {
+    "tried_sell": "Pemain mencoba menjual karang tapi tidak punya",
+    "sell_coral": "Pemain menjual karang seharga Rp %s",
+    "collect_coral": "Pemain mengambil karang di indeks %s",
+    "new_location": "Lokasi karang baru di indeks %s"
+  }
+}

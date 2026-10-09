@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_stash</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="panel" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo">📦</span><div><h1>Kelola Stash</h1><small id="sub"></small></div></div>
+            <div class="head-actions">
+                <button class="pill accent" id="add-btn">＋ Tambah di Posisi Saya</button>
+                <button class="icon-btn close" data-close>✕</button>
+            </div>
+        </header>
+
+        <div class="toolbar">
+            <nav class="tabs" id="tabs">
+                <button data-tab="all" class="active">Semua</button>
+                <button data-tab="job">Job</button>
+                <button data-tab="gang">Gang</button>
+                <button data-tab="public">Umum</button>
+            </nav>
+            <input id="search" placeholder="Cari nama stash / job / gang...">
+        </div>
+        <div id="msg" class="banner hidden"></div>
+        <main id="list" class="list"></main>
+
+        <aside id="sheet" class="sheet hidden">
+            <div class="sheet-head"><h2 id="sheet-title">Tambah Stash</h2><button class="icon-btn" id="sheet-close">✕</button></div>
+            <div class="sheet-body">
+                <div id="loc-note" class="note"></div>
+
+                <label>Nama stash</label>
+                <input id="f-label" maxlength="40" placeholder="Contoh: Gudang Ballas">
+
+                <label>Pemilik</label>
+                <div class="seg" id="f-gtype">
+                    <button data-v="job" class="active">Job</button>
+                    <button data-v="gang">Gang</button>
+                    <button data-v="public">Umum</button>
+                </div>
+                <select id="f-group"></select>
+                <small class="hint hidden" id="public-hint">Semua warga bisa membuka. Pakai Personal agar tiap warga punya isi sendiri (Bersama = siapa saja bisa ambil semua barang).</small>
+
+                <label>Akses</label>
+                <div class="seg" id="f-personal">
+                    <button data-v="0" class="active">Bersama</button>
+                    <button data-v="1">Personal</button>
+                </div>
+                <small class="hint" id="personal-hint">Bersama: satu isi untuk semua anggota. Personal: tiap anggota punya isi sendiri.</small>
+
+                <div id="grade-box">
+                    <label>Grade minimal</label>
+                    <div class="seg grades" id="f-grade"></div>
+                    <small class="hint" id="grade-hint"></small>
+                </div>
+
+                <div id="duty-row" class="check">
+                    <input type="checkbox" id="f-duty"><label for="f-duty">Wajib on duty</label>
+                </div>
+
+                <div class="two">
+                    <div><label>Berat maks (kg)</label><input id="f-weight" type="number" min="1"></div>
+                    <div><label>Jumlah slot</label><input id="f-slots" type="number" min="1"></div>
+                </div>
+            </div>
+            <div class="sheet-foot">
+                <div id="sheet-msg" class="msg hidden"></div>
+                <button id="save-btn" class="primary">Simpan</button>
+            </div>
+        </aside>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

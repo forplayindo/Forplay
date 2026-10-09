@@ -1,0 +1,29 @@
+{
+    "error": {
+        "negative": "Mau menjual jumlah minus?",
+        "no_melt": "Kamu tidak memberi saya apa pun untuk dilebur...",
+        "no_items": "Barangnya tidak cukup"
+    },
+    "success": {
+        "sold": "Kamu menjual %s x %s seharga Rp %s",
+        "items_received": "Kamu menerima %s x %s"
+    },
+    "info": {
+        "title": "Pegadaian",
+        "subject": "Peleburan Barang",
+        "message": "Barangmu sudah selesai dilebur. Kamu bisa mengambilnya kapan saja.",
+        "open_pawn": "Buka Pegadaian",
+        "sell": "Jual Barang",
+        "sell_pawn": "Jual Barang ke Pegadaian",
+        "melt": "Lebur Barang",
+        "melt_pawn": "Buka Tempat Peleburan",
+        "melt_pickup": "Ambil Barang Leburan",
+        "pawn_closed": "Pegadaian tutup. Datang lagi antara pukul %s:00 - %s:00",
+        "sell_items": "Harga jual Rp %s",
+        "back": "⬅ Kembali",
+        "melt_item": "Lebur %s",
+        "max": "Jumlah maksimal %s",
+        "submit": "Lebur",
+        "melt_wait": "Beri saya %s menit, barangmu akan selesai dilebur"
+    }
+}

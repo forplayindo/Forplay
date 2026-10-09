@@ -1,0 +1,48 @@
+{
+    "error": {
+        "not_your_vehicle": "Ini bukan kendaraanmu..",
+        "vehicle_does_not_exist": "Kendaraan tidak ditemukan",
+        "not_enough_money": "Uangmu tidak cukup",
+        "finish_payments": "Lunasi dulu cicilan kendaraan ini sebelum menjualnya..",
+        "no_space_on_lot": "Tidak ada tempat untuk mobilmu di showroom!",
+        "not_in_veh": "Kamu tidak sedang di dalam kendaraan!",
+        "not_for_sale": "Kendaraan ini TIDAK dijual!"
+    },
+    "menu": {
+        "view_contract": "Lihat Kontrak",
+        "view_contract_int": "[E] Lihat Kontrak",
+        "sell_vehicle": "Jual Kendaraan",
+        "sell_vehicle_help": "Jual kendaraan ke warga lain!",
+        "sell_back": "Jual ke dealer!",
+        "sell_back_help": "Jual mobilmu langsung ke dealer dengan harga lebih rendah!",
+        "interaction": "[E] Jual Kendaraan"
+    },
+    "success": {
+        "sold_car_for_price": "Mobilmu terjual seharga Rp %s",
+        "car_up_for_sale": "Mobilmu sudah dipajang untuk dijual! Harga - Rp %s",
+        "vehicle_bought": "Kendaraan dibeli"
+    },
+    "info": {
+        "confirm_cancel": "~g~Y~w~ - Konfirmasi / ~r~N~w~ - Batal ~g~",
+        "vehicle_returned": "Kendaraanmu dikembalikan",
+        "used_vehicle_lot": "Showroom Mobil Bekas",
+        "sell_vehicle_to_dealer": "[~g~E~w~] - Jual ke dealer seharga ~g~Rp %s",
+        "view_contract": "[~g~E~w~] - Lihat Kontrak Kendaraan",
+        "cancel_sale": "[~r~G~w~] - Batalkan Penjualan",
+        "model_price": "%s, Harga: ~g~Rp %s",
+        "are_you_sure": "Yakin tidak jadi menjual kendaraanmu?",
+        "yes_no": "[~g~7~w~] - Ya | [~r~8~w~] - Tidak",
+        "place_vehicle_for_sale": "[~g~E~w~] - Pajang Kendaraan untuk Dijual"
+    },
+    "charinfo": {
+        "firstname": "tidak",
+        "lastname": "diketahui",
+        "account": "Rekening tidak diketahui..",
+        "phone": "nomor telepon tidak diketahui.."
+    },
+    "mail": {
+        "sender": "Larrys RV Sales",
+        "subject": "Kendaraanmu terjual!",
+        "message": "Kamu mendapat Rp %s dari penjualan %s milikmu."
+    }
+}

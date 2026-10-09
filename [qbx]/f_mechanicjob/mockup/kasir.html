@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kasir Bengkel</title>
+<style>
+:root {
+    --bg: #0b1118; --panel: #0f1720; --card: #15202c; --card2: #1b2938; --line: #233447; --line2: #2e445c;
+    --text: #e6eef7; --muted: #8ca0b6; --accent: #2dd4bf; --accent-dark: #14b8a6; --accent-ink: #062521;
+    --ok: #22c55e; --warn: #eab308; --orange: #f97316; --bad: #ef4444;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; color: var(--text); font-size: 13px; line-height: 1.35; user-select: none; overflow: hidden; height: 100vh;
+    background: radial-gradient(ellipse at 50% 60%, #333d48 0%, #1a2129 50%, #0b0f14 100%); }
+button { font: inherit; color: inherit; border: none; background: none; cursor: pointer; outline: none; }
+input, select { font: inherit; color: var(--text); background: #0b1219; border: 1px solid var(--line2); border-radius: 7px; padding: 6px 9px; outline: none; }
+input:focus { border-color: var(--accent); }
+small { color: var(--muted); font-size: 11px; }
+.hidden { display: none !important; }
+
+.panel { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(1060px, 96vw); height: min(640px, 90vh);
+    background: linear-gradient(180deg, #111b26 0%, var(--panel) 40%); border: 1px solid var(--line); border-radius: 18px;
+    display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.55); }
+header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+.logo { font-size: 20px; width: 40px; height: 40px; display: grid; place-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+.kicker { font-size: 10px; letter-spacing: .18em; color: var(--muted); text-transform: uppercase; }
+h1 { font-size: 19px; font-weight: 700; } h2 { font-size: 15px; font-weight: 700; }
+h3 { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+.head-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.icon-btn { width: 36px; height: 36px; border-radius: 9px; background: var(--card); border: 1px solid var(--line); display: grid; place-items: center; }
+.icon-btn:hover { background: #3a1f24; border-color: #5a2a31; }
+.pill { font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 999px; border: 1px solid; white-space: nowrap; }
+.pill.cash { color: #86efac; border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.08); }
+.pill.bank { color: #93c5fd; border-color: rgba(59,130,246,.35); background: rgba(59,130,246,.08); }
+.tag { font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 5px; text-transform: uppercase; letter-spacing: .06em; }
+.tag.kustom { background: rgba(168,85,247,.15); color: #d8b4fe; }
+.tag.perbaikan { background: rgba(45,212,191,.12); color: var(--accent); }
+.tag.unpaid { background: rgba(249,115,22,.14); color: #fdba74; }
+.tag.wait { background: rgba(59,130,246,.15); color: #93c5fd; }
+.plate { font-family: Consolas, monospace; font-weight: 700; font-size: 11px; padding: 2px 6px; background: #f3f4f6; color: #111; border-radius: 4px; border: 2px solid #1e3a8a; }
+
+.body { flex: 1; display: grid; min-height: 0; }
+.scroll { overflow-y: auto; } .scroll::-webkit-scrollbar { width: 6px; } .scroll::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 3px; }
+
+/* ===== WARGA ===== */
+.cust { grid-template-columns: 1fr 360px; }
+.bills { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; border-right: 1px solid var(--line); }
+.bill { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.bill.on { border-color: rgba(45,212,191,.55); box-shadow: 0 0 0 3px rgba(45,212,191,.08); }
+.bill-h { display: flex; align-items: center; gap: 10px; padding: 11px 13px; cursor: pointer; }
+.bill-h .radio { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line2); flex-shrink: 0; }
+.bill.on .radio { border-color: var(--accent); background: radial-gradient(var(--accent) 45%, transparent 50%); }
+.bill-h .tx { flex: 1; } .bill-h .tx b { font-size: 13.5px; } .bill-h .tx small { display: block; }
+.bill-h .amt { font-weight: 800; font-size: 15px; }
+.lines { border-top: 1px solid var(--line); padding: 6px 13px 10px; }
+.ln { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.ln:last-child { border-bottom: none; }
+.ln .tx { flex: 1; } .ln small { margin-left: 6px; }
+.ln .pr { font-weight: 700; }
+.ln .x { width: 24px; height: 24px; border-radius: 7px; color: var(--muted); border: 1px solid var(--line); }
+.ln .x:hover { color: #fca5a5; border-color: #5a2a31; background: #3a1f24; }
+.ln .lock { width: 24px; text-align: center; opacity: .45; font-size: 12px; }
+.ln.disc .pr s { color: var(--muted); font-weight: 400; margin-right: 5px; }
+.note { font-size: 11px; color: var(--muted); padding: 2px 0 0; }
+
+.pay { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+.sumbox { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.sumbox div { display: flex; justify-content: space-between; padding: 3px 0; color: var(--muted); }
+.sumbox .tot { color: var(--text); font-size: 20px; font-weight: 800; border-top: 1px solid var(--line); margin-top: 6px; padding-top: 9px; }
+.sumbox .tot b { color: var(--accent); }
+.methods { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.method { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; text-align: left; }
+.method span { font-size: 22px; } .method b { display: block; margin-top: 4px; } .method small { display: block; }
+.method.on { border-color: rgba(45,212,191,.55); background: rgba(45,212,191,.07); }
+.method.no { opacity: .45; cursor: not-allowed; }
+.btn { width: 100%; padding: 12px; border-radius: 10px; font-weight: 800; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); } .btn.primary:hover { background: #5eead4; }
+.btn.primary:disabled { background: var(--card2); color: #5d7086; cursor: not-allowed; }
+.btn.ghost { background: var(--card); border: 1px solid var(--line); color: var(--muted); font-weight: 700; }
+.btn.danger { background: #7f1d1d; color: #fecaca; }
+.btn.sm { width: auto; padding: 6px 11px; font-size: 12px; border-radius: 8px; }
+.info { font-size: 11.5px; color: var(--muted); background: #0b1219; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.empty { text-align: center; padding: 60px 10px; color: var(--muted); } .empty span { font-size: 34px; display: block; margin-bottom: 6px; opacity: .6; }
+
+/* ===== MEKANIK ===== */
+.mech { grid-template-rows: auto 1fr; }
+.tabs { display: flex; gap: 6px; padding: 12px 18px 0; }
+.tab { padding: 8px 16px; border-radius: 9px; background: var(--card); border: 1px solid var(--line); font-weight: 700; color: var(--muted); }
+.tab.on { color: var(--accent); border-color: rgba(45,212,191,.45); background: rgba(45,212,191,.08); }
+.tab .badge { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 9px; background: var(--orange); color: #111; font-size: 11px; margin-left: 4px; }
+.tab.lock { opacity: .5; }
+.pane { min-height: 0; display: flex; flex-direction: column; }
+.toolbar { display: flex; gap: 8px; padding: 12px 18px; align-items: center; }
+.toolbar input { width: 240px; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 18px 12px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; }
+.card small { display: block; text-transform: uppercase; letter-spacing: .08em; font-size: 10px; } .card b { font-size: 16px; }
+table { width: 100%; border-collapse: collapse; }
+th { position: sticky; top: 0; background: var(--panel); text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+td { padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+tr:hover td { background: rgba(255,255,255,.015); }
+td .acts { display: flex; gap: 5px; justify-content: flex-end; }
+.tablewrap { flex: 1; padding: 0 18px 14px; }
+
+.price-grid { flex: 1; display: grid; grid-template-columns: 210px 1fr; min-height: 0; border-top: 1px solid var(--line); }
+.pcats { border-right: 1px solid var(--line); padding: 12px; display: flex; flex-direction: column; gap: 5px; }
+.pcat { text-align: left; padding: 9px 11px; border-radius: 9px; color: var(--muted); font-weight: 600; display: flex; justify-content: space-between; }
+.pcat:hover { background: var(--card); } .pcat.on { background: rgba(45,212,191,.08); color: var(--accent); }
+.pitems { padding: 4px 18px 14px; }
+.pitems input { width: 110px; text-align: right; }
+.pitems input.changed { border-color: var(--warn); background: rgba(234,179,8,.06); }
+.savebar { display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-top: 1px solid var(--line); background: #0d151d; }
+.savebar small { flex: 1; }
+
+.locked { flex: 1; display: grid; place-items: center; text-align: center; color: var(--muted); }
+.locked span { font-size: 40px; display: block; margin-bottom: 8px; }
+
+/* modal + toast */
+.overlay { position: absolute; inset: 0; background: rgba(5,9,13,.6); display: grid; place-items: center; z-index: 5; }
+.modal { width: 420px; padding: 22px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; }
+.modal h2 { margin-bottom: 6px; } .modal p { color: var(--muted); margin-bottom: 12px; }
+.modal .row2 { display: flex; gap: 8px; margin-top: 14px; }
+.modal textarea { width: 100%; height: 70px; resize: none; font: inherit; color: var(--text); background: #0b1219; border: 1px solid var(--line2); border-radius: 8px; padding: 8px; outline: none; }
+.toast { position: absolute; top: 24px; right: 24px; background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px; padding: 11px 14px; min-width: 260px; box-shadow: 0 10px 30px rgba(0,0,0,.4); z-index: 9; }
+.toast b { display: block; }
+
+.demo { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); display: flex; gap: 6px; padding: 6px 8px; font-size: 11px; background: rgba(15,23,32,.94); border: 1px solid var(--line); border-radius: 10px; z-index: 8; }
+.demo button { padding: 5px 9px; border-radius: 7px; background: var(--card); border: 1px dashed var(--line2); color: var(--muted); }
+.demo button.on { color: var(--warn); border-color: var(--warn); }
+</style>
+</head>
+<body>
+
+<div class="demo">
+    <small style="align-self:center">MOCKUP:</small>
+    <button id="dCust" class="on">Tampilan Warga</button>
+    <button id="dMech">Tampilan Mekanik</button>
+    <button id="dGrade">Grade: Boss</button>
+</div>
+
+<div class="panel">
+    <header>
+        <div class="logo">💳</div>
+        <div><div class="kicker" id="kick">Kasir Bengkel</div><h1 id="title">Tagihan Kamu</h1></div>
+        <div class="head-right" id="headRight"></div>
+        <button class="icon-btn" title="Tutup">✕</button>
+    </header>
+    <div class="body" id="body"></div>
+</div>
+
+<div class="overlay hidden" id="ov"><div class="modal" id="modal"></div></div>
+<div class="toast hidden" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const money = n => '$' + n.toLocaleString('id-ID');
+let view = 'cust', boss = true, mtab = 'unpaid', pcat = 'Performa';
+const ME = { name: 'Budi Santoso', cash: 3200, bank: 18500 };
+
+// tagihan milik warga yang sedang di kasir
+let myBills = [
+    { id: 1042, type: 'kustom', plate: 'F 1234 R', veh: 'Karin Sultan', by: 'Order sendiri', at: '14:21', status: 'unpaid', lines: [
+        { l: 'Mesin', v: 'EMS Lv.3', p: 4500 }, { l: 'Turbo', v: 'Turbo', p: 4500 }, { l: 'Warna Utama', v: 'Merah', p: 500 },
+        { l: 'Jenis Cat', v: 'Matte', p: 250 }, { l: 'Neon', v: 'Kiri, Kanan', p: 700 }, { l: 'Kaca Film', v: 'Gelap', p: 300 } ] },
+    { id: 1039, type: 'perbaikan', plate: 'F 1234 R', veh: 'Karin Sultan', by: 'Mekanik Andi', at: '13:58', status: 'unpaid', lines: [
+        { l: 'Perbaikan Bodi', v: '', p: 450 }, { l: 'Ganti Ban', v: 'Depan kiri', p: 200, n: 250 }, { l: 'Isi Oli Mesin', v: '', p: 120 } ] },
+];
+let selBill = myBills[0].id, method = 'cash';
+
+// semua tagihan belum lunas (menu mekanik)
+let allBills = [
+    { id: 1042, type: 'kustom', cust: 'Budi Santoso', plate: 'F 1234 R', total: 10750, by: 'Order sendiri', at: '14:21', status: 'unpaid' },
+    { id: 1040, type: 'kustom', cust: 'Rina Aulia', plate: 'F 8812 K', total: 6300, by: 'Order sendiri', at: '14:02', status: 'wait' },
+    { id: 1039, type: 'perbaikan', cust: 'Budi Santoso', plate: 'F 1234 R', total: 770, by: 'Mekanik Andi', at: '13:58', status: 'unpaid' },
+    { id: 1031, type: 'perbaikan', cust: 'Joko Prasetyo', plate: 'F 4410 B', total: 1250, by: 'Mekanik Sari', at: '12:40', status: 'unpaid' },
+    { id: 1027, type: 'kustom', cust: 'Dewi Lestari', plate: 'F 2071 D', total: 2400, by: 'Order sendiri', at: 'Kemarin', status: 'unpaid' },
+];
+
+const PRICES = {
+    'Performa': [['Mesin Lv.1', 1500], ['Mesin Lv.2', 3000], ['Mesin Lv.3', 4500], ['Mesin Lv.4', 6000], ['Rem Lv.1', 900], ['Rem Lv.2', 1800], ['Rem Lv.3', 2700],
+        ['Transmisi Lv.1', 1100], ['Transmisi Lv.2', 2200], ['Transmisi Lv.3', 3300], ['Suspensi (per level)', 700], ['Armor (per level)', 1300], ['Turbo', 4500]],
+    'Bodi': [['Spoiler', 600], ['Bumper Depan', 550], ['Bumper Belakang', 500], ['Rok Samping', 400], ['Knalpot', 450], ['Kap Mesin', 650], ['Atap', 500], ['Klakson', 150], ['Livery', 900]],
+    'Cat': [['Warna Utama', 500], ['Warna Kedua', 500], ['Pearl', 400], ['Warna Velg', 300], ['Matte', 250], ['Metal', 300], ['Chrome', 1200], ['Custom RGB', 700]],
+    'Velg & Ban': [['Model Velg', 800], ['Asap Ban', 350], ['Asap Ban RGB', 600], ['Ban Anti Bocor', 2500]],
+    'Lampu': [['Xenon', 800], ['Neon (per sisi)', 350]],
+    'Lainnya': [['Kaca Film', 300], ['Gaya Plat', 150]],
+    'Layanan Perbaikan': [['Perbaikan Bodi', 450], ['Perbaikan Mesin', 900], ['Ganti Ban', 250], ['Ganti Rem', 400], ['Isi Oli Mesin', 120], ['Panggilan Luar Bengkel', 300], ['Derek', 500]],
+};
+const edits = {};
+
+function toast(t, s) { const el = $('#toast'); el.innerHTML = `<b>${t}</b><small>${s}</small>`; el.classList.remove('hidden'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.add('hidden'), 3200); }
+function modal(html) { $('#modal').innerHTML = html; $('#ov').classList.remove('hidden'); }
+function closeModal() { $('#ov').classList.add('hidden'); }
+const billTotal = b => b.lines.reduce((a, l) => a + l.p, 0);
+
+/* ================= WARGA ================= */
+function renderCust() {
+    $('#kick').textContent = 'Kasir Bengkel'; $('#title').textContent = 'Tagihan Kamu';
+    $('#headRight').innerHTML = `<span class="pill cash">💵 Cash ${money(ME.cash)}</span><span class="pill bank">🏦 Bank ${money(ME.bank)}</span>`;
+    const body = $('#body'); body.className = 'body cust';
+    const bills = myBills.filter(b => b.status !== 'paid');
+    if (!bills.length) { body.className = 'body'; body.innerHTML = `<div class="empty"><span>🧾</span>Tidak ada tagihan yang perlu dibayar.</div>`; return; }
+    if (!bills.find(b => b.id === selBill)) selBill = bills[0].id;
+    const b = bills.find(x => x.id === selBill), total = billTotal(b);
+    const isWait = b.status === 'wait';
+
+    body.innerHTML = `
+    <div class="bills scroll">
+        <h3>Pilih tagihan (${bills.length})</h3>
+        ${bills.map(x => `
+        <div class="bill ${x.id === selBill ? 'on' : ''}">
+            <div class="bill-h" data-b="${x.id}"><span class="radio"></span>
+                <div class="tx"><b>#${x.id} · ${x.veh}</b> <span class="tag ${x.type}">${x.type}</span> ${x.status === 'wait' ? '<span class="tag wait">menunggu transfer</span>' : ''}
+                    <small><span class="plate">${x.plate}</span> &nbsp;${x.by} · ${x.at}</small></div>
+                <span class="amt">${money(billTotal(x))}</span></div>
+            ${x.id === selBill ? `<div class="lines">
+                ${x.lines.map((l, i) => `<div class="ln ${l.n ? 'disc' : ''}"><span class="tx">${l.l}${l.v ? `<small>${l.v}</small>` : ''}</span>
+                    <span class="pr">${l.n ? `<s>${money(l.n)}</s>` : ''}${money(l.p)}</span>
+                    ${x.type === 'kustom' && x.status === 'unpaid' ? `<button class="x" data-l="${i}" title="Hapus item ini">✕</button>` : `<span class="lock" title="Tidak bisa dihapus">🔒</span>`}</div>`).join('')}
+                ${x.type === 'perbaikan' ? `<div class="note">🔒 Perbaikan sudah dikerjakan, item tidak bisa dihapus. Hubungi mekanik jika ada keberatan.</div>`
+                    : x.status === 'unpaid' ? `<div class="note">Uang kurang? Hapus item yang tidak jadi dipasang.</div>` : ''}
+            </div>` : ''}
+        </div>`).join('')}
+    </div>
+    <div class="pay scroll">
+        <h3>Pembayaran #${b.id}</h3>
+        <div class="sumbox">
+            <div><span>${b.lines.length} item</span><span>${money(total)}</span></div>
+            <div class="tot"><span>Total</span><b>${money(total)}</b></div>
+        </div>
+        ${isWait ? `
+            <div class="info">📱 Invoice sudah dikirim ke <b>HP</b> kamu. Buka aplikasi tagihan di HP lalu bayar. Status lunas otomatis setelah dibayar.</div>
+            <button class="btn ghost" id="cancelTf">Batalkan Transfer &amp; Pilih Cash</button>`
+        : `
+        <h3>Metode</h3>
+        <div class="methods">
+            <button class="method ${method === 'cash' ? 'on' : ''} ${ME.cash < total ? 'no' : ''}" data-m="cash"><span>💵</span><b>Cash</b><small>${ME.cash < total ? 'Uang tunai kurang' : 'Potong uang di tas'}</small></button>
+            <button class="method ${method === 'transfer' ? 'on' : ''}" data-m="transfer"><span>📱</span><b>Transfer</b><small>Invoice ke HP</small></button>
+        </div>
+        <div class="info">${method === 'cash'
+            ? `Uang tunai <b>${money(total)}</b> langsung dipotong dari inventory. Sisa: ${money(Math.max(ME.cash - total, 0))}.`
+            : `Invoice <b>${money(total)}</b> dikirim ke HP. Tagihan lunas setelah kamu bayar dari HP.`}</div>
+        <button class="btn primary" id="pay" ${method === 'cash' && ME.cash < total ? 'disabled' : ''}>${method === 'cash' ? 'Bayar Cash ' + money(total) : 'Kirim Invoice ke HP'}</button>
+        ${b.type === 'kustom' ? `<small style="text-align:center">Setelah lunas, mekanik akan memasang modifikasi di kendaraanmu.</small>` : ''}`}
+    </div>`;
+
+    body.querySelectorAll('.bill-h').forEach(h => h.onclick = () => { selBill = +h.dataset.b; renderCust(); });
+    body.querySelectorAll('.ln .x').forEach(x => x.onclick = e => {
+        e.stopPropagation();
+        const l = b.lines[+x.dataset.l];
+        modal(`<h2>Hapus item?</h2><p><b style="color:var(--text)">${l.l}${l.v ? ' · ' + l.v : ''}</b> (${money(l.p)}) tidak akan dipasang.${b.lines.length === 1 ? '<br><span style="color:#fca5a5">Ini item terakhir, tagihan akan dibatalkan.</span>' : ''}</p>
+            <div class="row2"><button class="btn ghost" onclick="closeModal()">Batal</button><button class="btn danger" id="okDel">Hapus</button></div>`);
+        $('#okDel').onclick = () => {
+            b.lines.splice(+x.dataset.l, 1);
+            const ab = allBills.find(a => a.id === b.id);
+            if (!b.lines.length) { myBills = myBills.filter(m => m !== b); allBills = allBills.filter(a => a.id !== b.id); toast('Tagihan dibatalkan', `Order #${b.id} dihapus`); }
+            else if (ab) ab.total = billTotal(b);
+            closeModal(); renderCust();
+        };
+    });
+    body.querySelectorAll('.method').forEach(m => m.onclick = () => { if (m.classList.contains('no')) return; method = m.dataset.m; renderCust(); });
+    const pay = $('#pay');
+    if (pay) pay.onclick = () => {
+        if (method === 'cash') {
+            ME.cash -= total; b.status = 'paid'; allBills = allBills.filter(a => a.id !== b.id);
+            toast('Pembayaran berhasil', `${money(total)} dibayar cash. Tagihan #${b.id} lunas.`);
+        } else {
+            b.status = 'wait'; const ab = allBills.find(a => a.id === b.id); if (ab) ab.status = 'wait';
+            toast('Invoice terkirim', 'Cek aplikasi tagihan di HP kamu.');
+        }
+        renderCust();
+    };
+    const ct = $('#cancelTf');
+    if (ct) ct.onclick = () => { b.status = 'unpaid'; method = 'cash'; const ab = allBills.find(a => a.id === b.id); if (ab) ab.status = 'unpaid'; toast('Transfer dibatalkan', 'Invoice di HP ditarik.'); renderCust(); };
+}
+
+/* ================= MEKANIK ================= */
+function renderMech() {
+    $('#kick').textContent = 'Kasir Bengkel · Mekanik'; $('#title').textContent = 'Menu Kasir';
+    $('#headRight').innerHTML = `<span class="pill bank">🏦 Rekening Bengkel ${money(84250)}</span>`;
+    const body = $('#body'); body.className = 'body mech';
+    const unpaid = allBills.length;
+    body.innerHTML = `
+    <div class="tabs">
+        <button class="tab ${mtab === 'unpaid' ? 'on' : ''}" data-t="unpaid">Belum Dibayar<span class="badge">${unpaid}</span></button>
+        <button class="tab ${mtab === 'price' ? 'on' : ''} ${boss ? '' : 'lock'}" data-t="price">${boss ? '' : '🔒 '}Master Harga</button>
+    </div>
+    <div class="pane" id="pane"></div>`;
+    body.querySelectorAll('.tab').forEach(t => t.onclick = () => { mtab = t.dataset.t; renderMech(); });
+    mtab === 'unpaid' ? renderUnpaid() : renderPrice();
+}
+
+function renderUnpaid() {
+    const pane = $('#pane');
+    const q = (pane.dataset.q || '').toLowerCase();
+    const rows = allBills.filter(b => !q || (b.cust + b.plate + b.id).toLowerCase().includes(q));
+    const sum = allBills.reduce((a, b) => a + b.total, 0);
+    pane.innerHTML = `
+    <div class="toolbar"><input id="q" placeholder="Cari nama / plat / no. tagihan" value="${pane.dataset.q || ''}"><span style="flex:1"></span><small>Tagihan tidak kedaluwarsa otomatis; hapus manual jika perlu.</small></div>
+    <div class="cards">
+        <div class="card"><small>Belum dibayar</small><b>${allBills.filter(b => b.status === 'unpaid').length}</b></div>
+        <div class="card"><small>Menunggu transfer</small><b>${allBills.filter(b => b.status === 'wait').length}</b></div>
+        <div class="card"><small>Total piutang</small><b style="color:var(--accent)">${money(sum)}</b></div>
+    </div>
+    <div class="tablewrap scroll"><table>
+        <thead><tr><th>No.</th><th>Jenis</th><th>Pelanggan</th><th>Plat</th><th>Dibuat</th><th>Status</th><th style="text-align:right">Total</th><th></th></tr></thead>
+        <tbody>${rows.map(b => `<tr>
+            <td><b>#${b.id}</b></td><td><span class="tag ${b.type}">${b.type}</span></td><td>${b.cust}</td><td><span class="plate">${b.plate}</span></td>
+            <td>${b.at}<br><small>${b.by}</small></td>
+            <td><span class="tag ${b.status === 'wait' ? 'wait' : 'unpaid'}">${b.status === 'wait' ? 'Menunggu transfer' : 'Belum bayar'}</span></td>
+            <td style="text-align:right"><b>${money(b.total)}</b></td>
+            <td><div class="acts"><button class="btn ghost sm" data-d="${b.id}">Detail</button><button class="btn danger sm" data-x="${b.id}">Hapus</button></div></td></tr>`).join('')
+            || `<tr><td colspan="8" class="empty" style="padding:30px">Tidak ada tagihan.</td></tr>`}</tbody>
+    </table></div>`;
+    const qi = $('#q'); qi.oninput = () => { pane.dataset.q = qi.value; renderUnpaid(); const n = $('#q'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); };
+    pane.querySelectorAll('[data-d]').forEach(btn => btn.onclick = () => {
+        const b = allBills.find(x => x.id === +btn.dataset.d), mine = myBills.find(x => x.id === b.id);
+        modal(`<h2>Tagihan #${b.id}</h2><p>${b.cust} · <span class="plate">${b.plate}</span> · <span class="tag ${b.type}">${b.type}</span></p>
+            <div class="sumbox">${(mine ? mine.lines : [{ l: 'Contoh item', p: b.total }]).map(l => `<div><span>${l.l}${l.v ? ' · ' + l.v : ''}</span><span>${money(l.p)}</span></div>`).join('')}
+            <div class="tot"><span>Total</span><b>${money(b.total)}</b></div></div>
+            <div class="row2"><button class="btn ghost" onclick="closeModal()">Tutup</button></div>`);
+    });
+    pane.querySelectorAll('[data-x]').forEach(btn => btn.onclick = () => {
+        const b = allBills.find(x => x.id === +btn.dataset.x);
+        modal(`<h2>Hapus tagihan #${b.id}?</h2><p>${b.cust} · ${money(b.total)}${b.status === 'wait' ? '<br>Invoice di HP pelanggan juga ditarik.' : ''}${b.type === 'kustom' ? '<br>Order kustom batal, pelanggan bisa membuat order baru.' : ''}</p>
+            <div class="row2"><button class="btn ghost" onclick="closeModal()">Batal</button><button class="btn danger" id="okX">Hapus Tagihan</button></div>`);
+        $('#okX').onclick = () => {
+            allBills = allBills.filter(x => x !== b); myBills = myBills.filter(x => x.id !== b.id);
+            closeModal(); toast('Tagihan dihapus', `#${b.id} · ${b.cust}`); renderMech();
+        };
+    });
+}
+
+function renderPrice() {
+    const pane = $('#pane');
+    if (!boss) { pane.innerHTML = `<div class="locked"><div><span>🔒</span><b style="color:var(--text)">Akses ditolak</b><br>Master Harga hanya untuk grade tertentu (Config.priceGrades).</div></div>`; return; }
+    const nEdits = Object.keys(edits).length;
+    pane.innerHTML = `
+    <div class="toolbar"><small style="flex:1">Harga berlaku untuk order <b>baru</b>. Tagihan yang sudah dibuat tidak berubah.</small></div>
+    <div class="price-grid">
+        <div class="pcats scroll">${Object.keys(PRICES).map(c => {
+            const n = Object.keys(edits).filter(k => k.startsWith(c + '|')).length;
+            return `<button class="pcat ${c === pcat ? 'on' : ''}" data-c="${c}"><span>${c}</span><small>${n ? `<span style="color:var(--warn)">●${n}</span>` : PRICES[c].length}</small></button>`; }).join('')}</div>
+        <div class="pitems scroll"><table>
+            <thead><tr><th>Item</th><th style="text-align:right">Harga Lama</th><th style="text-align:right">Harga</th></tr></thead>
+            <tbody>${PRICES[pcat].map(([n, p]) => { const k = pcat + '|' + n, v = edits[k] ?? p;
+                return `<tr><td>${n}</td><td style="text-align:right"><small>${money(p)}</small></td>
+                <td style="text-align:right">$ <input type="number" min="0" max="100000" data-k="${k}" data-o="${p}" value="${v}" class="${k in edits ? 'changed' : ''}"></td></tr>`; }).join('')}</tbody>
+        </table></div>
+    </div>
+    <div class="savebar"><small>${nEdits ? `<span style="color:var(--warn)">${nEdits} harga diubah</span> · belum disimpan` : 'Tidak ada perubahan'}</small>
+        <button class="btn ghost sm" id="undo" ${nEdits ? '' : 'disabled'}>Batalkan</button><button class="btn primary sm" id="save" ${nEdits ? '' : 'disabled'}>Simpan Harga</button></div>`;
+    pane.querySelectorAll('.pcat').forEach(b => b.onclick = () => { pcat = b.dataset.c; renderPrice(); });
+    pane.querySelectorAll('input[data-k]').forEach(i => i.onchange = () => {
+        const v = Math.max(0, Math.min(100000, Math.floor(+i.value || 0)));
+        v === +i.dataset.o ? delete edits[i.dataset.k] : edits[i.dataset.k] = v; renderPrice();
+    });
+    $('#undo').onclick = () => { for (const k in edits) delete edits[k]; renderPrice(); };
+    $('#save').onclick = () => {
+        for (const k in edits) { const [c, n] = k.split('|'); PRICES[c].find(x => x[0] === n)[1] = edits[k]; delete edits[k]; }
+        toast('Harga disimpan', 'Berlaku untuk order baru.'); renderPrice();
+    };
+}
+
+function render() { view === 'cust' ? renderCust() : renderMech(); }
+$('#dCust').onclick = () => { view = 'cust'; $('#dCust').classList.add('on'); $('#dMech').classList.remove('on'); render(); };
+$('#dMech').onclick = () => { view = 'mech'; $('#dMech').classList.add('on'); $('#dCust').classList.remove('on'); render(); };
+$('#dGrade').onclick = () => { boss = !boss; $('#dGrade').textContent = 'Grade: ' + (boss ? 'Boss' : 'Karyawan'); render(); };
+$('#ov').onclick = e => { if (e.target.id === 'ov') closeModal(); };
+render();
+</script>
+</body>
+</html>

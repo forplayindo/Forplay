@@ -1,0 +1,932 @@
+/* --------------------------------------------------------------------------
+   ox_inventory - custom UI theme
+
+   $uiScale / $textScale control the overall size of the interface.
+   1 = the original (large) layout, 0.82 = current, 0.5 = half size.
+   -------------------------------------------------------------------------- */
+
+$uiScale: 0.82;
+$textScale: 0.78;
+
+$accent: #f3b354;
+$accentBright: #ffcd82;
+$accentDeep: #c8872c;
+$accentSoft: rgba(243, 179, 84, 0.16);
+
+$textColor: #dfe6e5;
+$textMuted: #a9b3b2;
+$panelPlate: rgba(20, 23, 26, 0.432);
+$slotColor: rgba(20, 23, 26, 0.432);
+$slotColorHover: rgba(36, 42, 45, 0.699);
+$slotBorder: rgba(207, 175, 29, 0.404);
+
+$mainFont: 'Poppins', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+$gridCols: 5;
+$gridRows: 5;
+$gridSize: 12.2vh * $uiScale;
+$gridGap: 0.85vh * $uiScale;
+$containerSize: calc(#{$gridRows} * #{$gridSize} + #{$gridRows - 1} * #{$gridGap});
+$panelWidth: calc(#{$gridCols} * #{$gridSize} + #{$gridCols - 1} * #{$gridGap});
+
+body {
+  margin: 0;
+  font-family: $mainFont;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100vh;
+  background: none !important;
+  overflow: hidden !important;
+  user-select: none;
+}
+
+#root {
+  height: 100%;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+  font-family: $mainFont;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.app-wrapper {
+  height: 100%;
+  width: 100%;
+  color: $textColor;
+}
+
+button:active {
+  transform: translateY(2px);
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid $accent;
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------- layout -- */
+
+.inventory-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  inset: 0;
+  /* leaves room for the docked hotbar underneath */
+  padding: 0 4vw 12vh;
+  box-sizing: border-box;
+  gap: 6vh * $uiScale;
+}
+
+/* ---------------------------------------------------------------- panel -- */
+
+.inventory-panel {
+  display: flex;
+  flex-direction: column;
+  width: $panelWidth;
+  gap: 1.6vh * $uiScale;
+}
+
+.inventory-panel-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.4vh * $uiScale;
+  padding: 1vh * $uiScale 1.3vh * $uiScale;
+  border-radius: 1.2vh * $uiScale;
+  background-color: $panelPlate;
+  border: 1px solid $slotBorder;
+}
+
+.inventory-panel-icon {
+  flex: none;
+  width: 5.2vh * $uiScale;
+  height: 5.2vh * $uiScale;
+  border-radius: 1.5vh * $uiScale;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(150deg, $accentBright, $accentDeep);
+  box-shadow:
+    0 0 2.4vh rgba(243, 179, 84, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
+  svg {
+    width: 2.6vh * $uiScale;
+    height: 2.6vh * $uiScale;
+    fill: #0d1514;
+  }
+}
+
+.inventory-panel-heading {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.35vh * $uiScale;
+  min-width: 0;
+}
+
+.inventory-panel-title {
+  font-size: 2.3vh * $textScale;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+.inventory-panel-subtitle {
+  font-size: 1.5vh * $textScale;
+  line-height: 1.2;
+  font-weight: 400;
+  color: $textMuted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+.inventory-grid-container {
+  display: grid;
+  height: $containerSize;
+  grid-template-columns: repeat($gridCols, $gridSize);
+  grid-auto-rows: $gridSize;
+  gap: $gridGap;
+  overflow-y: scroll;
+}
+
+/* ---------------------------------------------------- weight (in header) -- */
+
+.inventory-panel-weight {
+  flex: none;
+  width: 19vh * $uiScale;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6vh * $uiScale;
+}
+
+.inventory-panel-weight-value {
+  font-size: 1.5vh * $textScale;
+  font-weight: 600;
+  color: $textColor;
+  white-space: nowrap;
+}
+
+.weight-bar-segmented {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.3vh * $uiScale;
+  height: 1.25vh * $uiScale;
+  width: 100%;
+}
+
+.weight-bar-segment {
+  flex: 1 1 0;
+  height: 100%;
+  border-radius: 0.35vh;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background-color 0.25s ease;
+
+  &.is-filled {
+    background-color: $accent;
+  }
+}
+
+.weight-bar-segmented.is-warning .weight-bar-segment.is-filled {
+  background-color: #e8763c;
+}
+
+.weight-bar-segmented.is-critical .weight-bar-segment.is-filled {
+  background-color: #d94f45;
+}
+
+/* ---------------------------------------------------------------- slots -- */
+
+.inventory-slot {
+  background-color: $slotColor;
+  background-repeat: no-repeat;
+  background-position: center 36%;
+  background-size: 6.2vh * $uiScale;
+  border-radius: 1.1vh * $uiScale;
+  border: 1px solid $slotBorder;
+  image-rendering: -webkit-optimize-contrast;
+  position: relative;
+  overflow: hidden;
+  color: $textColor;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    background-color: $slotColorHover;
+    border-color: rgba(243, 179, 84, 0.45);
+  }
+}
+
+.item-slot-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.item-slot-header-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.item-hotslot-header-wrapper {
+  @extend .item-slot-header-wrapper;
+
+  /* The hotbar keeps its slot numbers, the inventory grid stays clean. */
+  .inventory-slot-number {
+    display: none;
+  }
+}
+
+.item-slot-info-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8vh * $uiScale 0.9vh * $uiScale 0;
+  gap: 0.6vh * $uiScale;
+
+  p {
+    font-size: 1.35vh * $textScale;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  }
+
+  p:last-child {
+    color: rgba(255, 255, 255, 0.62);
+  }
+}
+
+.inventory-slot-number {
+  background-color: $accent;
+  color: #0d1514;
+  font-family: $mainFont;
+  font-size: 1.2vh * $textScale;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.5vh * $uiScale 0.7vh * $uiScale;
+  margin: 0.6vh * $uiScale 0 0 0.6vh * $uiScale;
+  border-radius: 0.6vh * $uiScale;
+}
+
+.inventory-slot-label-box {
+  background-color: rgba(255, 255, 255, 0.07);
+  color: $textColor;
+  text-align: center;
+  border: none;
+  border-bottom-left-radius: 1vh * $uiScale;
+  border-bottom-right-radius: 1vh * $uiScale;
+}
+
+.inventory-slot-label-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.5vh * $uiScale 0.6vh * $uiScale;
+  font-weight: 500;
+  font-family: $mainFont;
+  font-size: 1.4vh * $textScale;
+  color: #edf2f1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.durability-bar {
+  width: 100%;
+  height: 0.42vh * $uiScale;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.weight-bar {
+  background: rgba(0, 0, 0, 0.4);
+  height: 0.8vh * $uiScale;
+  border-radius: 1vh;
+  overflow: hidden;
+}
+
+.item-slot-currency-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 0.6vh * $uiScale 0.4vh * $uiScale;
+  gap: 0.4vh * $uiScale;
+
+  p {
+    font-size: 1.5vh * $textScale;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  }
+}
+
+.item-slot-price-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding: 0 0.6vh * $uiScale 0.4vh * $uiScale;
+
+  p {
+    font-size: 1.5vh * $textScale;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  }
+}
+
+.item-drag-preview {
+  width: 8.4vh * $uiScale;
+  height: 8.4vh * $uiScale;
+  z-index: 1;
+  position: fixed;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 7.4vh * $uiScale;
+  image-rendering: -webkit-optimize-contrast;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+body.inv-dragging {
+  cursor: grabbing;
+
+  .item-slot-wrapper {
+    pointer-events: none;
+  }
+}
+
+/* ------------------------------------------------------- control column -- */
+
+.inventory-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3vh * $uiScale;
+  width: 17vh * $uiScale;
+}
+
+.inventory-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 14vh * $uiScale;
+  width: 100%;
+}
+
+.inventory-brand-mark {
+  width: 13vh * $uiScale;
+  height: 13vh * $uiScale;
+  stroke: $accent;
+  filter: drop-shadow(0 0 1.2vh rgba(243, 179, 84, 0.45));
+}
+
+.inventory-brand-text {
+  fill: $accentBright;
+  font-family: $mainFont;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.inventory-brand-image {
+  max-width: 100%;
+  max-height: 14vh * $uiScale;
+  object-fit: contain;
+}
+
+.inventory-control-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4vh * $uiScale;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.inventory-control-input,
+.inventory-control-button {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1.25vh * $uiScale 0.8vh * $uiScale;
+  border-radius: 3vh;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background-color: rgba(14, 17, 19, 0.62);
+  color: #ffffff;
+  font-family: $mainFont;
+  font-size: 1.7vh * $textScale;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.06em;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.inventory-control-input {
+  outline: none;
+
+  &:focus-within {
+    border-color: rgba(243, 179, 84, 0.7);
+    background-color: rgba(20, 26, 27, 0.8);
+  }
+}
+
+.inventory-control-button {
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover {
+    border-color: rgba(243, 179, 84, 0.7);
+    background-color: $accentSoft;
+    color: $accentBright;
+  }
+}
+
+/* --------------------------------------------------------- close button -- */
+
+.inventory-panel-topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 4.4vh * $uiScale;
+}
+
+.inventory-close {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.2vh * $uiScale;
+  padding: 0.7vh * $uiScale 0.8vh * $uiScale;
+  border-radius: 1.2vh * $uiScale;
+  background-color: $panelPlate;
+  border: 1px solid $slotBorder;
+}
+
+.inventory-close-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.inventory-close-action {
+  color: $accent;
+  font-size: 1.6vh * $textScale;
+  font-weight: 700;
+}
+
+.inventory-close-target {
+  color: #ffffff;
+  font-size: 1.6vh * $textScale;
+  font-weight: 500;
+}
+
+.inventory-close-button {
+  width: 4.4vh * $uiScale;
+  height: 4.4vh * $uiScale;
+  border: none;
+  border-radius: 1vh * $uiScale;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: linear-gradient(150deg, $accentBright, $accentDeep);
+  box-shadow: 0 0 2vh rgba(243, 179, 84, 0.3);
+  transition: filter 0.2s ease;
+
+  svg {
+    width: 2.2vh * $uiScale;
+    height: 2.2vh * $uiScale;
+    fill: #0d1514;
+  }
+
+  &:hover {
+    filter: brightness(1.12);
+  }
+}
+
+/* -------------------------------------------------------------- tooltip -- */
+
+.tooltip-wrapper {
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(14, 17, 19, 0.96);
+  width: 200px;
+  min-width: 200px;
+  padding: 10px;
+  color: $textColor;
+  font-family: $mainFont;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+
+  p {
+    font-size: 11px;
+    font-weight: 400;
+  }
+}
+
+.tooltip-header-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+
+  p {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  p:first-child {
+    color: #ffffff;
+  }
+
+  p:last-child {
+    color: $accent;
+  }
+}
+
+.tooltip-description {
+  padding-top: 6px;
+  color: $textMuted;
+}
+
+.tooltip-markdown > p {
+  margin: 0;
+}
+
+.tooltip-crafting-duration {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    padding-right: 3px;
+    fill: $accent;
+  }
+
+  p {
+    font-size: 12px;
+  }
+}
+
+.tooltip-ingredients {
+  padding-top: 6px;
+}
+
+.tooltip-ingredient {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  img {
+    width: 24px;
+    height: 24px;
+    padding-right: 5px;
+  }
+}
+
+/* --------------------------------------------------------- context menu -- */
+
+.context-menu-list {
+  min-width: 180px;
+  background-color: rgba(14, 17, 19, 0.96);
+  color: $textColor;
+  font-family: $mainFont;
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  outline: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.context-menu-item {
+  padding: 8px 9px;
+  border-radius: 6px;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  color: $textColor;
+  font-family: $mainFont;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &:active {
+    transform: none;
+  }
+
+  &:hover {
+    background-color: $accentSoft;
+    color: $accentBright;
+    cursor: pointer;
+  }
+}
+
+/* ------------------------------------------------------ useful controls -- */
+
+.useful-controls-dialog {
+  background-color: rgba(14, 17, 19, 0.97);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: $textColor;
+  font-family: $mainFont;
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  gap: 14px;
+}
+
+.useful-controls-dialog-overlay {
+  background-color: rgba(0, 0, 0, 0.55);
+}
+
+.useful-controls-dialog-title {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.useful-controls-dialog-close {
+  width: 25px;
+  height: 25px;
+  padding: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  fill: $textColor;
+
+  &:hover {
+    background-color: $accentSoft;
+    fill: $accentBright;
+    cursor: pointer;
+  }
+}
+
+.useful-controls-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-size: 13px;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.useful-controls-button {
+  position: absolute !important;
+  bottom: 3.2vh;
+  right: 3.2vh;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: $accent;
+  width: 4.4vh * $uiScale;
+  height: 4.4vh * $uiScale;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  fill: $accent;
+  border-radius: 1vh * $uiScale !important;
+  background-color: rgba(14, 17, 19, 0.62) !important;
+  transition: 200ms !important;
+
+  svg {
+    height: 2.2vh * $uiScale;
+  }
+
+  &:hover {
+    background-color: $accentSoft !important;
+    border-color: rgba(243, 179, 84, 0.7);
+    cursor: pointer;
+  }
+}
+
+.useful-controls-exit-button {
+  position: absolute !important;
+  right: 8px;
+  top: 8px;
+  border-radius: 6px !important;
+  color: $textMuted !important;
+}
+
+/* --------------------------------------------------------------- hotbar -- */
+
+$hotbarSize: 10.4vh * $uiScale;
+
+.hotbar-wrapper {
+  position: absolute;
+  bottom: 3vh;
+  left: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2vh * $uiScale;
+
+  /* Sits just under the inventory panels while the inventory is open. */
+  &.is-docked {
+    bottom: 13vh;
+  }
+}
+
+.hotbar-container {
+  display: flex;
+  align-items: center;
+  gap: $gridGap;
+  justify-content: center;
+}
+
+.hotbar-item-slot {
+  @extend .inventory-slot;
+  width: $hotbarSize;
+  height: $hotbarSize;
+  background-size: 5.6vh * $uiScale;
+  background-position: center 36%;
+}
+
+.hotbar-slot-key {
+  position: absolute;
+  left: 0.5vh * $uiScale;
+  bottom: 1.3vh * $uiScale;
+  min-width: 1.9vh * $uiScale;
+  padding: 0.3vh * $uiScale 0.5vh * $uiScale;
+  border-radius: 0.6vh * $uiScale;
+  background-color: $accent;
+  color: #0d1514;
+  font-family: $mainFont;
+  font-size: 1.25vh * $textScale;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.hotbar-slot-header-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding: 0.7vh * $uiScale 0.8vh * $uiScale 0;
+
+  .hotbar-slot-count {
+    font-size: 1.3vh * $textScale;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  }
+}
+
+.hotbar-slot-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5vh * $uiScale;
+
+  .hotbar-slot-weight {
+    align-self: flex-end;
+    padding-right: 0.7vh * $uiScale;
+    font-size: 1.25vh * $textScale;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.72);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  }
+}
+
+/* -------------------------------------------------------- notifications -- */
+
+.item-notification-container {
+  display: flex;
+  overflow-x: scroll;
+  flex-wrap: nowrap;
+  gap: $gridGap;
+  position: absolute;
+  bottom: 20vh;
+  left: 50%;
+  width: 100%;
+  margin-left: calc(50% - calc($gridSize / 2));
+  transform: translate(-50%);
+}
+
+.item-notification-action-box {
+  width: 100%;
+  color: #0d1514;
+  background-color: $accent;
+  text-transform: uppercase;
+  text-align: center;
+  border-top-left-radius: 1vh * $uiScale;
+  border-top-right-radius: 1vh * $uiScale;
+  font-family: $mainFont;
+
+  p {
+    font-size: 1.2vh * $textScale;
+    padding: 0.4vh * $uiScale;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+}
+
+.item-notification-item-box {
+  @extend .inventory-slot;
+  height: $gridSize;
+  width: $gridSize;
+}
+
+/* ---------------------------------------------------------- transitions -- */
+
+.transition-fade-enter {
+  opacity: 0;
+}
+
+.transition-fade-enter-active {
+  opacity: 1;
+  transition: opacity 200ms;
+}
+
+.transition-fade-exit {
+  opacity: 1;
+}
+
+.transition-fade-exit-active {
+  opacity: 0;
+  transition: opacity 200ms;
+}
+
+.transition-slide-up-enter {
+  transform: translateY(200px);
+}
+
+.transition-slide-up-enter-active {
+  transform: translateY(0px);
+  transition: all 200ms;
+}
+
+.transition-slide-up-exit {
+  transform: translateY(0px);
+}
+
+.transition-slide-up-exit-active {
+  transform: translateY(200px);
+  transition: all 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}

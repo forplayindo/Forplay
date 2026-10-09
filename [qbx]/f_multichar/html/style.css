@@ -1,0 +1,85 @@
+@font-face { font-family: 'Poppins'; font-weight: 300; src: url('fonts/poppins-300.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-weight: 400; src: url('fonts/poppins-400.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-weight: 500; src: url('fonts/poppins-500.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-weight: 600; src: url('fonts/poppins-600.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-weight: 700; src: url('fonts/poppins-700.woff2') format('woff2'); }
+
+:root {
+    --text: #f1f3f7;
+    --muted: rgba(241, 243, 247, .55);
+    --field: rgba(255, 255, 255, .07);
+    --field-hover: rgba(255, 255, 255, .12);
+    --accent: #3f6fb5;
+    --accent-hi: #4b80cc;
+    --male: #4aa3c7;
+    --female: #d47aa6;
+    --money: #7ee2a0;
+    --red: #f87171;
+    --shadow: 0 2px 10px rgba(0, 0, 0, .55);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; user-select: none; background: transparent; }
+body { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; color: var(--text); }
+button, input { font: inherit; color: inherit; border: none; background: none; outline: none; }
+button { cursor: pointer; }
+input { user-select: text; }
+.hidden { display: none !important; }
+svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* gelap di pinggir supaya teks terbaca (CSS saja, ringan) */
+.vignette { position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 55%, transparent 45%, rgba(0, 0, 0, .55) 100%),
+                linear-gradient(180deg, rgba(0, 0, 0, .45) 0%, transparent 28%); }
+
+/* ---------- slot karakter (atas) ---------- */
+.slots { position: fixed; top: 9vh; left: 0; right: 0; display: flex; justify-content: center; gap: 7vw; }
+.slot { min-width: 200px; text-align: center; opacity: .5; transition: opacity .2s; text-shadow: var(--shadow); }
+.slot:hover { opacity: .8; }
+.slot.active { opacity: 1; }
+.slot .first { display: block; font-size: 30px; font-weight: 300; letter-spacing: 1px; line-height: 1.1; text-transform: uppercase; }
+.slot .last { display: block; font-size: 44px; font-weight: 700; letter-spacing: 1px; line-height: 1.05; text-transform: uppercase; }
+.slot .sex { display: inline-block; margin-top: 10px; font-size: 20px; color: var(--male); }
+.slot .sex.f { color: var(--female); }
+.slot.plus { display: grid; place-items: center; height: 120px; }
+.slot.plus .p { width: 52px; height: 52px; border-radius: 10px; background: rgba(0, 0, 0, .35); display: grid; place-items: center; font-size: 30px; font-weight: 300; }
+.slot.plus.active .p { background: rgba(255, 255, 255, .12); }
+
+/* ---------- sisi kiri / kanan ---------- */
+.side { position: fixed; top: 50%; transform: translateY(-38%); width: 300px; }
+.side.left { left: 5vw; }
+.side.right { right: 5vw; }
+.title { font-size: 14px; font-weight: 600; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 16px; text-shadow: var(--shadow); }
+.side.right .title { text-align: right; }
+
+.info { display: flex; flex-direction: column; gap: 8px; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 6px; background: var(--field); font-size: 13px; }
+.row span { color: var(--muted); flex-shrink: 0; }
+.row b { font-weight: 500; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row b.money { color: var(--money); }
+
+.locs { display: flex; flex-direction: column; gap: 8px; max-height: 46vh; overflow-y: auto; scrollbar-width: none; }
+.locs::-webkit-scrollbar { display: none; }
+.loc { display: flex; align-items: center; gap: 10px; padding: 10px 12px 10px 14px; border-radius: 6px; background: var(--field); text-align: left; transition: background .15s; }
+.loc:hover { background: var(--field-hover); }
+.loc.active { background: var(--accent); }
+.loc .txt { flex: 1; min-width: 0; }
+.loc b { display: block; font-size: 13px; font-weight: 500; }
+.loc small { display: block; font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.loc.active small { color: rgba(255, 255, 255, .75); }
+.ico { width: 38px; height: 38px; border-radius: 6px; background: rgba(0, 0, 0, .25); display: grid; place-items: center; flex-shrink: 0; }
+
+.btn { display: block; margin: 22px 0 0 auto; padding: 12px 40px; border-radius: 6px; background: var(--field-hover); font-size: 14px; font-weight: 500; transition: background .15s; }
+.btn:hover:not(:disabled) { background: var(--accent-hi); }
+.btn:disabled { opacity: .5; cursor: default; }
+
+.form { display: flex; flex-direction: column; gap: 10px; }
+.field { display: flex; gap: 8px; }
+.field input { flex: 1; min-width: 0; padding: 11px 14px; border-radius: 6px; background: var(--field); font-size: 13px; }
+.field input::placeholder { color: var(--muted); }
+.field input:focus { background: var(--field-hover); }
+.field .ico { width: 44px; height: 44px; background: var(--field); }
+.seg { flex: 1; display: flex; gap: 8px; }
+.seg button { flex: 1; padding: 11px; border-radius: 6px; font-size: 13px; color: var(--muted); }
+.seg button.on { background: var(--accent); color: var(--text); }
+.hint { font-size: 11px; color: var(--muted); text-align: right; margin-top: 8px; text-shadow: var(--shadow); }
+.err { font-size: 12px; color: var(--red); text-align: right; margin-top: 10px; text-shadow: var(--shadow); min-height: 18px; }

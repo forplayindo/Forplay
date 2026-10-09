@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Cek Pasien</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app" class="hidden">
+    <div class="panel">
+        <header>
+            <div class="brand">
+                <span class="logo">🩺</span>
+                <div><h1>Cek Pasien</h1><small id="sub"></small></div>
+            </div>
+            <div class="head-right">
+                <span id="state" class="state-pill"></span>
+                <button class="icon-btn" id="close" title="Tutup (ESC)">✕</button>
+            </div>
+        </header>
+
+        <div class="main">
+            <div class="body-col">
+                <h3>Peta Luka</h3>
+                <svg class="body" id="body"></svg>
+                <div class="hover" id="hover">&nbsp;</div>
+                <div class="legend">
+                    <span><i style="background:#2b7de0"></i>Sehat</span>
+                    <span><i style="background:var(--s1)"></i>Iritasi</span>
+                    <span><i style="background:var(--s2)"></i>Cukup sakit</span>
+                    <span><i style="background:var(--s3)"></i>Sakit</span>
+                    <span><i style="background:var(--s4)"></i>Sangat sakit</span>
+                </div>
+                <div class="hint">Klik area tubuh untuk melihat & mengobati</div>
+            </div>
+
+            <div class="right">
+                <div class="tabs">
+                    <button data-tab="care" class="on">🩺 Perawatan</button>
+                    <button data-tab="bill">🧾 Tagihan</button>
+                </div>
+                <div class="vitals" id="vitals"></div>
+                <div class="content" id="content"></div>
+                <div class="content hidden" id="billing"></div>
+                <footer id="care-footer">
+                    <button id="btn-pk"><span>💊 Painkillers</span><small id="pk-sub"></small></button>
+                    <button id="btn-all"><span>🩹 Obati Semua</span><small id="all-sub"></small></button>
+                    <button id="btn-tf" class="blood"><span>🩸 Transfusi</span><small id="tf-sub"></small></button>
+                    <button id="btn-rev" class="revive"><span>❤️ Revive</span><small id="rev-sub"></small></button>
+                </footer>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Apotek: warga memesan / petugas EMS menyerahkan -->
+<div id="pharmacy" class="hidden">
+    <div class="panel ph-panel">
+        <header>
+            <div class="brand">
+                <span class="logo">💊</span>
+                <div><h1 id="ph-title">Apotek</h1><small id="ph-sub"></small></div>
+            </div>
+            <button class="icon-btn" id="ph-close" title="Tutup (ESC)">✕</button>
+        </header>
+        <div class="ph-body" id="ph-body"></div>
+        <footer class="ph-foot hidden" id="ph-foot"></footer>
+    </div>
+</div>
+<!-- Panel Operasi (Dokter) -->
+<div id="surgery" class="hidden">
+    <div class="panel sr-panel">
+        <header>
+            <div class="brand">
+                <span class="logo">⚕️</span>
+                <div><h1>Operasi</h1><small id="sr-sub"></small></div>
+            </div>
+            <button class="icon-btn" id="sr-close" title="Tutup (ESC)">✕</button>
+        </header>
+        <div class="sr-main">
+            <div class="sr-side" id="sr-side"></div>
+            <div class="sr-steps" id="sr-steps"></div>
+        </div>
+    </div>
+</div>
+<!-- Kasir: pasien membayar tagihan / petugas EMS (approval, belum dibayar, stok, supplier, harga, pengaturan) -->
+<div id="kasir" class="hidden">
+    <div class="panel ks-panel">
+        <header>
+            <div class="brand">
+                <span class="logo">🧾</span>
+                <div><h1 id="ks-title">Kasir</h1><small id="ks-sub"></small></div>
+            </div>
+            <button class="icon-btn" id="ks-close" title="Tutup (ESC)">✕</button>
+        </header>
+        <div class="ks-tabs" id="ks-tabs"></div>
+        <div class="ks-body" id="ks-body"></div>
+    </div>
+</div>
+<script src="app.js"></script>
+<script src="pharmacy.js"></script>
+<script src="surgery.js"></script>
+<script src="kasir.js"></script>
+</body>
+</html>

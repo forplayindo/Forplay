@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Tab Tagihan</title>
+<link rel="stylesheet" href="../html/style.css">
+<style>
+html, body { height: 100%; background: radial-gradient(ellipse at 50% 60%, #333d48 0%, #1a2129 50%, #0b0f14 100%); }
+/* dua tombol bayar (akan masuk ke html/style.css) */
+.pay2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pay2 button { padding: 10px; border-radius: 10px; font-weight: 800; display: flex; flex-direction: column; align-items: center; gap: 2px; border: 1px solid var(--line2); background: var(--card2); }
+.pay2 button small { font-weight: 400; }
+.pay2 button.kasir { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.pay2 button.kasir small { color: var(--accent-ink); opacity: .75; }
+.pay2 button:hover:not(:disabled) { filter: brightness(1.1); }
+.pay2 button:disabled { opacity: .4; cursor: not-allowed; }
+.demo { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); display: flex; gap: 6px; padding: 6px 8px; font-size: 11px; background: rgba(15,23,32,.94); border: 1px solid var(--line); border-radius: 10px; z-index: 9; }
+.demo button { padding: 5px 9px; border-radius: 7px; background: var(--card); border: 1px dashed var(--line2); color: var(--muted); }
+.demo button.on { color: var(--c2); border-color: var(--c2); }
+</style>
+</head>
+<body>
+
+<div class="demo"><small style="align-self:center">MOCKUP:</small><button id="dZone" class="on">Di area bengkel</button></div>
+
+<div class="panel">
+    <header>
+        <div class="brand"><span class="logo">🔧</span><div><div class="kicker">Diagnosa Bengkel</div><h1>Karin Sultan</h1></div></div>
+        <div class="head-right"><span class="state-pill road" id="pill">Di Jalan</span><button class="icon-btn">✕</button></div>
+    </header>
+    <div class="main">
+        <div class="left"><div class="stage"><div class="carbox"><img src="https://docs.fivem.net/vehicles/sultan.webp" alt="" onerror="this.remove()"></div></div></div>
+        <div class="right">
+            <div class="tabs">
+                <button class="tab">Kondisi</button><button class="tab">Kustom</button>
+                <button class="tab on">Tagihan <span class="badge">3</span></button>
+            </div>
+            <div class="tabpane"><div class="list" id="bill"></div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+let inZone = true, msg = null;
+let lines = [{ id: 1, l: 'Perbaikan Bodi', by: 'Andi', p: 450 }, { id: 2, l: 'Ganti Ban', by: 'Andi', p: 250 }, { id: 3, l: 'Isi Oli Mesin', by: 'Andi', p: 120 }];
+
+function render() {
+    $('#pill').className = 'state-pill ' + (inZone ? 'lift' : 'road');
+    $('#pill').textContent = inZone ? 'Di Bengkel' : 'Di Jalan';
+    const el = $('#bill');
+    let h = msg ? `<div class="empty">${msg}</div>` : '';
+    h += `<div class="field"><h3>Pelanggan</h3><select><option>Budi Santoso (pemilik kendaraan)</option><option>Rina Aulia</option></select></div>`;
+    h += '<h3>Layanan belum ditagih</h3>';
+    if (!lines.length) h += '<div class="note">Belum ada layanan. Setiap perbaikan di panel tercatat otomatis di sini.</div>';
+    lines.forEach(p => h += `<div class="bill-line"><input type="checkbox" checked><span>${p.l}<span class="who">oleh ${p.by}</span></span>
+        <input type="number" min="0" max="${p.p}" value="${p.p}"><button class="x">✕</button></div>`);
+    h += `<div class="field"><h3>Tambah layanan</h3><div class="chips"><button class="ghost">+ Panggilan Luar Bengkel ($300)</button><button class="ghost">+ Derek ($500)</button></div></div>`;
+    const t = lines.reduce((a, b) => a + b.p, 0);
+    h += `<div class="bill-sum"><span>Total</span><strong>$${t}</strong></div>
+        <div class="pay2">
+            <button class="kasir" id="toKasir" ${!t || !inZone ? 'disabled' : ''}><span>🧾 Bayar di Kasir</span><small>${inZone ? 'Pelanggan bayar di meja kasir' : 'Hanya di area bengkel'}</small></button>
+            <button id="direct" ${!t ? 'disabled' : ''}><span>📱 Bayar Langsung</span><small>Invoice ke HP pelanggan</small></button>
+        </div>
+        <div class="note">Harga boleh diturunkan (diskon), tidak bisa dinaikkan. Uang masuk ke rekening bengkel.</div>`;
+    el.innerHTML = h;
+    const done = text => { msg = text; lines = []; render(); };
+    $('#toKasir').onclick = () => done(`Tagihan $${t} masuk ke kasir atas nama Budi Santoso. Arahkan pelanggan ke meja kasir.`);
+    $('#direct').onclick = () => done(`Tagihan $${t} dikirim ke HP Budi Santoso.`);
+}
+$('#dZone').onclick = () => { inZone = !inZone; $('#dZone').classList.toggle('on', inZone); msg = null; render(); };
+render();
+</script>
+</body>
+</html>

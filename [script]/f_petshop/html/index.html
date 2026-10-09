@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_petshop</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- TOKO -->
+    <div id="shop" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo">🐾</span><div><h1 id="shop-title">Toko Hewan</h1><small id="shop-sub"></small></div></div>
+            <div class="head-actions">
+                <span class="wallet" id="wallet"></span>
+                <button class="icon-btn close" data-close>✕</button>
+            </div>
+        </header>
+        <nav class="tabs" id="shop-tabs">
+            <button data-tab="pets" class="active">Hewan</button>
+            <button data-tab="food">Makanan</button>
+        </nav>
+        <main id="grid" class="grid"></main>
+
+        <!-- form beli -->
+        <div id="modal" class="modal hidden">
+            <div class="modal-box">
+                <div class="modal-head"><span id="m-icon" class="m-icon">🐾</span><div><b id="m-title"></b><small id="m-price"></small></div></div>
+                <label id="m-name-wrap">Nama hewan
+                    <input id="m-name" type="text" maxlength="20" placeholder="contoh: Bobby" autocomplete="off">
+                </label>
+                <label id="m-qty-wrap" class="hidden">Jumlah
+                    <div class="qty"><button data-q="-1">−</button><input id="m-qty" type="number" min="1" max="50" value="1"><button data-q="1">+</button></div>
+                </label>
+                <div class="methods">
+                    <button data-method="cash" class="active">💵 Cash</button>
+                    <button data-method="bank">🏦 Bank</button>
+                </div>
+                <div class="total"><span>Total</span><strong id="m-total">Rp 0</strong></div>
+                <div id="m-msg" class="msg hidden"></div>
+                <div class="modal-actions">
+                    <button id="m-cancel" class="ghost">Batal</button>
+                    <button id="m-buy" class="primary">Beli</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL KONTROL (kanan bawah, supaya tidak menutupi notifikasi) -->
+    <div id="ctl" class="side hidden">
+        <div class="side-head">
+            <div><b>Hewan Peliharaan</b><small>ESC / ✕ untuk menutup</small></div>
+            <button class="icon-btn close" data-close>✕</button>
+        </div>
+        <section id="active" class="active-card hidden">
+            <div id="select" class="select"></div>
+            <div id="status"></div>
+            <div id="cmds"></div>
+        </section>
+        <div class="side-row">
+            <span class="side-label">Hewan milikmu</span>
+            <button id="summon-all" class="link hidden">Panggil semua</button>
+        </div>
+        <div id="pet-list" class="pet-list"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

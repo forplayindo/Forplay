@@ -1,0 +1,79 @@
+{
+    "preTitle": "Memuat · Sesi 24",
+    "title": "Foreplay",
+    "subtitle": "Indonesia",
+    "footer": "lastresort_loading · v3.3",
+
+    "online": "Online",
+    "offline": "Offline",
+    "playersSlash": "/",
+    "msUnit": "ms",
+
+    "welcome": "Selamat datang kembali,",
+    "welcomeAnon": "Selamat datang",
+    "tipLabel": "Tips",
+    "nowPlaying": "Sedang Diputar",
+    "noTrack": "Belum ada lagu",
+    "loadingTrack": "Memuat…",
+
+    "rulesTab": "Peraturan",
+    "staffTab": "Staf",
+    "newsTab": "Berita",
+
+    "playlist": "Playlist",
+    "trackCount": "{n} / {total}",
+
+    "gateTitle": "Peraturan server",
+    "gateIntro": "Baca peraturan sampai habis lalu setujui untuk masuk.",
+    "gateVersion": "Versi {v}",
+    "gateScrollHint": "Gulir sampai akhir peraturan untuk melanjutkan.",
+    "gateReadyHint": "Peraturan sudah dibaca — kamu bisa menyetujuinya sekarang.",
+    "gateAccept": "Saya setuju",
+    "gateDecline": "Tolak",
+    "gateSaving": "Menyimpan…",
+    "gateDeclined": "Kamu harus menyetujui peraturan server untuk bermain di sini.",
+
+    "stageOf": "Tahap {n} / {total}",
+    "starting": "Memulai",
+    "ready": "Siap — masuk",
+
+    "roles": {
+        "founder": "Founder",
+        "management": "Manajemen",
+        "scripting": "Scripting",
+        "support": "Support"
+    },
+    "badges": {
+        "owner": "Owner",
+        "admin": "Admin",
+        "dev": "Dev",
+        "mod": "Mod"
+    },
+
+    "rules": [
+        "Selalu tetap in character.",
+        "RDM dan VDM dilarang keras.",
+        "Hormati pemain lain dan staf.",
+        "Dilarang cheat, mod, atau exploit.",
+        "Dilarang powergaming atau metagaming."
+    ],
+
+    "tips": [
+        "Tekan F1 untuk membuka HP.",
+        "Ketik /help untuk melihat semua perintah.",
+        "Gabung Discord kami untuk info dan event terbaru.",
+        "Ambil gajimu di ATM mana saja.",
+        "Patuhi aturan lalu lintas — polisi mengawasi.",
+        "Pemain baru? Kunjungi job center untuk memulai."
+    ],
+
+    "stages": [
+        "Memuat data peta",
+        "Menyinkronkan resource",
+        "Memasang aset",
+        "Memuat data game",
+        "Memuat dunia",
+        "Menghubungkan ke server",
+        "Hampir selesai"
+    ]
+}

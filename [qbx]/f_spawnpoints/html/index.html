@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_spawnpoints</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="panel" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo">🏠</span><div><h1>Spawn Rumah</h1><small id="sub"></small></div></div>
+            <div class="head-actions">
+                <button class="pill accent" id="add-btn">＋ Tambah di Posisi Saya</button>
+                <button class="icon-btn close" data-close>✕</button>
+            </div>
+        </header>
+
+        <div class="toolbar">
+            <nav class="tabs" id="tabs">
+                <button data-tab="all" class="active">Semua</button>
+                <button data-tab="owned">Ada Pemilik</button>
+                <button data-tab="empty">Kosong</button>
+            </nav>
+            <input id="search" placeholder="Cari nama rumah / pemilik / citizenid...">
+        </div>
+        <div id="msg" class="banner hidden"></div>
+        <main id="list" class="list"></main>
+
+        <aside id="sheet" class="sheet hidden">
+            <div class="sheet-head"><h2 id="sheet-title">Tambah Rumah</h2><button class="icon-btn" id="sheet-close">✕</button></div>
+            <div class="sheet-body">
+                <div id="loc-note" class="note"></div>
+
+                <div id="label-box">
+                    <label>Nama rumah</label>
+                    <input id="f-label" maxlength="40" placeholder="Contoh: Rumah Vinewood 3">
+                    <small class="hint">Nama ini yang tampil di pemilihan karakter.</small>
+                </div>
+
+                <div id="give-box">
+                    <label>ID pemain / citizenid</label>
+                    <input id="f-target" maxlength="20" placeholder="Contoh: 12 atau ABC12345">
+                    <small class="hint">Angka = ID server pemain yang sedang online. Selain itu dianggap citizenid (boleh offline).</small>
+                    <small class="hint" id="give-current"></small>
+                </div>
+            </div>
+            <div class="sheet-foot">
+                <div id="sheet-msg" class="msg hidden"></div>
+                <button id="save-btn" class="primary">Simpan</button>
+            </div>
+        </aside>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

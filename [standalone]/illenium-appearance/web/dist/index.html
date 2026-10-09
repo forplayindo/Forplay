@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       ILLENIUM APPEARANCE - CUSTOM ARC UI
+       Warna aksen: ubah --accent di bawah.
+       ============================================================ */
+    :root {
+      --accent: #F3B354;
+      --accent-dim: rgba(243, 179, 84, .38);
+      --accent-soft: rgba(243, 179, 84, .12);
+      --panel: rgba(12, 12, 12, .60);
+      --panel-solid: rgba(18, 18, 18, .92);
+      --panel-line: rgba(255, 255, 255, .09);
+      --text: #f2f2f2;
+      --text-dim: rgba(240, 240, 240, .50);
+      --text-faint: rgba(240, 240, 240, .30);
+      --ui-scale: 1;
+      --radius: 5px;
+      --font: 'Rajdhani', 'Inter', system-ui, sans-serif;
+      --font-ui: 'Inter', system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%; overflow: hidden; background: transparent;
+      font-family: var(--font-ui); color: var(--text); user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #app { position: fixed; inset: 0; display: none; zoom: var(--ui-scale); }
+    #app.visible { display: block; }
+
+    /* ---------- HEADER ---------- */
+    .header { position: absolute; top: 2.2vh; left: 2vw; display: flex; align-items: center; gap: .9vw; }
+    .header .badge {
+      width: 3.4vh; height: 3.4vh; border-radius: var(--radius);
+      background: var(--accent); display: grid; place-items: center; flex: none;
+    }
+    .header .badge svg { width: 62%; height: 62%; fill: #111; }
+    .header .kicker {
+      font-size: .95vh; font-weight: 700; letter-spacing: .42em;
+      color: var(--accent); text-transform: uppercase; margin-bottom: .2vh;
+    }
+    .header .title {
+      font-family: var(--font); font-size: 3.1vh; font-weight: 700;
+      letter-spacing: .06em; line-height: .95; text-transform: uppercase;
+    }
+    .header .sub { font-size: 1.05vh; color: var(--text-dim); margin-top: .35vh; letter-spacing: .06em; }
+
+    /* ---------- TABS ---------- */
+    .tabs { position: absolute; top: 9.6vh; left: 2vw; display: flex; flex-wrap: wrap; gap: .6vh; max-width: 26vw; }
+    .tab {
+      display: flex; align-items: center; gap: .5vw; padding: .75vh 1.1vh;
+      border-radius: var(--radius); background: var(--panel); border: 1px solid var(--panel-line);
+      font-size: 1.05vh; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+      color: var(--text-dim); cursor: pointer; transition: all .14s ease;
+    }
+    .tab svg { width: 1.35vh; height: 1.35vh; fill: currentColor; }
+    .tab:hover { color: var(--text); border-color: var(--accent-dim); }
+    .tab.active { background: var(--accent); border-color: var(--accent); color: #111; box-shadow: 0 0 2.4vh var(--accent-soft); }
+
+    /* ---------- SIDEBAR ---------- */
+    .sidebar {
+      position: absolute; top: 15.5vh; left: 2vw; width: 24vw;
+      max-height: 66vh; overflow-y: auto; overflow-x: hidden; padding-right: .4vw;
+      scrollbar-width: thin; scrollbar-color: var(--accent-dim) transparent;
+    }
+    .sidebar::-webkit-scrollbar { width: 3px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 3px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+
+    .group-label {
+      font-size: .95vh; font-weight: 700; letter-spacing: .34em; color: var(--text-faint);
+      text-transform: uppercase; margin: 1.6vh 0 .7vh .3vw;
+    }
+    .group-label:first-child { margin-top: 0; }
+
+    .row {
+      display: flex; align-items: center; gap: .85vw; padding: .9vh 1vh; margin-bottom: .45vh;
+      background: var(--panel); border: 1px solid var(--panel-line); border-radius: var(--radius);
+      cursor: pointer; transition: border-color .14s ease, background .14s ease;
+    }
+    .row:hover { border-color: rgba(255,255,255,.22); }
+    .row.active {
+      border-color: var(--accent);
+      background: linear-gradient(90deg, rgba(243,179,84,.14), var(--panel) 60%);
+    }
+    .row .ico { width: 1.7vh; flex: none; display: grid; place-items: center; }
+    .row .ico svg { width: 1.6vh; height: 1.6vh; fill: var(--text-dim); }
+    .row.active .ico svg { fill: var(--accent); }
+    .row .txt { flex: 1; min-width: 0; }
+    .row .name {
+      font-family: var(--font); font-size: 1.55vh; font-weight: 600; letter-spacing: .03em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .row .val {
+      font-size: 1.02vh; color: var(--text-faint); margin-top: .1vh; letter-spacing: .05em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .row.active .val { color: var(--accent); opacity: .8; }
+
+    /* ---------- ARC ---------- */
+    .arc { position: absolute; top: 50%; right: 16vw; transform: translateY(-50%); width: 24vw; height: 66vh; }
+    .arc svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .arc-lbl {
+      position: absolute; font-family: var(--font); font-weight: 600; letter-spacing: .04em;
+      white-space: nowrap; cursor: pointer; transform: translate(-100%, -50%);
+      transition: color .16s ease;
+    }
+    .arc-lbl.sel { color: var(--accent); text-shadow: 0 0 1.8vh rgba(243,179,84,.5); }
+    .arc-lbl:not(.sel):hover { color: #fff; }
+    .arc-sw {
+      position: absolute; border-radius: 50%; transform: translate(-50%, -50%);
+      border: 1px solid rgba(255,255,255,.35); pointer-events: none;
+    }
+
+    /* ---------- RIGHT PANEL ---------- */
+    .rightcol {
+      position: absolute; top: 50%; right: 2vw; transform: translateY(-50%);
+      width: 13.5vw; display: flex; flex-direction: column; align-items: stretch; gap: .7vh;
+      max-height: 92vh;
+    }
+
+    .rpanel {
+      width: 100%; display: flex; flex-direction: column; align-items: center;
+      padding: 1.8vh 1.1vh 1.1vh; gap: .9vh;
+      background: var(--panel); border: 1px solid var(--panel-line);
+      border-radius: var(--radius);
+    }
+    .rp-circle {
+      width: 4.4vh; height: 4.4vh; border-radius: 50%;
+      background: rgba(243,179,84,.10); border: 1px solid var(--accent-dim);
+      display: grid; place-items: center; box-shadow: 0 0 2.8vh var(--accent-soft);
+    }
+    .rp-circle svg { width: 48%; height: 48%; fill: var(--accent); }
+    .rp-title {
+      font-family: var(--font); font-size: 2.1vh; font-weight: 700;
+      letter-spacing: .26em; text-transform: uppercase; text-align: center;
+      line-height: 1.1; word-break: break-word;
+    }
+    .rp-props { width: 100%; display: flex; flex-direction: column; gap: .45vh; margin-top: .3vh; }
+    .rp-box {
+      width: 100%; padding: .6vh .7vh .75vh; border-radius: var(--radius);
+      border: 1px solid transparent; text-align: center; cursor: pointer;
+      transition: all .14s ease;
+    }
+    .rp-box:hover { background: rgba(255,255,255,.05); }
+    .rp-box.active {
+      background: var(--accent-soft); border-color: var(--accent-dim);
+      box-shadow: 0 0 2vh rgba(243,179,84,.10);
+    }
+    .rp-label {
+      font-size: .88vh; font-weight: 700; letter-spacing: .26em; text-transform: uppercase;
+      color: var(--text-faint); margin-bottom: .3vh;
+    }
+    .rp-box.active .rp-label { color: var(--text-dim); }
+    .rp-line { display: flex; align-items: baseline; justify-content: center; gap: .4vw; }
+    .rp-val {
+      font-family: var(--font); font-size: 1.75vh; font-weight: 700; color: var(--text-dim);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 9.5vw;
+    }
+    .rp-box.active .rp-val { color: var(--accent); font-size: 2.1vh; }
+    .rp-count { font-size: .85vh; color: var(--text-faint); flex: none; }
+    .rp-swatch {
+      width: 1.5vh; height: 1.5vh; border-radius: 50%; border: 1px solid rgba(255,255,255,.3);
+      display: inline-block; vertical-align: middle;
+    }
+
+    .rp-price {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      padding: .5vh .6vh; margin-top: .3vh; border-radius: 3px;
+      background: rgba(255,255,255,.05); font-size: 1vh;
+    }
+    .rp-price .k {
+      font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--text-faint);
+    }
+    .rp-price .v { font-family: var(--font); font-size: 1.5vh; font-weight: 700; color: var(--accent); }
+    .rp-price.total { background: rgba(243,179,84,.10); border: 1px solid var(--accent-dim); }
+
+    .rp-empty {
+      font-size: 1.1vh; color: var(--text-faint); text-align: center; padding: 1vh .5vh;
+    }
+    .rp-action {
+      width: 100%; margin-top: .3vh; padding: .75vh; border-radius: var(--radius);
+      background: var(--accent); color: #111; border: none; cursor: pointer;
+      font-family: var(--font-ui); font-size: 1vh; font-weight: 700;
+      letter-spacing: .2em; text-transform: uppercase; transition: filter .13s ease;
+    }
+    .rp-action:hover { filter: brightness(1.12); }
+    .rp-action.ghost { background: rgba(255,255,255,.07); color: var(--text-dim); }
+    .rp-action.ghost:hover { background: rgba(255,80,80,.16); color: #ff7b7b; filter: none; }
+    .rp-applied {
+      width: 100%; max-height: 13vh; overflow-y: auto; margin-top: .5vh;
+      display: flex; flex-direction: column; gap: .25vh;
+      scrollbar-width: thin; scrollbar-color: var(--accent-dim) transparent;
+    }
+    .rp-applied::-webkit-scrollbar { width: 3px; }
+    .rp-applied::-webkit-scrollbar-thumb { background: var(--accent-dim); }
+    .rp-chip {
+      display: flex; align-items: center; justify-content: space-between; gap: .3vw;
+      padding: .4vh .6vh; border-radius: 3px; background: rgba(243,179,84,.10);
+      border: 1px solid var(--accent-dim); cursor: pointer; font-size: 1vh; color: var(--accent);
+      text-align: left;
+    }
+    .rp-chip:hover { background: rgba(255,80,80,.14); border-color: rgba(255,80,80,.4); color: #ff7b7b; }
+    .rp-chip span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rp-chip .x { flex: none; font-weight: 700; }
+
+    .rp-hints { width: 100%; display: flex; flex-direction: column; gap: .35vh; margin-top: .5vh; }
+    .rp-hint { display: flex; align-items: center; justify-content: space-between; gap: .4vw; }
+    .rp-hint .key {
+      font-size: .82vh; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--text-dim); background: rgba(255,255,255,.07);
+      padding: .35vh .5vh; border-radius: 3px; white-space: nowrap;
+    }
+    .rp-hint .act {
+      font-size: .82vh; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+      color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ---------- TATTOO PANEL ---------- */
+    .tattoo {
+      position: absolute; top: 15.5vh; right: 2vw; width: 26vw; max-height: 64vh;
+      overflow-y: auto; padding: 1.2vh; background: var(--panel);
+      border: 1px solid var(--panel-line); border-radius: var(--radius);
+      scrollbar-width: thin; scrollbar-color: var(--accent-dim) transparent;
+    }
+    .tattoo::-webkit-scrollbar { width: 3px; }
+    .tattoo::-webkit-scrollbar-thumb { background: var(--accent-dim); }
+    .tattoo h4 {
+      font-size: .95vh; font-weight: 700; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--text-faint); margin: 1vh 0 .8vh;
+    }
+    .tattoo h4:first-child { margin-top: 0; }
+    .tat-item {
+      display: flex; align-items: center; justify-content: space-between; gap: .6vw;
+      padding: .7vh .9vh; margin-bottom: .35vh; border-radius: 3px;
+      background: rgba(0,0,0,.4); border: 1px solid transparent; cursor: pointer; font-size: 1.25vh;
+    }
+    .tat-item:hover { border-color: var(--accent-dim); background: rgba(243,179,84,.08); }
+    .tat-item.on { border-color: var(--accent); color: var(--accent); }
+    .tat-item .act {
+      font-size: .9vh; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      padding: .3vh .6vh; border-radius: 2px; background: rgba(243,179,84,.16); color: var(--accent); flex: none;
+    }
+    .tat-item .act.del { background: rgba(255,80,80,.16); color: #ff7b7b; }
+
+    /* ---------- TOOLBAR ---------- */
+    .toolbar {
+      width: 100%; display: flex; flex-wrap: wrap; justify-content: center;
+      gap: .4vh; padding: .7vh;
+      background: var(--panel); border: 1px solid var(--panel-line);
+      border-radius: var(--radius);
+    }
+    .tool {
+      flex: 1 1 calc(25% - .4vh); height: 3vh; min-width: 2.6vh;
+      border-radius: 3px; display: grid; place-items: center; cursor: pointer; transition: all .13s ease;
+    }
+    .tool svg { width: 1.6vh; height: 1.6vh; fill: var(--text-dim); transition: fill .13s ease; }
+    .tool:hover { background: rgba(255,255,255,.08); }
+    .tool:hover svg, .tool.active svg { fill: var(--accent); }
+    .tool.active { background: rgba(243,179,84,.14); }
+
+    /* ---------- FOOTER ---------- */
+    .footer { width: 100%; display: flex; flex-direction: column; gap: .4vh; }
+    .fbtn {
+      display: flex; align-items: center; justify-content: center; gap: .4vw;
+      cursor: pointer; padding: .85vh .6vh;
+      border-radius: var(--radius); font-size: 1vh; font-weight: 700;
+      letter-spacing: .14em; text-transform: uppercase; color: var(--text-dim);
+      background: var(--panel); border: 1px solid var(--panel-line);
+      white-space: nowrap; transition: all .14s ease;
+    }
+    .fbtn svg { width: 1.4vh; height: 1.4vh; fill: currentColor; }
+    .fbtn:hover { color: #fff; border-color: var(--accent-dim); }
+    .fbtn.save {
+      background: var(--accent); border-color: var(--accent); color: #111;
+      box-shadow: 0 0 2.6vh var(--accent-soft);
+    }
+    .fbtn.save:hover { color: #111; filter: brightness(1.1); }
+
+    /* ---------- MODAL ---------- */
+    .modal-bg { position: absolute; inset: 0; background: rgba(0,0,0,.55); display: none; place-items: center; z-index: 50; }
+    .modal-bg.show { display: grid; }
+    .modal {
+      width: 36vh; padding: 2.4vh; text-align: center;
+      background: var(--panel-solid); border: 1px solid var(--accent-dim);
+      border-radius: var(--radius); box-shadow: 0 0 6vh rgba(0,0,0,.6);
+    }
+    .modal h3 { font-family: var(--font); font-size: 2.1vh; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .7vh; }
+    .modal p { font-size: 1.25vh; color: var(--text-dim); margin-bottom: 2vh; white-space: pre-line; }
+    .modal .acts { display: flex; gap: .8vh; }
+    .modal button {
+      flex: 1; padding: .95vh; border: 1px solid var(--panel-line); border-radius: 3px;
+      background: rgba(255,255,255,.05); color: var(--text-dim);
+      font-family: var(--font-ui); font-size: 1.1vh; font-weight: 700;
+      letter-spacing: .16em; text-transform: uppercase; cursor: pointer; transition: all .13s ease;
+    }
+    .modal button:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .modal button.yes { background: var(--accent); border-color: var(--accent); color: #111; }
+    .modal button.yes:hover { filter: brightness(1.12); color: #111; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div class="header">
+      <div class="badge" id="hBadge"></div>
+      <div>
+        <div class="kicker" id="hKicker">Ped</div>
+        <div class="title" id="hTitle">Model</div>
+        <div class="sub" id="hSub"></div>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabs"></div>
+    <div class="sidebar" id="sidebar"></div>
+    <div class="arc" id="arc"></div>
+
+    <div class="rightcol" id="rightcol">
+      <div class="rpanel" id="rpanel">
+        <div class="rp-circle" id="rpIcon"></div>
+        <div class="rp-title" id="rpTitle"></div>
+        <div class="rp-props" id="rpProps"></div>
+        <div class="rp-hints" id="rpHints"></div>
+      </div>
+
+      <div class="toolbar" id="toolbar"></div>
+
+      <div class="footer">
+        <div class="fbtn" id="btnExit">
+          <svg viewBox="0 0 24 24"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg>
+          <span id="lblExit">Exit Customization</span>
+        </div>
+        <div class="fbtn save" id="btnSave">
+          <svg viewBox="0 0 24 24"><path d="M18 8h-1V6a5 5 0 0 0-10 0v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zM9 6a3 3 0 0 1 6 0v2H9zm3 12a2 2 0 1 1 2-2 2 2 0 0 1-2 2z"/></svg>
+          <span id="lblSave">Save Customization</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tattoo hidden" id="tattoo"></div>
+
+    <div class="modal-bg" id="modalBg">
+      <div class="modal">
+        <h3 id="mTitle"></h3>
+        <p id="mDesc"></p>
+        <div class="acts">
+          <button id="mNo"></button>
+          <button class="yes" id="mYes"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    "use strict";
+
+    /* ================== NUI BRIDGE ================== */
+    var RES = (function () {
+      try { return GetParentResourceName(); } catch (e) { return "illenium-appearance"; }
+    })();
+
+    function nui(name, data) {
+      return fetch("https://" + RES + "/" + name, {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=UTF-8" },
+        body: JSON.stringify(data === undefined ? {} : data)
+      }).then(function (r) { return r.json(); }).catch(function () { return null; });
+    }
+
+    /* ================== ICONS ================== */
+    var I = {
+      ped: '<svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4 0-9 2-9 5v3h18v-3c0-3-5-5-9-5z"/></svg>',
+      face: '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM8.5 9A1.5 1.5 0 1 1 7 10.5 1.5 1.5 0 0 1 8.5 9zm7 0A1.5 1.5 0 1 1 14 10.5 1.5 1.5 0 0 1 15.5 9zM12 18a5 5 0 0 1-4.6-3h9.2A5 5 0 0 1 12 18z"/></svg>',
+      shirt: '<svg viewBox="0 0 24 24"><path d="M16 2l6 3-2 5-2-1v13H6V9L4 10 2 5l6-3 4 3z"/></svg>',
+      tattoo: '<svg viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.4 9.4 8 10 4.6-.6 8-5 8-10V6zm0 5a3 3 0 1 1-3 3 3 3 0 0 1 3-3z"/></svg>',
+      slider: '<svg viewBox="0 0 24 24"><path d="M3 7h9v2H3zm12 0h6v2h-6zM3 15h5v2H3zm8 0h10v2H11zM12 5h2v6h-2zM8 13h2v6H8z"/></svg>',
+      dna: '<svg viewBox="0 0 24 24"><path d="M7 2h2c0 4 6 5 6 10s-6 6-6 10H7c0-4 6-5 6-10S7 6 7 2zm10 0h2c0 4-6 5-6 10s6 6 6 10h-2c0-4-6-5-6-10S17 6 17 2z"/></svg>',
+      hair: '<svg viewBox="0 0 24 24"><path d="M12 2C7 2 4 6 4 11v9h3v-8c2 0 3-1 4-2 1 2 4 3 6 3v7h3v-9c0-5-3-9-8-9z"/></svg>',
+      eye: '<svg viewBox="0 0 24 24"><path d="M12 5C6 5 2 12 2 12s4 7 10 7 10-7 10-7-4-7-10-7zm0 11a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/></svg>',
+      brow: '<svg viewBox="0 0 24 24"><path d="M3 9c3-4 15-4 18 0l-1 2c-3-3-13-3-16 0zm2 6a7 7 0 0 0 14 0z"/></svg>',
+      beard: '<svg viewBox="0 0 24 24"><path d="M6 4h12v6a6 6 0 0 1-2 4.5L12 22l-4-7.5A6 6 0 0 1 6 10z"/></svg>',
+      brush: '<svg viewBox="0 0 24 24"><path d="M19 3 9 13l2 2L21 5zM7 15c-2 0-3 1.5-3 3s-1 2-2 2c1.5 1.5 3 1 4.5 1S10 19.5 10 18s-1-3-3-3z"/></svg>',
+      lips: '<svg viewBox="0 0 24 24"><path d="M12 9c2-3 7-4 10-2-2 5-6 9-10 9S4 12 2 7c3-2 8-1 10 2z"/></svg>',
+      star: '<svg viewBox="0 0 24 24"><path d="m12 2 2.9 6.3 6.8.8-5 4.6 1.3 6.8L12 17.2 6 20.5l1.3-6.8-5-4.6 6.8-.8z"/></svg>',
+      cam: '<svg viewBox="0 0 24 24"><path d="M9 4 7.2 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3.2L15 4zm3 5a5 5 0 1 1-5 5 5 5 0 0 1 5-5z"/></svg>',
+      head: '<svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-6 6v3l-2 3h3v4h5v-4h3a2 2 0 0 0 2-2V9a6 6 0 0 0-5-6z"/></svg>',
+      body: '<svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 1 1-2 2 2 2 0 0 1 2-2zm-5 5h10v6h-3v9h-4v-9H7z"/></svg>',
+      legs: '<svg viewBox="0 0 24 24"><path d="M8 2h8v7l-1 13h-4l-1-8-1 8H5z"/></svg>',
+      turn: '<svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/></svg>',
+      rotl: '<svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l4 4 4-4H6a7 7 0 1 1 7 7v2a9 9 0 0 0 0-18z"/></svg>',
+      rotr: '<svg viewBox="0 0 24 24"><path d="M11 3a9 9 0 0 1 9 9h3l-4 4-4-4h3a7 7 0 1 0-7 7v2a9 9 0 0 1 0-18z"/></svg>',
+      reset: '<svg viewBox="0 0 24 24"><path d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>',
+      glasses: '<svg viewBox="0 0 24 24"><path d="M6 8a4 4 0 1 0 3.9 5h4.2A4 4 0 1 0 18 8H6z"/></svg>',
+      mask: '<svg viewBox="0 0 24 24"><path d="M4 9v4a6 6 0 0 0 4 5.7L12 20l4-1.3A6 6 0 0 0 20 13V9L12 6z"/></svg>',
+      shoe: '<svg viewBox="0 0 24 24"><path d="M2 16h20v3H2zm2-8h4l3 3h9a2 2 0 0 1 2 2v1H4z"/></svg>',
+      bag: '<svg viewBox="0 0 24 24"><path d="M9 4h6v3h4v13H5V7h4zm2 0v3h2V4z"/></svg>',
+      armor: '<svg viewBox="0 0 24 24"><path d="M12 2 4 5v7c0 5 3.5 8.7 8 10 4.5-1.3 8-5 8-10V5z"/></svg>',
+      watch: '<svg viewBox="0 0 24 24"><path d="M9 1h6v3H9zm0 19h6v3H9zm3-16a8 8 0 1 0 8 8 8 8 0 0 0-8-8z"/></svg>',
+      hat: '<svg viewBox="0 0 24 24"><path d="M12 3 6 7v4a6 6 0 0 0 12 0V7zM2 16h20v3H2z"/></svg>'
+    };
+
+    /* ================== STATE ================== */
+    var S = {
+      L: null, settings: null, data: null, config: null,
+      tabs: [], tabIndex: 0, rowIndex: 0, propIndex: 0,
+      camera: "default", tattooZone: null, visible: false,
+      tatSel: {}, tatOpacity: 1,
+      origTattoos: {}, tatCost: 0, tatChargeOnSave: false
+    };
+
+    var EYE_COLORS = ["Green","Emerald","Light Blue","Ocean Blue","Light Brown","Dark Brown","Hazel","Dark Gray","Light Gray","Pink","Yellow","Purple","Blackout","Shades of Gray","Tequila Sunrise","Atomic","Warp","ECola","Space Ranger","Ying Yang","Bullseye","Lizard","Dragon","Extra Terrestrial","Goat","Smiley","Possessed","Demon","Infected","Alien","Undead","Zombie"];
+
+    /* urutan & ikon overlay mengikuti referensi */
+    var OVERLAY_ORDER = [
+      ["eyebrows", "brow"], ["beard", "beard"], ["makeUp", "brush"], ["blush", "face"],
+      ["lipstick", "lips"], ["chestHair", "hair"], ["blemishes", "star"], ["ageing", "star"],
+      ["complexion", "star"], ["sunDamage", "star"], ["moleAndFreckles", "star"], ["bodyBlemishes", "star"]
+    ];
+
+    var COMPONENT_MAP = {
+      1:  { key: "masks",          lk: "mask",           icon: "mask" },
+      3:  { key: "upperBody",      lk: "upperBody",      icon: "body" },
+      4:  { key: "lowerBody",      lk: "lowerBody",      icon: "legs" },
+      5:  { key: "bags",           lk: "bags",           icon: "bag" },
+      6:  { key: "shoes",          lk: "shoes",          icon: "shoe" },
+      7:  { key: "scarfAndChains", lk: "scarfAndChains", icon: "shirt" },
+      8:  { key: "shirts",         lk: "shirt",          icon: "shirt" },
+      9:  { key: "bodyArmor",      lk: "bodyArmor",      icon: "armor" },
+      10: { key: "decals",         lk: "decals",         icon: "shirt" },
+      11: { key: "jackets",        lk: "jackets",        icon: "shirt" }
+    };
+
+    var PROP_MAP = {
+      0: { key: "hats",      lk: "hats",      icon: "hat" },
+      1: { key: "glasses",   lk: "glasses",   icon: "glasses" },
+      2: { key: "ear",       lk: "ear",       icon: "ped" },
+      6: { key: "watches",   lk: "watches",   icon: "watch" },
+      7: { key: "bracelets", lk: "bracelets", icon: "watch" }
+    };
+
+    /* ================== HELPERS ================== */
+    function $(id) { return document.getElementById(id); }
+    function el(tag, cls, html) {
+      var n = document.createElement(tag);
+      if (cls) n.className = cls;
+      if (html !== undefined) n.innerHTML = html;
+      return n;
+    }
+    function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+    function r1(n) { return Math.round(n * 10) / 10; }
+    function rgb(c) { return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"; }
+    function vh(n) { return window.innerHeight * n / 100; }
+    function accent() {
+      try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+        return v || "#F3B354";
+      } catch (e) { return "#F3B354"; }
+    }
+
+    function txt(path, fallback) {
+      var o = S.L, parts = path.split(".");
+      for (var i = 0; i < parts.length; i++) {
+        if (!o || typeof o !== "object") return fallback !== undefined ? fallback : parts[parts.length - 1];
+        o = o[parts[i]];
+      }
+      return (typeof o === "string") ? o : (fallback !== undefined ? fallback : parts[parts.length - 1]);
+    }
+
+    /* ---- domains ---- */
+    function numDomain(min, max, factor, blocked) {
+      var step = factor || 1;
+      if (max < min) max = min;
+      var count = Math.round((max - min) / step) + 1;
+      if (count > 5000) count = 5000;
+      var vals = [], labels = [];
+      for (var i = 0; i < count; i++) {
+        var v = step < 1 ? r1(min + i * step) : Math.round(min + i * step);
+        vals.push(v);
+        labels.push(step < 1 ? v.toFixed(1) : String(v));
+      }
+      return { vals: vals, labels: labels, blocked: blocked || null, kind: "num" };
+    }
+    function listDomain(items) { return { vals: items.slice(), labels: items.slice(), kind: "list" }; }
+    function labeledDomain(items, labels) { return { vals: items.slice(), labels: labels.slice(), kind: "list" }; }
+    function colorDomain(colors) {
+      var vals = [], labels = [], cols = [];
+      for (var i = 0; i < colors.length; i++) { vals.push(i); labels.push(String(i)); cols.push(rgb(colors[i])); }
+      return { vals: vals, labels: labels, colors: cols, kind: "color" };
+    }
+    function isBlocked(dom, v) { return !!(dom.blocked && dom.blocked.indexOf(v) !== -1); }
+    function indexOfVal(dom, v) {
+      var i = dom.vals.indexOf(v);
+      if (i !== -1) return i;
+      if (dom.kind === "num" && typeof v === "number") {
+        var best = 0, bd = Infinity;
+        for (var k = 0; k < dom.vals.length; k++) {
+          var d = Math.abs(dom.vals[k] - v);
+          if (d < bd) { bd = d; best = k; }
+        }
+        return best;
+      }
+      return 0;
+    }
+
+    /* ================== SCHEMA ================== */
+    function prop(id, label, dom, get, set) { return { id: id, label: label, dom: dom, get: get, set: set }; }
+    function findById(list, key, id) {
+      if (!list) return null;
+      for (var i = 0; i < list.length; i++) if (list[i][key] === id) return list[i];
+      return null;
+    }
+
+    function buildSchema() {
+      var st = S.settings || {}, d = S.data || {}, c = S.config || {}, tabs = [];
+
+      /* -------- PED -------- */
+      var pedGroups = [];
+
+      if (c.ped && st.ped && st.ped.model && st.ped.model.items) {
+        pedGroups.push({
+          title: txt("ped.title", "Ped"),
+          rows: [{
+            id: "model", label: txt("ped.model", "Model"), icon: I.ped,
+            props: [prop("model", txt("ped.model", "Model"), listDomain(st.ped.model.items),
+              function () { return d.model; }, function (v) { changeModel(v); })]
+          }]
+        });
+      }
+
+      if (c.headBlend && st.headBlend && d.headBlend) {
+        var hb = st.headBlend;
+        var hbProp = function (key, label) {
+          return prop(key, label, numDomain(hb[key].min, hb[key].max, hb[key].factor),
+            function () { return d.headBlend[key]; },
+            function (v) { d.headBlend[key] = v; nui("appearance_change_head_blend", d.headBlend); });
+        };
+        pedGroups.push({
+          title: txt("headBlend.title", "Inheritance"),
+          rows: [
+            { id: "hb_shape", label: txt("headBlend.shape.title", "Face"), icon: I.face, props: [
+              hbProp("shapeFirst", txt("headBlend.shape.firstOption", "Father")),
+              hbProp("shapeSecond", txt("headBlend.shape.secondOption", "Mother")),
+              hbProp("shapeMix", txt("headBlend.shape.mix", "Mix"))] },
+            { id: "hb_skin", label: txt("headBlend.skin.title", "Skin"), icon: I.dna, props: [
+              hbProp("skinFirst", txt("headBlend.skin.firstOption", "Father")),
+              hbProp("skinSecond", txt("headBlend.skin.secondOption", "Mother")),
+              hbProp("skinMix", txt("headBlend.skin.mix", "Mix"))] },
+            { id: "hb_race", label: txt("headBlend.race.title", "Race"), icon: I.dna, props: [
+              hbProp("shapeThird", txt("headBlend.race.shape", "Shape")),
+              hbProp("skinThird", txt("headBlend.race.skin", "Skin")),
+              hbProp("thirdMix", txt("headBlend.race.mix", "Mix"))] }
+          ]
+        });
+      }
+
+      if (c.faceFeatures && st.faceFeatures && d.faceFeatures) {
+        var ffProp = function (key, label) {
+          var s = st.faceFeatures[key] || { min: -1, max: 1, factor: 0.1 };
+          return prop(key, label, numDomain(s.min, s.max, s.factor),
+            function () { return d.faceFeatures[key]; },
+            function (v) { d.faceFeatures[key] = v; nui("appearance_change_face_feature", d.faceFeatures); });
+        };
+        pedGroups.push({
+          title: txt("faceFeatures.title", "Face Features"),
+          rows: [
+            { id: "ff_nose", label: txt("faceFeatures.nose.title", "Nose"), icon: I.slider, props: [
+              ffProp("noseWidth", txt("faceFeatures.nose.width", "Width")),
+              ffProp("nosePeakHigh", txt("faceFeatures.nose.height", "Height")),
+              ffProp("nosePeakSize", txt("faceFeatures.nose.size", "Size")),
+              ffProp("noseBoneHigh", txt("faceFeatures.nose.boneHeight", "Bone height")),
+              ffProp("noseBoneTwist", txt("faceFeatures.nose.boneTwist", "Bone twist")),
+              ffProp("nosePeakLowering", txt("faceFeatures.nose.peakHeight", "Peak height"))] },
+            { id: "ff_brow", label: txt("faceFeatures.eyebrows.title", "Eyebrows"), icon: I.brow, props: [
+              ffProp("eyeBrownHigh", txt("faceFeatures.eyebrows.height", "Height")),
+              ffProp("eyeBrownForward", txt("faceFeatures.eyebrows.depth", "Depth"))] },
+            { id: "ff_cheek", label: txt("faceFeatures.cheeks.title", "Cheeks"), icon: I.slider, props: [
+              ffProp("cheeksBoneHigh", txt("faceFeatures.cheeks.boneHeight", "Bone height")),
+              ffProp("cheeksBoneWidth", txt("faceFeatures.cheeks.boneWidth", "Bone width")),
+              ffProp("cheeksWidth", txt("faceFeatures.cheeks.width", "Width"))] },
+            { id: "ff_eyes", label: txt("faceFeatures.eyesAndMouth.title", "Eyes and Mouth"), icon: I.eye, props: [
+              ffProp("eyesOpening", txt("faceFeatures.eyesAndMouth.eyesOpening", "Eyes opening")),
+              ffProp("lipsThickness", txt("faceFeatures.eyesAndMouth.lipsThickness", "Lip thickness"))] },
+            { id: "ff_jaw", label: txt("faceFeatures.jaw.title", "Jaw"), icon: I.slider, props: [
+              ffProp("jawBoneWidth", txt("faceFeatures.jaw.width", "Width")),
+              ffProp("jawBoneBackSize", txt("faceFeatures.jaw.size", "Size"))] },
+            { id: "ff_chin", label: txt("faceFeatures.chin.title", "Chin"), icon: I.slider, props: [
+              ffProp("chinBoneLowering", txt("faceFeatures.chin.lowering", "Lowering")),
+              ffProp("chinBoneLenght", txt("faceFeatures.chin.length", "Length")),
+              ffProp("chinBoneSize", txt("faceFeatures.chin.size", "Size")),
+              ffProp("chinHole", txt("faceFeatures.chin.hole", "Hole size"))] },
+            { id: "ff_neck", label: txt("faceFeatures.neck.title", "Neck"), icon: I.slider, props: [
+              ffProp("neckThickness", txt("faceFeatures.neck.thickness", "Thickness"))] }
+          ]
+        });
+      }
+
+      if (pedGroups.length) tabs.push({ id: "ped", label: txt("ped.title", "Ped"), icon: I.ped, groups: pedGroups });
+
+      /* -------- APPEARANCE -------- */
+      if (c.headOverlays && st.headOverlays && d.headOverlays) {
+        var appGroups = [], ovRows = [];
+
+        if (st.hair && d.hair) {
+          var hs = st.hair;
+          appGroups.push({
+            title: txt("headOverlays.hair.title", "Hair"),
+            rows: [{ id: "hair", label: txt("headOverlays.hair.title", "Hair"), icon: I.hair, props: [
+              prop("style", txt("headOverlays.hair.style", "Style"),
+                numDomain(hs.style.min, hs.style.max, 1, hs.blacklist && hs.blacklist.drawables),
+                function () { return d.hair.style; },
+                function (v) { d.hair.style = v; d.hair.texture = 0; applyHair(); }),
+              prop("texture", txt("headOverlays.hair.texture", "Texture"),
+                numDomain(hs.texture.min, hs.texture.max, 1),
+                function () { return d.hair.texture; },
+                function (v) { d.hair.texture = v; applyHair(); }),
+              prop("color", txt("headOverlays.hair.color", "Color"), colorDomain(hs.color.items),
+                function () { return d.hair.color; },
+                function (v) { d.hair.color = v; applyHair(); }),
+              prop("highlight", txt("headOverlays.hair.highlight", "Highlight"), colorDomain(hs.highlight.items),
+                function () { return d.hair.highlight; },
+                function (v) { d.hair.highlight = v; applyHair(); })
+            ]}]
+          });
+        }
+
+        OVERLAY_ORDER.forEach(function (pair) {
+          var name = pair[0], os = st.headOverlays[name];
+          if (!os || !d.headOverlays[name]) return;
+          var ps = [
+            prop("style", txt("headOverlays.style", "Style"), numDomain(os.style.min, os.style.max, 1),
+              function () { return d.headOverlays[name].style; },
+              function (v) { d.headOverlays[name].style = v; applyOverlays(); }),
+            prop("opacity", txt("headOverlays.opacity", "Opacity"), numDomain(os.opacity.min, os.opacity.max, os.opacity.factor),
+              function () { return d.headOverlays[name].opacity; },
+              function (v) { d.headOverlays[name].opacity = v; applyOverlays(); })
+          ];
+          if (os.color && os.color.items) {
+            ps.push(prop("color", txt("headOverlays.color", "Color"), colorDomain(os.color.items),
+              function () { return d.headOverlays[name].color; },
+              function (v) { d.headOverlays[name].color = v; applyOverlays(); }));
+            ps.push(prop("secondColor", txt("headOverlays.secondColor", "Secondary Color"), colorDomain(os.color.items),
+              function () { return d.headOverlays[name].secondColor; },
+              function (v) { d.headOverlays[name].secondColor = v; applyOverlays(); }));
+          }
+          ovRows.push({ id: "ov_" + name, label: txt("headOverlays." + name, name), icon: I[pair[1]] || I.face, props: ps });
+
+          /* Eye color ditempatkan tepat setelah Eyebrows, seperti referensi */
+          if (name === "eyebrows" && st.eyeColor) {
+            var eVals = [], eLabels = [];
+            for (var ei = st.eyeColor.min; ei <= st.eyeColor.max; ei++) { eVals.push(ei); eLabels.push(EYE_COLORS[ei] || String(ei)); }
+            ovRows.push({
+              id: "eyeColor", label: txt("headOverlays.eyeColor", "Eye color"), icon: I.eye,
+              props: [prop("eyeColor", txt("headOverlays.eyeColor", "Eye color"), labeledDomain(eVals, eLabels),
+                function () { return d.eyeColor; },
+                function (v) { d.eyeColor = v; nui("appearance_change_eye_color", v); })]
+            });
+          }
+        });
+
+        if (ovRows.length) appGroups.push({ title: txt("headOverlays.title", "Appearance"), rows: ovRows });
+        if (appGroups.length) tabs.push({ id: "appearance", label: txt("headOverlays.title", "Appearance"), icon: I.face, groups: appGroups });
+      }
+
+      /* -------- CLOTHES -------- */
+      var clothGroups = [];
+      if (c.components && st.components) {
+        var cRows = [];
+        st.components.forEach(function (cs) {
+          var map = COMPONENT_MAP[cs.component_id];
+          if (!map) return;
+          if (c.componentConfig && c.componentConfig[map.key] === false) return;
+          var cur = findById(d.components, "component_id", cs.component_id);
+          if (!cur) return;
+          cRows.push({
+            id: "comp_" + cs.component_id, label: txt("components." + map.lk, map.key), icon: I[map.icon],
+            props: [
+              prop("drawable", txt("components.drawable", "Drawable"),
+                numDomain(cs.drawable.min, cs.drawable.max, 1, cs.blacklist && cs.blacklist.drawables),
+                function () { return cur.drawable; },
+                function (v) { cur.drawable = v; cur.texture = 0; applyComponent(cs.component_id); }),
+              prop("texture", txt("components.texture", "Texture"),
+                numDomain(cs.texture.min, cs.texture.max, 1, cs.blacklist && cs.blacklist.textures),
+                function () { return cur.texture; },
+                function (v) { cur.texture = v; applyComponent(cs.component_id); })
+            ]
+          });
+        });
+        if (cRows.length) clothGroups.push({ title: txt("components.title", "Clothes"), rows: cRows });
+      }
+
+      if (c.props && st.props) {
+        var pRows = [];
+        st.props.forEach(function (ps2) {
+          var map = PROP_MAP[ps2.prop_id];
+          if (!map) return;
+          if (c.propConfig && c.propConfig[map.key] === false) return;
+          var cur = findById(d.props, "prop_id", ps2.prop_id);
+          if (!cur) return;
+          pRows.push({
+            id: "prop_" + ps2.prop_id, label: txt("props." + map.lk, map.key), icon: I[map.icon],
+            props: [
+              prop("drawable", txt("props.drawable", "Drawable"),
+                numDomain(ps2.drawable.min, ps2.drawable.max, 1, ps2.blacklist && ps2.blacklist.drawables),
+                function () { return cur.drawable; },
+                function (v) { cur.drawable = v; cur.texture = v === -1 ? -1 : 0; applyProp(ps2.prop_id); }),
+              prop("texture", txt("props.texture", "Texture"),
+                numDomain(ps2.texture.min, ps2.texture.max, 1, ps2.blacklist && ps2.blacklist.textures),
+                function () { return cur.texture; },
+                function (v) { cur.texture = v; applyProp(ps2.prop_id); })
+            ]
+          });
+        });
+        if (pRows.length) clothGroups.push({ title: txt("props.title", "Props"), rows: pRows });
+      }
+
+      if (clothGroups.length) tabs.push({ id: "clothes", label: txt("components.title", "Clothes"), icon: I.shirt, groups: clothGroups });
+
+      /* -------- TATTOOS -------- */
+      if (c.tattoos && st.tattoos && st.tattoos.items) {
+        var zRows = [];
+        var op = st.tattoos.opacity || { min: 0.1, max: 1, factor: 0.1 };
+        S.tatCost = st.tattoos.cost || 0;
+        S.tatChargeOnSave = !!st.tattoos.chargeOnSave;
+        Object.keys(st.tattoos.items).forEach(function (zone) {
+          var list = st.tattoos.items[zone] || [];
+          var ps = [];
+          if (list.length) {
+            var ids = [], names = [];
+            for (var i = 0; i < list.length; i++) { ids.push(i); names.push(list[i].label || list[i].name); }
+            ps.push(prop("tattoo", txt("tattoos.title", "Tattoo"), labeledDomain(ids, names),
+              function () { return S.tatSel[zone] || 0; },
+              function (v) { S.tatSel[zone] = v; previewTattoo(zone); }));
+            ps.push(prop("opacity", txt("tattoos.opacity", "Opacity"), numDomain(op.min, op.max, op.factor),
+              function () { return S.tatOpacity; },
+              function (v) { S.tatOpacity = v; previewTattoo(zone); }));
+          }
+          zRows.push({
+            id: "zone_" + zone, zone: zone, label: txt("tattoos.items." + zone, zone),
+            icon: I.tattoo, props: ps
+          });
+        });
+        if (zRows.length) {
+          tabs.push({ id: "tattoos", label: txt("tattoos.title", "Tattoos"), icon: I.tattoo, isTattoo: true,
+            groups: [{ title: txt("tattoos.title", "Tattoos"), rows: zRows }] });
+        }
+      }
+
+      return tabs;
+    }
+
+    /* ================== APPLY ================== */
+    function applyHair() {
+      nui("appearance_change_hair", S.data.hair).then(function (res) {
+        if (res && res.style) { S.settings.hair = res; rebuild(true); }
+      });
+    }
+    function applyOverlays() { nui("appearance_change_head_overlay", S.data.headOverlays); }
+    function applyComponent(id) {
+      nui("appearance_change_component", findById(S.data.components, "component_id", id)).then(function (res) {
+        if (res && res.component_id !== undefined) {
+          for (var i = 0; i < S.settings.components.length; i++) {
+            if (S.settings.components[i].component_id === id) { S.settings.components[i] = res; break; }
+          }
+          rebuild(true);
+        }
+      });
+    }
+    function applyProp(id) {
+      nui("appearance_change_prop", findById(S.data.props, "prop_id", id)).then(function (res) {
+        if (res && res.prop_id !== undefined) {
+          for (var i = 0; i < S.settings.props.length; i++) {
+            if (S.settings.props[i].prop_id === id) { S.settings.props[i] = res; break; }
+          }
+          rebuild(true);
+        }
+      });
+    }
+    /* PED_TATTOOS di Lua adalah tabel kosong saat pemain belum punya tattoo. json.encode
+       mengubahnya jadi "[]", yang di JS menjadi Array. Menaruh properti bernama pada Array
+       (arr["ZONE_TORSO"] = [...]) tidak error, tapi JSON.stringify MENGABAIKANNYA - jadi
+       payload yang dikirim balik ke Lua kosong dan semua tattoo lenyap.
+       Karena itu map tattoo selalu dinormalkan jadi objek biasa. */
+    function tattooMap(src) {
+      var out = {};
+      if (src && typeof src === "object" && !Array.isArray(src)) {
+        for (var k in src) {
+          if (Object.prototype.hasOwnProperty.call(src, k)) {
+            out[k] = Array.isArray(src[k]) ? src[k].slice() : [];
+          }
+        }
+      }
+      /* pastikan setiap zona yang dikenal selalu ada sebagai array */
+      var items = S.settings && S.settings.tattoos && S.settings.tattoos.items;
+      if (items) {
+        for (var z in items) {
+          if (Object.prototype.hasOwnProperty.call(items, z) && !out[z]) out[z] = [];
+        }
+      }
+      return out;
+    }
+
+    function cloneTattoos(src) {
+      var m = tattooMap(src), out = {};
+      for (var k in m) {
+        out[k] = m[k].map(function (t) {
+          var c = {};
+          for (var f in t) if (Object.prototype.hasOwnProperty.call(t, f)) c[f] = t[f];
+          return c;
+        });
+      }
+      return out;
+    }
+
+    function tattooCost(t) {
+      if (!t) return 0;
+      return (typeof t.cost === "number") ? t.cost : S.tatCost;
+    }
+    function money(n) { return "$" + String(n); }
+
+    /* Tattoo yang ada sekarang tapi belum ada saat menu dibuka = yang akan ditagih. */
+    function pendingTattoos() {
+      var before = {}, added = [];
+      var orig = S.origTattoos || {};
+      for (var z in orig) {
+        for (var i = 0; i < orig[z].length; i++) {
+          var k = z + "|" + (orig[z][i].name || orig[z][i].label || "?");
+          before[k] = (before[k] || 0) + 1;
+        }
+      }
+      var cur = S.data.tattoos || {};
+      for (var z2 in cur) {
+        for (var j = 0; j < cur[z2].length; j++) {
+          var t = cur[z2][j];
+          var k2 = z2 + "|" + (t.name || t.label || "?");
+          if ((before[k2] || 0) > 0) { before[k2] -= 1; }
+          else { added.push(t); }
+        }
+      }
+      return added;
+    }
+    function pendingTotal() {
+      var list = pendingTattoos(), sum = 0;
+      for (var i = 0; i < list.length; i++) sum += tattooCost(list[i]);
+      return sum;
+    }
+
+    function zoneList(zone) {
+      var st = S.settings.tattoos;
+      return (st && st.items && st.items[zone]) || [];
+    }
+    function selectedTattoo(zone) {
+      var list = zoneList(zone);
+      if (!list.length) return null;
+      var t = list[clamp(S.tatSel[zone] || 0, 0, list.length - 1)];
+      var copy = {};
+      for (var k in t) copy[k] = t[k];
+      copy.opacity = S.tatOpacity;
+      return copy;
+    }
+    function previewTattoo(zone) {
+      var t = selectedTattoo(zone);
+      if (!t) return;
+      S.data.tattoos = tattooMap(S.data.tattoos);
+      nui("appearance_preview_tattoo", { data: S.data.tattoos, tattoo: t });
+    }
+    function applyTattoo(zone) {
+      var t = selectedTattoo(zone);
+      if (!t) return;
+      var updated = cloneTattoos(S.data.tattoos);
+      if (!updated[zone]) updated[zone] = [];
+      updated[zone].push(t);
+      nui("appearance_apply_tattoo", { tattoo: t, updatedTattoos: updated }).then(function (ok) {
+        if (ok) { S.data.tattoos = updated; renderAll(); }
+      });
+    }
+    function removeTattoo(zone, i) {
+      /* PENTING: callback Lua `appearance_delete_tattoo` meneruskan payload apa adanya ke
+         client.removePedTattoo(ped, tattoos) -> setTattoos(ped, tattoos), yang meng-iterasi
+         SELURUH map tattoo per zona. Jadi yang harus dikirim adalah map lengkap setelah
+         penghapusan, bukan objek tattoo yang dihapus. */
+      var updated = cloneTattoos(S.data.tattoos);
+      if (!updated[zone] || !updated[zone].length) return;
+      updated[zone].splice(i, 1);
+      S.data.tattoos = updated;
+      nui("appearance_delete_tattoo", updated);
+      renderAll();
+    }
+
+    function changeModel(model) {
+      S.data.model = model;
+      nui("appearance_change_model", model).then(function (res) {
+        if (res && res.appearanceSettings) {
+          S.settings = res.appearanceSettings;
+          S.data = res.appearanceData;
+          rebuild(true);
+        }
+      });
+    }
+
+    /* ================== SELECTORS ================== */
+    function currentTab() { return S.tabs[S.tabIndex]; }
+    function flatRows() {
+      var t = currentTab(), out = [];
+      if (!t) return out;
+      for (var g = 0; g < t.groups.length; g++) {
+        for (var r = 0; r < t.groups[g].rows.length; r++) out.push(t.groups[g].rows[r]);
+      }
+      return out;
+    }
+    function currentRow() { return flatRows()[S.rowIndex] || null; }
+    function currentProp() {
+      var row = currentRow();
+      if (!row || !row.props.length) return null;
+      return row.props[clamp(S.propIndex, 0, row.props.length - 1)];
+    }
+    function fmtVal(p) {
+      var idx = indexOfVal(p.dom, p.get());
+      return p.dom.labels[idx] !== undefined ? p.dom.labels[idx] : String(p.get());
+    }
+    function rowSummary(row) {
+      if (!row || !row.props.length) return "";
+      var parts = [];
+      for (var i = 0; i < row.props.length; i++) parts.push(fmtVal(row.props[i]));
+      return parts.join(" · ");
+    }
+
+    /* ================== RENDER ================== */
+    function renderTabs() {
+      var c = $("tabs"); c.innerHTML = "";
+      S.tabs.forEach(function (t, i) {
+        var n = el("div", "tab" + (i === S.tabIndex ? " active" : ""), t.icon + "<span>" + t.label + "</span>");
+        n.onclick = function () { selectTab(i); };
+        c.appendChild(n);
+      });
+    }
+
+    function renderSidebar() {
+      var c = $("sidebar"); c.innerHTML = "";
+      var t = currentTab(); if (!t) return;
+      var counter = 0, activeNode = null;
+
+      t.groups.forEach(function (grp) {
+        c.appendChild(el("div", "group-label", grp.title));
+        grp.rows.forEach(function (row) {
+          var absIdx = counter++;
+          var active = absIdx === S.rowIndex;
+          var node = el("div", "row" + (active ? " active" : ""));
+          node.appendChild(el("div", "ico", row.icon || I.slider));
+          var wrap = el("div", "txt");
+          wrap.appendChild(el("div", "name", row.label));
+          var sum = rowSummary(row);
+          if (sum) wrap.appendChild(el("div", "val", sum));
+          node.appendChild(wrap);
+          node.onclick = function () {
+            S.rowIndex = absIdx; S.propIndex = 0;
+            if (row.zone) S.tattooZone = row.zone;
+            renderAll();
+          };
+          c.appendChild(node);
+          if (active) activeNode = node;
+        });
+      });
+
+      if (activeNode && activeNode.scrollIntoView) activeNode.scrollIntoView({ block: "nearest" });
+    }
+
+    /* --- busur --- */
+    var ARC_SLOTS = 5;       // item terlihat di atas & bawah item terpilih
+    var ARC_GAP_VH = 5.2;    // jarak vertikal antar item (vh)
+    var ARC_BOW_VH = 20.0;   // kedalaman lengkungan (vh)
+    var ARC_K = 0.26;        // kerapatan lengkungan
+    var ARC_LBLGAP_VH = 1.4; // jarak label ke titik
+
+    function bowAt(off) { return ARC_BOW_VH * (1 - Math.cos(off * ARC_K)); }
+
+    function renderArc() {
+      var arc = $("arc");
+      arc.innerHTML = "";
+      var p = currentProp();
+      if (!p) return;
+
+      var W = arc.clientWidth, H = arc.clientHeight;
+      if (!W || !H) return;
+
+      var dom = p.dom, cur = indexOfVal(dom, p.get());
+      var gap = vh(ARC_GAP_VH), lblGap = vh(ARC_LBLGAP_VH);
+      var maxBow = vh(bowAt(ARC_SLOTS + 1));
+      var x0 = W - maxBow;
+
+      var svgNS = "http://www.w3.org/2000/svg";
+      var svg = document.createElementNS(svgNS, "svg");
+      svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+
+      var AC = accent();
+      var defs = document.createElementNS(svgNS, "defs");
+      defs.innerHTML =
+        '<linearGradient id="arcFade" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0%" stop-color="' + AC + '" stop-opacity="0"/>' +
+        '<stop offset="28%" stop-color="' + AC + '" stop-opacity="0.35"/>' +
+        '<stop offset="50%" stop-color="' + AC + '" stop-opacity="0.9"/>' +
+        '<stop offset="72%" stop-color="' + AC + '" stop-opacity="0.35"/>' +
+        '<stop offset="100%" stop-color="' + AC + '" stop-opacity="0"/>' +
+        "</linearGradient>";
+      svg.appendChild(defs);
+
+      /* garis lengkung */
+      var dPath = "";
+      for (var o = -(ARC_SLOTS + 1); o <= ARC_SLOTS + 1; o += 0.25) {
+        var px = x0 + vh(bowAt(o)), py = H / 2 + o * gap;
+        dPath += (dPath ? " L" : "M") + px.toFixed(1) + " " + py.toFixed(1);
+      }
+      var path = document.createElementNS(svgNS, "path");
+      path.setAttribute("d", dPath);
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke", "url(#arcFade)");
+      path.setAttribute("stroke-width", "1.6");
+      svg.appendChild(path);
+
+      var dots = [];
+      for (var off = -ARC_SLOTS; off <= ARC_SLOTS; off++) {
+        var idx = cur + off;
+        if (idx < 0 || idx >= dom.vals.length) continue;
+        var a = Math.abs(off);
+        var dx = x0 + vh(bowAt(off)), dy = H / 2 + off * gap;
+        var isSel = off === 0;
+        var fade = isSel ? 1 : Math.max(.14, 0.7 - a * 0.13);
+
+        if (dom.kind === "color") {
+          var sw = document.createElementNS(svgNS, "circle");
+          sw.setAttribute("cx", dx); sw.setAttribute("cy", dy);
+          sw.setAttribute("r", isSel ? vh(.85) : vh(.6));
+          sw.setAttribute("fill", dom.colors[idx]);
+          sw.setAttribute("stroke", isSel ? AC : "rgba(255,255,255,.3)");
+          sw.setAttribute("stroke-width", isSel ? 1.6 : 1);
+          sw.setAttribute("opacity", fade);
+          svg.appendChild(sw);
+        } else {
+          if (isSel) {
+            var glow = document.createElementNS(svgNS, "circle");
+            glow.setAttribute("cx", dx); glow.setAttribute("cy", dy);
+            glow.setAttribute("r", vh(1.7));
+            glow.setAttribute("fill", AC);
+            glow.setAttribute("opacity", ".18");
+            svg.appendChild(glow);
+          }
+          var dot = document.createElementNS(svgNS, "circle");
+          dot.setAttribute("cx", dx); dot.setAttribute("cy", dy);
+          dot.setAttribute("r", isSel ? vh(.75) : vh(.34));
+          dot.setAttribute("fill", isSel ? AC : "rgba(255,255,255,.5)");
+          dot.setAttribute("opacity", fade);
+          svg.appendChild(dot);
+        }
+        dots.push({ idx: idx, off: off, dx: dx, dy: dy, fade: fade, sel: isSel, a: a });
+      }
+      arc.appendChild(svg);
+
+      /* label HTML supaya font & ellipsis konsisten */
+      dots.forEach(function (n) {
+        var lab = el("div", "arc-lbl" + (n.sel ? " sel" : ""), dom.labels[n.idx]);
+        lab.style.left = (n.dx - lblGap) + "px";
+        lab.style.top = n.dy + "px";
+        lab.style.fontSize = (n.sel ? 2.05 : Math.max(1.05, 1.55 - n.a * 0.10)) + "vh";
+        lab.style.opacity = n.fade;
+        if (!n.sel) lab.style.color = "rgba(240,240,240,.78)";
+        lab.onclick = function () { setValueByIndex(n.idx); };
+        arc.appendChild(lab);
+      });
+    }
+
+    /* --- panel kanan --- */
+    function renderRight() {
+      var row = currentRow();
+      var rp = $("rpanel");
+      if (!row || (!row.props.length && !row.zone)) { rp.classList.add("hidden"); return; }
+      rp.classList.remove("hidden");
+
+      $("rpIcon").innerHTML = row.icon || I.ped;
+      $("rpTitle").textContent = row.label;
+
+      var box = $("rpProps"); box.innerHTML = "";
+      row.props.forEach(function (p, i) {
+        var dom = p.dom, cur = indexOfVal(dom, p.get());
+        var n = el("div", "rp-box" + (i === S.propIndex ? " active" : ""));
+        n.appendChild(el("div", "rp-label", p.label));
+        var line = el("div", "rp-line");
+        if (dom.kind === "color") {
+          var sw = el("span", "rp-swatch");
+          sw.style.background = dom.colors[cur];
+          line.appendChild(sw);
+        } else {
+          var lv = String(dom.labels[cur]);
+          var vn = el("span", "rp-val", lv);
+          if (lv.length > 10) {
+            var base = (i === S.propIndex) ? 2.1 : 1.75;
+            vn.style.fontSize = Math.max(1.0, base * 10 / lv.length).toFixed(2) + "vh";
+          }
+          line.appendChild(vn);
+        }
+        line.appendChild(el("span", "rp-count", (cur + 1) + "/" + dom.vals.length));
+        n.appendChild(line);
+        n.onclick = function () { S.propIndex = i; renderAll(); };
+        box.appendChild(n);
+      });
+
+      var hints = $("rpHints"); hints.innerHTML = "";
+      function hint(key, act) {
+        var h = el("div", "rp-hint");
+        h.appendChild(el("span", "key", key));
+        h.appendChild(el("span", "act", act));
+        hints.appendChild(h);
+      }
+
+      if (row.zone) {
+        if (!row.props.length) box.appendChild(el("div", "rp-empty", "—"));
+
+        if (row.props.length && S.tatCost > 0) {
+          var sel = selectedTattoo(row.zone);
+          var pr = el("div", "rp-price");
+          pr.appendChild(el("span", "k", "Price"));
+          pr.appendChild(el("span", "v", money(tattooCost(sel))));
+          box.appendChild(pr);
+        }
+
+        if (row.props.length) {
+          var btn = el("button", "rp-action", txt("tattoos.apply", "Apply"));
+          btn.onclick = function () { applyTattoo(row.zone); };
+          box.appendChild(btn);
+        }
+
+        var applied = (S.data.tattoos && S.data.tattoos[row.zone]) || [];
+        if (applied.length) {
+          var wrap = el("div", "rp-applied");
+          applied.forEach(function (tt, ai) {
+            var chip = el("div", "rp-chip");
+            chip.appendChild(el("span", null, tt.label || tt.name));
+            chip.appendChild(el("span", "x", "\u00d7"));
+            chip.title = txt("tattoos.delete", "Remove");
+            chip.onclick = function () { removeTattoo(row.zone, ai); };
+            wrap.appendChild(chip);
+          });
+          box.appendChild(wrap);
+        }
+
+        var due = pendingTotal();
+        if (due > 0) {
+          var tt = el("div", "rp-price total");
+          tt.appendChild(el("span", "k", S.tatChargeOnSave ? "On save" : "Spent"));
+          tt.appendChild(el("span", "v", money(due)));
+          box.appendChild(tt);
+        }
+
+        if (row.props.length) {
+          hint("Scroll", row.props[S.propIndex].label);
+          if (row.props.length > 1) hint("Alt + Scroll", row.props[S.propIndex === 1 ? 0 : 1].label);
+        }
+        hint("Enter", txt("tattoos.apply", "Apply"));
+        return;
+      }
+
+      hint("Scroll", row.props[S.propIndex].label);
+      if (row.props.length > 1) {
+        var other = S.propIndex === 1 ? 0 : 1;
+        hint("Alt + Scroll", row.props[other].label);
+      }
+    }
+
+    function renderHeader() {
+      var t = currentTab(), row = currentRow();
+      $("hKicker").textContent = t ? t.label : "";
+      $("hTitle").textContent = row ? row.label : (t ? t.label : "");
+      var sum = rowSummary(row);
+      $("hSub").textContent = sum || ((S.data && S.data.model) || "");
+      $("hBadge").innerHTML = (t && t.icon) || I.ped;
+    }
+
+    function renderAll() {
+      renderTabs(); renderHeader(); renderSidebar();
+      $("tattoo").classList.add("hidden");
+      $("arc").classList.remove("hidden");
+      renderRight();
+      renderArc();
+    }
+
+    function rebuild(keep) {
+      var tabId = keep && currentTab() ? currentTab().id : null;
+      var rowId = keep && currentRow() ? currentRow().id : null;
+      var pIdx = S.propIndex;
+      S.tabs = buildSchema();
+      S.tabIndex = 0;
+      if (tabId) for (var i = 0; i < S.tabs.length; i++) if (S.tabs[i].id === tabId) { S.tabIndex = i; break; }
+      S.rowIndex = 0;
+      if (rowId) {
+        var fr = flatRows();
+        for (var j = 0; j < fr.length; j++) if (fr[j].id === rowId) { S.rowIndex = j; break; }
+      }
+      var row = currentRow();
+      S.propIndex = row ? clamp(pIdx, 0, Math.max(0, row.props.length - 1)) : 0;
+      renderAll();
+    }
+
+    /* ================== INTERACTION ================== */
+    function selectTab(i) {
+      S.tabIndex = i; S.rowIndex = 0; S.propIndex = 0;
+      var t = currentTab();
+      if (t && t.isTattoo && t.groups[0].rows[0]) S.tattooZone = t.groups[0].rows[0].zone;
+      renderAll();
+    }
+
+    function setValueByIndex(idx, propIdx) {
+      var row = currentRow(); if (!row || !row.props.length) return;
+      var p = row.props[clamp(propIdx === undefined ? S.propIndex : propIdx, 0, row.props.length - 1)];
+      var dom = p.dom;
+      idx = clamp(idx, 0, dom.vals.length - 1);
+      var v = dom.vals[idx];
+      if (isBlocked(dom, v)) return;
+      p.set(v);
+      renderAll();
+    }
+
+    function step(dir, propIdx) {
+      var row = currentRow(); if (!row || !row.props.length) return;
+      var pi = clamp(propIdx === undefined ? S.propIndex : propIdx, 0, row.props.length - 1);
+      var p = row.props[pi], dom = p.dom;
+      var i = indexOfVal(dom, p.get()), guard = 0;
+      do {
+        i += dir; guard++;
+        if (i < 0) i = dom.vals.length - 1;
+        if (i >= dom.vals.length) i = 0;
+      } while (isBlocked(dom, dom.vals[i]) && guard < dom.vals.length + 2);
+      setValueByIndex(i, pi);
+    }
+
+    function moveRow(dir) {
+      var fr = flatRows(); if (!fr.length) return;
+      S.rowIndex = (S.rowIndex + dir + fr.length) % fr.length;
+      S.propIndex = 0;
+      var row = currentRow();
+      if (row && row.zone) S.tattooZone = row.zone;
+      renderAll();
+    }
+
+    function moveProp(dir) {
+      var row = currentRow(); if (!row || row.props.length < 2) return;
+      S.propIndex = (S.propIndex + dir + row.props.length) % row.props.length;
+      renderAll();
+    }
+
+    document.addEventListener("wheel", function (e) {
+      if (!S.visible) return;
+      if ($("modalBg").classList.contains("show")) return;
+      if ($("sidebar").contains(e.target)) return;
+      var dir = e.deltaY > 0 ? 1 : -1;
+      if (e.altKey) {
+        var row = currentRow();
+        if (row && row.props.length > 1) {
+          step(dir, S.propIndex === 1 ? 0 : 1);
+          return;
+        }
+      }
+      step(dir);
+    }, { passive: true });
+
+    document.addEventListener("keydown", function (e) {
+      if (!S.visible) return;
+      if ($("modalBg").classList.contains("show")) { if (e.key === "Escape") closeModal(); return; }
+      switch (e.key) {
+        case "ArrowUp": e.preventDefault(); moveRow(-1); break;
+        case "ArrowDown": e.preventDefault(); moveRow(1); break;
+        case "ArrowLeft": e.preventDefault(); step(-1); break;
+        case "ArrowRight": e.preventDefault(); step(1); break;
+        case "a": case "A": nui("rotate_left"); break;
+        case "d": case "D": nui("rotate_right"); break;
+        case "q": case "Q": moveProp(-1); break;
+        case "e": case "E": moveProp(1); break;
+        case "Tab":
+          e.preventDefault();
+          if (!S.tabs.length) break;
+          selectTab((S.tabIndex + (e.shiftKey ? -1 : 1) + S.tabs.length) % S.tabs.length);
+          break;
+        case "Escape": if (!S.config || S.config.enableExit !== false) askExit(); break;
+        case "Enter": {
+          var r = currentRow();
+          if (r && r.zone) { applyTattoo(r.zone); break; }
+          askSave(); break;
+        }
+      }
+    });
+
+    window.addEventListener("resize", function () { if (S.visible) renderAll(); });
+
+    /* ================== TOOLBAR ================== */
+    function renderToolbar() {
+      var c = $("toolbar"); c.innerHTML = "";
+      [{ id: "default", icon: I.cam, tip: "Full body" }, { id: "head", icon: I.head, tip: "Head" },
+       { id: "body", icon: I.body, tip: "Torso" }, { id: "bottom", icon: I.legs, tip: "Legs" }].forEach(function (cam) {
+        var n = el("div", "tool" + (S.camera === cam.id ? " active" : ""), cam.icon);
+        n.title = cam.tip;
+        n.onclick = function () { S.camera = cam.id; nui("appearance_set_camera", cam.id); renderToolbar(); };
+        c.appendChild(n);
+      });
+      function tool(icon, tip, fn) {
+        var n = el("div", "tool", icon);
+        n.title = tip;
+        n.onclick = fn;
+        c.appendChild(n);
+      }
+      tool(I.turn, "Turn around", function () { nui("appearance_turn_around"); });
+      tool(I.rotl, "Rotate ped left  (A)", function () { nui("rotate_left"); });
+      tool(I.rotr, "Rotate ped right  (D)", function () { nui("rotate_right"); });
+      tool(I.reset, "Orbit camera", function () { nui("appearance_rotate_camera", "left"); });
+    }
+
+    /* ================== MODAL ================== */
+    var modalAction = null;
+    function openModal(title, desc, fn) {
+      $("mTitle").textContent = title;
+      $("mDesc").textContent = desc;
+      $("mYes").textContent = txt("modal.accept", "Yes");
+      $("mNo").textContent = txt("modal.decline", "No");
+      modalAction = fn;
+      $("modalBg").classList.add("show");
+    }
+    function closeModal() { $("modalBg").classList.remove("show"); modalAction = null; }
+    $("mYes").onclick = function () { var f = modalAction; closeModal(); if (f) f(); };
+    $("mNo").onclick = closeModal;
+
+    function askExit() {
+      openModal(txt("modal.exit.title", "Exit customization"), txt("modal.exit.description", ""), function () {
+        hide(); nui("appearance_exit");
+      });
+    }
+    function askSave() {
+      var desc = txt("modal.save.description", "");
+      var due = S.tatChargeOnSave ? pendingTotal() : 0;
+      if (due > 0) {
+        var n = pendingTattoos().length;
+        desc = txt("tattoos.title", "Tattoos") + ": " + n + " \u00d7 \u2014 " + money(due) + (desc ? "\n" + desc : "");
+      }
+      openModal(txt("modal.save.title", "Save customization"), desc, function () {
+        hide(); nui("appearance_save", S.data);
+      });
+    }
+    $("btnExit").onclick = askExit;
+    $("btnSave").onclick = askSave;
+
+    /* ================== SHOW / HIDE ================== */
+    function show() { S.visible = true; $("app").classList.add("visible"); renderAll(); }
+    function hide() { S.visible = false; $("app").classList.remove("visible"); closeModal(); }
+
+    function boot() {
+      nui("appearance_get_locales").then(function (loc) {
+        S.L = loc || {};
+        $("lblExit").textContent = txt("modal.exit.title", "Exit Customization");
+        $("lblSave").textContent = txt("modal.save.title", "Save Customization");
+        return nui("appearance_get_settings");
+      }).then(function (res) {
+        S.settings = (res && res.appearanceSettings) || {};
+        return nui("appearance_get_data");
+      }).then(function (res) {
+        S.config = (res && res.config) || {};
+        S.data = (res && res.appearanceData) || {};
+        S.data.tattoos = tattooMap(S.data.tattoos);
+        S.origTattoos = cloneTattoos(S.data.tattoos);
+        if (S.config.enableExit === false) $("btnExit").classList.add("hidden");
+        else $("btnExit").classList.remove("hidden");
+
+        S.tabIndex = 0; S.rowIndex = 0; S.propIndex = 0;
+        S.tabs = buildSchema();
+        var t = currentTab();
+        if (t && t.isTattoo && t.groups[0].rows[0]) S.tattooZone = t.groups[0].rows[0].zone;
+        S.camera = "default";
+        renderToolbar();
+        show();
+      });
+    }
+
+    window.addEventListener("message", function (ev) {
+      var msg = ev.data || {};
+      if (msg.type === "appearance_display") boot();
+      else if (msg.type === "appearance_hide") hide();
+    });
+
+    document.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  })();
+  </script>
+</body>
+
+</html>

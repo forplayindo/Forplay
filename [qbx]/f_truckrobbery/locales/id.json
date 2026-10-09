@@ -1,0 +1,31 @@
+{
+    "error": {
+        "activation_cost": "Kamu butuh Rp %s untuk menerima misi ini...",
+        "get_out_water": "Keluar dari air dulu sebelum memasang bom...",
+        "truck_moving": "Kamu tidak bisa merampok kendaraan yang sedang bergerak...",
+        "missing_bomb": "Sepertinya kamu tidak punya bom...",
+        "active_police": "Butuh minimal %s polisi untuk memulai misi ini...",
+        "already_active": "Sudah ada orang lain yang menjalankan misi...",
+        "no_truck_spawned": "Sepertinya ada masalah saat memunculkan truk lapis baja...",
+        "truck_escaped": "Truknya kabur! Misi gagal."
+    },
+    "success": {
+        "looted": "Kamu berhasil menjarah truk"
+    },
+    "mission": {
+        "ask_for_mission": "Minta misi",
+        "sender": "Bos",
+        "subject": "Target Baru",
+        "message": "Jadi kamu mau cari uang, ya? Bagus. Lokasinya saya kirim sekarang. Cepat, sebelum orang lain duluan menyerang truk ini!"
+    },
+    "info": {
+        "plant_bomb": "Pasang bom",
+        "planting_bomb": "Memasang bom...",
+        "bomb_timer": "Timer diatur %s detik! Menjauh!",
+        "loot_truck": "Jarah truk",
+        "looting_truck": "Menjarah truk...",
+        "alert_title": "Percobaan Perampokan Truk Lapis Baja",
+        "alert_desc": "Truk lapis baja sedang dirampok!",
+        "truck_spotted": "Truknya sudah terlihat! Kejar sebelum didahului orang lain!"
+    }
+}

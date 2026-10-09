@@ -1,0 +1,93 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="main.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <link rel="stylesheet" href="admin.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    </head>
+    <body style="background:rgb(0,0,0,0.0)">
+        <div id="camcontainer" v-show="camerasOpen">
+            <div id="camlabel">{{ cameraLabel }}</div>
+            <div id="camdatelabel">{{ dateLabel }}</div>
+            <div id="camtimelabel">{{ timeLabel }}</div>
+            <div id="iplabel">{{ ipLabel }}</div>
+            <div id="connectedlabel" class="connected">{{ connectLabel }}</div>
+            <div id="blockscreen"></div>
+        </div>
+        <div id="helicontainer">
+            <div class="vehicleinfo">
+                <div class="heli-model">
+                    <p>MODEL: COSAGNETTI</p>
+                </div>
+                <div class="heli-street">
+                    <p>Spanish Ave | Lagunas Pl</p>
+                </div>
+                <div class="heli-plate">
+                    <p>PLATE: 01AGB123</p>
+                </div>
+                <div class="heli-speed">
+                    <p>420 KM/U</p>
+                </div>
+                <div class="heli-rectangle"></div>
+            </div>
+            <div class="scan">
+                <div class="scanBar"></div>
+            </div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+        <!-- ADMINISTRASI (tilang) -->
+        <div id="admin" class="fp hidden">
+            <div class="ad-panel">
+                <header>
+                    <div class="brand"><span class="logo">👮</span><div><h1>Administrasi</h1><small id="ad-sub"></small></div></div>
+                    <button class="icon-btn close" data-ad-close>✕</button>
+                </header>
+                <main id="ad-grid" class="ad-grid"></main>
+                <aside id="ad-sheet" class="sheet hidden">
+                    <div class="sheet-head"><h2 id="ad-sheet-title"></h2><button class="icon-btn" id="ad-sheet-close">✕</button></div>
+                    <div id="ad-sheet-body" class="sheet-body"></div>
+                    <div class="sheet-foot">
+                        <div class="total hidden" id="ad-total-row"><span>Total</span><strong id="ad-total">Rp 0</strong></div>
+                        <div id="ad-msg" class="msg hidden"></div>
+                        <button id="ad-submit" class="primary"></button>
+                    </div>
+                </aside>
+            </div>
+        </div>
+        <!-- LAB FORENSIK -->
+        <div id="lab" class="fp hidden">
+            <div class="ad-panel">
+                <header>
+                    <div class="brand"><span class="logo">🧪</span><div><h1>Lab Forensik</h1><small id="lab-sub"></small></div></div>
+                    <button class="icon-btn close" data-lab-close>✕</button>
+                </header>
+                <main id="lab-grid" class="ad-grid"></main>
+                <main id="lab-result" class="lab-result hidden"></main>
+                <div id="lab-actions" class="lab-actions hidden">
+                    <button id="lab-back">← Bukti lain</button>
+                    <button data-lab-close>Tutup</button>
+                </div>
+            </div>
+        </div>
+        <!-- ADMINISTRASI PENJARA -->
+        <div id="prison" class="fp hidden">
+            <div class="ad-panel">
+                <header>
+                    <div class="brand"><span class="logo">🏛️</span><div><h1>Administrasi Penjara</h1><small id="pr-sub"></small></div></div>
+                    <button class="icon-btn close" data-pr-close>✕</button>
+                </header>
+                <main id="pr-list" class="pr-list"></main>
+                <div class="lab-actions">
+                    <button id="pr-refresh">↻ Muat ulang</button>
+                    <button data-pr-close>Tutup</button>
+                </div>
+            </div>
+        </div>
+        <script src="vue.min.js"></script>
+        <script src="script.js"></script>
+        <script src="admin.js"></script>
+        <script src="lab.js"></script>
+        <script src="prison.js"></script>
+    </body>
+</html>

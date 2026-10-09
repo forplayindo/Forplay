@@ -1,0 +1,17 @@
+# Asset (map, MLO, mobil, prop) - tidak di-upload
+[[]assets]/
+/stream/
+
+# Dependency Node.js - pasang ulang dengan `npm install`
+node_modules/
+
+# File backup / arsip
+*.7z
+*.zip
+*.rar
+
+# Lain-lain
+.claude/
+*.log
+Thumbs.db
+desktop.ini

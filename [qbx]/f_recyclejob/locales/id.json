@@ -1,0 +1,25 @@
+{
+  "success": {
+    "you_have_been_clocked_in": "Kamu sudah mulai bekerja"
+  },
+  "text": {
+    "point_enter_warehouse": "[E] - Masuk Gudang",
+    "enter_warehouse": "Masuk Gudang",
+    "exit_warehouse": "Keluar Gudang",
+    "point_exit_warehouse": "[E] - Keluar Gudang",
+    "clock_out": "Selesai Bekerja",
+    "point_clock_out": "[E] - Selesai Bekerja",
+    "clock_in": "Mulai Bekerja",
+    "point_clock_in": "[E] - Mulai Bekerja",
+    "hand_in_package": "Serahkan Paket",
+    "point_hand_in_package": "[E] - Serahkan Paket",
+    "get_package": "Ambil Paket",
+    "point_get_package": "[E] - Ambil Paket",
+    "picking_up_the_package": "Mengambil paket",
+    "unpacking_the_package": "Membongkar paket"
+  },
+  "error": {
+    "you_have_clocked_out": "Kamu sudah selesai bekerja",
+    "overweight_check": "Kamu tidak bisa membawa barang lagi"
+  }
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="panel" class="hidden">
+        <header>
+            <h1 id="title">Billboard</h1>
+            <button id="btn-close" class="icon" title="Tutup">&#x2715;</button>
+        </header>
+
+        <section id="view-list">
+            <div class="row">
+                <input id="search" type="text" placeholder="Cari nama / #id">
+                <button id="btn-new" class="primary">+ Baru</button>
+            </div>
+            <div id="list"></div>
+        </section>
+
+        <section id="view-form" class="hidden">
+            <label>Nama
+                <input data-f="label" type="text" maxlength="50">
+            </label>
+
+            <div class="field">
+                <span>Tipe</span>
+                <div class="seg" id="seg-type">
+                    <button data-type="zone">Zone (layar melayang)</button>
+                    <button data-type="prop">Prop (billboard GTA)</button>
+                </div>
+            </div>
+
+            <label class="only-prop">Model prop
+                <select data-f="model" id="sel-model"></select>
+            </label>
+
+            <label>URL media <span id="badge" class="badge"></span>
+                <input data-f="url" type="text" placeholder="https://... / YouTube / images/nama.png">
+            </label>
+
+            <label>Tampilan
+                <select data-f="fit">
+                    <option value="cover">Penuhi layar (terpotong)</option>
+                    <option value="contain">Utuh (ada bingkai hitam)</option>
+                    <option value="fill">Regangkan</option>
+                </select>
+            </label>
+
+            <div class="grid2">
+                <label>Lebar (m)<input data-f="width" type="number" step="0.05" min="0.1"></label>
+                <label>Tinggi (m)<input data-f="height" type="number" step="0.05" min="0.1"></label>
+            </div>
+
+            <div class="grid3 only-prop">
+                <label>Offset X<input data-f="ox" type="number" step="0.01"></label>
+                <label>Offset Y<input data-f="oy" type="number" step="0.01"></label>
+                <label>Offset Z<input data-f="oz" type="number" step="0.01"></label>
+            </div>
+
+            <div class="grid2">
+                <label>Arah (&deg;)<input data-f="rz" type="number" step="1"></label>
+                <label class="only-zone">Miring (&deg;)<input data-f="rx" type="number" step="1" min="-90" max="90"></label>
+            </div>
+
+            <label>Jarak menyala: <b id="val-renderDistance"></b> m
+                <input data-f="renderDistance" type="range" step="5">
+            </label>
+
+            <label>Kecerahan: <b id="val-brightness"></b>%
+                <input data-f="brightness" type="range" min="10" max="100" step="5">
+            </label>
+
+            <label class="check"><input data-f="active" type="checkbox"> Aktif</label>
+
+            <div class="actions">
+                <button id="btn-place">Atur posisi</button>
+                <button id="btn-save" class="primary">Simpan</button>
+                <button id="btn-cancel">Batal</button>
+            </div>
+        </section>
+
+        <div id="toast"></div>
+    </div>
+
+    <div id="confirm" class="hidden">
+        <div class="box">
+            <p id="confirm-text"></p>
+            <div class="actions">
+                <button id="confirm-yes" class="danger">Hapus</button>
+                <button id="confirm-no">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

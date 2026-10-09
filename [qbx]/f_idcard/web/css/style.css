@@ -1,0 +1,400 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,500;1,600&display=swap");
+
+/* ============================================================
+   f_idcard — Premium cream / ivory document theme
+   Flat, opaque card (no glass/blur): cream face on top, a solid
+   colour band at the bottom driven by each license's configured
+   `background` colour in config/shared.lua. Data bindings are
+   unchanged in shape — only the presentation moved.
+   ============================================================ */
+
+:root {
+    --cream-1: #f8f1e1;
+    --cream-2: #efe1c7;
+    --ink: #251d14;
+    --ink-soft: #6b5c46;
+    --muted: #8d7c62;
+
+    --gold-1: #f5e0a3;
+    --gold-2: #cda44e;
+    --gold-3: #8a6a2f;
+
+    --line: rgba(37, 29, 20, 0.14);
+    --radius: 1.3vh;
+    --foot-h: 3.6vh;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", sans-serif;
+    text-transform: uppercase;
+    user-select: none;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100vh;
+    padding-right: 3vh;
+    background: transparent;
+}
+
+/* ===== Badge (rank/grade) — corner medallion ===== */
+#badge {
+    display: none;
+    position: absolute;
+    top: 1.3vh;
+    right: 1.4vh;
+    z-index: 5;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35vh;
+    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
+}
+#badge img {
+    width: 4.2vh;
+    height: 4.2vh;
+    object-fit: contain;
+}
+#badge #badgegrade {
+    background-image: linear-gradient(135deg, var(--gold-1), var(--gold-2) 55%, var(--gold-3));
+    color: #2a2005;
+    font-weight: 700;
+    padding: 0.2vh 0.6vh;
+    font-size: 0.85vh;
+    border-radius: 100px;
+    letter-spacing: 0.5px;
+}
+
+/* ===== Card shell ===== */
+#um-idcard {
+    visibility: hidden;
+    position: relative;
+    width: 40vh;
+    height: 25vh;
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 1.3vh 1.8vh 0;
+    isolation: isolate;
+    border: 1px solid rgba(138, 106, 47, 0.35);
+    box-shadow:
+        0 1.5vh 3vh rgba(20, 14, 6, 0.35),
+        0 0.4vh 0.8vh rgba(20, 14, 6, 0.22);
+    /* the accent band at the very bottom is this element's own colour,
+       set inline per license (config/shared.lua -> license.background) */
+    background-image: none !important;
+}
+
+/* cream face — covers everything above the accent band so the license
+   colour only ever shows through in the footer band */
+#um-idcard::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    bottom: var(--foot-h);
+    z-index: 0;
+    background:
+        repeating-linear-gradient(-32deg, transparent 0 18px, rgba(37, 29, 20, 0.028) 18px 19px),
+        linear-gradient(160deg, var(--cream-1) 0%, var(--cream-2) 100%);
+}
+
+/* soft gold medallion watermark behind the data grid */
+.seal {
+    position: absolute;
+    top: 3.9vh;
+    right: 1.6vh;
+    width: 6.2vh;
+    height: 6.2vh;
+    border-radius: 50%;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.4;
+    background:
+        repeating-conic-gradient(from 0deg, rgba(138, 106, 47, 0.35) 0deg 4deg, transparent 4deg 18deg),
+        radial-gradient(circle at 38% 32%, var(--gold-1), var(--gold-2) 55%, var(--gold-3) 100%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+/* rubber-stamp style "Expired" mark, shown only when the license is past its date */
+.expired-stamp {
+    display: none;
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-14deg);
+    z-index: 4;
+    padding: 0.4vh 1.3vh;
+    border: 0.22vh solid rgba(163, 35, 28, 0.85);
+    border-radius: 0.4vh;
+    color: rgba(163, 35, 28, 0.85);
+    font-family: "Poppins", sans-serif;
+    font-weight: 800;
+    font-size: 1.9vh;
+    letter-spacing: 3px;
+    background: rgba(248, 241, 225, 0.4);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+}
+
+/* ===== Top row: brand + document tag ===== */
+.topline {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.8vh;
+}
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.7vh;
+    min-width: 0;
+}
+.brand-mark {
+    flex-shrink: 0;
+    width: 2vh;
+    height: 2vh;
+    border-radius: 50%;
+    border: 1.3px solid var(--gold-2);
+    box-shadow: inset 0 0 0 2px rgba(248, 241, 225, 0.9);
+}
+.brand-name {
+    font-family: "Playfair Display", serif;
+    font-weight: 700;
+    font-size: 1.05vh;
+    letter-spacing: 0.5px;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.doc-tag {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35vh;
+}
+.tier-tag {
+    font-size: 0.72vh;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--gold-3);
+}
+/* small Indonesian flag: red over white */
+.flag-id {
+    width: 1.9vh;
+    height: 1.3vh;
+    border-radius: 1px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(37, 29, 20, 0.25);
+    background: linear-gradient(to bottom, #ce1126 0%, #ce1126 50%, #ffffff 50%, #ffffff 100%);
+}
+
+/* ===== Title block ===== */
+.title-block {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1vh;
+    margin-top: 0.7vh;
+}
+.doc-title {
+    font-family: "Playfair Display", serif;
+    font-weight: 700;
+    font-size: 1.85vh;
+    letter-spacing: 0.4px;
+    color: var(--ink);
+    /* judul Indonesia lebih panjang: tetap satu baris, diperkecil lewat kelas di bawah */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 30vh;
+}
+.doc-title.is-long { font-size: 1.5vh; }
+.doc-title.is-xlong { font-size: 1.22vh; letter-spacing: 0.2px; }
+.doc-subtitle {
+    font-size: 0.72vh;
+    font-weight: 500;
+    letter-spacing: 0.7px;
+    color: var(--muted);
+}
+
+/* ===== Body content ===== */
+.content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 1.9vh;
+    margin-top: 0.9vh;
+}
+
+.icon {
+    flex: 0 0 auto;
+    width: 7vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5vh;
+}
+
+.photo-frame {
+    width: 7vh;
+    height: 7vh;
+    border-radius: 0.6vh;
+    overflow: hidden;
+    border: 1px solid rgba(138, 106, 47, 0.4);
+    background: rgba(37, 29, 20, 0.06);
+    box-shadow: 0 0.4vh 1vh rgba(20, 14, 6, 0.18);
+}
+.photo-frame #mugshot {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: #d9cdb2;
+}
+
+/* STNK: wide vehicle photo instead of a square mugshot */
+#um-idcard.is-vehicle .icon { width: 10.5vh; }
+#um-idcard.is-vehicle .photo-frame { width: 10.5vh; height: 6.6vh; }
+#um-idcard.is-vehicle .photo-frame #mugshot { object-fit: cover; }
+
+.signature {
+    width: 100%;
+    font-family: "Playfair Display", serif;
+    font-style: italic;
+    font-weight: 600;
+    text-transform: capitalize;
+    font-size: 1.05vh;
+    color: var(--ink-soft);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    align-self: stretch;
+    justify-content: center;
+}
+.text ul {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+.text ul li {
+    flex: 0 0 calc(50% - 1vh);
+    max-width: calc(50% - 1vh);
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+    padding: 0.35vh 0;
+    margin-right: 2vh;
+    border-bottom: 1px solid var(--line);
+    gap: 0.12vh;
+}
+.text ul li:nth-child(2n) { margin-right: 0; }
+.text ul li:nth-last-child(-n+2) { border-bottom: none; }
+
+.text ul li span:not(.info) {
+    font-size: 0.72vh;
+    font-weight: 500;
+    letter-spacing: 1.1px;
+    color: var(--muted);
+}
+.text ul span.info {
+    font-family: "Poppins", sans-serif;
+    font-size: 1.15vh;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--ink);
+}
+.text ul span.info.is-expired {
+    color: #a3231c;
+}
+
+/* ===== Footer / accent band ===== */
+.footer-bar {
+    position: relative;
+    z-index: 2;
+    flex: 0 0 var(--foot-h);
+    height: var(--foot-h);
+    margin: auto -1.8vh 0;
+    padding: 0 1.8vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.disclaimer {
+    width: 100%;
+    text-align: center;
+    text-transform: none;
+    font-family: "Playfair Display", serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 0.74vh;
+    letter-spacing: 0.2px;
+    line-height: 1.25;
+    color: rgba(248, 241, 225, 0.8);
+}
+
+#cid_div {
+    display: none;
+}
+
+/* ===== KTP Sementara: putih & biru ===== */
+.temp-watermark { display: none; }
+
+#um-idcard.theme-temp {
+    --ink: #12305f;
+    --ink-soft: #3a5a8c;
+    --muted: #6d84a8;
+    --line: rgba(18, 48, 95, 0.14);
+    border-color: rgba(29, 79, 156, 0.35);
+}
+#um-idcard.theme-temp::before {
+    background:
+        repeating-linear-gradient(-32deg, transparent 0 18px, rgba(29, 79, 156, 0.035) 18px 19px),
+        linear-gradient(160deg, #ffffff 0%, #e9f1fb 100%);
+}
+#um-idcard.theme-temp .seal {
+    background:
+        repeating-conic-gradient(from 0deg, rgba(29, 79, 156, 0.35) 0deg 4deg, transparent 4deg 18deg),
+        radial-gradient(circle at 38% 32%, #d6e6fb, #5b8bd0 55%, #1d4f9c 100%);
+}
+#um-idcard.theme-temp .brand-mark { border-color: #1d4f9c; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.9); }
+#um-idcard.theme-temp .tier-tag { color: #1d4f9c; }
+#um-idcard.theme-temp .photo-frame { border-color: rgba(29, 79, 156, 0.45); background: rgba(29, 79, 156, 0.06); }
+#um-idcard.theme-temp .photo-frame #mugshot { background: #d6e2f2; }
+#um-idcard.theme-temp .disclaimer { color: rgba(255, 255, 255, 0.85); }
+#um-idcard.theme-temp .temp-watermark {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    transform: translate(-50%, -50%) rotate(-14deg);
+    z-index: 1;
+    font-family: "Poppins", sans-serif;
+    font-weight: 800;
+    font-size: 4.2vh;
+    letter-spacing: 0.9vh;
+    color: rgba(29, 79, 156, 0.07);
+    pointer-events: none;
+    white-space: nowrap;
+}
