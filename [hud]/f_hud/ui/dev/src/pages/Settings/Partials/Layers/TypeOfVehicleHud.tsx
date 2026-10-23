@@ -42,6 +42,7 @@ const TypeOfVehicleHud = () => {
     8: "semi_circle",
     9: "hud_v2",
     10: "race_hud",
+    11: "gta6",
   };
 
   const backgroundColors = ["rgba(0, 194, 255, .3)", "rgba(163, 18, 52, .3)", "rgba(128, 174, 51, .3)", "rgba(1, 222, 167, .3)", "rgba(35, 129, 240, .3)"];
@@ -68,7 +69,24 @@ const TypeOfVehicleHud = () => {
                 }}
               >
                 <div className={classNames({ "scale-75 -translate-x-5": slot == 5 || slot == 8 })}>
-                  <img className={classNames("h-14 w-full")} src={src} alt="vehicle_hud" />
+                  {v == "gta6" ? (
+                    // no preview image for the GTA VI speedometer: a tiny text mock instead
+                    <div className="h-14 w-24 flex flex-col justify-center font-bold leading-none">
+                      <span className="text-2xl"><span className="text-white/20">0</span>88</span>
+                      <span className="mt-1 h-1 w-20 rounded bg-[#f3b354]" />
+                    </div>
+                  ) : v == "gmg" ? (
+                    // GMG was redrawn as a line design: no matching preview image, so a small mock
+                    <div className="h-14 w-24 flex items-center gap-1.5 font-bold leading-none">
+                      <span className="w-4 h-4 border-2 border-white rounded-sm" />
+                      <span className="flex flex-col">
+                        <span className="text-2xl">195</span>
+                        <span className="mt-1 h-0.5 w-12 rounded bg-[#f3b354]" />
+                      </span>
+                    </div>
+                  ) : (
+                    <img className={classNames("h-14 w-full")} src={src} alt="vehicle_hud" />
+                  )}
                 </div>
                 <div>
                   <h1 className="uppercase font-bold text-sm">{t(v)} Series</h1>

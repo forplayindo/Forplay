@@ -4,7 +4,7 @@ local setStaticEmitterEnabled = SetStaticEmitterEnabled
 
 if not config.enabled then return end
 
-lib.print.warn('Static emitters enabled ! config: f_smallresources/f_staticemitters/config.lua')
+-- lib.print.warn('Static emitters enabled ! config: f_smallresources/f_staticemitters/config.lua')
 
 local emitterGroupsData = {}
 

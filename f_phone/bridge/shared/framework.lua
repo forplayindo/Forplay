@@ -49,7 +49,7 @@ if not info then
     ]])
 end
 
-print(('^2[F_PHONE]^0 Framework detected: ^3%s^0'):format(info.name))
+-- print(('^2[F_PHONE]^0 Framework detected: ^3%s^0'):format(info.name))
 
 if info.name == 'ox' then
     print([[

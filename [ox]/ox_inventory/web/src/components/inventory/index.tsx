@@ -44,14 +44,17 @@ const Inventory: React.FC = () => {
     <>
       <Fade in={inventoryVisible}>
         <div className="inventory-wrapper">
-          <LeftInventory />
-          <InventoryControl />
-          <RightInventory />
+          <div className="inventory-row">
+            <LeftInventory />
+            <InventoryControl />
+            <RightInventory />
+          </div>
+          <InventoryHotbar docked />
           <Tooltip />
           <InventoryContext />
         </div>
       </Fade>
-      <InventoryHotbar alwaysVisible={inventoryVisible} />
+      <InventoryHotbar suppressed={inventoryVisible} />
     </>
   );
 };

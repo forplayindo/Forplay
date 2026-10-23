@@ -11,7 +11,7 @@ Config.DefaultHudSettings   = {
     bar_style = 'hexagon-w',
     --[[ Places all bar types in a new order. ]]
     is_res_style_active = true,
-    vehicle_hud_style = 4,
+    vehicle_hud_style = 11, -- 11 = Sora Series (default)
     -- If `editableByPlayers` value is `false` players cannot change the `onlyInVehicle` value.
     mini_map = { onlyInVehicle = true, style = 'rectangle', editableByPlayers = true },
     -- If `editableByPlayers` value is `false` players cannot change the `onlyInVehicle` value.
@@ -69,6 +69,9 @@ Config.DefaultHudSettings   = {
         vehicle_engine = '#C4FF48',
         voice = '#FFFFFF',
         vehicle_nitro = '#cf654e',
+        mandi = '#4FC3F7',
+        kencing = '#FFE14D',
+        poop = '#B07A4F',
     },
 }
 
@@ -135,10 +138,69 @@ Config.Blur = {
     autoFps = { high = 75, medium = 45, low = 30 }, -- below `low` -> blur off
 }
 
+--[[ Stress (dipindah dari f_stress). Nilai disimpan server di statebag/metadata 'stress'. ]]
+Config.Stress = {
+    enabled = true,
+    excludedJobs = { police = true },  -- job ini tidak bisa dapat stress
+    -- Ngebut
+    minimumSpeed = 100,                -- km/j, di atas ini dapat stress tiap 10 detik
+    speedGain = { min = 1, max = 3 },
+    ignoredVehicleClasses = { [13] = true, [14] = true, [15] = true, [16] = true, [21] = true },
+    -- Menembak
+    shootChance = 0.1,                 -- 10% per tembakan
+    shootGain = { min = 1, max = 3 },
+    whitelistedWeapons = { `weapon_petrolcan`, `weapon_hazardcan`, `weapon_fireextinguisher` },
+    -- Efek layar
+    minimumStress = 50,                -- mulai blur dari level ini, 100 = jatuh/ragdoll
+    blur = {                           -- lama blur (ms) per rentang level
+        { min = 50, max = 60, intensity = 1500 },
+        { min = 60, max = 70, intensity = 2000 },
+        { min = 70, max = 80, intensity = 2500 },
+        { min = 80, max = 90, intensity = 2700 },
+        { min = 90, max = 100, intensity = 3000 },
+    },
+    interval = {                       -- jeda antar efek (ms) per rentang level
+        { min = 50, max = 60, from = 50000, to = 60000 },
+        { min = 60, max = 70, from = 40000, to = 50000 },
+        { min = 70, max = 80, from = 30000, to = 40000 },
+        { min = 80, max = 90, from = 20000, to = 30000 },
+        { min = 90, max = 100, from = 15000, to = 20000 },
+    },
+    -- Server: berkurang sendiri
+    passiveRelief = { every = 3 * 60000, amount = 5 },
+    -- Server: batas per event dari client (anti-cheat)
+    maxGainPerEvent = 10,
+    gainCooldown = 1000,               -- ms antar GainStress per pemain
+    reliefCooldown = 5000,             -- ms antar RelieveStress per pemain
+}
+
 --If you want to hide GTA components, you need to enable this.
-Config.HideGTAHudComponents = false
+Config.HideGTAHudComponents = true -- sembunyikan HUD bawaan GTA (nama/kelas kendaraan "Karin Sultan, Sport", nama area, jalan, uang)
 --Works with `HideGTAHudComponents` Components. | Can be used to fix the map if it is broken.
 Config.HavePostalMap        = false
+--[[ Minimap gaya GTA VI (stream/minimap.gfx, minimap.ytd, gta6_graphics.ytd).
+     Status darah/lapar/haus/suara/armor tampil di bawah minimap, jadi peta dinaikkan (y negatif = naik). ]]
+Config.Minimap              = {
+    --[[ Nilai bawaan minimap "rectangle" asli f_hud (1080p). mask & blur: x relatif terhadap x minimap,
+         mask y relatif terhadap minimap, blur y absolut. Area = bagian peta yang terlihat (satuan tinggi layar). ]]
+    x = -0.007, y = -0.075, width = 0.1685, height = 0.19,
+    mask = { x = 0.007, y = -0.006, w = 0.128, h = 0.2 }, -- y -0.006: garis rute tidak keluar di bawah peta
+    blur = { x = -0.0015, y = -0.045, w = 0.27, h = 0.3 },
+    arrow = { x = 0.0, y = 0.0 },
+    lift = -0.003,                  -- negatif = minimap turun (mendekati bar status), positif = naik
+    area = { left = 0.0148, bottom = 0.0972, w = 0.2944, h = 0.1787 }, -- diukur in-game 1920x1080: peta x 16-334, y 782-975
+    zoom = 1000,
+    routeColor = { 247, 115, 164 }, -- garis GPS pink
+    showNorth = false,              -- ikon N bawaan disembunyikan (seperti gta6_hud)
+    radius = 30,                    -- px, sudut lapisan malam (samakan dengan sudut peta)
+    frame = false,                  -- garis tepi NUI di sekeliling peta (gta6 tidak memakai frame)
+    statusGap = 8,                  -- px jarak bar status di bawah peta
+    -- lapisan gelap malam di atas peta (0 = mati, seperti gta6_hud; mis. 0.42 untuk menyalakan)
+    night = { opacity = 0.0, duskStart = 19, duskEnd = 21, dawnStart = 5, dawnEnd = 7 },
+    -- koreksi area overlay (fraksi layar). Cek dengan /hudmapdebug
+    overlayOffset = { x = 0.0, y = 0.0, w = 0.0, h = 0.0 },
+    coverRight = 0,
+}
 
 --Defines the refresh thread timecycle for data that need to be updated periodically. Milliseconds
 Config.RefreshTimes         = {

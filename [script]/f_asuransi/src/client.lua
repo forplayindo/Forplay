@@ -8,7 +8,7 @@ end
 Citizen.CreateThread(function()
     if Config.RemoveCarsInSafeZone then return end
     for _, zone in ipairs(Config.safezone.zone) do
-        if Config.safezone.blipshow then
+        if Config.safezone.blipshow and zone.coord then
             local blip = AddBlipForRadius(zone.coord.x, zone.coord.y, zone.coord.z, zone.radius)
             SetBlipColour(blip, Config.safezone.blipstyle.color)
             SetBlipAlpha(blip, Config.safezone.blipstyle.degraded)
@@ -46,7 +46,7 @@ AddEventHandler('bk_asuransi:client:closeui', function()
             style = Config.nui.style,
             color = Config.nui.color,
             logo = Config.clear_nui.logo,
-            tittle = Config.nui.tittle,
+            tittle = Config.clear_nui.tittle or Config.nui.tittle,
             description = Config.clear_nui.description,
             position = Config.nui.position,
             clear_sound = Config.clear_nui.clear_sound.sound,

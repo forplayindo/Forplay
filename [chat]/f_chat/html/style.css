@@ -77,14 +77,14 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 #feed {
   position: absolute;
   top: 3.2vh;
-  left: 2.2vw;
+  left: 1.48vh; /* sejajar kiri peta f_hud (Config.Minimap.area.left = 0.0148 tinggi layar) */
   width: var(--panel-w);
   display: flex;
   flex-direction: column;
   gap: 7px;
   pointer-events: auto;
 }
-#chat[data-position='right'] #feed { left: auto; right: 2.2vw; }
+#chat[data-position='right'] #feed { left: auto; right: 1.48vh; }
 
 /* composer: flows right under the log, same panel */
 #dock {

@@ -30,4 +30,6 @@ export type DataContextProps = {
   isEditorOpen: boolean;
   setEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;
   useableColors: string[];
+  /** f_hygiene's show/hide (F3) state for the hygiene bars */
+  hygieneVisible: boolean;
 };

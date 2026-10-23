@@ -110,4 +110,4 @@
 /* ---------- low / off tier: stop looping animations (they repaint every frame) ---------- */
 .hud-lite .wave, .hud-lite .wave2, .hud-lite .wave3,
 .hud-lite .animate-plane-dial, .hud-lite .animate-rpmbounce { animation: none !important; }
-.hud-lite .gl-compass .tape { transition-duration: 0.12s; }
+.hud-lite .gl-compass .tape, .hud-lite .g6-compass .tape { transition-duration: 0.12s; }

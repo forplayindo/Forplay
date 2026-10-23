@@ -12,6 +12,7 @@ import HudV2 from "@/components/VehicleHud/HudV2";
 import RaceV2 from "@/components/VehicleHud/RaceV2";
 import Bmg from "@/components/VehicleHud/Bmg";
 import Gmg from "@/components/VehicleHud/Gmg";
+import Gta6 from "@/components/VehicleHud/Gta6";
 
 export const VehicleHud = () => {
   const { VehicleInfo, HudStyle, onChangeHudPositions, isEditorOpen } = useData();
@@ -38,6 +39,8 @@ export const VehicleHud = () => {
         return <HudV2 veh={VehicleInfo} />;
       case 10:
         return <RaceV2 veh={VehicleInfo} />;
+      case 11:
+        return <Gta6 veh={VehicleInfo} />;
       default:
         return <ClassicOld veh={VehicleInfo} />;
     }
@@ -46,15 +49,17 @@ export const VehicleHud = () => {
   const { positions } = VehicleInfo;
 
   const posStyle = {} as any;
+  // GTA VI style (11) sits tighter in the bottom-right corner
+  const isGta6 = HudStyle.vehicle_hud_style == 11;
   if (positions.x) {
     posStyle.left = positions.x;
   } else {
-    posStyle.right = 32;
+    posStyle.right = isGta6 ? 28 : 32;
   }
   if (positions.y) {
     posStyle.top = positions.y;
   } else {
-    posStyle.bottom = 52;
+    posStyle.bottom = isGta6 ? 36 : 52;
   }
 
   const handleDragEnd = (key: string, x: number, y: number) => {
@@ -79,7 +84,7 @@ export const VehicleHud = () => {
               <FaLocationCrosshairs />
             </button>
           )}
-          <div className="mr-10 4k:scale-150">{renderHud()}</div>
+          <div className={isGta6 ? "4k:scale-150 origin-bottom-right" : "mr-10 4k:scale-150"}>{renderHud()}</div>
         </DragDropContainer>
       </div>
     )

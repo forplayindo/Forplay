@@ -1,0 +1,205 @@
+// GTA VI style speedometer (vehicle_hud_style 11)
+.g6s {
+  --accent: #f3b354;
+  width: 310px;
+  color: #fff;
+  font-family: "sentic-text-bold", sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+  user-select: none;
+}
+
+.g6s-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.g6s-speed {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.g6s-digits {
+  font-size: 46px;
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+
+  .lead {
+    color: rgba(255, 255, 255, 0.18);
+    text-shadow: none;
+  }
+}
+
+.g6s-unit {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 1px;
+}
+
+.g6s-gear {
+  width: 40px;
+  height: 46px;
+  border: 1.5px solid var(--accent);
+  border-radius: 7px;
+  background: rgba(10, 16, 26, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(243, 179, 84, 0.25);
+
+  .num {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .lbl {
+    margin-top: 3px;
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+}
+
+.g6s-rpm {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.g6s-rpm-label {
+  flex: none;
+  width: 24px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 6px;
+}
+
+.g6s-rpm-body {
+  flex: 1;
+}
+
+.g6s-rpm-track {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(20, 24, 34, 0.6);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+
+  .fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: 3px;
+    background: linear-gradient(90deg, rgba(243, 179, 84, 0.55), var(--accent));
+    transition: width 0.12s linear;
+  }
+
+  .red {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 0 3px 3px 0;
+    background: rgba(255, 77, 94, 0.85);
+  }
+
+  .knob {
+    position: absolute;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--accent);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 6px rgba(243, 179, 84, 0.7);
+    transition: left 0.12s linear;
+  }
+}
+
+.g6s-rpm-scale {
+  position: relative;
+  height: 10px;
+  margin-top: 4px;
+
+  span {
+    position: absolute;
+    transform: translateX(-50%);
+    font-size: 7px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.45);
+
+    &.red {
+      color: rgba(255, 77, 94, 0.9);
+    }
+  }
+}
+
+.g6s-inds {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.g6s-ind {
+  width: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  .ico {
+    font-size: 12px;
+    color: var(--c);
+    line-height: 1;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+  }
+
+  .lbl {
+    margin-top: 3px;
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .val {
+    margin-top: 2px;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--c);
+  }
+
+  .line {
+    width: 100%;
+    margin-top: 3px;
+    height: 2px;
+    border-radius: 1px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.18);
+
+    > div {
+      height: 100%;
+      background: var(--c);
+      transition: width 0.3s ease;
+    }
+  }
+
+  &.dim {
+    .ico,
+    .val {
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+}

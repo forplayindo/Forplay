@@ -59,22 +59,31 @@ return {
     -- Log: selalu tercetak di console server (txAdmin). Isi URL webhook Discord kalau mau dikirim juga.
     Webhook = nil,
 
-    -- Wilayah (turf war). Zona ada di shared/zones.lua. Hanya gang bertag 'gang' yang ikut.
-    -- Alur: di zona gang lain / bebas selama PromptSeconds -> pilihan [J] Rebut / [X] Abaikan ->
-    -- persiapan PrepMinutes (tetap di zona) -> perebutan WarMinutes -> poin terbanyak menguasai zona.
-    -- Zona tetap milik gang sampai direbut gang lain. Semua dihitung di server.
+    -- Gang Wars (perebutan wilayah). Menu /peranggang + radial. Hanya gang bertag 'gang' yang ikut.
+    -- Wilayah (poligon, minimal peserta, reward) disimpan di tabel crew_turf_zones dan diatur admin
+    -- lewat menu. Alur: Boss/Wakil klik Kuasai/Rebut -> syarat dicek SAAT ITU saja (anggota online
+    -- penyerang & pemilik >= minimal peserta wilayah) -> persiapan PrepMinutes (gang lain bisa Join)
+    -- -> perang WarMinutes -> poin terbanyak menguasai wilayah + dapat reward. Setelah setuju, perang
+    -- tetap jalan walau anggota logout / crash. Satu gang hanya bisa ikut satu perang sekaligus.
     Turf = {
         Enabled = true,
-        TickSeconds = 15,       -- cek posisi anggota gang online + status di layar + simpan ke database
+        TickSeconds = 15,       -- hitung poin hadir + kirim scoreboard + simpan ke database
+        AdminAce = 'admin',     -- ACE untuk tambah / edit / hapus wilayah di menu
 
-        PromptSeconds = 60,     -- lama di zona sebelum pilihan Rebut / Abaikan muncul
-        PrepMinutes = 2,        -- TEST: kembalikan ke 10 setelah selesai tes. Persiapan sebelum perebutan.
-
-        -- Perebutan
+        PrepMinutes = 1,       -- persiapan sebelum perang (gang lain bisa Join)
         WarMinutes = 10,
-        MaxWars = 3,            -- perebutan bersamaan di seluruh kota
-        MinDefenders = 2,       -- zona milik gang hanya bisa direbut kalau anggota pemilik online sebanyak ini
-        WarCooldownMinutes = 24 * 60, -- zona yang baru selesai diperebutkan tidak bisa direbut lagi selama ini
+        MaxWars = 3,            -- perang bersamaan di seluruh kota (persiapan ikut dihitung)
+        DefaultMinPlayers = 5,  -- minimal peserta online per gang (default form wilayah baru)
+        WarCooldownMinutes = 24 * 60, -- wilayah yang baru selesai diperebutkan tidak bisa direbut lagi selama ini
+
+        HistoryLimit = 20,      -- riwayat perang yang disimpan; sisanya dihapus
+        RewardKeepDays = 7,     -- reward yang SUDAH diambil dihapus dari daftar setelah sekian hari
+        MaxRewardItems = 10,    -- item reward per wilayah
+
+        -- Pengumuman chat (f_chat tab Pengumuman). Tidak dikirim ke job bertipe ini (cek job, bukan duty).
+        ChatHideJobTypes = { leo = true, ems = true },
+        ChatTag = 'GANG WARS',
+        ChatColor = '#E5484D',
 
         -- Poin perebutan (hanya dihitung selama masa perebutan, bukan saat persiapan)
         WarPresencePoints = 1,  -- per menit untuk tiap anggota yang hidup di zona
@@ -85,10 +94,18 @@ return {
             carjacking = { points = 5, cooldown = 10 }, -- hotwire mobil orang (f_vehiclekeys)
         },
 
-        -- Blip map (hanya terlihat anggota gang bertag 'gang').
-        BlipAlpha = 60,         -- transparansi kotak zona (0-255); kecil = jalan di minimap tetap terlihat
-        LabelBlips = true,      -- ikon kecil di tengah zona berisi nama zona + gang pemilik
-        LabelSprite = 84,
-        LabelScale = 0.6,
+        -- Mode "Rebut Bendera" (dipilih admin per wilayah). Saat perang: bendera musuh dicabut (tahan E),
+        -- lalu gang peserta menancapkan benderanya (pegang item, tahan E). Bendera yang berdiri saat
+        -- waktu habis = pemenang; titik kosong = pemilik lama tetap menang. Poin kill/hadir tidak dipakai.
+        -- Item hanya dari admin (tab Bendera di /peranggang) atau mafia. Bendera yang dicabut kembali ke Boss.
+        Flag = {
+            Item = 'bendera_gang',
+            PullSeconds = 15,           -- tahan E untuk mencabut bendera musuh
+            PlantSeconds = 20,          -- tahan E untuk menancapkan bendera sendiri
+            ActionRadius = 2.5,         -- jarak maksimal dari tiang (meter, dicek server)
+            ContestRadius = 10.0,       -- musuh hidup dalam radius ini = progres berhenti
+            DefaultModel = 'prop_flag_us',  -- bendera tertancap untuk gang tanpa model addon (sementara: bendera Indonesia)
+            DefaultHandModel = 'prop_golfflag', -- bendera di tangan untuk gang tanpa model addon
+        },
     },
 }

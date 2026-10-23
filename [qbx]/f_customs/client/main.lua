@@ -25,12 +25,20 @@ local function canUse()
     return not (z and z.deniedClasses and z.deniedClasses[class])
 end
 
+local shownText ---@type string?
+
 local function refreshText()
-    if zoneId and not open and canUse() then
-        lib.showTextUI('[E] Bengkel Kustom', { icon = 'fa-solid fa-spray-can', position = 'left-center' })
-    else
+    local st = zoneId and cfg.stations[cfg.zones[zoneId].station]
+    if st and not open and canUse() then
+        local text = '[E] ' .. st.label
+        if shownText ~= text then
+            lib.showTextUI(text, { icon = st.icon, position = 'left-center' })
+            shownText = text
+        end
+    elseif shownText then
         local isOpen, text = lib.isTextUIOpen()
-        if isOpen and text == '[E] Bengkel Kustom' then lib.hideTextUI() end
+        if isOpen and text == shownText then lib.hideTextUI() end
+        shownText = nil
     end
 end
 
@@ -50,6 +58,7 @@ for i, z in ipairs(cfg.zones) do
     lib.zones.poly({
         points = z.points,
         thickness = cfg.thickness,
+        debug = cfg.debug,
         onEnter = function()
             zoneId = i
             keybind:disable(false)
@@ -272,6 +281,7 @@ openMenu = function(asAdmin)
     SetEntityVelocity(vehicle, 0.0, 0.0, 0.0)
     FreezeEntityPosition(vehicle, true)
     lib.hideTextUI()
+    shownText = nil
     startCam()
 
     local model = GetEntityModel(vehicle)

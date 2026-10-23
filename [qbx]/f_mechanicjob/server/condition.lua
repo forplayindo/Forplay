@@ -320,6 +320,29 @@ AddEventHandler('playerDropped', function()
     end
 end)
 
+---Kurangi kondisi satu part dari resource lain (mis. ox_fuel: busi aus karena BBM oktan rendah).
+---Hanya pengurangan; amount dibatasi 0-10% per panggilan.
+---@param veh number
+---@param part string salah satu cfg.custom (oil, sparkplugs, ...)
+---@param amount number persen
+exports('AddWear', function(veh, part, amount)
+    amount = math.min(10.0, math.max(0.0, tonumber(amount) or 0))
+    if amount <= 0 or not DoesEntityExist(veh) then return false end
+
+    local valid = false
+    for _, p in ipairs(cfg.custom) do
+        if p == part then valid = true break end
+    end
+    if not valid then return false end
+
+    local c = Condition.Get(veh)
+    if not c or type(c[part]) ~= 'number' then return false end
+
+    c[part] = math.max(0.0, c[part] - amount)
+    Condition.Set(veh, c)
+    return true
+end)
+
 ---Kondisi kendaraan untuk resource lain (persen). nil kalau tidak didukung.
 exports('GetCondition', function(veh)
     local c = Condition.Get(veh)

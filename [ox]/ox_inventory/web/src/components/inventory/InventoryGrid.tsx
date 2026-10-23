@@ -8,7 +8,7 @@ import { useIntersection } from '../../hooks/useIntersection';
 import { Locale } from '../../store/locale';
 import { PlayerPanelIcon, StoragePanelIcon } from '../utils/icons/InventoryIcons';
 import CloseButton from './CloseButton';
-import { hotbarSlots } from '../../store/hotbar';
+import { getGridItems } from '../../store/hotbar';
 
 const PAGE_SIZE = 30;
 
@@ -62,9 +62,9 @@ const InventoryGrid: React.FC<{ inventory: Inventory; side: 'left' | 'right' }> 
   const { ref, entry } = useIntersection({ threshold: 0.5 });
   const isBusy = useAppSelector((state) => state.inventory.isBusy);
   const heading = useMemo(() => getPanelHeading(inventory, side), [inventory.id, inventory.label, inventory.type, side]);
-  // The last slots of the player's inventory belong to the quick action bar.
+  // The last slots of the player's inventory belong to the quick action bar and the key ring.
   const gridItems = useMemo(
-    () => (side === 'left' ? inventory.items.slice(0, Math.max(inventory.items.length - hotbarSlots, 0)) : inventory.items),
+    () => (side === 'left' ? getGridItems(inventory.items) : inventory.items),
     [inventory.items, side]
   );
   const percent = inventory.maxWeight ? (weight / inventory.maxWeight) * 100 : 0;

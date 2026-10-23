@@ -2,7 +2,7 @@ AddEventHandler('onClientResourceStart', function(resource)
 	if resource ~= GetCurrentResourceName() then
 		return
 	end
-	print('Starting script initialization')
+	-- print('Starting script initialization')
 
 	-- Some people modify pma-voice and mess up the resource Kvp, which means that if someone
 	-- joins another server that has pma-voice, it will error out, this will catch and fix the kvp.
@@ -46,5 +46,5 @@ AddEventHandler('onClientResourceStart', function(resource)
 		LocalPlayer.state:set("disableRadio", 0, true)
 	end
 
-	print('Script initialization finished.')
+	-- print('Script initialization finished.')
 end)

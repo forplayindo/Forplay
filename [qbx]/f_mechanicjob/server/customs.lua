@@ -67,6 +67,54 @@ local BUNDLE = {
     neon = { label = 'Neon', keys = { neonEnabled = true, neonColor = true } },
 }
 
+---------------------------------------------------------------------------
+-- Jenis zona (f_customs config/shared.lua): 'paint' = warna bodi saja, 'mod' = sisanya
+---------------------------------------------------------------------------
+local BODY_PAINT = { color1 = true, color2 = true, pearlescentColor = true }
+local STATION_LABEL = { mod = 'zona Modifikasi Kendaraan (lift)', paint = 'zona Cat Kendaraan (booth cat)' }
+
+---@param items { id: string }[]
+local function stationOf(items)
+    for _, it in ipairs(items) do
+        if BODY_PAINT[it.id] then return 'paint' end
+    end
+    return 'mod'
+end
+
+---Jenis zona tempat kendaraan berada (nil = di luar zona / f_customs mati).
+local function vehStation(veh)
+    if GetResourceState('f_customs') ~= 'started' then return end
+    local ok, st = pcall(function() return exports.f_customs:StationAt(GetEntityCoords(veh)) end)
+    return ok and st or nil
+end
+
+-- urutan pengerjaan modifikasi (animasi mekanik per kelompok)
+local GROUP_ORDER = { 'perf', 'wheel', 'body', 'interior' }
+local function groupOf(id)
+    if LEVEL[id] or id == 'modTurbo' or (MOD[id] and MOD[id][1] == 'engineBay') then return 'perf' end
+    if id == 'wheels' or id == 'tires' or id == 'smoke' then return 'wheel' end
+    if MOD[id] and MOD[id][1] == 'interior' then return 'interior' end
+    return 'body'
+end
+
+local function groupsOf(items)
+    local has = {}
+    for _, it in ipairs(items) do has[groupOf(it.id)] = true end
+    local out = {}
+    for _, g in ipairs(GROUP_ORDER) do if has[g] then out[#out + 1] = g end end
+    return out
+end
+
+---Lama pemasangan (ms) dari tahap-tahapnya.
+local function installTime(veh, station, groups)
+    local T = cfg.customInstall
+    if station == 'paint' then return T.paintSide * 4 end
+    local wheels = Condition.Kind(veh) == 'bike' and 2 or 4
+    local total = 0
+    for _, g in ipairs(groups) do total += g == 'wheel' and T.wheel * wheels or T[g] end
+    return total
+end
+
 local PAINT = {}
 for group, ids in pairs(CUS.paintGroups) do
     if type(ids) == 'table' then for _, id in ipairs(ids) do PAINT[id] = group end end
@@ -395,6 +443,13 @@ local function submit(src, netId, lines, opts)
 
     local err, priced, total = priceAll(lines, row and row.mods or {})
     if err then return { error = err } end
+    -- zona cat hanya warna bodi, zona modifikasi tanpa warna bodi (admin bebas)
+    if opts.station and not opts.admin then
+        for _, l in ipairs(priced) do
+            if opts.station == 'paint' and not BODY_PAINT[l.id] then return { error = 'Di booth cat hanya bisa mengganti warna bodi' } end
+            if opts.station == 'mod' and BODY_PAINT[l.id] then return { error = 'Warna bodi diganti di booth cat' } end
+        end
+    end
 
     local mech = isMechanic(src)
     local free = opts.admin or (row and mech and row.citizenid == player.PlayerData.citizenid)
@@ -443,11 +498,14 @@ local function customData(veh)
     if not b then return { order = false } end
     local items = {}
     for i, it in ipairs(b.items) do items[i] = { label = it.label, desc = it.desc, price = it.price } end
+    local station = stationOf(b.items)
     return {
         order = { id = b.id, name = b.name, plate = b.plate, total = b.total, method = b.method, paidAt = b.paidAt, items = items },
-        inWorkshop = Billing.InWorkshop(GetEntityCoords(veh)),
+        station = station,
+        stationLabel = STATION_LABEL[station],
+        inStation = vehStation(veh) == station,
+        duration = installTime(veh, station, groupsOf(b.items)),
         empty = GetPedInVehicleSeat(veh, -1) == 0,
-        duration = cfg.customInstall.duration,
     }
 end
 
@@ -462,11 +520,14 @@ lib.callback.register('f_mechanicjob:server:customStart', function(src, netId, b
     if err then return { error = err } end
     local b = Customs.ReadyFor(veh)
     if not b or b.id ~= tonumber(billId) then return { error = 'Order tidak ditemukan atau belum lunas' } end
-    if not Billing.InWorkshop(GetEntityCoords(veh)) then return { error = 'Kendaraan harus berada di area bengkel' } end
+    local station = stationOf(b.items)
+    if vehStation(veh) ~= station then return { error = ('Kendaraan harus berada di %s'):format(STATION_LABEL[station]) } end
     if GetPedInVehicleSeat(veh, -1) ~= 0 then return { error = 'Kendaraan harus kosong (tanpa pengemudi)' } end
-    installing[src] = { net = tonumber(netId), bill = b.id, startedAt = GetGameTimer() }
+    local groups = groupsOf(b.items)
+    local duration = installTime(veh, station, groups)
+    installing[src] = { net = tonumber(netId), bill = b.id, startedAt = GetGameTimer(), duration = duration }
     FreezeEntityPosition(veh, true)
-    return { duration = cfg.customInstall.duration }
+    return { duration = duration, station = station, groups = groups }
 end)
 
 lib.callback.register('f_mechanicjob:server:customCancel', function(src)
@@ -482,7 +543,7 @@ lib.callback.register('f_mechanicjob:server:customFinish', function(src)
     if not job then return { error = 'Tidak ada pemasangan berjalan' } end
     local veh = getVeh(job.net)
     if veh then FreezeEntityPosition(veh, false) end
-    if GetGameTimer() - job.startedAt < cfg.customInstall.duration - 500 then return { error = 'Pemasangan terlalu cepat' } end
+    if GetGameTimer() - job.startedAt < job.duration - 500 then return { error = 'Pemasangan terlalu cepat' } end
 
     local err
     err, veh = checkMech(src, job.net)
@@ -490,6 +551,7 @@ lib.callback.register('f_mechanicjob:server:customFinish', function(src)
     local b = Customs.ReadyFor(veh)
     if not b or b.id ~= job.bill then return { error = 'Order tidak ditemukan' } end
     if GetPedInVehicleSeat(veh, -1) ~= 0 then return { error = 'Kendaraan harus kosong (tanpa pengemudi)' } end
+    if vehStation(veh) ~= stationOf(b.items) then return { error = ('Kendaraan harus berada di %s'):format(STATION_LABEL[stationOf(b.items)]) } end
 
     applyProps(veh, b.vehicleid, mergeProps(b.items))
     Kasir.Done(b)

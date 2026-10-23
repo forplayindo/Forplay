@@ -3,6 +3,7 @@
    - Kaca transparan saat blur asli aktif (f_ui.js menggambar blur di belakangnya)
    - Notifikasi bawah tengah, maksimal 4, di atas teks [E] & progress bar
    - Radial: di tengah layar, tulisan kuning di bawah ikon
+   - Progress bar: tanpa panel, label tebal miring, [X] Batal, bar gradasi ke #f3b354
    ========================================================================= */
 /* Kaca rata tanpa emboss, warna gelap sama dengan f_chat (tint 16,20,28).
    Gradasi 158deg dibiarkan ada tapi transparan: f_ui.js memakainya sebagai penanda panel kaca. */
@@ -99,3 +100,289 @@
   pointer-events: none;
 }
 .f-radial-btn:hover .f-radial-label { color: var(--on-y); }
+
+/* ---------- teks [E]: kartu tombol (kiri tengah, bertumpuk) ----------
+   Huruf mengikuti notifikasi: label kecil mono 9px, teks 13px normal. */
+.f-textui.f-textui-keys {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  gap: 0 !important;
+}
+.f-textui-keys > div:not(.f-tk-list) { display: none !important; } /* ikon bawaan */
+.f-tk-list { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+.f-tk-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 7px 14px 7px 7px;
+}
+.f-tk-key {
+  min-width: 26px; height: 26px; padding: 0 6px; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff; font-family: var(--f-body); font-size: 12px; font-weight: 600; line-height: 1;
+  text-transform: uppercase;
+}
+.f-tk-txt { display: flex; flex-direction: column; gap: 3px; }
+.f-tk-sub {
+  font-family: var(--f-mono); font-size: 9px; font-weight: 600; letter-spacing: 0.18em;
+  line-height: 1; text-transform: uppercase;
+  color: rgba(246, 245, 242, 0.5);
+}
+.f-tk-title {
+  font-family: var(--f-body); font-size: 13px; font-weight: 400; line-height: 1.3;
+  color: var(--text); white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- teks tanpa tombol: bawah tengah, kartu seperti notifikasi ---------- */
+.f-textui:not(.f-textui-keys) {
+  position: relative;
+  border: 1px solid var(--hairline) !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  padding: 10px 14px 11px 25px !important;
+  max-width: 360px !important;
+  font-family: var(--f-body) !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+.f-textui:not(.f-textui-keys)::before {
+  content: "";
+  position: absolute; left: 12px; top: 11px; bottom: 11px;
+  width: 2px; border-radius: 2px;
+  background: var(--ox-textui-border, var(--f-yellow));
+}
+.f-textui:not(.f-textui-keys) p { margin: 0; }
+
+/* =========================================================================
+   Gaya iOS: notifikasi & teks tanpa tombol model "toast"
+   ========================================================================= */
+:root {
+  --f-notify-bg: rgba(30, 30, 34, 0.62);
+  --ios-txt-2: rgba(235, 235, 245, 0.6);
+  --ios-txt-3: rgba(235, 235, 245, 0.3);
+  --ios-green: #30d158; --ios-red: #ff453a; --ios-orange: #ff9f0a; --ios-blue: #0a84ff;
+}
+.hud-blur-on { --f-notify-bg: rgba(30, 30, 34, 0.45); }
+html, body { -webkit-font-smoothing: antialiased; }
+
+/* ---- notifikasi ---- */
+.notifications-container { gap: 10px !important; }
+.notifications-container > .wrapper {
+  position: relative;
+  width: 360px !important; max-width: 360px !important;
+  min-height: 62px; box-sizing: border-box;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 12px 16px 12px 62px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35) !important;
+}
+.notifications-container > .wrapper .rail,
+.notifications-container > .wrapper .sheen { display: none !important; }
+.notifications-container > .wrapper::before {          /* kotak ikon */
+  content: ""; position: absolute; left: 12px; top: 50%; margin-top: -19px;
+  width: 38px; height: 38px; border-radius: 11px;
+  background-color: var(--ios-blue);
+  background-repeat: no-repeat; background-position: center; background-size: 20px 20px;
+}
+.notifications-container > .wrapper::after {           /* waktu */
+  content: "sekarang"; position: absolute; top: 12px; right: 16px;
+  font-size: 12px; color: rgba(255, 255, 255, 0.85);
+}
+.notifications-container > .wrapper .title {
+  font-family: var(--f-body) !important; font-size: 14px !important; font-weight: 600 !important;
+  letter-spacing: 0 !important; text-transform: none !important;
+  color: #f5f5f7 !important; margin: 0 64px 1px 0 !important; line-height: 1.3;
+}
+.notifications-container > .wrapper .description {
+  font-size: 13px !important; font-weight: 400 !important; line-height: 1.3 !important; color: #fff !important;
+  text-shadow: none !important; margin: 0 !important;
+}
+.f-n-success::before { background-color: var(--ios-green) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E"); }
+.f-n-error::before { background-color: var(--ios-red) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 7v6M12 17h.01'/%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3C/svg%3E"); }
+.f-n-warning::before { background-color: var(--ios-orange) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4l9 16H3z'/%3E%3Cpath d='M12 10v4M12 17h.01'/%3E%3C/svg%3E"); }
+.f-n-inform::before, .f-n-info::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v6M12 7.5h.01'/%3E%3C/svg%3E"); }
+
+/* ---- teks tanpa tombol: model toast (bawah tengah) ---- */
+.f-textui:not(.f-textui-keys) {
+  background: var(--glass-sheen), var(--f-notify-bg) !important; /* 158deg = penanda blur f_ui.js */
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35) !important;
+  padding: 10px 18px 10px 52px !important;
+  min-height: 50px; box-sizing: border-box;
+  max-width: 380px !important;
+  font-size: 13px !important; font-weight: 400 !important; line-height: 1.3 !important; color: #fff !important;
+  text-shadow: none !important;
+}
+.f-textui:not(.f-textui-keys)::before {                 /* kotak ikon default (info) */
+  left: 10px; top: 50%; bottom: auto; margin-top: -15px;
+  width: 30px; height: 30px; border-radius: 9px;
+  background: var(--ios-blue) no-repeat center / 17px 17px
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v6M12 7.5h.01'/%3E%3C/svg%3E");
+}
+/* kalau script mengirim ikon sendiri: kotak ikon bawaan bergaya iOS */
+.f-textui.f-textui-icon:not(.f-textui-keys) { padding-left: 10px !important; gap: 10px !important; }
+.f-textui.f-textui-icon:not(.f-textui-keys)::before { display: none; }
+.f-textui.f-textui-icon:not(.f-textui-keys) > div:first-child {
+  width: 30px !important; height: 30px !important; border-radius: 9px !important;
+  background-color: var(--ios-blue) !important;
+}
+.f-textui.f-textui-icon:not(.f-textui-keys) > div:first-child svg { color: #fff !important; font-size: 15px !important; }
+
+/* kartu tombol ikut sudut & huruf iOS */
+.f-tk-item { border-radius: 16px; border-color: rgba(255, 255, 255, 0.08); }
+.f-tk-sub { color: rgba(255, 255, 255, 0.85); }
+.f-tk-title { font-weight: 500; }
+
+/* ---- font notifikasi & teks [E]: Nunito Sans ---- */
+@font-face {
+  font-family: "Nunito Sans"; font-style: normal; font-weight: 200 1000; font-display: swap;
+  src: url("./fonts/NunitoSans.woff2") format("woff2");
+}
+:root { --f-notify-font: "Nunito Sans", "Segoe UI", sans-serif; }
+.notifications-container > .wrapper .title,
+.notifications-container > .wrapper .description,
+.notifications-container > .wrapper::after,
+.f-textui, .f-textui *,
+.f-tk-key, .f-tk-sub, .f-tk-title {
+  font-family: var(--f-notify-font) !important;
+}
+
+/* ---- penyesuaian: huruf lebih tipis, notifikasi 1 baris lebih ramping ---- */
+.notifications-container > .wrapper .title { font-weight: 500 !important; }
+.notifications-container > .wrapper .description { font-weight: 300 !important; }
+.f-textui:not(.f-textui-keys) { font-weight: 300 !important; }
+.f-tk-key { font-weight: 500; }
+.f-tk-title { font-weight: 300; }
+
+/* notifikasi 1 baris (tanpa judul atau tanpa isi): ikon kecil, teks sejajar tengah ikon */
+.notifications-container > .wrapper.f-n-single {
+  min-height: 0;
+  padding: 9px 74px 9px 48px !important;
+  border-radius: 18px !important;
+}
+.notifications-container > .wrapper.f-n-single::before {
+  left: 11px; margin-top: -13px;
+  width: 26px; height: 26px; border-radius: 8px;
+  background-size: 15px 15px;
+}
+.notifications-container > .wrapper.f-n-single::after { top: 50%; transform: translateY(-50%); }
+.notifications-container > .wrapper.f-n-single .title { margin: 0 !important; }
+.notifications-container > .wrapper.f-n-single .description:empty { display: none; }
+
+/* teks tanpa tombol: ikon lebih kecil */
+.f-textui:not(.f-textui-keys) { min-height: 0; padding: 9px 16px 9px 44px !important; border-radius: 18px !important; }
+.f-textui:not(.f-textui-keys)::before {
+  left: 10px; margin-top: -12px;
+  width: 24px; height: 24px; border-radius: 7px; background-size: 14px 14px;
+}
+.f-textui.f-textui-icon:not(.f-textui-keys) { padding-left: 10px !important; }
+.f-textui.f-textui-icon:not(.f-textui-keys) > div:first-child {
+  width: 24px !important; height: 24px !important; border-radius: 7px !important;
+}
+.f-textui.f-textui-icon:not(.f-textui-keys) > div:first-child svg { font-size: 12px !important; }
+
+/* ---- sudut: notifikasi & teks tanpa tombol 5px (ikon ikut lebih kotak) ---- */
+.notifications-container > .wrapper,
+.notifications-container > .wrapper.f-n-single,
+.f-textui:not(.f-textui-keys) { border-radius: 5px !important; }
+.notifications-container > .wrapper::before,
+.notifications-container > .wrapper.f-n-single::before,
+.f-textui:not(.f-textui-keys)::before { border-radius: 4px; }
+.f-textui.f-textui-icon:not(.f-textui-keys) > div:first-child { border-radius: 4px !important; }
+/* kartu tombol [E] ikut 5px, kotak huruf 4px */
+.f-tk-item { border-radius: 5px; }
+.f-tk-key { border-radius: 4px; }
+
+/* ---- bar hitung mundur di bawah notifikasi (warna sesuai jenis) ---- */
+.notifications-container > .wrapper .f-n-bar {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  background: var(--ios-blue);
+  transform-origin: left center;
+  animation: f-n-bar var(--f-n-dur, 5000ms) linear forwards;
+  pointer-events: none;
+}
+.notifications-container > .wrapper.f-n-success .f-n-bar { background: var(--ios-green); }
+.notifications-container > .wrapper.f-n-error .f-n-bar { background: var(--ios-red); }
+.notifications-container > .wrapper.f-n-warning .f-n-bar { background: var(--ios-orange); }
+@keyframes f-n-bar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+
+/* ---------- progress bar: tanpa panel, label tebal miring, bar tebal gradasi ke #f3b354 ---------- */
+@font-face {
+  font-family: "F Progress"; font-style: italic; font-weight: 800; font-display: swap;
+  src: url("./fonts/Roboto-ExtraBoldItalic.ttf") format("truetype");
+}
+.f-progress {
+  --f-progress-w: 420px;
+  width: var(--f-progress-w) !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+.f-progress > div:first-child {             /* baris label + tombol batal */
+  align-items: center !important;
+  margin-bottom: 10px !important;
+}
+.f-progress > div:first-child > p:first-child { /* label */
+  font-family: "F Progress", Roboto, sans-serif !important;
+  font-style: italic !important;
+  font-weight: 800 !important;
+  font-size: 19px !important;
+  letter-spacing: 0.01em !important;
+  text-transform: uppercase !important;
+  color: #fff !important;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.75);
+}
+.f-progress .f-progress-cancel {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  font-family: "F Progress", Roboto, sans-serif !important;
+  font-style: italic !important;
+  font-weight: 800 !important;
+  font-size: 17px !important;
+  letter-spacing: 0.01em !important;
+  text-transform: uppercase !important;
+  color: #fff !important;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.75);
+}
+.f-progress .f-progress-key {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 26px; height: 22px; padding: 0 6px; box-sizing: border-box;
+  border-radius: 4px;
+  background: #fff;
+  color: #0d1514;
+  font-size: 13px;
+  text-shadow: none;
+}
+.f-progress > div:last-child {              /* track */
+  height: 9px !important;
+  border-radius: 9px !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45) !important;
+}
+.f-progress > div:last-child > div {        /* bar: gradasi selebar track, warna penuh #f3b354 di ujung */
+  border-radius: 9px !important;
+  background-color: transparent !important;
+  background-image: linear-gradient(90deg, #b9782a 0%, #f3b354 100%) !important;
+  background-size: var(--f-progress-w) 100% !important;
+  background-repeat: no-repeat !important;
+  box-shadow: 0 0 12px rgba(243, 179, 84, 0.45) !important;
+}

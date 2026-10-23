@@ -102,6 +102,45 @@ for i, lift in ipairs(LIFT.lifts) do
     })
 end
 
+---Index lift tempat kendaraan berdiri (atau sedang dinaikkan), atau nil.
+local function liftOf(veh)
+    local net = NetworkGetNetworkIdFromEntity(veh)
+    local pos = GetEntityCoords(veh)
+    for i, lift in ipairs(LIFT.lifts) do
+        local s = liftState(i)
+        if s.up and s.net == net then return i end
+        if #(pos.xy - lift.coords.xy) <= LIFT.radius and math.abs(pos.z - lift.coords.z) < 2.5 then return i end
+    end
+end
+
+-- juga langsung di kendaraan yang ada di atas platform (tidak bergantung titik panel)
+exports.ox_target:addGlobalVehicle({
+    {
+        name = 'f_mechanicjob:vehLiftUp',
+        icon = 'fa-solid fa-arrow-up',
+        label = 'Naikkan Lift',
+        distance = 3.0,
+        canInteract = function(entity)
+            if not isMechanic() then return false end
+            local i = liftOf(entity)
+            return i ~= nil and not liftState(i).up
+        end,
+        onSelect = function(data) toggle(liftOf(data.entity)) end,
+    },
+    {
+        name = 'f_mechanicjob:vehLiftDown',
+        icon = 'fa-solid fa-arrow-down',
+        label = 'Turunkan Lift',
+        distance = 3.0,
+        canInteract = function(entity)
+            if not isMechanic() then return false end
+            local i = liftOf(entity)
+            return i ~= nil and liftState(i).up
+        end,
+        onSelect = function(data) toggle(liftOf(data.entity)) end,
+    },
+})
+
 -- platform map diganti objek lokal yang bisa digerakkan
 CreateThread(function()
     if not LIFT.animatePlatform then return end

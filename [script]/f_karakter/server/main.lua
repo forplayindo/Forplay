@@ -11,7 +11,14 @@ local function isAdmin(src)
 end
 
 CreateThread(function()
-    local rows = MySQL.query.await('SELECT TABLE_NAME AS t, COLUMN_NAME AS c FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE()') or {}
+    -- hanya ambil kolom dari tabel yang dipakai (bukan seluruh database) agar hasil query kecil
+    local tables, seen = { 'mechanic_vehicle_condition' }, { mechanic_vehicle_condition = true }
+    for _, d in ipairs(cfg.deleteTables) do
+        local t = d[1]:lower()
+        if not seen[t] then seen[t] = true; tables[#tables + 1] = t end
+    end
+    local rows = MySQL.query.await(('SELECT TABLE_NAME AS t, COLUMN_NAME AS c FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND LOWER(TABLE_NAME) IN (%s)')
+        :format(('?,'):rep(#tables):sub(1, -2)), tables) or {}
     local exists = {}
     for _, r in ipairs(rows) do exists[r.t:lower() .. '.' .. r.c:lower()] = true end
 

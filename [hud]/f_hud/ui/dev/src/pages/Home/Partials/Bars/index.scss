@@ -1,0 +1,256 @@
+// GTA VI style status block (bottom-left, under the minimap)
+.g6b {
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #fff;
+  font-family: "sentic-text-bold", sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+}
+
+.g6b-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.g6b-ico {
+  flex: none;
+  width: 19px;
+  height: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: -4px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
+
+.g6b-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.g6b-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 5px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.g6b-track,
+.g6b-seg {
+  position: relative;
+  height: 7px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(20, 22, 30, 0.6);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+
+  > div {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.35s ease, background 0.3s;
+  }
+}
+
+.g6b-segs {
+  display: flex;
+  gap: 5px;
+
+  .g6b-seg {
+    flex: 1;
+  }
+}
+
+.g6b-value {
+  flex: none;
+  min-width: 26px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: -2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.g6b-minis {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.g6b-mini {
+  width: 40px;
+
+  &.wide {
+    width: 68px;
+  }
+}
+
+.g6b-mini-top {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.g6b-mini-line {
+  margin-top: 4px;
+  height: 3px;
+  border-radius: 1px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.18);
+
+  > div {
+    height: 100%;
+    transition: width 0.35s ease, background 0.3s;
+  }
+}
+
+// stack above the minimap: hygiene row, then location card
+.g6-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+// location card hidden: keep the hygiene row off the minimap edge
+.g6-stack > .g6h:last-child {
+  margin-bottom: 8px;
+}
+
+// location card on blurred glass (.gl)
+.g6l {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border-radius: 0 !important;
+  width: 100%;
+  box-sizing: border-box;
+  text-shadow: none;
+
+  .g6l-ico {
+    width: 16px;
+    height: 16px;
+    flex: none;
+  }
+
+  .g6l-txt {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.15;
+  }
+
+  .g6l-street,
+  .g6l-area {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .g6l-street {
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .g6l-area {
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .g6l-time {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+
+    img {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+// hygiene row: three bars side by side
+.g6h {
+  display: flex;
+  gap: 12px;
+  color: #fff;
+  font-family: "sentic-text-bold", sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+}
+
+.g6h-item {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.g6h-ico {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
+
+.g6h-track {
+  flex: 1;
+  height: 5px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: rgba(20, 22, 30, 0.6);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+
+  > div {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.35s ease, background 0.3s;
+  }
+}
+
+.g6h-val {
+  flex: none;
+  min-width: 22px;
+  text-align: right;
+  font-size: 10.5px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 2560px) {
+  .g6-stack {
+    transform: scale(1.35);
+    transform-origin: bottom left;
+  }
+
+  .g6h {
+    transform: scale(1.35);
+    transform-origin: bottom left;
+  }
+
+  .g6b {
+    transform: scale(1.35);
+    transform-origin: bottom left;
+  }
+}

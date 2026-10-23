@@ -14,47 +14,10 @@ local function onEnterStation(point)
 	if config.showBlips == 1 and not point.blip then
 		point.blip = utils.createBlip(point.coords)
 	end
-end
 
----@param point CPoint
-local function nearbyStation(point)
-	if point.currentDistance > 15 then return end
-
-	local pumps = point.pumps
-	local pumpDistance
-
-	for i = 1, #pumps do
-		local pump = pumps[i]
-		pumpDistance = #(cache.coords - pump)
-
-		if pumpDistance <= 3 then
-			state.nearestPump = pump
-
-			repeat
-				local playerCoords = GetEntityCoords(cache.ped)
-				pumpDistance = #(GetEntityCoords(cache.ped) - pump)
-
-				if cache.vehicle then
-					DisplayHelpTextThisFrame('fuelLeaveVehicleText', false)
-				elseif not state.isFueling then
-					local vehicleInRange = state.lastVehicle ~= 0 and
-						#(GetEntityCoords(state.lastVehicle) - playerCoords) <= 3
-
-					if vehicleInRange then
-						DisplayHelpTextThisFrame('fuelHelpText', false)
-					elseif config.petrolCan.enabled then
-						DisplayHelpTextThisFrame('petrolcanHelpText', false)
-					end
-				end
-
-				Wait(0)
-			until pumpDistance > 3
-
-			state.nearestPump = nil
-
-			return
-		end
-	end
+	-- interaksi pompa (client/interact.lua) hanya aktif di dekat SPBU / charger
+	state.nearStations[point] = true
+	state.nearStation = point
 end
 
 ---@param point CPoint
@@ -62,6 +25,9 @@ local function onExitStation(point)
 	if point.blip then
 		point.blip = RemoveBlip(point.blip)
 	end
+
+	state.nearStations[point] = nil
+	state.nearStation = next(state.nearStations)
 end
 
 for station, pumps in pairs(stations) do
@@ -70,7 +36,43 @@ for station, pumps in pairs(stations) do
 		distance = 60,
 		onEnter = onEnterStation,
 		onExit = onExitStation,
-		nearby = nearbyStation,
 		pumps = pumps,
 	})
+end
+
+-- Stasiun charger kendaraan listrik: charger (prop bawaan GTA) dicari di sekitar titik saat player mendekat
+if config.electric.enabled then
+	local chargerModel = {}
+	for i = 1, #config.electric.chargerModels do chargerModel[config.electric.chargerModels[i]] = true end
+
+	local function findChargers(center)
+		local found = {}
+		local objects = GetGamePool('CObject')
+
+		for i = 1, #objects do
+			local obj = objects[i]
+			if chargerModel[GetEntityModel(obj)] then
+				local coords = GetEntityCoords(obj)
+				if #(coords - center) <= config.electric.stationRadius then found[#found + 1] = coords end
+			end
+		end
+
+		-- prop tidak ditemukan (map custom): pakai titik stasiun sebagai charger
+		if #found == 0 then found[1] = center end
+		return found
+	end
+
+	for i = 1, #config.electric.stations do
+		lib.points.new({
+			coords = config.electric.stations[i],
+			distance = 60,
+			electric = true,
+			pumps = {},
+			onEnter = function(point)
+				point.pumps = findChargers(point.coords)
+				onEnterStation(point)
+			end,
+			onExit = onExitStation,
+		})
+	end
 end

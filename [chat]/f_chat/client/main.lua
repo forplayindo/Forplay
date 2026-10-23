@@ -35,8 +35,41 @@ local function setOpen(state, channelId)
     send('focus', { open = state, channel = channelId })
 end
 
+-- Init lokal dari Config: chat bisa langsung dibuka tanpa menunggu server (yang
+-- baru start sering telat membalas). Hanya channel 'open'; channel job/staf dan
+-- suggestion server menyusul lewat f_chat:init.
+local booted = false
+local function localInit()
+    if ready then return end
+    local channels = {}
+    for _, c in ipairs(Config.Channels) do
+        if not c.commandOnly and c.permission and c.permission.type == 'open' then
+            channels[#channels + 1] = {
+                id = c.id, label = c.label, tag = c.tag, command = c.command,
+                tab = c.tab or 'global', color = c.color, icon = c.icon, radius = c.radius,
+                italic = c.italic, default = c.default,
+            }
+        end
+    end
+    loadSettings()
+    send('init', {
+        channels = channels, themes = Config.Themes, fonts = Config.Fonts,
+        defaults = Config.DefaultTheme, staff = false, maxLength = Config.MaxLength,
+        fadeAfter = Config.FadeAfter, announceFadeAfter = Config.AnnounceFadeAfter,
+        suggestions = {}, serverId = GetPlayerServerId(PlayerId()), settings = settings,
+    })
+    booted = true
+end
+
+-- NUI selesai dimuat (pesan yang dikirim sebelum ini bisa hilang)
+RegisterNUICallback('loaded', function(_, cb)
+    if ready then TriggerServerEvent('f_chat:requestInit') else localInit() end
+    cb('ok')
+end)
+
 RegisterNetEvent('f_chat:init', function(payload)
     ready = true
+    booted = true
     staff = payload.staff
     loadSettings()
     payload.settings = settings
@@ -130,7 +163,7 @@ end
 -- belum siap: ingat tombolnya, minta init sekarang juga, buka begitu init datang
 local function requestOpen(channelId)
     if open or IsPauseMenuActive() or isDead() then return end
-    if ready then return setOpen(true, channelId) end
+    if ready or booted then return setOpen(true, channelId) end
     pendingOpen = channelId or false
     TriggerServerEvent('f_chat:requestInit')
 end

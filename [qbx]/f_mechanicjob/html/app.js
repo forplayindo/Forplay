@@ -41,8 +41,9 @@
     const label = k => (bike() && C.parts[k].bikeLabel) || C.parts[k].label;
     const pct = k => Math.round(S.parts[k] ?? 100);
     const needs = k => pct(k) < C.needs;
-    const locked = k => C.parts[k].heavy && !S.heavyOk;
-    const lockText = () => S.heavyNeed === 'bawa ke bengkel' ? 'Perlu Bengkel' : 'Perlu Lift';
+    const underLocked = k => C.liftParts && C.liftParts[k] && S.underOk === false;
+    const locked = k => underLocked(k) || (C.parts[k].heavy && !S.heavyOk);
+    const lockText = k => (k && underLocked(k)) || S.heavyNeed !== 'bawa ke bengkel' ? 'Perlu Lift' : 'Perlu Bengkel';
     const tyreLvl = t => (S.tyres[t] && S.tyres[t].burst) ? 4 : level(S.tyres[t] ? S.tyres[t].wear : 100);
     const tyreNeeds = t => S.tyres[t] && (S.tyres[t].burst || S.tyres[t].wear < C.needs);
     const tyresWorst = () => Math.max(...tyreList().map(t => tyreLvl(t.key)));
@@ -120,9 +121,10 @@
         if (!S) return;
         $('vehname').textContent = `${S.name} · ${S.plate}`;
         const st = $('state');
-        st.className = 'state-pill ' + (S.bag === false ? 'road' : S.heavyOk ? 'lift' : 'road');
+        st.className = 'state-pill ' + (S.bag === false ? 'road' : S.heavyOk && S.underOk !== false ? 'lift' : 'road');
         st.textContent = S.bag === false ? '🧰 Bawa Tas Perkakas dulu (Gudang Bengkel)'
             : S.onLift ? '⬆ Di Lift · semua bisa diperbaiki'
+            : S.underOk === false ? 'Bagian bawah mobil (rem, as roda, suspensi, kopling, oli transmisi) perlu lift'
             : S.heavyOk ? 'Semua bagian bisa diperbaiki'
             : `Perbaikan ringan · bagian berat ${S.heavyNeed || 'perlu lift'}`;
 
@@ -182,7 +184,7 @@
     function partRow(k) {
         const P = C.parts[k], v = pct(k), l = level(v), ok = have(P.item) >= P.qty;
         const act = locked(k)
-            ? `<button class="btn locked" disabled>🔒 ${lockText()}</button>`
+            ? `<button class="btn locked" disabled>🔒 ${lockText(k)}</button>`
             : `<button class="btn" ${ok ? '' : 'disabled'} data-act="part" data-key="${k}">🔧 ${P.fluid ? 'Isi Ulang' : 'Perbaiki'}</button>`;
         return `<div class="row" data-row="${k}">
             <div class="nm">${esc(label(k))}<span>${esc(P.fx[l - 1])}</span></div>
@@ -372,13 +374,13 @@
             ${o.items.map(it => `<div class="mod"><span class="tx"><b>${esc(it.label)}</b></span><span class="arrow">→ <b>${esc(it.desc || '-')}</b></span></div>`).join('')}
             <h3>Syarat</h3>
             <div class="req">
-                <div class="${custom.inWorkshop ? 'ok' : 'no'}">${custom.inWorkshop ? '✔' : '✘'} Kendaraan di area bengkel</div>
+                <div class="${custom.inStation ? 'ok' : 'no'}">${custom.inStation ? '✔' : '✘'} Kendaraan di ${esc(custom.stationLabel || 'zona kustom')}</div>
                 <div class="${custom.empty ? 'ok' : 'no'}">${custom.empty ? '✔' : '✘'} Kendaraan kosong (tidak ada pengemudi)</div>
             </div>`;
         el.innerHTML = h;
         foot.classList.remove('hidden');
         const btn = $('btn-custom');
-        btn.disabled = !(custom.inWorkshop && custom.empty);
+        btn.disabled = !(custom.inStation && custom.empty);
         $('custom-sub').textContent = `${Math.round(custom.duration / 1000)} detik · ${o.items.length} item`;
         btn.onclick = () => { btn.disabled = true; customMsg = null; post('customInstall', { id: o.id }); };
     }

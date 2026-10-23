@@ -10,7 +10,7 @@ import SlideUp from '../utils/transitions/SlideUp';
 import { onDrop } from '../../dnd/onDrop';
 import { onUse } from '../../dnd/onUse';
 import { closeTooltip } from '../../store/tooltip';
-import { hotbarSlots } from '../../store/hotbar';
+import { getHotbarItems } from '../../store/hotbar';
 
 const formatWeight = (weight: number) => {
   if (!weight || weight <= 0) return '';
@@ -87,14 +87,18 @@ const HotbarSlot: React.FC<{ item: Slot; hotkey: number }> = ({ item, hotkey }) 
   );
 };
 
-/** `alwaysVisible` keeps the hotbar on screen while the inventory is open. */
-const InventoryHotbar: React.FC<{ alwaysVisible?: boolean }> = ({ alwaysVisible }) => {
+/**
+ * `docked`: static row under the inventory panels (inventory open).
+ * Otherwise the quick-view toggled by the hotbar key; `suppressed` hides it while the inventory is open.
+ */
+const InventoryHotbar: React.FC<{ docked?: boolean; suppressed?: boolean }> = ({ docked, suppressed }) => {
   const [hotbarVisible, setHotbarVisible] = useState(false);
-  const items = useAppSelector(selectLeftInventory).items.slice(-hotbarSlots);
+  const items = getHotbarItems(useAppSelector(selectLeftInventory).items);
 
   //stupid fix for timeout
   const [handle, setHandle] = useState<ReturnType<typeof setTimeout>>();
   useNuiEvent('toggleHotbar', () => {
+    if (docked) return;
     if (hotbarVisible) {
       setHotbarVisible(false);
     } else {
@@ -104,15 +108,19 @@ const InventoryHotbar: React.FC<{ alwaysVisible?: boolean }> = ({ alwaysVisible 
     }
   });
 
+  const slots = (
+    <div className="hotbar-container">
+      {items.map((item, index) => (
+        <HotbarSlot key={`hotbar-${item.slot}`} item={item} hotkey={index + 1} />
+      ))}
+    </div>
+  );
+
+  if (docked) return <div className="hotbar-wrapper is-docked">{slots}</div>;
+
   return (
-    <SlideUp in={alwaysVisible || hotbarVisible}>
-      <div className={`hotbar-wrapper${alwaysVisible ? ' is-docked' : ''}`}>
-        <div className="hotbar-container">
-          {items.map((item, index) => (
-            <HotbarSlot key={`hotbar-${item.slot}`} item={item} hotkey={index + 1} />
-          ))}
-        </div>
-      </div>
+    <SlideUp in={!suppressed && hotbarVisible}>
+      <div className="hotbar-wrapper">{slots}</div>
     </SlideUp>
   );
 };

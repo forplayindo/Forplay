@@ -7,6 +7,8 @@
   "seatbelt_on": "Sabuk pengaman terpasang",
   "seatbelt_off": "Sabuk pengaman dilepas",
   "seatbelt_warning": "Jangan lupa pakai sabuk pengaman!",
+  "more_stressed": "Kamu merasa makin stres",
+  "more_relaxed": "Kamu merasa lebih rileks",
   "ui": {
     "auto_hide": "Sembunyi Otomatis",
     "map_type": "Jenis Peta",
@@ -72,6 +74,24 @@
     "clear_cache": "Hapus Cache",
     "edit_mini_map": "Ubah Minimap",
     "reset_mini_map": "Reset Minimap",
-    "other_currency": "Uang Kotor"
+    "other_currency": "Uang Kotor",
+    "voice_range_1": "Bisik",
+    "voice_range_2": "Normal",
+    "voice_range_3": "Teriak",
+    "fuel": "Bensin",
+    "battery": "Baterai",
+    "engine": "Mesin",
+    "belt": "Sabuk",
+    "cruise": "Cruise",
+    "lights": "Lampu",
+    "state_on": "On",
+    "state_off": "Off",
+    "engine_ok": "OK",
+    "engine_warn": "Rusak",
+    "engine_bad": "Kritis",
+    "gta6": "Sora",
+    "mandi": "Mandi",
+    "kencing": "Kencing",
+    "poop": "BAB"
   }
 }

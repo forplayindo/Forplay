@@ -9,38 +9,112 @@ local carrying = false -- dokter sedang menggendong pasien (f_police kidnap / ca
 
 AddEventHandler('hospital:client:SetEscortingState', function(state) carrying = state == true end)
 
--- animasi dokter per tahap (posisi berdiri di samping meja)
--- animasi tangan bekerja setinggi dada (dict di balik scenario PROP_HUMAN_PARKING_METER; scenario
--- sendiri tidak bisa digabung prop di tangan)
-local WORK_ANIM = { dict = 'amb@prop_human_parking_meter@male@base', clip = 'base', flag = 1 }
-local HAND = { bone = 57005, pos = vec3(0.10, 0.02, -0.02), rot = vec3(-80.0, 0.0, 0.0) } -- tangan kanan
+-- animasi dokter semua tahap: tangan bekerja di meja (clip mekanik clubhouse). Aslinya jongkok, flag 49
+-- = badan atas saja + loop, jadi kaki tetap berdiri di samping meja operasi
+local WORK_ANIM = { dict = 'anim@amb@clubhouse@tutorial@bkr_tut_ig3@', clip = 'machinic_loop_mechandplayer', flag = 49 }
+local L_HAND = { bone = 18905, pos = vec3(0.11, 0.03, 0.01), rot = vec3(0.0, 180.0, -70.0) } -- tangan kiri
 
--- props: daftar model, dipakai yang pertama ada di game (prop yang tidak ada dilewati, animasi tetap jalan)
+-- tiap tahap = daftar fase { anim, props, time }; fase terakhir jalan sampai tahap selesai.
+-- props: tiap entri = satu prop di satu tangan; models dicoba berurutan, dipakai yang pertama ada di
+-- game (kalau tidak ada satu pun, prop itu dilewati, animasi tetap jalan)
 local STEP_ANIM = {
-    anesthesia = { anim = { dict = 'anim@heists@humane_labs@finale@keycards', clip = 'ped_a_enter_loop', flag = 49 },
-                   props = { 'prop_syringe_01' }, hand = { bone = 18905, pos = vec3(0.11, 0.03, 0.01), rot = vec3(90.0, 0.0, -50.0) } },
-    incision = { anim = WORK_ANIM, props = { 'prop_scalpel', 'prop_cs_scalpel', 'prop_cs_scissors' }, hand = HAND }, -- sayat
-    repair   = { anim = WORK_ANIM, props = { 'prop_tool_pliers', 'prop_cs_pliers', 'prop_cs_scissors' }, hand = HAND }, -- ambil peluru / pasang pen
-    suture   = { anim = WORK_ANIM, props = { 'prop_cs_scissors' }, hand = HAND }, -- jahit
+    anesthesia = { -- bius
+        { anim = WORK_ANIM, props = {
+            { models = { 'prop_syringe_01', 'p_syringe_01_s' }, hand = L_HAND },
+        } },
+    },
+    incision = { -- sayat
+        { anim = WORK_ANIM, props = {
+            { models = { 'bkr_prop_fakeid_scalpel_02a', 'prop_scalpel' }, hand = { bone = 18905, pos = vec3(0.11, 0.03, 0.01), rot = vec3(180.0, 0.0, 0.0) } },
+        } },
+    },
+    repair = { -- ambil peluru / pasang pen
+        { anim = WORK_ANIM, props = {
+            { models = { 'prop_tool_pliers', 'prop_cs_pliers' }, hand = L_HAND }, -- pinset (sementara tang, belum ada prop pinset)
+        } },
+    },
+    suture = { -- jahit
+        { anim = WORK_ANIM, props = {
+            { models = { 'prop_cs_scissors' }, hand = { bone = 18905, pos = vec3(0.11, 0.03, 0.01), rot = vec3(0.0, 0.0, 0.0) } },
+        } },
+    },
 }
-local DEFAULT_ANIM = { anim = { dict = 'amb@medic@standing@tendtodead@base', clip = 'base', flag = 1 } }
+local DEFAULT_ANIM = { { anim = WORK_ANIM } } -- sterilisasi, perban
 
 local propCache = {}
----@return table? prop untuk lib.progressCircle
+---@return table[]? daftar prop { model, bone, pos, rot } fase ini
 local function stepProp(a)
     if not a.props then return end
-    local key = a.props[1]
-    if propCache[key] == nil then
-        propCache[key] = false
-        for _, name in ipairs(a.props) do
-            local model = joaat(name)
-            if IsModelInCdimage(model) then
-                propCache[key] = { model = model, bone = a.hand.bone, pos = a.hand.pos, rot = a.hand.rot }
-                break
+    if propCache[a] == nil then
+        local list = {}
+        for _, p in ipairs(a.props) do
+            for _, name in ipairs(p.models) do
+                local model = joaat(name)
+                if IsModelInCdimage(model) then
+                    list[#list + 1] = { model = model, bone = p.hand.bone, pos = p.hand.pos, rot = p.hand.rot }
+                    break
+                end
             end
         end
+        propCache[a] = #list > 0 and list or false
     end
-    return propCache[key] or nil
+    return propCache[a] or nil
+end
+
+local function attachProp(t)
+    AttachEntityToEntity(t.obj, cache.ped, GetPedBoneIndex(cache.ped, t.bone), t.pos.x, t.pos.y, t.pos.z,
+        t.rot.x, t.rot.y, t.rot.z, true, true, false, true, 1, true)
+end
+
+---Putar fase animasi berurutan (anim + prop tiap fase); fase terakhir di-loop sampai stop().
+---@param phases table[]
+---@param networked boolean prop terlihat pemain lain
+---@return { props: table[], stop: fun() }
+local function playPhases(phases, networked)
+    local h = { props = {}, active = true }
+
+    local function clearProps()
+        for i = #h.props, 1, -1 do
+            local obj = h.props[i].obj
+            if DoesEntityExist(obj) then DeleteEntity(obj) end
+            h.props[i] = nil
+        end
+    end
+
+    function h.stop()
+        h.active = false
+        clearProps()
+        ClearPedTasks(cache.ped)
+    end
+
+    CreateThread(function()
+        for i, ph in ipairs(phases) do
+            if not h.active then break end
+            clearProps()
+            local anim = ph.anim
+            if not pcall(lib.playAnim, cache.ped, anim.dict, anim.clip, 3.0, -3.0, -1, anim.flag or 1, 0, false, false, false) then
+                exports.qbx_core:Notify(('Animasi tidak ada: %s / %s'):format(anim.dict, anim.clip), 'error')
+            end
+            local c = GetEntityCoords(cache.ped)
+            for _, p in ipairs(stepProp(ph) or {}) do
+                lib.requestModel(p.model)
+                if not h.active then break end
+                local t = { obj = CreateObject(p.model, c.x, c.y, c.z, networked, true, false), bone = p.bone, pos = p.pos, rot = p.rot }
+                attachProp(t)
+                SetModelAsNoLongerNeeded(p.model)
+                h.props[#h.props + 1] = t
+            end
+            local untilTime = ph.time and i < #phases and GetGameTimer() + ph.time
+            while h.active and (not untilTime or GetGameTimer() < untilTime) do
+                if not untilTime and not IsEntityPlayingAnim(cache.ped, anim.dict, anim.clip, 3) then
+                    pcall(lib.playAnim, cache.ped, anim.dict, anim.clip, 3.0, -3.0, -1, anim.flag or 1, 0, false, false, false)
+                end
+                Wait(200)
+            end
+        end
+        if not h.active then clearProps() end
+    end)
+    return h
 end
 
 local function isDoctor()
@@ -87,7 +161,7 @@ local function runStep(stepIndex)
 
     SetNuiFocus(false, false)
     SendNUIMessage({ action = 'surgeryHide' })
-    local a = STEP_ANIM[res.id] or DEFAULT_ANIM
+    local anim = playPhases(STEP_ANIM[res.id] or DEFAULT_ANIM, true)
     local ok = lib.progressCircle({
         duration = res.duration,
         position = 'bottom',
@@ -95,10 +169,8 @@ local function runStep(stepIndex)
         useWhileDead = false,
         canCancel = true,
         disable = { move = true, car = true, combat = true, mouse = false },
-        anim = a.anim,
-        prop = stepProp(a),
     })
-    ClearPedTasks(cache.ped)
+    anim.stop()
 
     local done
     if ok then done = lib.callback.await('f_ambulancejob:server:surgeryFinish', false, index) end
@@ -266,8 +338,98 @@ RegisterNetEvent('f_ambulancejob:client:surgeryRelease', function()
     releaseFromTable()
 end)
 
+-------------------------------------------------------------------------------
+-- TEST animasi operasi (sementara, hapus setelah animasi final)
+-- /optest bius|steril|sayat|pen|jahit|perban [fase]   -> tanpa fase: semua fase berurutan seperti operasi;
+--                                                        dengan fase (1/2): hanya fase itu, di-loop
+-- /optest baring | stop
+-- /optest custom <dict> <clip> [flag]   -> coba animasi lain (tanpa prop)
+-------------------------------------------------------------------------------
+local TEST_STEP = { bius = 'anesthesia', steril = 'sterilize', sayat = 'incision', pen = 'repair', peluru = 'repair', jahit = 'suture', perban = 'dress' }
+local testAnim ---@type { props: table[], stop: fun() }?
+
+local function stopTest()
+    if testAnim then testAnim.stop() end
+    testAnim = nil
+    ClearPedTasks(cache.ped)
+end
+
+local function testProp(no)
+    local t = testAnim and testAnim.props[no]
+    if not t then exports.qbx_core:Notify('Jalankan /optest dulu', 'error') end
+    return t
+end
+
+local function reattach(t, no, extra)
+    DetachEntity(t.obj, true, false)
+    attachProp(t)
+    local line = ('prop %d%s: pos = vec3(%.3f, %.3f, %.3f), rot = vec3(%.1f, %.1f, %.1f)'):format(no, extra or '',
+        t.pos.x, t.pos.y, t.pos.z, t.rot.x, t.rot.y, t.rot.z)
+    print(line)
+    exports.qbx_core:Notify(line, 'inform', 8000)
+end
+
+-- /opprop <no> x y z rx ry rz  -> geser/putar prop ke-<no> dari /optest; '_' = nilai tetap
+RegisterCommand('opprop', function(_, args)
+    local no = tonumber(args[1]) or 1
+    local t = testProp(no)
+    if not t then return end
+    local n = {}
+    for k = 2, 7 do n[k - 1] = tonumber(args[k]) end
+    t.pos = vec3(n[1] or t.pos.x, n[2] or t.pos.y, n[3] or t.pos.z)
+    t.rot = vec3(n[4] or t.rot.x, n[5] or t.rot.y, n[6] or t.rot.z)
+    reattach(t, no)
+end, false)
+
+-- /opputar [no] -> putar prop ke arah berikutnya (24 arah kelipatan 90 derajat), posisi tetap
+local ORIENT = {}
+for _, base in ipairs({ { 0, 0 }, { 90, 0 }, { 180, 0 }, { 270, 0 }, { 0, 90 }, { 0, 270 } }) do
+    for z = 0, 270, 90 do ORIENT[#ORIENT + 1] = vec3(base[1], base[2], z) end
+end
+
+RegisterCommand('opputar', function(_, args)
+    local no = tonumber(args[1]) or 1
+    local t = testProp(no)
+    if not t then return end
+    t.orient = (t.orient or 0) % #ORIENT + 1
+    t.rot = ORIENT[t.orient]
+    reattach(t, no, (' arah %d/%d'):format(t.orient, #ORIENT))
+end, false)
+
+RegisterCommand('optest', function(_, args)
+    local name = args[1]
+    stopTest()
+    if not name or name == 'stop' then return end
+
+    if name == 'baring' then
+        lib.playAnim(cache.ped, InBedDict, InBedAnim, 8.0, 1.0, -1, 1, 0, false, false, false)
+        return exports.qbx_core:Notify(('Pasien: %s / %s'):format(InBedDict, InBedAnim), 'inform')
+    end
+
+    local phases
+    if name == 'custom' then
+        if not args[2] or not args[3] then return exports.qbx_core:Notify('/optest custom <dict> <clip> [flag]', 'error') end
+        phases = { { anim = { dict = args[2], clip = args[3], flag = tonumber(args[4]) or 1 } } }
+    else
+        local step = TEST_STEP[name]
+        if not step then return exports.qbx_core:Notify('Tahap: bius, steril, sayat, pen, jahit, perban, baring, stop', 'error') end
+        phases = STEP_ANIM[step] or DEFAULT_ANIM
+        local only = tonumber(args[2])
+        if only then
+            if not phases[only] then return exports.qbx_core:Notify(('%s hanya punya %d fase'):format(name, #phases), 'error') end
+            phases = { phases[only] }
+        end
+    end
+
+    testAnim = playPhases(phases, false)
+    local desc = {}
+    for i, ph in ipairs(phases) do desc[i] = ('%s / %s (flag %d)'):format(ph.anim.dict, ph.anim.clip, ph.anim.flag or 1) end
+    exports.qbx_core:Notify(('%s: %s'):format(name, table.concat(desc, ' → ')), 'inform', 6000)
+end, false)
+
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= cache.resource then return end
     if panelIndex then SetNuiFocus(false, false) end
     if onTable then releaseFromTable() end
+    if testAnim then stopTest() end
 end)

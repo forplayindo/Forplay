@@ -2,10 +2,11 @@ import useData from "@/hooks/useData";
 import { useRef } from "react";
 import "./index.scss";
 
-const PX = 4; // pixels per degree
-const SPAN = 70; // degrees rendered each side of the needle
+const PX = 3.7; // pixels per degree
+const SPAN = 75; // degrees rendered each side of the pointer
 const CARDINALS: Record<number, string> = { 0: "N", 45: "NE", 90: "E", 135: "SE", 180: "S", 225: "SW", 270: "W", 315: "NW" };
 
+/** GTA VI style compass: heading readout, open tick ruler (no glass) and streets underneath. */
 export const Compass = () => {
   const { Compass, VehicleInfo } = useData();
   // "unwrapped" heading so 359° -> 1° animates 2° instead of spinning back 358°
@@ -20,37 +21,36 @@ export const Compass = () => {
     acc.current += ((h - cur + 540) % 360) - 180;
   }
   const u = acc.current;
+  const shown = Math.round(((h % 360) + 360) % 360) % 360;
 
-  const ticks = [];
+  const marks = [];
   for (let d = Math.floor((u - SPAN) / 5) * 5; d <= u + SPAN; d += 5) {
     const a = ((d % 360) + 360) % 360;
-    const major = a % 15 === 0;
-    ticks.push(<div key={"t" + d} className={major ? "tk maj" : "tk"} style={{ left: d * PX }} />);
-    if (major) {
+    if (a % 15 === 0) {
       const c = CARDINALS[a];
-      ticks.push(
-        <div key={"l" + d} className={c && c.length === 1 ? "lb card" : "lb"} style={{ left: d * PX }}>
+      marks.push(
+        <div key={d} className={c ? (c.length === 1 ? "lb card" : "lb inter") : "lb"} style={{ left: d * PX }}>
           {c || a}
         </div>
       );
+    } else {
+      marks.push(<div key={d} className="tk" style={{ left: d * PX }} />);
     }
   }
 
   return (
-    <div id="compass" className="absolute top-0 left-1/2 -translate-x-1/2 select-none flex flex-col items-center gl-compass-wrap">
-      <div className="gl gl-compass">
-        <div className="win">
-          <div className="tape" style={{ transform: `translateX(${-u * PX}px)` }}>
-            {ticks}
-          </div>
+    <div id="compass" className="g6-compass select-none">
+      <div className="heading">{shown}</div>
+      <div className="pointer" />
+      <div className="ruler">
+        <div className="tape" style={{ transform: `translateX(${-u * PX}px)` }}>
+          {marks}
         </div>
-        <div className="needle" />
-        <div className="notch" />
       </div>
       {(Compass.street1 || Compass.street2) && (
-        <div className="gl gl-round gl-compass-street">
-          <span>{Compass.street1}</span>
-          {Compass.street2 && <span className="sep" />}
+        <div className="streets">
+          <span className="s1">{Compass.street1}</span>
+          {Compass.street2 && <span className="sep">-</span>}
           {Compass.street2 && <span className="s2">{Compass.street2}</span>}
         </div>
       )}

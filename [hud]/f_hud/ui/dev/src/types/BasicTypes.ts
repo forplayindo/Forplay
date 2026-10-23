@@ -1,6 +1,9 @@
 export type ClientInfoType = "radio" | "player_source" | "time" | "server_info" | "cash" | "bank" | "job" | "weapon" | "extra_currency";
 
-export type BarType = "hunger" | "health" | "thirst" | "armor" | "stamina" | "oxygen" | "stress" | "voice" | "vehicle_engine" | "vehicle_nitro";
+export type BarType = "hunger" | "health" | "thirst" | "armor" | "stamina" | "oxygen" | "stress" | "voice" | "vehicle_engine" | "vehicle_nitro" | "mandi" | "kencing" | "poop";
+
+/** Hygiene bars fed by f_hygiene (value = need level: 0 clean, 100 urgent). */
+export const HYGIENE_BARS = ["mandi", "kencing", "poop"] as const;
 
 export type BarStyleType = "circle" | "square" | "hexagon" | "hexagon-w" | "zarg" | "wave-c" | "wave-h" | "classic" | "universal" | "grt-premium" | "zarg-m";
 
@@ -13,7 +16,7 @@ export type BarProps = {
   [key: string]: any;
 };
 
-export type VehicleHudType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+export type VehicleHudType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
 export interface iClientInfo {
   active: boolean;
@@ -135,6 +138,7 @@ export interface iVehicleInfo {
   isFrontRightDoorOn: boolean;
   isFrontLeftDoorOn: boolean;
   isSeatbeltOn: boolean;
+  isCruiseOn?: boolean;
   veh_class: number;
 }
 

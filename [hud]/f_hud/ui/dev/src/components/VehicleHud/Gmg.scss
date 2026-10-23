@@ -1,0 +1,189 @@
+// "GMG" vehicle style (6): line design with #f3b354 accent
+.gmg2 {
+  --accent: #f3b354;
+  position: relative;
+  width: 280px;
+  padding-top: 22px;
+  color: #fff;
+  font-family: "sentic-text-bold", sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+  user-select: none;
+}
+
+// thin frame line: up from the engine box, rounded corner, then along the top
+.gmg2-line {
+  position: absolute;
+  top: 6px;
+  left: 16px;
+  right: 34px;
+  height: 22px;
+  border-top: 2px solid rgba(255, 255, 255, 0.9);
+  border-left: 2px solid rgba(255, 255, 255, 0.9);
+  border-top-left-radius: 16px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.gmg2-cruise {
+  position: absolute;
+  top: -2px;
+  right: 6px;
+  font-size: 18px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.3);
+
+  &.on {
+    color: var(--accent);
+  }
+}
+
+.gmg2-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gmg2-engine {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 2px solid #fff;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: rgba(10, 10, 12, 0.25);
+
+  &.warn {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  &.bad {
+    color: #ff4d5e;
+    border-color: #ff4d5e;
+  }
+}
+
+.gmg2-speed {
+  flex: 1;
+  min-width: 0;
+
+  .num {
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rpm {
+    margin-top: 6px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.15);
+    overflow: hidden;
+
+    > div {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.12s linear;
+    }
+  }
+}
+
+.gmg2-gear {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .box {
+    min-width: 28px;
+    height: 28px;
+    padding: 0 4px;
+    border: 2px solid #fff;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1;
+    background: rgba(10, 10, 12, 0.35);
+  }
+
+  .unit {
+    margin-top: 4px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+  }
+}
+
+.gmg2-fuel {
+  flex: none;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 7px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.6);
+
+  .bar {
+    width: 4px;
+    height: 36px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.15);
+    display: flex;
+    flex-direction: column-reverse;
+    overflow: hidden;
+
+    > div {
+      background: var(--accent);
+      transition: height 0.4s ease;
+    }
+  }
+
+  .pump {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: #fff;
+  }
+
+  &.low .bar > div {
+    background: #ff4d5e;
+  }
+}
+
+.gmg2-tells {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  margin-left: 44px;
+
+  .tell {
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.45);
+    background: rgba(10, 10, 12, 0.55);
+
+    &.on {
+      color: #fff;
+    }
+
+    &.off {
+      color: var(--accent);
+    }
+  }
+}

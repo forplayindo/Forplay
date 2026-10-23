@@ -13,6 +13,7 @@ shared_scripts {
 client_scripts {
     'client/main.lua',
     'client/turf.lua',
+    'client/flag.lua',
 }
 
 server_scripts {
@@ -20,8 +21,14 @@ server_scripts {
     'server/main.lua',
 }
 
+-- Gang Wars (menu /peranggang + scoreboard). App Crew di HP tetap memakai web/ lewat iframe f_phone.
+ui_page 'html/index.html'
+
 files {
-    'shared/zones.lua',
+    'html/index.html',
+    'html/style.css',
+    'html/app.js',
+    'html/map.jpg',
     'web/index.html',
     'web/style.css',
     'web/app.js',
@@ -32,4 +39,5 @@ dependencies {
     'ox_lib',
     'oxmysql',
     'qbx_core',
+    'ox_inventory',
 }

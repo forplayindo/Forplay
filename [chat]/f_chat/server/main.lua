@@ -494,6 +494,10 @@ RegisterNetEvent('_chat:messageEntered', function(name, color, message)
 end)
 
 AddEventHandler('chat:addSuggestion', function(name, help, params)
+    -- ganti entri lama dengan nama sama, supaya restart resource tidak menumpuk duplikat di payload init
+    for i = #suggestions, 1, -1 do
+        if suggestions[i].name == name then table.remove(suggestions, i) end
+    end
     suggestions[#suggestions + 1] = { name = name, help = help, params = params }
     TriggerClientEvent('chat:addSuggestion', -1, name, help, params)
 end)

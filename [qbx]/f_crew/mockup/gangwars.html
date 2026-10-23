@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Gang Wars — Mockup</title>
+<style>
+:root {
+    --bg: #111827; --card: #1a2233; --card2: #222c40; --line: #2e3a52;
+    --text: #e8edf6; --muted: #93a0b8; --accent: #5b9dff; --accent-dark: #3f82ea;
+    --gold: #e7c36a; --green: #4ade80; --red: #f87171; --orange: #fb923c; --radius: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; user-select: none; }
+body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; color: var(--text); font-size: 14px;
+    background: #2b3340 radial-gradient(circle at 30% 20%, #3b4656, #1c222b); }
+button { font: inherit; color: inherit; border: none; background: none; cursor: pointer; }
+input, select { font: inherit; }
+.hidden { display: none !important; }
+
+/* kontrol mockup (bukan bagian UI) */
+.mock-bar { position: fixed; top: 10px; right: 12px; display: flex; gap: 8px; align-items: center; z-index: 50;
+    background: rgba(0,0,0,.55); padding: 6px 10px; border-radius: 10px; font-size: 12px; color: #cbd5e1; }
+.mock-bar select { background: #0b1220; color: #e8edf6; border: 1px solid #334; border-radius: 6px; padding: 3px 6px; }
+
+/* chat preview */
+.chat { position: fixed; top: 14px; left: 14px; width: 440px; display: flex; flex-direction: column; gap: 6px; z-index: 40; }
+.chat .msg { background: rgba(10,14,22,.82); border-left: 3px solid #ef4444; border-radius: 8px; padding: 8px 10px; font-size: 13px;
+    animation: pop .25s ease; }
+.chat .msg b.tag { color: #ef4444; margin-right: 6px; }
+.chat .msg small { color: var(--muted); display: block; margin-top: 2px; font-size: 11px; }
+@keyframes pop { from { transform: translateY(-6px); opacity: 0; } }
+
+.panel { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: min(1220px, 96vw); height: min(770px, 92vh); background: var(--bg); border: 1px solid var(--line);
+    border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,.5); }
+header { display: flex; align-items: center; justify-content: space-between; padding: 16px 22px; border-bottom: 1px solid var(--line); }
+.brand { display: flex; gap: 12px; align-items: center; }
+.logo { font-size: 24px; width: 46px; height: 46px; display: grid; place-items: center; background: #3a1f1f; border-radius: 12px; }
+h1 { font-size: 20px; font-weight: 800; letter-spacing: .3px; }
+h1 span { color: #ef4444; }
+small { color: var(--muted); }
+.head-actions { display: flex; gap: 8px; align-items: center; }
+.icon-btn { width: 40px; height: 40px; border-radius: 10px; background: var(--card); display: grid; place-items: center; font-size: 16px; }
+.icon-btn:hover { background: #4a2323; }
+.mygang { display: flex; align-items: center; gap: 8px; padding: 0 14px; height: 40px; border-radius: 10px; background: var(--card); font-weight: 600; font-size: 13px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+.tabs { display: flex; gap: 6px; padding: 12px 22px 0; }
+.tabs button { padding: 8px 18px; border-radius: 999px; background: var(--card); color: var(--muted); font-weight: 600; position: relative; }
+.tabs button.active { background: var(--accent); color: #0b1220; }
+.tabs .count { margin-left: 6px; background: #ef4444; color: #fff; border-radius: 999px; padding: 0 7px; font-size: 11px; }
+
+main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 14px 22px 20px; }
+.view { flex: 1; min-height: 0; display: flex; gap: 14px; }
+.scroll { overflow-y: auto; scrollbar-width: thin; }
+.scroll::-webkit-scrollbar { width: 6px; } .scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+
+/* MAP */
+.map-wrap { flex: 1; position: relative; border-radius: var(--radius); overflow: hidden; background: #0ea5d0; border: 1px solid var(--line); cursor: grab; }
+.map-wrap.drawing { cursor: crosshair; }
+.map-inner { position: absolute; left: 0; top: 0; width: 2048px; height: 2048px; transform-origin: 0 0; }
+.map-inner img { width: 2048px; height: 2048px; display: block; pointer-events: none; }
+.map-inner svg { position: absolute; inset: 0; }
+.zone { stroke-width: 2.5; vector-effect: non-scaling-stroke; cursor: pointer; transition: fill-opacity .15s; }
+.zone.free { fill: #d1d5db; fill-opacity: .45; stroke: #9ca3af; }
+.zone.owned { fill-opacity: .45; }
+.zone:hover { fill-opacity: .7; }
+.zone.sel { stroke: #fff; stroke-width: 3.5; }
+.zone.war { animation: blink 1s infinite; }
+.zone.prep { stroke-dasharray: 8 5; }
+@keyframes blink { 50% { fill-opacity: .15; } }
+.zlabel { font-size: 11px; font-weight: 800; fill: #111827; paint-order: stroke; stroke: rgba(255,255,255,.85); stroke-width: 3px; pointer-events: none; text-anchor: middle; }
+.me { fill: #ef4444; stroke: #fff; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.me-ring { fill: none; stroke: #ef4444; stroke-width: 2; vector-effect: non-scaling-stroke; animation: ring 1.5s infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes ring { from { transform: scale(.5); opacity: 1; } to { transform: scale(2.4); opacity: 0; } }
+.draft { fill: #5b9dff; fill-opacity: .25; stroke: #5b9dff; stroke-width: 2.5; vector-effect: non-scaling-stroke; pointer-events: none; }
+.vtx { fill: #fff; stroke: #5b9dff; stroke-width: 2.5; vector-effect: non-scaling-stroke; cursor: move; }
+.vtx.first { fill: #5b9dff; }
+
+.map-tools { position: absolute; left: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
+.map-tools button { width: 36px; height: 36px; border-radius: 10px; background: rgba(17,24,39,.9); font-size: 17px; font-weight: 700; }
+.legend { position: absolute; left: 12px; top: 12px; background: rgba(17,24,39,.9); border-radius: 10px; padding: 8px 12px; font-size: 12px; display: flex; flex-direction: column; gap: 4px; }
+.legend div { display: flex; gap: 8px; align-items: center; }
+.legend .sw { width: 14px; height: 10px; border-radius: 3px; }
+.tip { position: absolute; pointer-events: none; background: rgba(11,18,32,.95); border: 1px solid var(--line); border-radius: 10px; padding: 8px 11px; font-size: 12px; z-index: 5; min-width: 150px; }
+.tip b { display: block; font-size: 13px; margin-bottom: 2px; }
+.draw-hint { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: rgba(17,24,39,.92); border: 1px solid var(--accent);
+    border-radius: 10px; padding: 7px 14px; font-size: 12px; color: var(--accent); }
+
+.side { width: 330px; flex-shrink: 0; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); display: flex; flex-direction: column; min-height: 0; }
+.side-body { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.side-foot { padding: 14px 16px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.side h3 { font-size: 17px; }
+.kv { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; padding: 7px 0; border-bottom: 1px dashed var(--line); }
+.kv span:first-child { color: var(--muted); }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label { font-size: 12px; color: var(--muted); font-weight: 600; }
+.field input { padding: 9px 11px; border-radius: 10px; border: 1px solid var(--line); background: var(--card2); color: var(--text); outline: none; }
+.field input:focus { border-color: var(--accent); }
+.items { display: flex; flex-direction: column; gap: 6px; }
+.item-row { display: grid; grid-template-columns: 1fr 70px 32px; gap: 6px; }
+.item-row input { padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--card2); color: var(--text); outline: none; min-width: 0; }
+.item-row button { border-radius: 9px; background: #3a1f1f; color: var(--red); font-weight: 800; }
+.ghost { padding: 8px; border-radius: 10px; border: 1px dashed var(--line); color: var(--muted); font-weight: 600; font-size: 13px; }
+.ghost:hover { border-color: var(--accent); color: var(--accent); }
+.pts { display: flex; gap: 6px; flex-wrap: wrap; }
+.pts span { font-size: 11px; background: var(--card2); border-radius: 6px; padding: 3px 7px; color: var(--muted); font-family: Consolas, monospace; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.btn { padding: 10px 14px; border-radius: 10px; background: var(--card2); font-weight: 700; font-size: 13px; }
+.btn:hover { background: #2c3850; }
+.btn.primary { background: var(--accent); color: #0b1220; }
+.btn.primary:hover { background: var(--accent-dark); }
+.btn.war { background: #ef4444; color: #fff; }
+.btn.war:hover { background: #dc2626; }
+.btn.claim { background: var(--green); color: #0f2417; }
+.btn.danger { background: #3a1f1f; color: var(--red); }
+.btn:disabled { opacity: .4; cursor: not-allowed; background: var(--line); color: var(--muted); }
+.reason { font-size: 11px; color: var(--orange); margin-top: 4px; }
+
+/* LIST / TABLE */
+.list { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 10px; }
+.toolbar .info { color: var(--muted); font-size: 12px; }
+.filters { display: flex; gap: 6px; }
+.filters button { padding: 6px 14px; border-radius: 999px; background: var(--card); color: var(--muted); font-size: 12px; font-weight: 600; }
+.filters button.active { background: var(--card2); color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
+.thead, .trow { display: grid; grid-template-columns: 1.3fr 1.2fr 1.2fr 0.8fr 170px; gap: 12px; align-items: center; padding: 0 16px; }
+.thead { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .6px; padding-bottom: 4px; }
+.trow { background: var(--card); border: 1px solid var(--line); border-radius: 12px; min-height: 60px; padding-top: 10px; padding-bottom: 10px; }
+.trow b { font-size: 14px; }
+.trow .sub { font-size: 11px; color: var(--muted); }
+.gang { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.status { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; display: inline-block; }
+.st-free { background: #263042; color: #cbd5e1; }
+.st-owned { background: #1d2a44; color: var(--accent); }
+.st-cd { background: #3a2a14; color: var(--gold); }
+.st-prep { background: #3a2a14; color: var(--orange); }
+.st-war { background: #3a1f1f; color: var(--red); }
+.st-done { background: #173a26; color: var(--green); }
+.reward-mini { font-size: 11px; color: var(--muted); }
+
+/* PERANG */
+.war-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.war-card.live { border-color: #7f1d1d; box-shadow: inset 0 0 0 1px #7f1d1d; }
+.war-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.war-head h3 { font-size: 17px; }
+.timer { font-family: Consolas, monospace; font-size: 24px; font-weight: 800; }
+.timer small { display: block; font-family: 'Segoe UI'; font-size: 11px; text-align: right; }
+.parts { display: flex; gap: 8px; flex-wrap: wrap; }
+.part { display: flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px; background: var(--card2); font-size: 13px; font-weight: 600; }
+.part em { font-style: normal; font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+.scores { display: flex; flex-direction: column; gap: 7px; }
+.score { display: grid; grid-template-columns: 130px 1fr 60px; gap: 10px; align-items: center; font-size: 13px; }
+.bar { height: 10px; background: var(--card2); border-radius: 999px; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 999px; transition: width .4s; }
+.score b { text-align: right; font-family: Consolas, monospace; font-size: 15px; }
+.empty { color: var(--muted); text-align: center; padding: 60px 0; }
+
+/* RIWAYAT */
+.hrow { display: grid; grid-template-columns: 110px 1fr 2fr 1.3fr; gap: 12px; align-items: center; padding: 12px 16px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.hrow .when { font-size: 12px; color: var(--muted); }
+.hscores { display: flex; gap: 10px; flex-wrap: wrap; font-size: 12px; }
+.hscores span { display: flex; align-items: center; gap: 5px; }
+.result { font-size: 13px; font-weight: 700; }
+.result.win { color: var(--green); } .result.hold { color: var(--accent); } .result.fail { color: var(--muted); }
+
+/* LEADERBOARD */
+.podium { display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 14px; align-items: end; margin-bottom: 16px; }
+.pod { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; text-align: center; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.pod .medal { font-size: 30px; }
+.pod .big { font-size: 30px; font-weight: 800; }
+.pod.p1 { padding: 26px 16px; border-color: var(--gold); }
+.pod .gname { font-weight: 800; font-size: 16px; display: flex; gap: 8px; align-items: center; }
+.lrow { display: grid; grid-template-columns: 50px 1.2fr 90px 2fr; gap: 12px; align-items: center; padding: 12px 16px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.lrow.mine { border-color: var(--accent); }
+.lrow .rank { font-weight: 800; font-size: 16px; color: var(--muted); }
+.lrow .zones { font-size: 12px; color: var(--muted); }
+
+/* REWARD */
+.rgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; align-content: start; }
+.rcard { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.rcard.taken { opacity: .5; }
+.rcard ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.rcard li { display: flex; justify-content: space-between; background: var(--card2); padding: 7px 10px; border-radius: 8px; font-size: 13px; }
+.rcard li span { color: var(--muted); font-family: Consolas, monospace; }
+
+/* MODAL */
+.modal-bg { position: absolute; inset: 0; background: rgba(5,8,14,.7); display: grid; place-items: center; z-index: 20; }
+.modal { width: 520px; max-height: 88%; background: var(--bg); border: 1px solid var(--line); border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; }
+.modal-head { padding: 18px 20px; border-bottom: 1px solid var(--line); }
+.modal-head h2 { font-size: 18px; }
+.modal-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; font-size: 13px; }
+.modal-foot { padding: 14px 20px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; }
+.rules { display: flex; flex-direction: column; gap: 6px; }
+.rules li { margin-left: 18px; color: #cbd5e1; line-height: 1.45; }
+.checks { display: flex; flex-direction: column; gap: 6px; }
+.check { display: flex; justify-content: space-between; padding: 8px 12px; border-radius: 9px; background: var(--card); }
+.check.ok b { color: var(--green); } .check.no b { color: var(--red); }
+.ptable { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; background: var(--card); border-radius: 10px; padding: 10px 12px; }
+.ptable span:nth-child(even) { color: var(--gold); font-weight: 700; text-align: right; }
+.agree { display: flex; gap: 8px; align-items: center; color: #cbd5e1; cursor: pointer; }
+.section-t { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+
+.toast { position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); background: #111827; border: 1px solid var(--line);
+    padding: 10px 16px; border-radius: 10px; font-size: 13px; z-index: 30; animation: pop .2s; }
+.toast.err { border-color: var(--red); color: var(--red); }
+.toast.ok { border-color: var(--green); color: var(--green); }
+
+.note { margin-top: 10px; font-size: 11px; color: var(--gold); background: #2a2414; border: 1px dashed #7a5a24; border-radius: 8px; padding: 7px 10px; }
+</style>
+</head>
+<body>
+
+<!-- Kontrol mockup: bukan bagian dari UI asli -->
+<div class="mock-bar">
+    MOCKUP · Lihat sebagai:
+    <select id="mock-role">
+        <option value="boss">Ballas · Boss (rank 3)</option>
+        <option value="member">Ballas · Anggota (rank 1)</option>
+        <option value="admin">Ballas · Boss + Admin</option>
+    </select>
+</div>
+
+<div class="chat" id="chat"></div>
+
+<div class="panel">
+    <header>
+        <div class="brand"><span class="logo">⚔️</span><div><h1>GANG <span>WARS</span></h1><small>Forplay · Perebutan wilayah antar gang</small></div></div>
+        <div class="head-actions">
+            <div class="mygang"><span class="dot" style="background:#a855f7"></span>Ballas · <span id="my-rank">Boss</span> · <span style="color:var(--green)">7 online</span></div>
+            <button class="icon-btn" title="Tutup">✕</button>
+        </div>
+    </header>
+    <nav class="tabs" id="tabs">
+        <button data-tab="map" class="active">🗺️ Map</button>
+        <button data-tab="zones">📍 Wilayah</button>
+        <button data-tab="wars">⚔️ Perang<span class="count" id="war-count">2</span></button>
+        <button data-tab="history">📜 Riwayat</button>
+        <button data-tab="board">🏆 Leaderboard</button>
+        <button data-tab="reward">🎁 Reward<span class="count" id="reward-count">2</span></button>
+    </nav>
+
+    <main>
+        <!-- MAP -->
+        <section class="view" id="v-map">
+            <div class="map-wrap" id="map">
+                <div class="map-inner" id="map-inner">
+                    <img src="../../../f_phone/web/src/assets/maps/los-santos.png" alt="">
+                    <svg id="svg" viewBox="0 0 2048 2048" width="2048" height="2048"></svg>
+                </div>
+                <div class="legend">
+                    <div><span class="sw" style="background:#d1d5db"></span>Belum dikuasai</div>
+                    <div><span class="sw" style="background:#a855f7"></span>Dikuasai (warna gang)</div>
+                    <div><span class="sw" style="background:#ef4444"></span>Berkedip = perang</div>
+                    <div><span class="sw" style="border:1px dashed #fff"></span>Garis putus = persiapan</div>
+                    <div><span class="dot" style="background:#ef4444"></span>Posisi kamu</div>
+                </div>
+                <div class="map-tools">
+                    <button id="zoom-in">+</button><button id="zoom-out">−</button><button id="zoom-me" title="Ke posisi saya">◎</button>
+                </div>
+                <div class="draw-hint hidden" id="draw-hint">Klik kiri = tambah titik · Drag titik = geser · Klik kanan titik = hapus · Scroll = zoom</div>
+                <div class="tip hidden" id="tip"></div>
+            </div>
+            <aside class="side" id="side"></aside>
+        </section>
+
+        <!-- WILAYAH -->
+        <section class="view hidden" id="v-zones" style="flex-direction:column">
+            <div class="toolbar">
+                <div class="filters" id="zone-filter">
+                    <button data-f="all" class="active">Semua</button><button data-f="free">Bebas</button>
+                    <button data-f="mine">Gang saya</button><button data-f="open">Bisa direbut</button>
+                </div>
+                <div class="info">Perang berjalan: <b id="slot">2/3</b> · Hanya Boss/Wakil yang bisa Kuasai/Rebut</div>
+            </div>
+            <div class="thead"><span>Wilayah</span><span>Gang</span><span>Status</span><span>Min. peserta</span><span></span></div>
+            <div class="list scroll" id="zone-list"></div>
+        </section>
+
+        <!-- PERANG -->
+        <section class="view hidden" id="v-wars" style="flex-direction:column">
+            <div class="toolbar"><div class="info">Join hanya saat masa persiapan · skor diperbarui tiap 15 detik</div></div>
+            <div class="list scroll" id="war-list"></div>
+        </section>
+
+        <!-- RIWAYAT -->
+        <section class="view hidden" id="v-history" style="flex-direction:column">
+            <div class="toolbar">
+                <div class="filters" id="hist-filter"><button data-f="all" class="active">Semua</button><button data-f="mine">Gang saya</button></div>
+                <div class="info">20 perang terakhir · sisanya dihapus otomatis</div>
+            </div>
+            <div class="list scroll" id="hist-list"></div>
+        </section>
+
+        <!-- LEADERBOARD -->
+        <section class="view hidden scroll" id="v-board" style="flex-direction:column; display:block"></section>
+
+        <!-- REWARD -->
+        <section class="view hidden" id="v-reward" style="flex-direction:column">
+            <div class="toolbar"><div class="info">Reward dari wilayah yang dimenangkan gangmu · diambil oleh Boss/Wakil ke inventory sendiri</div></div>
+            <div class="rgrid scroll" id="reward-list"></div>
+        </section>
+    </main>
+
+    <div class="modal-bg hidden" id="modal"></div>
+    <div class="toast hidden" id="toast"></div>
+</div>
+
+<script>
+// ---------------------------------------------------------------- data contoh
+const MAX_WARS = 3, PREP_MIN = 10, WAR_MIN = 10, CD_HOURS = 24;
+const MY = 'ballas';
+const GANGS = {
+    ballas:   { label: 'Ballas',   color: '#a855f7', online: 7 },
+    vagos:    { label: 'Vagos',    color: '#facc15', online: 6 },
+    families: { label: 'Families', color: '#22c55e', online: 3 },
+    lostmc:   { label: 'Lost MC',  color: '#ef4444', online: 9 },
+};
+const now = () => Date.now();
+const MIN = 60000, HOUR = 3600000;
+
+// koordinat game (x, y) — poligon vec2
+let zones = [
+    { id: 'ROCKF', label: 'Rockford Hills', owner: 'vagos', cd: now() + 3*HOUR + 20*MIN, min: 5,
+      reward: [['money', 50000], ['weed_bag', 10]],
+      pts: [[-1379,-38],[-1300,-38],[-1300,445],[-743,445],[-743,13],[-595,13],[-595,-127],[-550,-127],[-550,-407],[-1300,-407],[-1300,-257],[-1379,-257]] },
+    { id: 'MORN', label: 'Morningwood', owner: null, cd: 0, min: 5, reward: [['money', 25000]],
+      pts: [[-1635,-500],[-1300,-511],[-1300,-257],[-1379,-257],[-1379,-107],[-1635,-107]] },
+    { id: 'KOREAT', label: 'Little Seoul', owner: 'lostmc', cd: 0, min: 5, reward: [['money', 40000], ['lockpick', 5]],
+      pts: [[-1127,-723],[-774,-723],[-774,-1158],[-355,-1158],[-355,-723],[-403,-723],[-403,-511],[-1127,-511]] },
+    { id: 'VESP', label: 'Vespucci', owner: null, cd: 0, min: 6, reward: [['money', 30000]],
+      pts: [[-1400,-1500],[-1050,-1500],[-1050,-1000],[-1400,-1000]] },
+    { id: 'MIRR', label: 'Mirror Park', owner: 'families', cd: 0, min: 5, reward: [['money', 35000], ['coke_bag', 5]],
+      pts: [[870,-821],[1391,-821],[1391,-282],[870,-282]] },
+    { id: 'LMESA', label: 'La Mesa', owner: 'vagos', cd: 0, min: 5, reward: [['money', 30000], ['meth_bag', 5]],
+      pts: [[618,-1708],[1118,-1708],[1118,-1392],[934,-1392],[934,-1006],[505,-1006],[505,-1158],[618,-1158]] },
+    { id: 'DAVIS', label: 'Davis', owner: 'ballas', cd: now() + 15*HOUR + 5*MIN, min: 5, reward: [['money', 30000]],
+      pts: [[-250,-1800],[300,-1800],[300,-1520],[-250,-1520]] },
+    { id: 'STRAW', label: 'Strawberry', owner: 'ballas', cd: 0, min: 5, reward: [['money', 30000], ['weed_bag', 5]],
+      pts: [[-350,-1520],[300,-1520],[300,-1250],[-350,-1250]] },
+    { id: 'RANCHO', label: 'Rancho', owner: null, cd: 0, min: 8, reward: [['money', 60000], ['pistol_ammo', 50]],
+      pts: [[250,-2150],[600,-2150],[600,-1820],[250,-1820]] },
+    { id: 'SANDY', label: 'Sandy Shores', owner: 'lostmc', cd: 0, min: 5, reward: [['money', 45000]],
+      pts: [[1350,3500],[2200,3500],[2200,3900],[1350,3900]] },
+    { id: 'PALETO', label: 'Paleto Bay', owner: null, cd: 0, min: 5, reward: [['money', 45000]],
+      pts: [[-450,6050],[250,6050],[250,6550],[-450,6550]] },
+];
+
+// perang aktif
+let wars = [
+    { zone: 'LMESA', phase: 'prep', ends: now() + 7*MIN + 42000, defender: 'vagos', attackers: ['families'], points: {} },
+    { zone: 'KOREAT', phase: 'war', ends: now() + 4*MIN + 15000, defender: 'lostmc', attackers: ['ballas'], points: { ballas: 124, lostmc: 98 } },
+];
+
+let history = [
+    { t: '17/10 21:30', zone: 'Davis', from: 'families', win: 'ballas', scores: { ballas: 210, families: 180, vagos: 40 } },
+    { t: '17/10 20:05', zone: 'Paleto Bay', from: null, win: null, scores: { families: 0 } },
+    { t: '16/10 23:10', zone: 'Rockford Hills', from: 'vagos', win: 'vagos', scores: { vagos: 150, ballas: 120 } },
+    { t: '16/10 21:44', zone: 'Sandy Shores', from: null, win: 'lostmc', scores: { lostmc: 96 } },
+    { t: '16/10 19:20', zone: 'Mirror Park', from: 'vagos', win: 'families', scores: { families: 132, vagos: 101 } },
+    { t: '15/10 22:02', zone: 'Strawberry', from: 'lostmc', win: 'ballas', scores: { ballas: 188, lostmc: 77 } },
+];
+
+let rewards = [
+    { zone: 'Davis', t: '17/10 21:30', items: [['money', 30000]], taken: false },
+    { zone: 'Strawberry', t: '15/10 22:02', items: [['money', 30000], ['weed_bag', 5]], taken: false },
+    { zone: 'Davis', t: '12/10 20:11', items: [['money', 30000]], taken: true, by: 'Tyrone (Wakil)' },
+];
+
+const ME_POS = [120, -1640]; // posisi pemain (Davis)
+
+// ---------------------------------------------------------------- util
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const role = () => $('#mock-role').value;
+const canAct = () => role() !== 'member';
+const isAdmin = () => role() === 'admin';
+const zoneById = id => zones.find(z => z.id === id);
+const warOf = id => wars.find(w => w.zone === id);
+const gdot = g => `<span class="dot" style="background:${GANGS[g].color}"></span>`;
+const gname = g => g ? `<span class="gang">${gdot(g)}${GANGS[g].label}</span>` : '<span class="sub">— Belum ada</span>';
+const fmtItems = items => items.map(([n, q]) => `${q}x ${n}`).join(', ');
+const mmss = ms => { ms = Math.max(0, ms); const s = Math.floor(ms / 1000); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; };
+const hm = ms => { const m = Math.max(1, Math.ceil(ms / MIN)); const h = Math.floor(m / 60); return h ? `${h} jam ${m % 60} menit` : `${m} menit`; };
+
+// kalibrasi gambar 2048px (perkiraan untuk mockup; versi asli dikalibrasi dari titik acuan)
+const S = 0.1762, OX = 990, OY = 1375;
+const toImg = ([x, y]) => [OX + x * S, OY - y * S];
+const toGame = (px, py) => [Math.round((px - OX) / S), Math.round((OY - py) / S)];
+
+function toast(text, kind = '') {
+    const t = $('#toast'); t.textContent = text; t.className = 'toast ' + kind;
+    clearTimeout(t._t); t._t = setTimeout(() => t.classList.add('hidden'), 2600);
+}
+function announce(text) {
+    const m = document.createElement('div'); m.className = 'msg';
+    m.innerHTML = `<b class="tag">[GANG WARS]</b>${text}<small>Chat · Pengumuman — tidak terlihat oleh job police/bcso/sasp/ambulance</small>`;
+    $('#chat').prepend(m); setTimeout(() => m.remove(), 12000);
+}
+
+// status satu wilayah + bisa/tidaknya diklik
+function zoneState(z) {
+    const w = warOf(z.id);
+    if (w) return { key: w.phase, text: (w.phase === 'prep' ? 'Persiapan ' : 'Perang ') + mmss(w.ends - now()), cls: 'st-' + w.phase, ends: w.ends };
+    if (z.cd > now()) return { key: 'cd', text: 'Cooldown ' + hm(z.cd - now()), cls: 'st-cd' };
+    return z.owner ? { key: 'owned', text: 'Dikuasai', cls: 'st-owned' } : { key: 'free', text: 'Bebas', cls: 'st-free' };
+}
+function actionOf(z) {
+    const st = zoneState(z);
+    if (st.key === 'prep' || st.key === 'war' || st.key === 'cd') return null;
+    if (z.owner === MY) return null;
+    const label = z.owner ? 'Rebut' : 'Kuasai';
+    const checks = [
+        { t: 'Rank Boss / Wakil', ok: canAct(), v: canAct() ? 'Boss' : 'Anggota' },
+        { t: `Anggota Ballas online (min ${z.min})`, ok: GANGS[MY].online >= z.min, v: `${GANGS[MY].online}/${z.min}` },
+    ];
+    if (z.owner) checks.push({ t: `Anggota ${GANGS[z.owner].label} online (min ${z.min})`, ok: GANGS[z.owner].online >= z.min, v: `${GANGS[z.owner].online}/${z.min}` });
+    checks.push({ t: `Perang bersamaan (maks ${MAX_WARS})`, ok: wars.length < MAX_WARS, v: `${wars.length}/${MAX_WARS}` });
+    const bad = checks.find(c => !c.ok);
+    return { label, checks, ok: !bad, reason: bad && (bad.t.startsWith('Rank') ? 'Hanya Boss/Wakil' : bad.t.replace(/ \(.*/, '') + ' ' + bad.v) };
+}
+
+// ---------------------------------------------------------------- MAP
+const map = $('#map'), inner = $('#map-inner'), svg = $('#svg');
+let view = { s: 1.5, x: 0, y: 0 };
+let selected = null;
+let draft = null; // { label, min, items, pts: [[x,y]], editId }
+
+function applyView() { inner.style.transform = `translate(${view.x}px,${view.y}px) scale(${view.s})`; }
+function centerOn([x, y], s) {
+    const [px, py] = toImg([x, y]); if (s) view.s = s;
+    view.x = map.clientWidth / 2 - px * view.s; view.y = map.clientHeight / 2 - py * view.s; applyView();
+}
+function zoomAt(f, cx, cy) {
+    const ns = Math.min(6, Math.max(0.35, view.s * f));
+    view.x = cx - (cx - view.x) * ns / view.s; view.y = cy - (cy - view.y) * ns / view.s; view.s = ns; applyView();
+}
+function evImg(e) { const r = map.getBoundingClientRect(); return [(e.clientX - r.left - view.x) / view.s, (e.clientY - r.top - view.y) / view.s]; }
+
+function renderMap() {
+    let h = '';
+    for (const z of zones) {
+        const st = zoneState(z);
+        const pts = z.pts.map(p => toImg(p).join(',')).join(' ');
+        const cls = ['zone', z.owner ? 'owned' : 'free', st.key === 'war' ? 'war' : '', st.key === 'prep' ? 'prep' : '', selected === z.id ? 'sel' : ''].join(' ');
+        const fill = z.owner ? `fill="${GANGS[z.owner].color}" stroke="${GANGS[z.owner].color}"` : '';
+        h += `<polygon class="${cls}" data-id="${z.id}" points="${pts}" ${fill}/>`;
+        const c = z.pts.reduce((a, p) => [a[0] + p[0] / z.pts.length, a[1] + p[1] / z.pts.length], [0, 0]);
+        const [lx, ly] = toImg(c);
+        h += `<text class="zlabel" x="${lx}" y="${ly}">${esc(z.label)}</text>`;
+    }
+    if (draft && draft.pts.length) {
+        const pts = draft.pts.map(p => toImg(p).join(',')).join(' ');
+        h += draft.pts.length > 2 ? `<polygon class="draft" points="${pts}"/>` : `<polyline class="draft" fill="none" points="${pts}"/>`;
+        draft.pts.forEach((p, i) => { const [x, y] = toImg(p); h += `<circle class="vtx ${i ? '' : 'first'}" data-i="${i}" cx="${x}" cy="${y}" r="${6 / view.s + 2}"/>`; });
+    }
+    const [mx, my] = toImg(ME_POS);
+    h += `<circle class="me-ring" cx="${mx}" cy="${my}" r="9"/><circle class="me" cx="${mx}" cy="${my}" r="5"/>`;
+    svg.innerHTML = h;
+    map.classList.toggle('drawing', !!draft);
+    $('#draw-hint').classList.toggle('hidden', !draft);
+}
+
+// pan / klik / drag titik
+let drag = null;
+map.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    const v = e.target.closest('.vtx');
+    drag = v ? { vtx: +v.dataset.i } : { sx: e.clientX, sy: e.clientY, vx: view.x, vy: view.y, moved: false };
+});
+window.addEventListener('mousemove', e => {
+    if (drag && drag.vtx !== undefined) { const [px, py] = evImg(e); draft.pts[drag.vtx] = toGame(px, py); renderMap(); renderSide(); return; }
+    if (drag) {
+        const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+        if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+        if (drag.moved) { view.x = drag.vx + dx; view.y = drag.vy + dy; applyView(); }
+    }
+    const pg = e.target.closest && e.target.closest('polygon.zone');
+    const tip = $('#tip');
+    if (pg && !drag && !draft) {
+        const z = zoneById(pg.dataset.id), st = zoneState(z), r = map.getBoundingClientRect();
+        tip.innerHTML = `<b>${esc(z.label)}</b>${z.owner ? GANGS[z.owner].label : 'Belum dikuasai'}<br><span class="status ${st.cls}" style="margin-top:5px">${st.text}</span>`;
+        tip.style.left = (e.clientX - r.left + 14) + 'px'; tip.style.top = (e.clientY - r.top + 14) + 'px'; tip.classList.remove('hidden');
+    } else tip.classList.add('hidden');
+});
+window.addEventListener('mouseup', e => {
+    if (!drag) return;
+    const d = drag; drag = null;
+    if (d.vtx !== undefined || d.moved) return;
+    if (draft) { const [px, py] = evImg(e); draft.pts.push(toGame(px, py)); renderMap(); renderSide(); return; }
+    const pg = e.target.closest('polygon.zone');
+    selected = pg ? pg.dataset.id : null; renderMap(); renderSide();
+});
+map.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    const v = e.target.closest('.vtx');
+    if (v && draft) { draft.pts.splice(+v.dataset.i, 1); renderMap(); renderSide(); }
+});
+map.addEventListener('wheel', e => { e.preventDefault(); const r = map.getBoundingClientRect(); zoomAt(e.deltaY < 0 ? 1.15 : 1 / 1.15, e.clientX - r.left, e.clientY - r.top); renderMap(); }, { passive: false });
+$('#zoom-in').onclick = () => { zoomAt(1.3, map.clientWidth / 2, map.clientHeight / 2); renderMap(); };
+$('#zoom-out').onclick = () => { zoomAt(1 / 1.3, map.clientWidth / 2, map.clientHeight / 2); renderMap(); };
+$('#zoom-me').onclick = () => { centerOn(ME_POS, 2.5); renderMap(); };
+
+// panel kanan
+function actionButton(z, full) {
+    const a = actionOf(z);
+    if (!a) return '';
+    return `<div><button class="btn war" style="${full ? 'width:100%' : 'width:100%'}" data-act="${z.id}" ${a.ok ? '' : 'disabled'}>${a.label}</button>${a.ok ? '' : `<div class="reason">⚠ ${a.reason}</div>`}</div>`;
+}
+function renderSide() {
+    const side = $('#side');
+    if (draft) {
+        side.innerHTML = `
+        <div class="side-body scroll">
+            <h3>${draft.editId ? 'Edit Wilayah' : 'Tambah Wilayah'}</h3>
+            <div class="field"><label>Nama wilayah</label><input id="d-name" value="${esc(draft.label)}" placeholder="mis. Grove Street"></div>
+            <div class="field"><label>Minimal peserta online (tiap gang)</label><input id="d-min" type="number" min="1" value="${draft.min}"></div>
+            <div class="section-t">Reward (nama item + jumlah)</div>
+            <div class="items" id="d-items">${draft.items.map((it, i) => `
+                <div class="item-row"><input data-k="n" data-i="${i}" value="${esc(it[0])}" placeholder="nama item, mis. money"><input data-k="q" data-i="${i}" type="number" min="1" value="${it[1]}"><button data-rm="${i}">✕</button></div>`).join('')}
+            </div>
+            <button class="ghost" id="d-add">+ Tambah item</button>
+            <div class="section-t">Titik (${draft.pts.length}) — min. 3</div>
+            <div class="pts">${draft.pts.map((p, i) => `<span>${i + 1}: ${p[0]}, ${p[1]}</span>`).join('') || '<small>Klik di peta untuk menambah titik</small>'}</div>
+            <div class="row2"><button class="btn" id="d-undo">↶ Undo</button><button class="btn" id="d-me">📍 Posisi saya [E]</button></div>
+            <div class="note">Mode gambar tetap aktif saat NUI ditutup: jalan ke sudut zona → tekan [E] untuk menambah titik dari posisi asli. Garis zona tampil di dunia game.</div>
+        </div>
+        <div class="side-foot">
+            <button class="btn primary" id="d-save" ${draft.pts.length >= 3 ? '' : 'disabled'}>Simpan Wilayah</button>
+            <button class="btn" id="d-cancel">Batal</button>
+        </div>`;
+        $('#d-name').oninput = e => draft.label = e.target.value;
+        $('#d-min').oninput = e => draft.min = +e.target.value;
+        side.querySelectorAll('#d-items input').forEach(inp => inp.oninput = e => {
+            const i = +e.target.dataset.i; if (e.target.dataset.k === 'n') draft.items[i][0] = e.target.value; else draft.items[i][1] = +e.target.value;
+        });
+        side.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { draft.items.splice(+b.dataset.rm, 1); renderSide(); });
+        $('#d-add').onclick = () => { draft.items.push(['', 1]); renderSide(); };
+        $('#d-undo').onclick = () => { draft.pts.pop(); renderMap(); renderSide(); };
+        $('#d-me').onclick = () => { draft.pts.push([ME_POS[0] + Math.round(Math.random() * 60 - 30), ME_POS[1] + Math.round(Math.random() * 60 - 30)]); renderMap(); renderSide(); toast('Titik ditambah dari posisi kamu', 'ok'); };
+        $('#d-cancel').onclick = () => { draft = null; renderMap(); renderSide(); };
+        $('#d-save').onclick = saveDraft;
+        return;
+    }
+    const z = selected && zoneById(selected);
+    if (!z) {
+        const owned = zones.filter(z => z.owner === MY).length;
+        side.innerHTML = `
+        <div class="side-body scroll">
+            <h3>Ringkasan</h3>
+            <div class="kv"><span>Total wilayah</span><b>${zones.length}</b></div>
+            <div class="kv"><span>Dikuasai Ballas</span><b>${owned}</b></div>
+            <div class="kv"><span>Wilayah bebas</span><b>${zones.filter(z => !z.owner).length}</b></div>
+            <div class="kv"><span>Perang berjalan</span><b>${wars.length}/${MAX_WARS}</b></div>
+            <small style="margin-top:6px">Klik wilayah di peta untuk detail. Scroll untuk zoom, drag untuk geser.</small>
+        </div>
+        ${isAdmin() ? `<div class="side-foot"><button class="btn primary" id="add-zone">＋ Tambah Wilayah (Admin)</button></div>` : ''}`;
+        if (isAdmin()) $('#add-zone').onclick = () => { draft = { label: '', min: 5, items: [['money', 25000]], pts: [] }; selected = null; renderMap(); renderSide(); };
+        return;
+    }
+    const st = zoneState(z);
+    side.innerHTML = `
+    <div class="side-body scroll">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h3>${esc(z.label)}</h3><button class="icon-btn" id="side-close" style="width:30px;height:30px">✕</button></div>
+        <div><span class="status ${st.cls}">${st.text}</span></div>
+        <div class="kv"><span>Dikuasai</span>${gname(z.owner)}</div>
+        <div class="kv"><span>Min. peserta online</span><b>${z.min} / gang</b></div>
+        <div class="section-t" style="margin-top:6px">Reward jika menang</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">${z.reward.map(([n, q]) => `<li class="kv" style="border:0;background:var(--card2);padding:7px 10px;border-radius:8px"><span>${esc(n)}</span><b>${q}x</b></li>`).join('')}</ul>
+    </div>
+    <div class="side-foot">
+        ${actionButton(z, true)}
+        ${isAdmin() ? `<div class="row2"><button class="btn" id="z-edit">✏️ Edit</button><button class="btn danger" id="z-del">🗑 Hapus</button></div>` : ''}
+    </div>`;
+    $('#side-close').onclick = () => { selected = null; renderMap(); renderSide(); };
+    bindActs(side);
+    if (isAdmin()) {
+        $('#z-edit').onclick = () => { draft = { editId: z.id, label: z.label, min: z.min, items: z.reward.map(r => [...r]), pts: z.pts.map(p => [...p]) }; renderMap(); renderSide(); };
+        $('#z-del').onclick = () => { if (warOf(z.id)) return toast('Tidak bisa hapus wilayah yang sedang diperebutkan', 'err'); zones = zones.filter(x => x !== z); selected = null; renderAll(); toast('Wilayah dihapus', 'ok'); };
+    }
+}
+function saveDraft() {
+    const items = draft.items.filter(i => i[0].trim() && i[1] > 0);
+    if (!draft.label.trim()) return toast('Nama wilayah wajib diisi', 'err');
+    if (draft.pts.length < 3) return toast('Minimal 3 titik', 'err');
+    if (draft.editId) {
+        const z = zoneById(draft.editId); Object.assign(z, { label: draft.label.trim(), min: draft.min, reward: items, pts: draft.pts });
+        toast('Wilayah diperbarui', 'ok');
+    } else {
+        const id = draft.label.trim().toUpperCase().replace(/[^A-Z]/g, '').slice(0, 8) || 'Z' + zones.length;
+        zones.push({ id, label: draft.label.trim(), owner: null, cd: 0, min: draft.min, reward: items, pts: draft.pts });
+        toast('Wilayah baru disimpan (abu-abu, belum dikuasai)', 'ok');
+    }
+    draft = null; renderAll();
+}
+
+// ---------------------------------------------------------------- WILAYAH
+let zoneFilter = 'all';
+function renderZones() {
+    const list = zones.filter(z => {
+        if (zoneFilter === 'free') return !z.owner;
+        if (zoneFilter === 'mine') return z.owner === MY;
+        if (zoneFilter === 'open') { const a = actionOf(z); return a && a.ok; }
+        return true;
+    });
+    $('#zone-list').innerHTML = list.map(z => {
+        const st = zoneState(z);
+        return `<div class="trow">
+            <div><b>${esc(z.label)}</b><div class="reward-mini">🎁 ${esc(fmtItems(z.reward))}</div></div>
+            <div>${gname(z.owner)}</div>
+            <div><span class="status ${st.cls}" ${st.ends ? `data-ends="${st.ends}" data-pre="${st.key === 'prep' ? 'Persiapan ' : 'Perang '}"` : ''}>${st.text}</span></div>
+            <div><b>${z.min}</b> <span class="sub">/ gang</span></div>
+            <div>${actionButton(z)}</div>
+        </div>`;
+    }).join('') || '<div class="empty">Tidak ada wilayah</div>';
+    $('#slot').textContent = `${wars.length}/${MAX_WARS}`;
+    bindActs($('#zone-list'));
+}
+document.querySelectorAll('#zone-filter button').forEach(b => b.onclick = () => {
+    zoneFilter = b.dataset.f; document.querySelectorAll('#zone-filter button').forEach(x => x.classList.toggle('active', x === b)); renderZones();
+});
+
+function bindActs(root) { root.querySelectorAll('[data-act]').forEach(b => b.onclick = () => openRules(zoneById(b.dataset.act), 'start')); }
+
+// ---------------------------------------------------------------- POPUP ATURAN
+function openRules(z, mode) {
+    const w = warOf(z.id);
+    let title, checks;
+    if (mode === 'join') {
+        title = `Join Perang — ${z.label}`;
+        checks = [
+            { t: 'Rank Boss / Wakil', ok: canAct(), v: canAct() ? 'Boss' : 'Anggota' },
+            { t: `Anggota Ballas online (min ${z.min})`, ok: GANGS[MY].online >= z.min, v: `${GANGS[MY].online}/${z.min}` },
+            { t: 'Masih masa persiapan', ok: w && w.phase === 'prep', v: w ? mmss(w.ends - now()) : '-' },
+        ];
+    } else {
+        const a = actionOf(z); title = `${a.label} ${z.label}`; checks = a.checks;
+    }
+    const ok = checks.every(c => c.ok);
+    const m = $('#modal');
+    m.innerHTML = `<div class="modal">
+        <div class="modal-head"><h2>⚔️ ${esc(title)}</h2><small>${z.owner ? 'Dikuasai ' + GANGS[z.owner].label : 'Wilayah bebas'} · Reward: ${esc(fmtItems(z.reward))}</small></div>
+        <div class="modal-body scroll">
+            <div class="section-t">Syarat (dicek sekarang)</div>
+            <div class="checks">${checks.map(c => `<div class="check ${c.ok ? 'ok' : 'no'}"><span>${c.ok ? '✔' : '✖'} ${c.t}</span><b>${c.v}</b></div>`).join('')}</div>
+            <div class="section-t">Aturan Perang</div>
+            <ul class="rules">
+                <li><b>Persiapan ${PREP_MIN} menit</b> — gang lain bisa Join. Poin belum dihitung.</li>
+                <li><b>Perang ${WAR_MIN} menit</b> — kumpulkan poin di dalam wilayah.</li>
+                <li>Gang dengan poin terbanyak menguasai wilayah. Seri = pemilik lama menang. Penyerang dengan 0 poin tidak bisa menang.</li>
+                <li>Setelah setuju, perang <b>tetap berjalan</b> walau anggota logout / crash / berkurang.</li>
+                <li>Selesai perang: wilayah <b>cooldown ${CD_HOURS} jam</b>. Pemenang mendapat reward (diambil Boss/Wakil di tab Reward).</li>
+            </ul>
+            <div class="ptable">
+                <span>Hadir hidup di wilayah</span><span>+1 / menit / anggota</span>
+                <span>Bunuh anggota gang peserta lain</span><span>+10</span>
+                <span>Jual narkoba di pojokan</span><span>+3</span>
+                <span>Hotwire mobil</span><span>+5</span>
+            </div>
+            <label class="agree"><input type="checkbox" id="agree"> Saya mengerti dan setuju dengan aturan perang</label>
+        </div>
+        <div class="modal-foot"><button class="btn" id="m-cancel">Batal</button><button class="btn war" id="m-ok" disabled>${ok ? 'Setuju & Mulai' : 'Syarat belum terpenuhi'}</button></div>
+    </div>`;
+    m.classList.remove('hidden');
+    $('#agree').onchange = e => $('#m-ok').disabled = !(e.target.checked && ok);
+    $('#m-cancel').onclick = () => m.classList.add('hidden');
+    $('#m-ok').onclick = () => {
+        m.classList.add('hidden');
+        if (mode === 'join') {
+            w.attackers.push(MY);
+            announce(`<b>Ballas</b> ikut perebutan <b>${esc(z.label)}</b>! Cek menu Gang Wars.`);
+            toast('Gangmu ikut perang ' + z.label, 'ok');
+        } else {
+            wars.push({ zone: z.id, phase: 'prep', ends: now() + PREP_MIN * MIN, defender: z.owner, attackers: [MY], points: {} });
+            announce(z.owner
+                ? `<b>Ballas</b> akan merebut <b>${esc(z.label)}</b> dari <b>${GANGS[z.owner].label}</b>! Perang dimulai ${PREP_MIN} menit lagi. Cek menu Gang Wars.`
+                : `<b>Ballas</b> akan menguasai <b>${esc(z.label)}</b>! Perang dimulai ${PREP_MIN} menit lagi. Cek menu Gang Wars.`);
+            toast('Persiapan dimulai: ' + z.label, 'ok');
+        }
+        renderAll();
+    };
+}
+
+// ---------------------------------------------------------------- PERANG
+function renderWars() {
+    $('#war-count').textContent = wars.length; $('#war-count').classList.toggle('hidden', !wars.length);
+    $('#war-list').innerHTML = wars.map(w => {
+        const z = zoneById(w.zone);
+        const parts = [...w.attackers.map(g => [g, 'penyerang']), ...(w.defender ? [[w.defender, 'pemilik']] : [])];
+        const joined = parts.some(p => p[0] === MY);
+        let body = '';
+        if (w.phase === 'war') {
+            const max = Math.max(1, ...parts.map(p => w.points[p[0]] || 0));
+            body = `<div class="scores">${parts.sort((a, b) => (w.points[b[0]] || 0) - (w.points[a[0]] || 0)).map(([g]) => `
+                <div class="score"><span class="gang">${gdot(g)}${GANGS[g].label}</span><div class="bar"><i style="width:${(w.points[g] || 0) / max * 100}%;background:${GANGS[g].color}"></i></div><b>${Math.floor(w.points[g] || 0)}</b></div>`).join('')}</div>`;
+        } else {
+            let btn;
+            if (joined) btn = `<span class="status st-done">✔ Gangmu ikut</span>`;
+            else if (!canAct()) btn = `<div><button class="btn war" disabled>Join</button><div class="reason">⚠ Hanya Boss/Wakil</div></div>`;
+            else btn = `<button class="btn war" data-join="${z.id}">Join Perang</button>`;
+            body = `<div style="display:flex;justify-content:space-between;align-items:center"><small>Poin belum dihitung selama persiapan.</small>${btn}</div>`;
+        }
+        return `<div class="war-card ${w.phase === 'war' ? 'live' : ''}">
+            <div class="war-head">
+                <div><h3>${esc(z.label)}</h3><span class="status ${w.phase === 'war' ? 'st-war' : 'st-prep'}">${w.phase === 'war' ? '🔥 PERANG BERLANGSUNG' : '⏳ MASA PERSIAPAN'}</span></div>
+                <div class="timer" data-ends="${w.ends}">${mmss(w.ends - now())}<small>${w.phase === 'war' ? 'sisa perang' : 'menuju perang'}</small></div>
+            </div>
+            <div class="parts">${parts.map(([g, r]) => `<span class="part">${gdot(g)}${GANGS[g].label} <em>${r}</em></span>`).join('')}</div>
+            ${body}
+        </div>`;
+    }).join('') || '<div class="empty">Tidak ada perang berjalan</div>';
+    $('#war-list').querySelectorAll('[data-join]').forEach(b => b.onclick = () => openRules(zoneById(b.dataset.join), 'join'));
+}
+
+// ---------------------------------------------------------------- RIWAYAT
+let histFilter = 'all';
+function renderHistory() {
+    const list = history.filter(h => histFilter === 'all' || h.scores[MY] !== undefined).slice(0, 20);
+    $('#hist-list').innerHTML = list.map(h => {
+        let res;
+        if (!h.win) res = `<span class="result fail">Gagal — ${h.from ? 'tetap milik ' + GANGS[h.from].label : 'tetap bebas'}</span>`;
+        else if (h.win === h.from) res = `<span class="result hold">${GANGS[h.win].label} bertahan</span>`;
+        else res = `<span class="result win">${GANGS[h.win].label} ${h.from ? 'merebut dari ' + GANGS[h.from].label : 'menguasai'}</span>`;
+        const sc = Object.entries(h.scores).sort((a, b) => b[1] - a[1]);
+        return `<div class="hrow"><span class="when">${h.t}</span><b>${esc(h.zone)}</b>
+            <div class="hscores">${sc.map(([g, p]) => `<span>${gdot(g)}${GANGS[g].label} <b>${p}</b></span>`).join('')}</div>${res}</div>`;
+    }).join('') || '<div class="empty">Belum ada riwayat</div>';
+}
+document.querySelectorAll('#hist-filter button').forEach(b => b.onclick = () => {
+    histFilter = b.dataset.f; document.querySelectorAll('#hist-filter button').forEach(x => x.classList.toggle('active', x === b)); renderHistory();
+});
+
+// ---------------------------------------------------------------- LEADERBOARD
+function renderBoard() {
+    const rows = Object.keys(GANGS).map(g => ({ g, zones: zones.filter(z => z.owner === g).map(z => z.label) }))
+        .filter(r => r.zones.length).sort((a, b) => b.zones.length - a.zones.length || GANGS[a.g].label.localeCompare(GANGS[b.g].label));
+    const pod = (r, i) => r ? `<div class="pod ${i === 0 ? 'p1' : ''}"><div class="medal">${['🥇', '🥈', '🥉'][i]}</div>
+        <div class="gname">${gdot(r.g)}${GANGS[r.g].label}</div><div class="big">${r.zones.length}</div><small>wilayah</small></div>` : '<div></div>';
+    $('#v-board').innerHTML = `
+        <div class="podium">${pod(rows[1], 1)}${pod(rows[0], 0)}${pod(rows[2], 2)}</div>
+        <div class="list">${rows.map((r, i) => `<div class="lrow ${r.g === MY ? 'mine' : ''}"><span class="rank">#${i + 1}</span>
+            <span class="gang">${gdot(r.g)}${GANGS[r.g].label}${r.g === MY ? ' <small>(gangmu)</small>' : ''}</span>
+            <b>${r.zones.length} / ${zones.length}</b><span class="zones">${r.zones.map(esc).join(', ')}</span></div>`).join('')}</div>`;
+}
+
+// ---------------------------------------------------------------- REWARD
+function renderReward() {
+    const pending = rewards.filter(r => !r.taken).length;
+    $('#reward-count').textContent = pending; $('#reward-count').classList.toggle('hidden', !pending);
+    $('#reward-list').innerHTML = rewards.map((r, i) => `<div class="rcard ${r.taken ? 'taken' : ''}">
+        <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:15px">🏴 ${esc(r.zone)}</b><small>${r.t}</small></div>
+        <ul>${r.items.map(([n, q]) => `<li>${esc(n)}<span>${q}x</span></li>`).join('')}</ul>
+        ${r.taken ? `<small>Sudah diambil oleh ${esc(r.by)}</small>`
+            : canAct() ? `<button class="btn claim" data-claim="${i}">Ambil Reward</button>`
+            : `<div><button class="btn claim" disabled style="width:100%">Ambil Reward</button><div class="reason">⚠ Hanya Boss/Wakil</div></div>`}
+    </div>`).join('') || '<div class="empty">Belum ada reward</div>';
+    $('#reward-list').querySelectorAll('[data-claim]').forEach(b => b.onclick = () => {
+        const r = rewards[+b.dataset.claim]; r.taken = true; r.by = 'Kamu (Boss)'; renderReward(); toast('Reward masuk ke inventory: ' + fmtItems(r.items), 'ok');
+    });
+}
+
+// ---------------------------------------------------------------- tabs / tick
+document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => {
+    document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('active', x === b));
+    document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+    $('#v-' + b.dataset.tab).classList.remove('hidden');
+    if (b.dataset.tab === 'map') { applyView(); renderMap(); }
+});
+$('#mock-role').onchange = () => { $('#my-rank').textContent = role() === 'member' ? 'Anggota' : 'Boss'; draft = null; renderAll(); };
+
+function renderAll() { renderMap(); renderSide(); renderZones(); renderWars(); renderHistory(); renderBoard(); renderReward(); }
+
+// hitung mundur dihitung di NUI dari waktu selesai (server tidak kirim apa-apa tiap detik)
+setInterval(() => {
+    let changed = false;
+    for (const w of [...wars]) {
+        if (w.ends > now()) continue;
+        const z = zoneById(w.zone);
+        if (w.phase === 'prep') {
+            w.phase = 'war'; w.ends = now() + WAR_MIN * MIN; [...w.attackers, w.defender].filter(Boolean).forEach(g => w.points[g] = 0);
+        } else {
+            const ent = Object.entries(w.points).sort((a, b) => b[1] - a[1] || (a[0] === w.defender ? -1 : 1));
+            let win = ent[0] && ent[0][1] > 0 ? ent[0][0] : w.defender;
+            history.unshift({ t: new Date().toTimeString().slice(0, 5), zone: z.label, from: w.defender, win, scores: Object.fromEntries(ent.map(([g, p]) => [g, Math.floor(p)])) });
+            history = history.slice(0, 20);
+            z.owner = win; z.cd = now() + CD_HOURS * HOUR; wars = wars.filter(x => x !== w);
+            announce(win ? `<b>${esc(z.label)}</b> dikuasai <b>${GANGS[win].label}</b>!` : `Perebutan <b>${esc(z.label)}</b> selesai tanpa pemenang.`);
+        }
+        changed = true;
+    }
+    if (changed) return renderAll();
+    document.querySelectorAll('[data-ends]').forEach(el => {
+        const t = mmss(+el.dataset.ends - now());
+        if (el.classList.contains('timer')) el.firstChild.textContent = t; else el.textContent = (el.dataset.pre || '') + t;
+    });
+}, 1000);
+// skor perang (di versi asli dikirim server tiap 15 detik ke yang membuka menu)
+setInterval(() => {
+    for (const w of wars) if (w.phase === 'war') for (const g in w.points) w.points[g] += Math.random() < .3 ? 10 : Math.random() * 4;
+    renderWars();
+}, 3000);
+// cooldown jam:menit diperbarui 1x per menit
+setInterval(() => { renderZones(); renderSide(); }, 60000);
+
+window.addEventListener('resize', applyView);
+centerOn([150, -900], 1.4);
+renderAll();
+</script>
+</body>
+</html>

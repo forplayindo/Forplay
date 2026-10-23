@@ -46,7 +46,12 @@ return {
         stress = { show = false, value = 0 },
         vehicle_nitro = { show = false, value = 0 },
         voice = { show = false, value = 0 },
+        -- hygiene, fed by f_hygiene (value = need level, 0 = clean / 100 = urgent)
+        mandi = { show = false, value = 0 },
+        kencing = { show = false, value = 0 },
+        poop = { show = false, value = 0 },
     },
+    hygiene = { visible = false },
     music_info = {
         active = true,
     },

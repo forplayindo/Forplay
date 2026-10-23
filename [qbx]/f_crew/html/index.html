@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Gang Wars</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ======================= MENU /peranggang ======================= -->
+    <div class="panel hidden" id="panel">
+        <header>
+            <div class="brand"><span class="logo">⚔️</span><div><h1>GANG <span>WARS</span></h1><small>Forplay · Perebutan wilayah antar gang</small></div></div>
+            <div class="head-actions">
+                <div class="mygang" id="mygang"></div>
+                <button class="icon-btn" id="close" title="Tutup">✕</button>
+            </div>
+        </header>
+        <nav class="tabs" id="tabs">
+            <button data-tab="map" class="active">🗺️ Map</button>
+            <button data-tab="zones">📍 Wilayah</button>
+            <button data-tab="wars">⚔️ Perang<span class="count hidden" id="war-count"></span></button>
+            <button data-tab="history">📜 Riwayat</button>
+            <button data-tab="board">🏆 Leaderboard</button>
+            <button data-tab="reward" id="tab-reward">🎁 Reward<span class="count hidden" id="reward-count"></span></button>
+            <button data-tab="flags" id="tab-flags" class="hidden">🚩 Bendera</button>
+        </nav>
+
+        <main>
+            <section class="view" id="v-map">
+                <div class="map-wrap" id="map">
+                    <div class="map-inner" id="map-inner">
+                        <img id="map-img" alt="">
+                        <svg id="svg" viewBox="0 0 2048 2048" width="2048" height="2048"></svg>
+                    </div>
+                    <div class="legend">
+                        <div><span class="sw" style="background:#d1d5db"></span>Belum dikuasai</div>
+                        <div><span class="sw" style="background:#a855f7"></span>Dikuasai (warna gang)</div>
+                        <div><span class="sw" style="background:#ef4444"></span>Berkedip = perang</div>
+                        <div><span class="sw" style="border:1px dashed #fff"></span>Garis putus = persiapan</div>
+                        <div><span class="dot" style="background:#ef4444"></span>Posisi kamu</div>
+                    </div>
+                    <div class="map-tools">
+                        <button id="zoom-in">+</button><button id="zoom-out">−</button><button id="zoom-me" title="Ke posisi saya">◎</button>
+                    </div>
+                    <div class="draw-hint hidden" id="draw-hint">Klik kiri = tambah titik · Drag titik = geser · Klik kanan titik = hapus · Scroll = zoom</div>
+                    <div class="tip hidden" id="tip"></div>
+                </div>
+                <aside class="side" id="side"></aside>
+            </section>
+
+            <section class="view col hidden" id="v-zones">
+                <div class="toolbar">
+                    <div class="filters" id="zone-filter">
+                        <button data-f="all" class="active">Semua</button><button data-f="free">Bebas</button>
+                        <button data-f="mine">Gang saya</button><button data-f="open">Bisa direbut</button>
+                    </div>
+                    <div class="info" id="zone-info"></div>
+                </div>
+                <div class="thead"><span>Wilayah</span><span>Gang</span><span>Status</span><span>Min. peserta</span><span></span></div>
+                <div class="list scroll" id="zone-list"></div>
+            </section>
+
+            <section class="view col hidden" id="v-wars">
+                <div class="toolbar"><div class="info">Join hanya saat masa persiapan · skor diperbarui tiap 15 detik</div></div>
+                <div class="list scroll" id="war-list"></div>
+            </section>
+
+            <section class="view col hidden" id="v-history">
+                <div class="toolbar">
+                    <div class="filters" id="hist-filter"><button data-f="all" class="active">Semua</button><button data-f="mine">Gang saya</button></div>
+                    <div class="info" id="hist-info"></div>
+                </div>
+                <div class="list scroll" id="hist-list"></div>
+            </section>
+
+            <section class="view col hidden scroll" id="v-board"></section>
+
+            <section class="view col hidden" id="v-flags">
+                <div class="toolbar">
+                    <div class="info" id="flag-info"></div>
+                </div>
+                <div class="fhead"><span>Gang</span><span>Boss</span><span>Model prop (addon)</span><span>Status</span><span></span></div>
+                <div class="list scroll" id="flag-list"></div>
+            </section>
+
+            <section class="view col hidden" id="v-reward">
+                <div class="toolbar"><div class="info">Reward dari wilayah yang dimenangkan gangmu · diambil Boss / Wakil ke inventory sendiri</div></div>
+                <div class="rgrid scroll" id="reward-list"></div>
+            </section>
+        </main>
+
+        <div class="modal-bg hidden" id="modal"></div>
+        <div class="toast hidden" id="toast"></div>
+    </div>
+
+    <!-- mode gambar admin di dalam game -->
+    <div class="world-hint hidden" id="world-hint"><b>E</b> Tambah titik dari posisi saya<span id="world-flag" class="hidden"> · <b>F</b> Titik bendera</span> · <b>G</b> Kembali ke editor<span id="world-count"></span></div>
+
+    <!-- ======================= HUD ======================= -->
+    <div class="hud hidden" id="hud">
+        <div class="cd glass" id="cd">
+            <span class="cd-icon" id="cd-icon">⏳</span>
+            <div class="cd-text"><div class="cd-title" id="cd-title"></div><div class="cd-desc" id="cd-desc"></div></div>
+            <span class="cd-timer" id="cd-timer">00:00</span>
+            <div class="cd-bar"><i id="cd-fill"></i></div>
+        </div>
+        <div class="sb glass" id="sb">
+            <div class="sb-head">
+                <div><div class="sb-title">Gang Wars</div><div class="sb-zone" id="sb-zone"></div></div>
+                <span class="sb-phase" id="sb-phase"></span>
+            </div>
+            <div class="sb-flag hidden" id="sb-flag"></div>
+            <div class="sb-rows" id="sb-rows"></div>
+            <div class="sb-foot"><span id="sb-me"></span><span><span class="key" id="sb-key">F7</span> sembunyikan</span></div>
+        </div>
+        <div class="sb-mini glass hidden" id="sb-mini"></div>
+    </div>
+
+    <!-- ======================= REBUT BENDERA (di luar #hud: pegang bendera juga di luar perang) ======================= -->
+    <div class="flagui" id="flagui">
+        <div class="fprompt glass hidden" id="fprompt"></div>
+        <div class="fhold glass hidden" id="fhold">
+            <div class="fhold-top"><span class="hi" id="fh-ic">🚩</span><div class="ht"><b id="fh-t"></b><small id="fh-s"></small></div><span class="hs" id="fh-n"></span></div>
+            <div class="fhold-bar"><i id="fh-bar"></i></div>
+        </div>
+        <div class="fcarry glass hidden" id="fcarry"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

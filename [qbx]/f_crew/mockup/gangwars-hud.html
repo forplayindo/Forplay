@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Gang Wars HUD — Mockup</title>
+<style>
+:root {
+    /* sama dengan ox_lib redesign (ox_lib_f_patch) */
+    --glass-carrier: rgba(13, 13, 12, .78);
+    --glass-sheen: linear-gradient(158deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,.055) 26%, rgba(255,255,255,.016) 58%, rgba(255,255,255,.065) 100%);
+    --surface: var(--glass-sheen), var(--glass-carrier);
+    --rim: inset 0 1px 0 rgba(255,255,255,.17), inset 0 -1px 0 rgba(0,0,0,.42);
+    --lift-sm: 0 14px 34px -14px rgba(0,0,0,.85), var(--rim);
+    --hairline: rgba(255,255,255,.14);
+    --text: #F6F5F2; --muted: rgba(246,245,242,.62);
+    --y: #FFC629; --y-soft: rgba(255,198,41,.14);
+    --red: #ef4444; --green: #4ade80;
+    --radius-sm: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; user-select: none; }
+body { font-family: Roboto, 'Segoe UI', system-ui, sans-serif; color: var(--text);
+    /* latar pengganti layar game */
+    background: linear-gradient(180deg, #7aa6c9 0%, #b9cbd6 38%, #8b8f86 39%, #5c5f58 70%, #3c3e3a 100%); }
+button, select { font: inherit; color: inherit; }
+.hidden { display: none !important; }
+
+/* gedung-gedung palsu supaya terasa seperti layar game */
+.city { position: absolute; left: 0; right: 0; top: 18%; height: 21%; display: flex; align-items: flex-end; gap: 6px; padding: 0 3%; opacity: .55; }
+.city i { flex: 1; background: #47515c; border-radius: 3px 3px 0 0; }
+
+/* kontrol mockup (bukan UI asli) */
+.mock { position: fixed; right: 12px; bottom: 12px; z-index: 99; background: rgba(0,0,0,.7); border-radius: 12px; padding: 10px 12px;
+    display: flex; flex-direction: column; gap: 8px; font-size: 12px; width: 270px; }
+.mock b { color: var(--y); }
+.mock .r { display: flex; gap: 6px; flex-wrap: wrap; }
+.mock button { padding: 5px 10px; border-radius: 7px; background: #222; border: 1px solid #444; cursor: pointer; }
+.mock button.on { border-color: var(--y); color: var(--y); }
+
+/* ---------- f_hud compass (tiruan, untuk cek jarak) ---------- */
+.compass { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;
+    text-shadow: 0 1px 3px rgba(0,0,0,.7); font-weight: 800; pointer-events: none; }
+.compass .h { font-size: 14px; }
+.compass .p { margin-top: 3px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #fff; }
+.compass .ruler { width: 520px; height: 22px; margin-top: 3px; display: flex; justify-content: space-between; align-items: center; padding: 0 40px;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent); font-size: 13px; }
+.compass .ruler span { width: 2px; height: 8px; background: rgba(255,255,255,.7); }
+.compass .st { margin-top: 4px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.compass .st em { font-style: normal; color: rgba(255,255,255,.62); margin-left: 8px; }
+.guide { position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(255,80,80,.7); font-size: 10px; color: #ffb4b4; padding-left: 8px; pointer-events: none; }
+
+/* ---------- COUNTDOWN (gaya textUI ox_lib, top-center di bawah compass) ---------- */
+.countdown { position: absolute; top: 92px; left: 50%; transform: translateX(-50%);
+    background: var(--surface); border: 1px solid var(--hairline); border-left: 2px solid var(--y); border-radius: var(--radius-sm);
+    box-shadow: var(--lift-sm); backdrop-filter: blur(10px);
+    display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-size: 14.5px; font-weight: 500; white-space: nowrap;
+    animation: drop .25s ease; }
+.countdown.war { border-left-color: var(--red); }
+.countdown.done { border-left-color: var(--green); }
+.countdown .ic { width: 26px; height: 26px; border-radius: 8px; background: var(--y-soft); display: grid; place-items: center; font-size: 13px; }
+.countdown.war .ic { background: rgba(239,68,68,.16); }
+.countdown.done .ic { background: rgba(74,222,128,.16); }
+.countdown .lbl { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.countdown .zone { font-weight: 700; }
+.countdown .t { font-family: 'Roboto Mono', Consolas, monospace; font-size: 18px; font-weight: 800; color: var(--y); min-width: 58px; text-align: right; }
+.countdown.war .t { color: var(--red); }
+.countdown .note { font-size: 12px; color: var(--muted); }
+@keyframes drop { from { opacity: 0; transform: translate(-50%, -10px); } }
+
+/* ---------- SCOREBOARD (kiri tengah) ---------- */
+.board { position: absolute; left: 28px; top: 50%; transform: translateY(-50%); width: 270px;
+    background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-sm); box-shadow: var(--lift-sm);
+    backdrop-filter: blur(10px); overflow: hidden; transition: opacity .2s, transform .2s; }
+.board-head { display: flex; justify-content: space-between; align-items: center; padding: 11px 14px 9px; border-bottom: 1px solid var(--hairline); }
+.board-head .title { font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--y); }
+.board-head .zone { font-size: 15px; font-weight: 700; margin-top: 2px; }
+.board-head .phase { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 999px; letter-spacing: .08em; }
+.phase.prep { background: var(--y-soft); color: var(--y); }
+.phase.war { background: rgba(239,68,68,.18); color: #fca5a5; animation: pulse 1.2s infinite; }
+.phase.done { background: rgba(74,222,128,.16); color: var(--green); }
+@keyframes pulse { 50% { opacity: .55; } }
+.rows { padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
+.row { position: relative; display: grid; grid-template-columns: 20px 1fr auto; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 9px;
+    background: rgba(255,255,255,.04); overflow: hidden; }
+.row.mine { box-shadow: inset 0 0 0 1px rgba(255,198,41,.55); }
+.row .fill { position: absolute; left: 0; top: 0; bottom: 0; opacity: .22; transition: width .5s; }
+.row .pos { position: relative; font-weight: 800; font-size: 13px; color: var(--muted); }
+.row .g { position: relative; display: flex; flex-direction: column; min-width: 0; }
+.row .g b { font-size: 13.5px; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.row .g small { font-size: 10.5px; color: var(--muted); }
+.row .pts { position: relative; font-family: 'Roboto Mono', Consolas, monospace; font-size: 17px; font-weight: 800; }
+.row .delta { position: absolute; right: 10px; top: -2px; font-size: 10px; color: var(--green); font-weight: 800; animation: up 1.4s forwards; }
+@keyframes up { to { transform: translateY(-8px); opacity: 0; } }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.tag { font-size: 9px; font-weight: 800; color: var(--muted); border: 1px solid var(--hairline); border-radius: 5px; padding: 0 4px; letter-spacing: .05em; }
+.board-foot { display: flex; justify-content: space-between; padding: 8px 14px 10px; border-top: 1px solid var(--hairline); font-size: 11px; color: var(--muted); }
+.key { display: inline-block; min-width: 20px; padding: 1px 6px; border-radius: 5px; background: rgba(255,255,255,.1); border: 1px solid var(--hairline);
+    color: var(--text); font-weight: 700; font-size: 10.5px; text-align: center; }
+.inzone { color: var(--green); }
+.outzone { color: #fca5a5; }
+
+/* versi tersembunyi: pill kecil */
+.mini { position: absolute; left: 28px; top: 50%; transform: translateY(-50%); background: var(--surface); border: 1px solid var(--hairline);
+    border-left: 2px solid var(--y); border-radius: 10px; box-shadow: var(--lift-sm); padding: 7px 12px; font-size: 12px; display: flex; gap: 8px; align-items: center; }
+
+/* ---------- textUI ox_lib lain (contoh: jual narkoba) ---------- */
+.oxtext { position: absolute; right: 28px; top: 50%; transform: translateY(-50%); background: var(--surface); border: 1px solid var(--hairline);
+    border-left: 2px solid var(--y); border-radius: var(--radius-sm); box-shadow: var(--lift-sm); padding: 12px 16px; display: flex; gap: 12px; align-items: center; font-size: 14.5px; }
+.oxtext .ic { width: 26px; height: 26px; border-radius: 8px; background: var(--y-soft); display: grid; place-items: center; font-size: 13px; }
+.oxtext small { display: block; font-size: 10px; color: #ffb4b4; margin-top: 3px; }
+</style>
+</head>
+<body>
+<div class="city"><i style="height:60%"></i><i style="height:85%"></i><i style="height:45%"></i><i style="height:100%"></i><i style="height:70%"></i><i style="height:55%"></i><i style="height:90%"></i><i style="height:40%"></i><i style="height:75%"></i><i style="height:65%"></i></div>
+
+<!-- tiruan compass f_hud -->
+<div class="compass">
+    <div class="h">245</div><div class="p"></div>
+    <div class="ruler"><span></span>SW<span></span><span></span>W<span></span><span></span>NW<span></span></div>
+    <div class="st">Grove St<em>Davis</em></div>
+</div>
+<div class="guide" id="guide" style="top:80px">batas bawah compass f_hud ≈ 80px</div>
+
+<!-- COUNTDOWN -->
+<div class="countdown" id="cd">
+    <span class="ic" id="cd-ic">⏳</span>
+    <div><div class="lbl" id="cd-lbl">Persiapan Perang</div><div><span class="zone" id="cd-zone">La Mesa</span> <span class="note" id="cd-note">· poin belum dihitung</span></div></div>
+    <span class="t" id="cd-t">07:42</span>
+</div>
+
+<!-- SCOREBOARD -->
+<div class="board" id="board">
+    <div class="board-head">
+        <div><div class="title">Gang Wars</div><div class="zone" id="b-zone">La Mesa</div></div>
+        <span class="phase prep" id="b-phase">PERSIAPAN</span>
+    </div>
+    <div class="rows" id="rows"></div>
+    <div class="board-foot"><span id="b-me" class="inzone">● Kamu di dalam wilayah</span><span><span class="key">F7</span> sembunyikan</span></div>
+</div>
+<div class="mini hidden" id="mini">⚔️ <b id="mini-txt">Ballas 124</b><span class="key">F7</span></div>
+
+<!-- contoh textUI ox_lib dari script lain -->
+<div class="oxtext" id="ox"><span class="ic">💊</span><div><b>[E]</b> Jual narkoba<small>textUI ox_lib script lain — tidak bentrok dengan countdown</small></div></div>
+
+<!-- kontrol mockup -->
+<div class="mock">
+    <div><b>MOCKUP</b> · kontrol simulasi</div>
+    <div class="r">Fase:
+        <button data-ph="prep" class="on">Persiapan</button><button data-ph="war">Perang</button><button data-ph="done">Selesai</button>
+    </div>
+    <div class="r">
+        <button id="m-toggle">Hide/Show (F7)</button>
+        <button id="m-zone" class="on">Di dalam zona</button>
+        <button id="m-ox" class="on">textUI lain</button>
+        <button id="m-guide" class="on">Garis bantu</button>
+    </div>
+</div>
+
+<script>
+const GANGS = {
+    ballas:   { label: 'Ballas',   color: '#a855f7', role: 'penyerang', inZone: 4 },
+    vagos:    { label: 'Vagos',    color: '#facc15', role: 'pemilik',   inZone: 5 },
+    families: { label: 'Families', color: '#22c55e', role: 'penyerang', inZone: 2 },
+};
+const MY = 'ballas';
+let phase = 'prep', ends = Date.now() + 7 * 60000 + 42000, hidden = false, inZone = true;
+let pts = { ballas: 0, vagos: 0, families: 0 };
+const $ = s => document.querySelector(s);
+const mmss = ms => { const s = Math.max(0, Math.floor(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+
+function setPhase(p) {
+    phase = p;
+    document.querySelectorAll('[data-ph]').forEach(b => b.classList.toggle('on', b.dataset.ph === p));
+    const cd = $('#cd'); cd.className = 'countdown ' + (p === 'prep' ? '' : p);
+    if (p === 'prep') { ends = Date.now() + 7 * 60000 + 42000; pts = { ballas: 0, vagos: 0, families: 0 }; }
+    if (p === 'war') { ends = Date.now() + 4 * 60000 + 15000; pts = { ballas: 124, vagos: 98, families: 40 }; }
+    if (p === 'done') { ends = Date.now() + 5000; }
+    $('#cd-ic').textContent = { prep: '⏳', war: '⚔️', done: '🏆' }[p];
+    $('#cd-lbl').textContent = { prep: 'Persiapan Perang', war: 'Perang Berlangsung', done: 'Perang Selesai' }[p];
+    $('#cd-note').textContent = { prep: '· poin belum dihitung', war: '· kumpulkan poin di wilayah', done: '· La Mesa dikuasai Ballas' }[p];
+    const ph = $('#b-phase'); ph.className = 'phase ' + p; ph.textContent = { prep: 'PERSIAPAN', war: 'PERANG', done: 'SELESAI' }[p];
+    render(); tick();
+}
+
+function render(delta = {}) {
+    const order = Object.keys(GANGS).sort((a, b) => pts[b] - pts[a]);
+    const max = Math.max(1, ...order.map(g => pts[g]));
+    $('#rows').innerHTML = order.map((g, i) => `
+        <div class="row ${g === MY ? 'mine' : ''}">
+            <i class="fill" style="width:${phase === 'prep' ? 0 : pts[g] / max * 100}%;background:${GANGS[g].color}"></i>
+            <span class="pos">${i + 1}</span>
+            <div class="g"><b><span class="dot" style="background:${GANGS[g].color}"></span>${GANGS[g].label} <span class="tag">${GANGS[g].role.toUpperCase()}</span></b>
+                <small>👤 ${GANGS[g].inZone} di wilayah</small></div>
+            <span class="pts">${phase === 'prep' ? '—' : Math.floor(pts[g])}</span>
+            ${delta[g] ? `<span class="delta">+${delta[g]}</span>` : ''}
+        </div>`).join('');
+    $('#mini-txt').textContent = phase === 'prep' ? 'La Mesa · persiapan' : `${GANGS[order[0]].label} ${Math.floor(pts[order[0]])} · kamu #${order.indexOf(MY) + 1}`;
+}
+
+function tick() {
+    $('#cd-t').textContent = mmss(ends - Date.now());
+    if (ends <= Date.now()) {
+        if (phase === 'prep') setPhase('war');
+        else if (phase === 'war') setPhase('done');
+        else { $('#cd').classList.add('hidden'); $('#board').classList.add('hidden'); $('#mini').classList.add('hidden'); }
+    }
+}
+setInterval(tick, 1000);
+
+// skor: di versi asli dikirim server tiap 15 detik (di sini 4 detik supaya terlihat)
+setInterval(() => {
+    if (phase !== 'war') return;
+    const d = {};
+    for (const g in pts) { const add = Math.random() < .25 ? 10 : Math.round(GANGS[g].inZone * 15 / 60); pts[g] += add; if (add) d[g] = add; }
+    render(d);
+}, 4000);
+
+function toggle() {
+    if ($('#board').classList.contains('hidden') && $('#mini').classList.contains('hidden')) return; // perang sudah selesai
+    hidden = !hidden;
+    $('#board').classList.toggle('hidden', hidden); $('#mini').classList.toggle('hidden', !hidden);
+}
+$('#m-toggle').onclick = toggle;
+document.addEventListener('keydown', e => { if (e.key === 'F7') { e.preventDefault(); toggle(); } });
+document.querySelectorAll('[data-ph]').forEach(b => b.onclick = () => {
+    $('#cd').classList.remove('hidden'); $('#board').classList.toggle('hidden', hidden); $('#mini').classList.toggle('hidden', !hidden); setPhase(b.dataset.ph);
+});
+$('#m-zone').onclick = e => {
+    inZone = !inZone; e.target.classList.toggle('on', inZone);
+    const m = $('#b-me'); m.className = inZone ? 'inzone' : 'outzone';
+    m.textContent = inZone ? '● Kamu di dalam wilayah' : '● Kamu di luar wilayah';
+};
+$('#m-ox').onclick = e => e.target.classList.toggle('on', !$('#ox').classList.toggle('hidden'));
+$('#m-guide').onclick = e => e.target.classList.toggle('on', !$('#guide').classList.toggle('hidden'));
+
+setPhase('prep');
+</script>
+</body>
+</html>

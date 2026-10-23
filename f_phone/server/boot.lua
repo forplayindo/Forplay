@@ -60,7 +60,7 @@ CreateThread(function()
     end
 
     local current = version.current()
-    print(('^2[f_phone]^0 v%s ready ^2·^0 %d schemas'):format(current or '?', ready))
+    -- print(('^2[f_phone]^0 v%s ready ^2·^0 %d schemas'):format(current or '?', ready))
 
     if #failures > 0 then
         print(('^1[f_phone]^0 %d schema(s) failed: %s'):format(#failures, table.concat(failures, ', ')))
@@ -84,12 +84,12 @@ CreateThread(function()
         print('^3[f_phone]^0 update it before reporting a `nil value` error from a lib.* call.')
     end
 
-    if not current then return end
-    local latest = version.latest(UPDATE_REPO)
-    if latest and version.isNewer(current, latest) then
-        print(('^3[f_phone]^0 update available: ^2v%s^0 (running ^3v%s^0) - https://github.com/%s/releases')
-            :format(latest, current, UPDATE_REPO))
-    end
+    -- if not current then return end
+    -- local latest = version.latest(UPDATE_REPO)
+    -- if latest and version.isNewer(current, latest) then
+    --     print(('^3[f_phone]^0 update available: ^2v%s^0 (running ^3v%s^0) - https://github.com/%s/releases')
+    --         :format(latest, current, UPDATE_REPO))
+    -- end
 end)
 
 return M

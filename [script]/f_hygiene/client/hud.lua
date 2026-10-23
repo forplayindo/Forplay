@@ -1,16 +1,23 @@
-local function RefreshNui()
-    SendNUIMessage({
-        action = 'update',
+-- Tampilan HUD sekarang ada di f_hud (bar Mandi / Kencing / Poop, warnanya bisa diganti di setting f_hud).
+-- Resource ini tetap menghitung nilainya dan meneruskannya ke f_hud; panel NUI lamanya tidak ditampilkan lagi.
+local function PushToFHud()
+    TriggerEvent('f_hud:client:setHygiene', {
         mandi = HygieneState.mandi,
         kencing = HygieneState.kencing,
         poop = HygieneState.poop,
+        visible = HygieneState.hudVisible,
     })
+end
+
+local function RefreshNui()
+    PushToFHud()
 end
 RegisterNetEvent('hygiene:client:RefreshHud', RefreshNui)
 
 local function SetHudVisible(state)
     HygieneState.hudVisible = state
-    SendNUIMessage({ action = 'visibility', visible = state })
+    SendNUIMessage({ action = 'visibility', visible = false }) -- panel lama selalu disembunyikan
+    PushToFHud()
 end
 
 RegisterCommand('hygienehud', function()
@@ -22,27 +29,14 @@ end, false)
 -- mengikuti apa yang di-set player di sana)
 RegisterKeyMapping('hygienehud', 'Show/Hide HUD Hygiene (Mandi, Kencing, Poop)', 'keyboard', 'F3')
 
--- label tombol yang ditampilkan di judul HUD (misal "F3") - dibaca dari keymapping yang sama
--- di atas via GetControlInstructionalButton, jadi otomatis ikut berubah kalau player rebind
--- tombolnya lewat Settings > Key Bindings, tidak perlu direstart manual
-local hudKeyHash = joaat('hygienehud') | 0x80000000
-local lastHudKeyLabel = nil
-
-local function PushHudKeyLabel()
-    local label = GetControlInstructionalButton(0, hudKeyHash, true):sub(3)
-    if label ~= lastHudKeyLabel then
-        lastHudKeyLabel = label
-        SendNUIMessage({ action = 'keybind', key = label })
-    end
-end
-
-CreateThread(function()
-    while true do
-        PushHudKeyLabel()
-        Wait(1000)
-    end
+exports('GetHygieneState', function()
+    return {
+        mandi = HygieneState.mandi,
+        kencing = HygieneState.kencing,
+        poop = HygieneState.poop,
+        visible = HygieneState.hudVisible,
+    }
 end)
-
 exports('ShowHygieneHud', function() SetHudVisible(true) end)
 exports('HideHygieneHud', function() SetHudVisible(false) end)
 exports('ToggleHygieneHud', function() SetHudVisible(not HygieneState.hudVisible) end)

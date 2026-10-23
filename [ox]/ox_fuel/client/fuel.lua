@@ -47,7 +47,11 @@ function fuel.getPetrolCan(coords, refuel)
 	ClearPedTasks(cache.ped)
 end
 
-function fuel.startFueling(vehicle, isPump)
+---@param vehicle integer
+---@param isPump? boolean
+---@param opts? { anim?: table } anim = ganti animasi progress
+function fuel.startFueling(vehicle, isPump, opts)
+	opts = opts or {}
 	local vehState = Entity(vehicle).state
 	local fuelAmount = vehState.fuel or GetVehicleFuelLevel(vehicle)
 	local duration = math.ceil((100 - fuelAmount) / config.refillValue) * config.refillTick
@@ -82,6 +86,9 @@ function fuel.startFueling(vehicle, isPump)
 	TaskTurnPedToFaceEntity(cache.ped, vehicle, duration)
 	Wait(500)
 
+	local vehicleStart = GetEntityCoords(vehicle)
+	local holdingHose = isPump and state.hose
+
 	CreateThread(function()
 		lib.progressCircle({
 			duration = duration,
@@ -92,11 +99,12 @@ function fuel.startFueling(vehicle, isPump)
 				car = true,
 				combat = true,
 			},
-			anim = {
+			anim = opts.anim or {
 				dict = isPump and 'timetable@gardener@filling_can' or 'weapon@w_sp_jerrycan',
 				clip = isPump and 'gar_ig_5_filling_can' or 'fire',
 			},
-			prop = isPump and {
+			-- corong sudah dipegang lewat selang, prop hanya untuk mode lama (ox_target)
+			prop = isPump and not holdingHose and {
 				model = 'prop_cs_fuel_nozle',
 				bone = 18905,
 				pos = vec3(0.1, 0.02, 0.02),
@@ -109,6 +117,13 @@ function fuel.startFueling(vehicle, isPump)
 	end)
 
 	while state.isFueling do
+		-- mobil bergerak / player terlalu jauh dari pompa -> berhenti
+		if not DoesEntityExist(vehicle) or #(GetEntityCoords(vehicle) - vehicleStart) > 0.5
+			or (holdingHose and #(GetEntityCoords(cache.ped) - state.hose) > config.hose.length) then
+			lib.cancelProgress()
+			break
+		end
+
 		if isPump then
 			price += config.priceTick
 

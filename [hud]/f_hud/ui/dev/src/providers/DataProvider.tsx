@@ -123,7 +123,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       talkRange: 2,
     },
     vehicle_nitro: { value: 0, autoHide: 99, color: "#CF654E" },
+    mandi: { value: 0, autoHide: 100, color: "#4FC3F7" },
+    kencing: { value: 0, autoHide: 100, color: "#FFE14D" },
+    poop: { value: 0, autoHide: 100, color: "#B07A4F" },
   });
+  const [hygieneVisible, setHygieneVisible] = useState<boolean>(false);
   const [Cinematic, setCinematic] = useState<iCinematic>({
     active: true,
     show: false,
@@ -131,7 +135,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [HudStyle, setHudStyle] = useState<iHudStyle>({
     bar_style: "hexagon-w",
     is_res_style_active: true,
-    vehicle_hud_style: 4,
+    vehicle_hud_style: 11,
     positions: {
       bar_res_active: {},
       bar_default: {},
@@ -305,7 +309,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           isTalking: data.bars.voice.isTalking,
           talkRange: data.bars.voice.talkRange,
         },
+        ...(data.bars.mandi && {
+          mandi: { ...prevBarsInfo.mandi, value: data.bars.mandi.value },
+          kencing: { ...prevBarsInfo.kencing, value: data.bars.kencing.value },
+          poop: { ...prevBarsInfo.poop, value: data.bars.poop.value },
+        }),
       }));
+    }
+    if (data.hygiene) {
+      setHygieneVisible(!!data.hygiene.visible);
     }
   });
 
@@ -402,6 +414,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           color: def.bars.vehicle_nitro.color,
         },
         voice: { ...prevBarsInfo.voice, color: def.bars.voice.color },
+        ...(def.bars.mandi && {
+          mandi: { ...prevBarsInfo.mandi, color: def.bars.mandi.color },
+          kencing: { ...prevBarsInfo.kencing, color: def.bars.kencing.color },
+          poop: { ...prevBarsInfo.poop, color: def.bars.poop.color },
+        }),
       }));
     }
     setUpStorage();
@@ -618,6 +635,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         ...prevBarsInfo.vehicle_nitro,
         ...getLocalStorage("vehicle_nitro", prevBarsInfo.vehicle_nitro, true),
       },
+      mandi: { ...prevBarsInfo.mandi, ...getLocalStorage("mandi", prevBarsInfo.mandi, true) },
+      kencing: { ...prevBarsInfo.kencing, ...getLocalStorage("kencing", prevBarsInfo.kencing, true) },
+      poop: { ...prevBarsInfo.poop, ...getLocalStorage("poop", prevBarsInfo.poop, true) },
     }));
 
     setVehicleInfo((prevVehicleInfo) => ({
@@ -792,6 +812,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     isEditorOpen,
     setEditorOpen,
     useableColors,
+    hygieneVisible,
   };
 
   return <DataCtx.Provider value={value}>{children}</DataCtx.Provider>;

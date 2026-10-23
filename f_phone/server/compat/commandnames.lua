@@ -18,7 +18,7 @@ function names.claim(shim, name)
     local holder = claimed[key]
     if holder then
         if holder ~= shim then
-            print(('^3[f_phone]^0 %s compat: /%s is already provided by the %s shim, so it was not registered twice.'):format(shim, name, holder))
+            -- print(('^3[f_phone]^0 %s compat: /%s is already provided by the %s shim, so it was not registered twice.'):format(shim, name, holder))
         end
         return false
     end

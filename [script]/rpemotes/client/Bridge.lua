@@ -48,7 +48,7 @@ local function InitializeFramework()
         end)
     end
 
-    print('[RPEmotes-Reborn] Framework initialized: ' .. Framework)
+    -- print('[RPEmotes-Reborn] Framework initialized: ' .. Framework)
 end
 
 function CanDoAction()

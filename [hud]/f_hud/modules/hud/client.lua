@@ -9,6 +9,33 @@ local Utils = require 'modules.utils.client'
 local Voice = require 'modules.voice.client'
 local CarControl = require 'modules.car_control.client'
 local Seatbelt = require 'modules.seatbelt.client'
+local Minimap = require 'modules.minimap.client'
+
+-- hygiene bars: values and the F3 show/hide state come from f_hygiene
+local function setHygiene(data)
+    if type(data) ~= 'table' then return end
+    local bars = Hud.data.bars
+    if data.mandi then bars.mandi.value = math.floor(data.mandi + 0.5) end
+    if data.kencing then bars.kencing.value = math.floor(data.kencing + 0.5) end
+    if data.poop then bars.poop.value = math.floor(data.poop + 0.5) end
+    if data.visible ~= nil then Hud.data.hygiene.visible = data.visible end
+end
+AddEventHandler('f_hud:client:setHygiene', setHygiene)
+
+-- f_hud (re)started after f_hygiene: pull the current state once
+CreateThread(function()
+    Wait(1000)
+    if GetResourceState('f_hygiene') == 'started' then
+        local ok, state = pcall(function() return exports.f_hygiene:GetHygieneState() end)
+        if ok then setHygiene(state) end
+    end
+end)
+
+-- cruise control state, toggled by f_smallresources/f_cruise
+local isCruiseOn = false
+AddEventHandler('seatbelt:client:ToggleCruise', function()
+    isCruiseOn = not isCruiseOn
+end)
 
 local Weapons = lib.load('data.weapons')
 
@@ -27,105 +54,6 @@ local function getScreenResolution()
     screenResolution.x = screenWidth
     screenResolution.y = screenHeight
     return { x = screenWidth, y = screenHeight }
-end
-
----Get mini map positions to client screen resolution
----@param mapType any
----@param screenResolution any
----@return table
-local function getMinimapPositions(mapType, screenResolution)
-    local positions = { minimap = {}, minimap_blur = {}, minimap_mask = {}, }
-    local defaultAspectRatio = 1920 / 1080
-    local resolution = getScreenResolution()
-    local resolutionX, resolutionY = resolution.x, resolution.y
-    local aspectRatio = resolutionX / resolutionY
-
-    local minimapOffset = 0
-    if aspectRatio > defaultAspectRatio then
-        minimapOffset = ((defaultAspectRatio - aspectRatio) / 3.6)
-    end
-
-    local mapPlacer = Hud.data.mini_map.map_placer[mapType]
-    if not mapPlacer then
-        if mapType == 'rectangle' then
-            if screenResolution.x >= 3440 then
-                positions.minimap = { x = -0.007, y = -0.075, width = 0.1685, height = 0.19 }
-                positions.minimap_blur = { x = -0.0085, y = -0.045, width = 0.27, height = 0.3 }
-                positions.minimap_mask = { x = 0.0, y = 0.0, width = 0.128, height = 0.2 }
-            elseif screenResolution.x >= 2560 then
-                positions.minimap = { x = -0.007, y = -0.075, width = 0.1685, height = 0.19 }
-                positions.minimap_blur = { x = -0.0085, y = -0.045, width = 0.27, height = 0.3 }
-                positions.minimap_mask = { x = 0.0, y = 0.0, width = 0.128, height = 0.2 }
-            else
-                positions.minimap = { x = -0.007, y = -0.075, width = 0.1685, height = 0.19 }
-                positions.minimap_blur = { x = -0.0085, y = -0.045, width = 0.27, height = 0.3 }
-                positions.minimap_mask = { x = 0.0, y = 0.0, width = 0.128, height = 0.2 }
-            end
-        else
-            if screenResolution.x >= 3440 then
-                positions.minimap = { x = 0.0085, y = -0.075, width = 0.14, height = 0.18 }
-                positions.minimap_blur = { x = 0.007, y = -0.075, width = 0.14, height = 0.18 }
-                positions.minimap_mask = { x = 0.1, y = -0.020, width = 0.08, height = 0.22 }
-            elseif screenResolution.x >= 2560 then
-                positions.minimap = { x = 0.0085, y = -0.075, width = 0.14, height = 0.18 }
-                positions.minimap_blur = { x = 0.007, y = -0.075, width = 0.14, height = 0.18 }
-                positions.minimap_mask = { x = 0.1, y = -0.020, width = 0.08, height = 0.22 }
-            else
-                positions.minimap = { x = 0.0085, y = -0.075, width = 0.14, height = 0.18 }
-                positions.minimap_blur = { x = 0.007, y = -0.075, width = 0.14, height = 0.18 }
-                positions.minimap_mask = { x = 0.1, y = -0.020, width = 0.08, height = 0.22 }
-            end
-        end
-
-        positions.minimap.x += minimapOffset
-        positions.minimap_blur.x += minimapOffset
-        positions.minimap_mask.x += minimapOffset
-        if not Hud.data.is_res_style_active then
-            if Hud.data.bar_style == 'zarg-m' then
-                local wInc = 0.01
-                local hInc = 0.02
-                local yInc = 0.045
-                local xInc = -0.03
-                positions.minimap.y = positions.minimap.y + yInc
-                positions.minimap_blur.y = positions.minimap_blur.y + yInc
-                positions.minimap.x = positions.minimap.x + xInc
-                positions.minimap_blur.x = positions.minimap_blur.x + xInc
-                positions.minimap.width = positions.minimap.width + wInc
-                positions.minimap.height = positions.minimap.height + hInc
-                positions.minimap_blur.width = positions.minimap_blur.width + wInc
-                positions.minimap_blur.height = positions.minimap_blur.height + hInc
-            elseif Hud.data.bar_style == 'universal' then
-                local inc = 0.0
-                positions.minimap.y = positions.minimap.y + inc
-                positions.minimap_blur.y = positions.minimap_blur.y + inc
-            else
-                local inc = 0.012
-                positions.minimap.y = positions.minimap.y + inc
-                positions.minimap_blur.y = positions.minimap_blur.y + inc
-            end
-        end
-    else
-        local _minimap = { x = -0.007, y = -0.075, width = 0.1685, height = 0.19 }
-        local _minimap_blur = { x = -0.0085, y = -0.045, width = 0.27, height = 0.3 }
-        if mapType == 'circle' then
-            _minimap = { x = 0.0085, y = -0.075, width = 0.14, height = 0.18 }
-            _minimap_blur = { x = 0.007, y = -0.075, width = 0.14, height = 0.18 }
-        end
-        positions.minimap = {
-            x = _minimap.x + mapPlacer.offsetX,
-            y = _minimap.y + mapPlacer.offsetY,
-            width = _minimap.width + mapPlacer.scale,
-            height = _minimap.height + mapPlacer.scale
-        }
-        positions.minimap_blur = {
-            x = _minimap_blur.x + mapPlacer.offsetX,
-            y = _minimap_blur.y + mapPlacer.offsetY,
-            width = _minimap_blur.width + mapPlacer.scale,
-            height = _minimap_blur.height + mapPlacer.scale
-        }
-        positions.minimap_mask = { x = 0.0, y = 0.0, width = 0.128, height = 0.2 }
-    end
-    return positions
 end
 
 ---Update ClientInfo Data
@@ -311,10 +239,12 @@ local function updateVehicleInfo()
         vehicle_info.rpm = engineRunning and math.floor(GetVehicleCurrentRpm(vehicle) * 100) / 100 or 0
         vehicle_info.isSeatbeltOn = Seatbelt.GetCurrentState()
         vehicle_info.isLightOn = lightson == 1 or highbeams == 1
+        vehicle_info.isCruiseOn = isCruiseOn
         Hud.data.bars.vehicle_engine.value = vehicle_info.engineHealth
     else
         if oldVehicle then
             oldVehicle = nil
+            isCruiseOn = false
             vehicle_info = {
                 entity = false,
                 kmH = vehicle_info.kmH,
@@ -362,6 +292,9 @@ function Hud.SetDefaultSettings()
     Hud.data.bars.vehicle_engine.color = def.bar_colors.vehicle_engine
     Hud.data.bars.vehicle_nitro.color = def.bar_colors.vehicle_nitro
     Hud.data.bars.voice.color = def.bar_colors.voice
+    Hud.data.bars.mandi.color = def.bar_colors.mandi
+    Hud.data.bars.kencing.color = def.bar_colors.kencing
+    Hud.data.bars.poop.color = def.bar_colors.poop
     Hud.data.music_info.active = def.music_info.active
     Hud.data.colors = Config.BarColors
     Hud.data.navigation_widget.active = def.navigation_widget.active
@@ -383,42 +316,11 @@ function Hud.CheckRadarDisplay()
     end
 end
 
----Fix mini map position/scale to client screen resolution
+---Places the GTA VI minimap (modules/minimap) and refreshes radar visibility
 function Hud.FixMiniMap()
     CreateThread(function()
         DisplayRadar(false)
-        local mapType = Hud.data.mini_map.style
-        local screenResolution = getScreenResolution()
-        local minimapPositions = getMinimapPositions(mapType, screenResolution)
-
-        if mapType == 'rectangle' then
-            RequestStreamedTextureDict('rectangle', false)
-            while not HasStreamedTextureDictLoaded('rectangle') do
-                Wait(150)
-            end
-            AddReplaceTexture('platform:/textures/graphics', 'radarmasksm', 'rectangle', 'radarmasksm')
-            AddReplaceTexture('platform:/textures/graphics', 'radarmask1g', 'rectangle', 'radarmasksm')
-        else
-            RequestStreamedTextureDict('circlemap', false)
-            while not HasStreamedTextureDictLoaded('circlemap') do
-                Wait(150)
-            end
-            AddReplaceTexture('platform:/textures/graphics', 'radarmasksm', 'circlemap', 'radarmasksm')
-        end
-
-        SetMinimapComponentPosition('minimap', 'L', 'B', minimapPositions.minimap.x, minimapPositions.minimap.y,
-            minimapPositions.minimap.width, minimapPositions.minimap.height)
-        SetMinimapComponentPosition('minimap_blur', 'L', 'B', minimapPositions.minimap_blur.x,
-            minimapPositions.minimap_blur.y, minimapPositions.minimap_blur.width, minimapPositions.minimap_blur.height)
-        SetMinimapComponentPosition('minimap_mask', 'L', 'B', minimapPositions.minimap_mask.x,
-            minimapPositions.minimap_mask.y, minimapPositions.minimap_mask.width, minimapPositions.minimap_mask.height)
-
-        SetMinimapClipType(mapType == 'rectangle' and 0 or 1)
-
-        SetBlipAlpha(GetNorthRadarBlip(), 0)
-        SetBigmapActive(true, false)
-        Wait(100)
-        SetBigmapActive(false, false)
+        Minimap.Load()
         Wait(100)
         Hud.CheckRadarDisplay()
     end)

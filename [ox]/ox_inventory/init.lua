@@ -30,6 +30,23 @@ shared.firsthotbarslot = shared.playerslots - shared.hotbarslots + 1
 shared.dropslots = GetConvarInt('inventory:dropslots', shared.playerslots)
 shared.dropweight = GetConvarInt('inventory:dropweight', shared.playerweight)
 
+-- Key ring: extra slots appended AFTER the regular + hotbar slots (so existing saved slots never move).
+-- Only `shared.keyitem` may be placed there; the UI shows them in the middle column.
+shared.keyslots = GetConvarInt('inventory:keyslots', 10)
+shared.keyitem = GetConvar('inventory:keyitem', 'car_key')
+shared.firstkeyslot = shared.playerslots + 1
+shared.playerslots = shared.playerslots + shared.keyslots
+
+---Whether `itemName` may sit in `slot` of an inventory of type `invType` (key ring slots only take keys).
+---@param invType string?
+---@param slot number
+---@param itemName string?
+---@return boolean
+function shared.slotAccepts(invType, slot, itemName)
+    if invType ~= 'player' or slot < shared.firstkeyslot then return true end
+    return itemName == shared.keyitem
+end
+
 do
     if type(shared.police) == 'string' then
         shared.police = { shared.police }

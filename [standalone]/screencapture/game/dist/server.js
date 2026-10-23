@@ -33374,7 +33374,7 @@ function registerStreamHandlers() {
 var uploadStore = new UploadStore();
 var liveStreamStore = new LiveStreamStore();
 async function boot() {
-  void checkForUpdates();
+  // void checkForUpdates();
   createServer(uploadStore);
   registerImageHandlers();
   registerStreamHandlers();

@@ -4,7 +4,7 @@ import { store } from '../store';
 import { DragSource, DropTarget, InventoryType, SlotWithItem } from '../typings';
 import { moveSlots, stackSlots, swapSlots } from '../store/inventory';
 import { Items } from '../store/items';
-import { hotbarSlots } from '../store/hotbar';
+import { getGridItems, getKeyItems, keyItem, playerSlotAccepts } from '../store/hotbar';
 
 export const onDrop = (source: DragSource, target?: DropTarget) => {
   const { inventory: state } = store.getState();
@@ -28,10 +28,12 @@ export const onDrop = (source: DragSource, target?: DropTarget) => {
       return console.log(`Cannot move container ${sourceSlot.name} when opened`);
   }
 
-  // Fast-moving an item never drops it into the reserved quick action slots.
+  // Fast-moving an item never drops it into the reserved quick action slots; keys try the key ring first.
   const autoTargetItems =
     targetInventory.type === InventoryType.PLAYER
-      ? targetInventory.items.slice(0, Math.max(targetInventory.items.length - hotbarSlots, 0))
+      ? sourceSlot.name === keyItem
+        ? [...getKeyItems(targetInventory.items), ...getGridItems(targetInventory.items)]
+        : getGridItems(targetInventory.items)
       : targetInventory.items;
 
   const targetSlot = target
@@ -39,6 +41,16 @@ export const onDrop = (source: DragSource, target?: DropTarget) => {
     : findAvailableSlot(sourceSlot, sourceData, autoTargetItems);
 
   if (targetSlot === undefined) return console.error('Target slot undefined!');
+
+  // Key ring slots only take keys (both ways: a swap moves the target item into the source slot).
+  if (
+    (targetInventory.type === InventoryType.PLAYER &&
+      !playerSlotAccepts(targetInventory.items.length, targetSlot.slot, sourceSlot.name)) ||
+    (sourceInventory.type === InventoryType.PLAYER &&
+      targetSlot.name &&
+      !playerSlotAccepts(sourceInventory.items.length, sourceSlot.slot, targetSlot.name))
+  )
+    return;
 
   // If dropping on container slot when opened
   if (targetSlot.metadata?.container !== undefined && state.rightInventory.id === targetSlot.metadata.container)

@@ -20,6 +20,15 @@
         ['light', '💡', 'Lampu'], ['interior', '💺', 'Interior'], ['misc', '✨', 'Lainnya'],
     ];
     const PAINT_TABS = [['color1', 'Utama'], ['color2', 'Kedua'], ['pearlescentColor', 'Pearl'], ['wheelColor', 'Velg'], ['interiorColor', 'Interior'], ['dashboardColor', 'Dashboard']];
+    // jenis zona: 'paint' = Cat Kendaraan (warna bodi saja), 'mod' = Modifikasi (tanpa warna bodi), admin = semua
+    const BODY_PAINT = ['color1', 'color2', 'pearlescentColor'];
+    const cats = () => {
+        if (I.station === 'paint') return [['paint', '🎨', 'Cat Bodi']];
+        if (I.station === 'mod') return CATS.map(c => c[0] === 'paint' ? ['paint', '🎨', 'Warna Lain'] : c);
+        return CATS;
+    };
+    const paintTabs = () => I.station === 'paint' ? PAINT_TABS.filter(t => BODY_PAINT.includes(t[0]))
+        : I.station === 'mod' ? PAINT_TABS.filter(t => !BODY_PAINT.includes(t[0])) : PAINT_TABS;
     const GROUP_LABEL = { Classic: 'Metalik', Matte: 'Matte', Metal: 'Metal', Worn: 'Kusam', Chameleon: 'Chameleon' };
     const LEVELS = ['modEngine', 'modBrakes', 'modTransmission', 'modSuspension', 'modArmor'];
 
@@ -88,7 +97,7 @@
 
     // ------------------------------------------------------------ panel kiri
     function renderCats() {
-        $('cats').innerHTML = CATS.map(([id, ic, name]) => `<button class="cat ${id === cat ? 'on' : ''}" data-c="${id}"><span>${ic}</span>${name}</button>`).join('');
+        $('cats').innerHTML = cats().map(([id, ic, name]) => `<button class="cat ${id === cat ? 'on' : ''}" data-c="${id}"><span>${ic}</span>${name}</button>`).join('');
         document.querySelectorAll('.cat').forEach(b => b.onclick = () => { cat = b.dataset.c; sub = null; wheelType = null; renderCats(); renderList(); });
     }
 
@@ -144,7 +153,7 @@
 
     function renderList() {
         const el = $('list');
-        const catName = CATS.find(c => c[0] === cat)[2];
+        const catName = cats().find(c => c[0] === cat)[2];
         $('back').classList.toggle('hidden', !sub);
         $('crumb').textContent = sub ? `${catName} / ${sub.label}` : catName;
         if (sub && sub.render) return sub.render(el);
@@ -162,14 +171,16 @@
     }
 
     function renderPaint(el) {
+        const tabs = paintTabs();
+        if (!tabs.some(t => t[0] === paintTab)) paintTab = tabs[0][0];
         const key = paintTab;
         const main = key === 'color1' || key === 'color2';
         const groups = main ? Object.keys(C.paints) : (key === 'pearlescentColor' ? ['Classic', 'Chameleon'] : ['Classic']);
         if (!groups.includes(paintGroup)) paintGroup = groups[0];
-        const tabLabel = PAINT_TABS.find(t => t[0] === key)[1];
+        const tabLabel = tabs.find(t => t[0] === key)[1];
         const was = O[key];
         el.innerHTML = `
-            <div class="sub-tabs">${PAINT_TABS.map(([k, l]) => `<button class="${k === key ? 'on' : ''}" data-t="${k}">${l}</button>`).join('')}</div>
+            <div class="sub-tabs">${tabs.map(([k, l]) => `<button class="${k === key ? 'on' : ''}" data-t="${k}">${l}</button>`).join('')}</div>
             ${groups.length > 1 ? `<div class="lbl"><span>Jenis</span></div><div class="sub-tabs">${groups.map(g => `<button class="${g === paintGroup ? 'on' : ''}" data-g="${g}">${GROUP_LABEL[g] || g}</button>`).join('')}</div>` : ''}
             <div class="lbl"><span>Warna ${tabLabel}</span><span>${priceTxt(est(key, { [key]: (C.paints[paintGroup][0] || {}).id ?? 0 }))}</span></div>
             <div class="chips">${C.paints[paintGroup].map(p => `<button class="chip ${cur[key] === p.id ? 'on' : ''}" data-p="${p.id}" ${canSelect() ? '' : 'disabled'}>
@@ -417,8 +428,9 @@
         const d = e.data || {};
         if (d.action === 'open') {
             I = d.info; C = d.catalog; O = d.orig || {}; cur = clone(O);
-            cart.clear(); cat = 'perf'; sub = null; paintTab = 'color1'; paintGroup = 'Classic'; wheelType = null; wheelOpts = null;
+            cart.clear(); cat = cats()[0][0]; sub = null; paintTab = paintTabs()[0][0]; paintGroup = 'Classic'; wheelType = null; wheelOpts = null;
             $('vname').textContent = d.vehicle.name;
+            $('kicker').textContent = I.station === 'paint' ? 'Cat Kendaraan' : I.station === 'mod' ? 'Modifikasi Kendaraan' : 'Bengkel Kustom';
             $('vplate').textContent = d.vehicle.plate;
             document.querySelectorAll('[data-cam]').forEach(x => x.classList.toggle('on', x.dataset.cam === 'free'));
             closeModal();

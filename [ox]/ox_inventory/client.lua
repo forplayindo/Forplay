@@ -1352,7 +1352,9 @@ RegisterNetEvent('ox_inventory:setPlayerInventory', function(currentDrops, inven
 				maxWeight = shared.playerweight,
 			},
 			imagepath = client.imagepath,
-			hotbarSlots = shared.hotbarslots
+			hotbarSlots = shared.hotbarslots,
+			keySlots = shared.keyslots,
+			keyItem = shared.keyitem
 		}
 	})
 

@@ -6,7 +6,7 @@
 --    (item di tas mekanik -> angka stok, satu arah).
 return {
     -- titik Gudang Bengkel (ox_target): Setor Bahan + Ambil Tas Perkakas. Atur dengan /vec3.
-    point = { coords = vec3(-346.08, -1334.10, 30.32), radius = 1.0, distance = 2.5 },
+    point = { coords = vec3(-349.66, -1330.34, 30.46), radius = 1.0, distance = 2.5 },
 
     bag = 'tas_perkakas',     -- item Tas Perkakas (ox_inventory, degrade = masa berlaku)
 

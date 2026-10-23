@@ -638,4 +638,11 @@ return {
 
 -- Hewan peliharaan (f_petshop). Diberikan lewat target pada hewanmu.
 ['pet_food'] = { label = 'Makanan Hewan', weight = 200, stack = true, close = true, description = 'Makanan untuk hewan peliharaan. Arahkan target ke hewanmu lalu pilih "Beri Makanan Hewan".' },
+
+-- Gang Wars Rebut Bendera (f_crew). Metadata crew = gang pemilik; hanya dari admin (/peranggang > Bendera) / mafia.
+['bendera_gang'] = {
+    label = 'Bendera Gang', weight = 2000, stack = false, close = true,
+    description = 'Bendera gang. Pakai untuk memegang, tancapkan saat Rebut Bendera.',
+    client = { export = 'f_crew.useFlag' },
+},
 }

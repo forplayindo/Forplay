@@ -674,3 +674,6 @@ window.addEventListener('message', (event) => {
 /* preview harness hook — ignored in game */
 window.NXSTATE = state;
 window.NXAPI = { addMessage, setOpen, setChannel, applySettings, buildSettingsPanel, applyReaction, render };
+
+/* beri tahu Lua halaman sudah siap -> init lokal dikirim tanpa menunggu server */
+post('loaded', {});

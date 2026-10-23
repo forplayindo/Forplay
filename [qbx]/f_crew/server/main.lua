@@ -232,6 +232,18 @@ local function sessionStart(src)
     local pg = p.PlayerData.gang
     local g = pg and Gangs[pg.name]
     if not g then return end
+    -- qbx_core mereset rank gang aktif ke 0 kalau pemain login sebelum gang crew didaftarkan
+    -- (server baru start / resource di-restart). Rank asli tetap ada di player_groups (PlayerData.gangs):
+    -- pulihkan. SetPlayerPrimaryGang memicu OnGangUpdate -> sesi dimulai ulang dengan rank yang benar.
+    local real = p.PlayerData.gangs and p.PlayerData.gangs[g.name]
+    if real and real ~= (pg.grade and pg.grade.level) then
+        lib.print.info(('[f_crew] rank gang %s dipulihkan %s -> %s'):format(p.PlayerData.citizenid, pg.grade and pg.grade.level or '?', real))
+        exports.qbx_core:SetPlayerPrimaryGang(p.PlayerData.citizenid, g.name)
+        if Sessions[src] then return end
+        p = exports.qbx_core:GetPlayer(src)
+        pg = p and p.PlayerData.gang
+        if not pg or pg.name ~= g.name then return end
+    end
     Sessions[src] = {
         cid = p.PlayerData.citizenid,
         gang = g.name,

@@ -66,6 +66,7 @@ local function buildStatus(src, veh)
         stock = stockOf(),
         bag = HasToolBag(src),
         onLift = Lift.Holds(veh),
+        underOk = Condition.Kind(veh) ~= 'car' or Lift.Holds(veh),
         heavyOk = heavyAllowed(veh),
         heavyNeed = select(2, heavyAllowed(veh)),
         pendingBill = Billing.PendingCount(veh),
@@ -91,11 +92,13 @@ local function plan(src, veh, action, key)
     local values = partValues(veh, c)
     local tyres = Condition.Tyres(veh, c)
     local heavyOk, heavyNeed = heavyAllowed(veh)
+    -- bagian bawah mobil hanya di atas lift yang naik
+    local underOk = Condition.Kind(veh) ~= 'car' or Lift.Holds(veh)
     local stock = stockOf()
     if not HasToolBag(src) then return 'Bawa Tas Perkakas dulu (ambil di Gudang Bengkel)' end
 
     local items, parts, tyreList, services, duration = {}, {}, {}, {}, 0
-    local wheelFix = false
+    local wheelFix, tyreDuration = false, 0
     local function addPart(k)
         local def = cfg.parts[k]
         items[def.item] = (items[def.item] or 0) + def.qty
@@ -108,6 +111,7 @@ local function plan(src, veh, action, key)
         tyreList[#tyreList + 1] = k
         services[#services + 1] = cfg.tyre.service
         duration += cfg.tyre.duration
+        tyreDuration += cfg.tyre.duration
         -- roda lepas: dipasang ulang lewat perbaikan body (SetVehicleFixed), jadi bahan & jasa body ikut
         if tyres[k].off and not wheelFix then
             wheelFix = true
@@ -115,6 +119,7 @@ local function plan(src, veh, action, key)
             items[body.item] = (items[body.item] or 0) + body.qty
             services[#services + 1] = body.service
             duration += body.duration
+            tyreDuration += body.duration
         end
     end
 
@@ -122,6 +127,9 @@ local function plan(src, veh, action, key)
         local def = cfg.parts[key]
         if not def then return 'Bagian tidak dikenal' end
         if values[key] >= 100 then return ('%s masih dalam kondisi baik'):format(def.label) end
+        if cfg.liftParts[key] and not underOk then
+            return ('%s ada di bawah mobil: naikkan mobil di lift bengkel dulu'):format(def.label)
+        end
         if def.heavy and not heavyOk then
             return heavyNeed == 'perlu lift' and ('%s hanya bisa diperbaiki di atas lift bengkel'):format(def.label)
                 or ('%s hanya bisa diperbaiki di bengkel'):format(def.label)
@@ -135,14 +143,16 @@ local function plan(src, veh, action, key)
     elseif action == 'tyres' or action == 'all' then
         if action == 'all' then
             for k, def in pairs(cfg.parts) do
-                if values[k] < cfg.needs and (not def.heavy or heavyOk) then addPart(k) end
+                if values[k] < cfg.needs and (not def.heavy or heavyOk) and (not cfg.liftParts[k] or underOk) then addPart(k) end
             end
         end
         for k, t in pairs(tyres) do
             if t.burst or t.wear < cfg.needs then addTyre(k) end
         end
         if #parts == 0 and #tyreList == 0 then return 'Tidak ada yang perlu diperbaiki di sini' end
+        local raw = duration
         duration = math.min(60000, math.floor(duration * 0.6))
+        tyreDuration = math.floor(tyreDuration * duration / raw)
     else
         return 'Tindakan tidak dikenal'
     end
@@ -152,7 +162,14 @@ local function plan(src, veh, action, key)
             return ('Stok gudang kurang: %s ×%d (sisa %d)'):format(Stock.Label(item), count, stock[item] or 0)
         end
     end
-    return { items = items, duration = duration, parts = parts, tyres = tyreList, services = services, wheelFix = wheelFix }
+    -- ruang mesin (mobil saja): mekanik ke depan kendaraan & membuka kap
+    local hood = false
+    if Condition.Kind(veh) == 'car' then
+        for i = 1, #parts do
+            if cfg.hoodParts[parts[i]] then hood = true break end
+        end
+    end
+    return { items = items, duration = duration, tyreDuration = tyreDuration, parts = parts, tyres = tyreList, services = services, wheelFix = wheelFix, hood = hood }
 end
 
 ---Terapkan perbaikan. Bagian bawaan GTA diterapkan oleh pemilik entity (client yang memegang fisika).
@@ -186,6 +203,23 @@ local function apply(src, veh, p)
     end
 end
 
+---Posisi mekanik relatif terhadap kendaraan: side (+ kanan, - kiri), front (+ depan, - belakang).
+local function relPos(src, veh)
+    local d = GetEntityCoords(GetPlayerPed(src)) - GetEntityCoords(veh)
+    local h = math.rad(GetEntityHeading(veh))
+    return d.x * math.cos(h) + d.y * math.sin(h), -d.x * math.sin(h) + d.y * math.cos(h)
+end
+
+---Mekanik berdiri di sisi ban `key` (FL/FR/RL/RR, motor F/R)?
+local function besideTyre(src, veh, key)
+    local side, front = relPos(src, veh)
+    if (key:sub(1, 1) == 'F') ~= (front > 0) then return false end
+    local lr = key:sub(2, 2)
+    if lr == 'L' and side > -0.3 then return false end
+    if lr == 'R' and side < 0.3 then return false end
+    return true
+end
+
 lib.callback.register('f_mechanicjob:server:panelOpen', function(src, netId)
     local err, veh = checkCommon(src, netId)
     if err then return { error = err } end
@@ -204,7 +238,11 @@ lib.callback.register('f_mechanicjob:server:actionStart', function(src, netId, a
     local p = plan(src, veh, action, key)
     if type(p) == 'string' then return { error = p } end
     pending[src] = { net = tonumber(netId), action = action, key = key, startedAt = GetGameTimer(), duration = p.duration }
-    return { duration = p.duration }
+    -- ban yang diganti (client mendatangi tiap roda)
+    local info = Condition.Tyres(veh, Condition.Get(veh))
+    local tyres = {}
+    for _, k in ipairs(p.tyres) do tyres[#tyres + 1] = { key = k, index = info[k].index } end
+    return { duration = p.duration, tyreDuration = p.tyreDuration, tyres = tyres, hood = p.hood }
 end)
 
 lib.callback.register('f_mechanicjob:server:actionFinish', function(src)
@@ -218,6 +256,14 @@ lib.callback.register('f_mechanicjob:server:actionFinish', function(src)
     -- kondisi bisa berubah selama progress (bahan dipindah, kendaraan turun dari lift, dll.)
     local p = plan(src, veh, job.action, job.key)
     if type(p) == 'string' then return { error = p } end
+    if job.action == 'tyre' and not besideTyre(src, veh, job.key) then
+        local t = Condition.Tyres(veh, Condition.Get(veh))[job.key]
+        return { error = ('Kamu harus berada di dekat %s'):format(t and t.label:lower() or 'ban itu') }
+    end
+    if job.action == 'part' and p.hood then
+        local side, front = relPos(src, veh)
+        if front < 1.0 or math.abs(side) > 1.5 then return { error = 'Kamu harus berada di depan kap mesin' } end
+    end
 
     local ok, missing = Stock.Take(p.items)
     if not ok then return { error = ('Stok gudang kurang: %s'):format(Stock.Label(missing)) } end

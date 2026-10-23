@@ -10,6 +10,12 @@ return {
     heavyRepair = 'anywhere',
     workshop = { center = vec3(-338.0, -1355.0, 30.4), radius = 45.0 },
 
+    -- bagian bawah kendaraan: mobil WAJIB di atas lift yang sedang naik (motor tidak). Animasi tangan ke atas.
+    liftParts = { brakes = true, axle = true, suspension = true, clutch = true, transfluid = true },
+
+    -- bagian di ruang mesin: mekanik harus berdiri di depan kendaraan dengan kap terbuka (mobil saja)
+    hoodParts = { engine = true, radiator = true, airfilter = true, sparkplugs = true, oil = true, coolant = true, brakefluid = true },
+
     distance = 3.0,        -- jarak ox_target "Periksa Kendaraan"
     closeDistance = 6.0,   -- jarak maksimal mekanik <-> kendaraan selama panel terbuka / perbaikan
 
@@ -104,7 +110,7 @@ return {
     locations = {
         blip = vec3(-338.0, -1355.0, 30.4),
         duty = vec3(-328.20, -1337.40, 30.35),
-        stash = vec3(-346.08, -1334.10, 30.32),
+        stash = vec3(-349.78, -1327.88, 30.46),
         garage = vec3(-360.0, -1372.0, 30.4),           -- titik ambil / kembalikan kendaraan kerja
         garageSpawn = vec4(-362.0, -1378.0, 30.4, 90.0), -- tempat kendaraan kerja muncul
     },
@@ -113,8 +119,15 @@ return {
     -- mekanik membuka Menu Kasir (daftar belum bayar + Master Harga). Pembayar harus dalam `distance`.
     cashier = { coords = vec3(-327.51, -1336.86, 30.46), radius = 0.8, distance = 3.0 },
 
-    -- Pasang kustom dari tab Kustom (ms). Kendaraan harus di area `workshop` dan tanpa pengemudi.
-    customInstall = { duration = 15000 },
+    -- Pasang kustom dari tab Kustom (ms per tahap). Kendaraan harus di zona f_customs dengan jenis yang
+    -- sama dengan order (cat = booth cat, modifikasi = lift) dan tanpa pengemudi. Total = jumlah tahap.
+    customInstall = {
+        paintSide = 6000,  -- cat: per sisi (depan, kiri, belakang, kanan)
+        perf = 8000,       -- modifikasi performa / ruang mesin (kap dibuka)
+        wheel = 3500,      -- velg / ban / asap ban: per roda
+        body = 8000,       -- bodi, warna lain, lampu, kaca film, dll. (las)
+        interior = 6000,   -- interior (pintu pengemudi dibuka)
+    },
 
     -- kendaraan kerja
     jobVehicles = {

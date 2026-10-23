@@ -51,7 +51,8 @@ lib.callback.register('f_mechanicjob:server:liftToggle', function(src, i)
     local lift = i and LIFTS[i]
     if not lift then return { error = 'Lift tidak ditemukan' } end
     if not isMechanic(src) then return { error = 'Hanya mekanik yang sedang bertugas' } end
-    if #(GetEntityCoords(GetPlayerPed(src)) - lift.panel) > 4.0 then return { error = 'Kamu terlalu jauh dari panel lift' } end
+    local here = GetEntityCoords(GetPlayerPed(src))
+    if #(here - lift.panel) > 4.0 and #(here - lift.coords.xyz) > 6.0 then return { error = 'Kamu terlalu jauh dari lift' } end
 
     local s = get(i)
     if (os.time() - (s.at or 0)) * 1000 < cfg.lift.duration then return { error = 'Lift masih bergerak' } end

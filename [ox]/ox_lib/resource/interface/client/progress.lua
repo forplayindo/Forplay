@@ -250,7 +250,9 @@ function lib.progressBar(data)
             action = 'progress',
             data = {
                 label = data.label,
-                duration = data.duration
+                duration = data.duration,
+                canCancel = data.canCancel, -- f_patch: tombol [X] Batal di progress bar
+                cancelKey = data.canCancel and GetControlInstructionalButton(0, joaat('cancelprogress') | 0x80000000, true):match('^t_(.+)') or nil
             }
         })
     end

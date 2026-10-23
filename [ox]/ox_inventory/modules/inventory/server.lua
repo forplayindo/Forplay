@@ -1116,6 +1116,26 @@ end
 
 exports('SetMaxWeight', Inventory.SetMaxWeight)
 
+local keySlotOrder, normalSlotOrder
+
+---Slot search order for player inventories: keys try the key ring first, other items never land there.
+---@param itemName string
+---@return number[]
+local function playerSlotOrder(itemName)
+	if not normalSlotOrder then
+		normalSlotOrder, keySlotOrder = {}, {}
+
+		for i = shared.firstkeyslot, shared.playerslots do keySlotOrder[#keySlotOrder + 1] = i end
+
+		for i = 1, shared.firstkeyslot - 1 do
+			normalSlotOrder[i] = i
+			keySlotOrder[#keySlotOrder + 1] = i
+		end
+	end
+
+	return itemName == shared.keyitem and keySlotOrder or normalSlotOrder
+end
+
 ---@param inv inventory
 ---@param item table | string
 ---@param count number
@@ -1142,6 +1162,8 @@ function Inventory.AddItem(inv, item, count, metadata, slot, cb)
 
 	metadata = assertMetadata(metadata)
 
+	if slot and not shared.slotAccepts(inv.type, slot, item.name) then slot = nil end
+
 	if slot then
 		local slotData = inv.items[slot]
 		slotMetadata, slotCount = Items.Metadata(inv.id, item, metadata and table.clone(metadata) or {}, count)
@@ -1154,8 +1176,10 @@ function Inventory.AddItem(inv, item, count, metadata, slot, cb)
 	if not toSlot then
 		local items = inv.items
 		slotMetadata, slotCount = Items.Metadata(inv.id, item, metadata and table.clone(metadata) or {}, count)
+		local order = inv.type == 'player' and playerSlotOrder(item.name)
 
-		for i = 1, inv.slots do
+		for n = 1, order and #order or inv.slots do
+			local i = order and order[n] or n
 			local slotData = items[i]
 
 			if item.stack and slotData ~= nil and slotData.name == item.name and table.matches(slotData.metadata, slotMetadata) then
@@ -1771,6 +1795,12 @@ lib.callback.register('ox_inventory:swapItems', function(source, data)
         end
 
 		if fromData then
+            -- key ring slots only take keys (checked both ways, a swap moves toData into the source slot)
+            if not shared.slotAccepts(toInventory.type, data.toSlot, fromData.name)
+                or (toData and not shared.slotAccepts(fromInventory.type, data.fromSlot, toData.name)) then
+                return false, 'keyring_only'
+            end
+
             if fromData.metadata.container and toInventory.type == 'container' then return false end
             if toData and toData.metadata.container and fromInventory.type == 'container' then return false end
 
@@ -2214,6 +2244,13 @@ function Inventory.GetSlotForItem(inv, itemName, metadata)
 	local emptySlot
 	-- stacking into a quick action slot is fine, but it is never picked as a free slot
 	local lastFreeSlot = inventory.type == 'player' and shared.firsthotbarslot - 1 or inventory.slots
+
+	-- keys go to the first free key ring slot
+	if inventory.type == 'player' and item.name == shared.keyitem then
+		for i = shared.firstkeyslot, inventory.slots do
+			if not items[i] then return i end
+		end
+	end
 
 	for i = 1, inventory.slots do
 		local slotData = items[i]

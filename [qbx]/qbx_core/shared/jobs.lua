@@ -38,70 +38,11 @@ return {
                 name = 'Kepala',
                 isboss = true,
                 bankAuth = true,
-                payment = 700000
+                payment = 625000
             },
         },
     },
-    ['bcso'] = {
-        label = 'BCSO',
-        type = 'leo',
-        defaultDuty = true,
-        offDutyPay = false,
-        grades = {
-            [0] = {
-                name = 'Rekrutan',
-                payment = 350000
-            },
-            [1] = {
-                name = 'Petugas',
-                payment = 400000
-            },
-            [2] = {
-                name = 'Sersan',
-                payment = 475000
-            },
-            [3] = {
-                name = 'Letnan',
-                payment = 550000
-            },
-            [4] = {
-                name = 'Kepala',
-                isboss = true,
-                bankAuth = true,
-                payment = 700000
-            },
-        },
-    },
-    ['sasp'] = {
-        label = 'SASP',
-        type = 'leo',
-        defaultDuty = true,
-        offDutyPay = false,
-        grades = {
-            [0] = {
-                name = 'Rekrutan',
-                payment = 350000
-            },
-            [1] = {
-                name = 'Petugas',
-                payment = 400000
-            },
-            [2] = {
-                name = 'Sersan',
-                payment = 475000
-            },
-            [3] = {
-                name = 'Letnan',
-                payment = 550000
-            },
-            [4] = {
-                name = 'Kepala',
-                isboss = true,
-                bankAuth = true,
-                payment = 700000
-            },
-        },
-    },
+   
     ['ambulance'] = {
         label = 'EMS',
         type = 'ems',
@@ -128,7 +69,7 @@ return {
                 name = 'Kepala',
                 isboss = true,
                 bankAuth = true,
-                payment = 700000
+                payment = 625000
             },
         },
     },
@@ -257,7 +198,7 @@ return {
                 name = 'Manajer',
                 isboss = true,
                 bankAuth = true,
-                payment = 700000
+                payment = 625000
             },
         },
     },
@@ -278,7 +219,7 @@ return {
                 name = 'Kepala Dinas',
                 isboss = true,
                 bankAuth = true,
-                payment = 700000
+                payment = 625000
             },
         },
     },
@@ -387,7 +328,7 @@ return {
                 name = 'Manajer',
                 isboss = true,
                 bankAuth = true,
-                payment = 700000
+                payment = 625000
             },
         },
     },

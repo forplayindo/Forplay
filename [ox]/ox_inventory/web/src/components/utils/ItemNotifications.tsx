@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { TransitionGroup } from 'react-transition-group';
 import useNuiEvent from '../../hooks/useNuiEvent';
@@ -8,6 +8,8 @@ import { getItemUrl } from '../../helpers';
 import { SlotWithItem } from '../../typings';
 import { Items } from '../../store/items';
 import Fade from './transitions/Fade';
+
+const MAX_NOTIFICATIONS = 10;
 
 interface ItemNotificationProps {
   item: SlotWithItem;
@@ -57,14 +59,22 @@ export const ItemNotificationsProvider = ({ children }: { children: React.ReactN
     ref: React.RefObject<HTMLDivElement | null>;
   }>();
 
+  // at most two columns of five next to the hotbar; extra notifications are dropped
+  const shown = useRef(0);
+  const nextId = useRef(0);
+
   const add = (item: ItemNotificationProps) => {
+    if (shown.current >= MAX_NOTIFICATIONS) return;
+
+    shown.current++;
     const ref = React.createRef<HTMLDivElement>();
-    const notification = { id: Date.now(), item, ref: ref };
+    const notification = { id: nextId.current++, item, ref: ref };
 
     queue.add(notification);
 
     const timeout = setTimeout(() => {
       queue.remove();
+      shown.current--;
       clearTimeout(timeout);
     }, 2500);
   };
@@ -78,8 +88,8 @@ export const ItemNotificationsProvider = ({ children }: { children: React.ReactN
       {children}
       {createPortal(
         <TransitionGroup className="item-notification-container">
-          {queue.values.map((notification, index) => (
-            <Fade key={`item-notification-${index}`}>
+          {queue.values.map((notification) => (
+            <Fade key={`item-notification-${notification.id}`}>
               <ItemNotification item={notification.item} ref={notification.ref} />
             </Fade>
           ))}

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Gang Wars Bendera — Mockup</title>
+<!-- pakai style asli Gang Wars supaya tampilan sama persis -->
+<link rel="stylesheet" href="../html/style.css">
+<style>
+/* latar pengganti layar game */
+body.game { background: linear-gradient(180deg, #7aa6c9 0%, #b9cbd6 38%, #8b8f86 39%, #5c5f58 70%, #3c3e3a 100%); }
+body.menu { background: #2b3038; }
+.city { position: absolute; left: 0; right: 0; top: 18%; height: 21%; display: flex; align-items: flex-end; gap: 6px; padding: 0 3%; opacity: .55; }
+.city i { flex: 1; background: #47515c; border-radius: 3px 3px 0 0; }
+
+/* kontrol mockup (bukan UI asli) */
+.mock { position: fixed; left: 12px; bottom: 12px; z-index: 99; background: rgba(0,0,0,.78); border-radius: 12px; padding: 10px 12px;
+    display: flex; flex-direction: column; gap: 8px; font-size: 12px; width: 300px; color: #fff; }
+.mock b { color: #FFD60A; }
+.mock .r { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.mock button { padding: 5px 10px; border-radius: 7px; background: #222; border: 1px solid #444; }
+.mock button.on { border-color: #FFD60A; color: #FFD60A; }
+
+/* ====== BARU: status bendera di scoreboard ====== */
+.sb-flag { margin: 7px 8px 0; padding: 8px 10px; border-radius: 12px; display: flex; align-items: center; gap: 9px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); }
+.sb-flag .fi { width: 28px; height: 28px; border-radius: 14px; display: grid; place-items: center; font-size: 14px; flex: none; }
+.sb-flag .ft { min-width: 0; flex: 1; }
+.sb-flag .ft small { display: block; font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.6); font-weight: 800; }
+.sb-flag .ft b { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-flag.empty b { color: rgba(255,255,255,.7); font-weight: 600; }
+.sb-flag .act { font-size: 10px; color: #FF8A82; font-weight: 700; margin-top: 1px; }
+.sb-row .flagmark { font-size: 11px; margin-left: 2px; }
+
+/* ====== BARU: progress cabut / tancap (bawah tengah) ====== */
+.hold { position: fixed; left: 50%; bottom: 150px; transform: translateX(-50%); width: 320px; border-radius: 18px; padding: 9px 12px 11px; }
+.hold-top { display: flex; align-items: center; gap: 9px; }
+.hold-top .hi { width: 30px; height: 30px; border-radius: 15px; display: grid; place-items: center; font-size: 14px; flex: none;
+    background: linear-gradient(180deg, rgba(255,214,10,.4), rgba(255,214,10,.14)); }
+.hold-top .ht { flex: 1; min-width: 0; }
+.hold-top .ht b { display: block; font-size: 12.5px; font-weight: 600; }
+.hold-top .ht small { font-size: 10.5px; color: rgba(255,255,255,.7); }
+.hold-top .hs { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; color: #FFD60A; }
+.hold-bar { margin-top: 8px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.16); overflow: hidden; }
+.hold-bar i { display: block; height: 100%; width: 0; background: #FFD60A; border-radius: 3px; transition: width .25s linear; }
+.hold.pull .hi { background: linear-gradient(180deg, rgba(255,69,58,.55), rgba(255,69,58,.22)); }
+.hold.pull .hs { color: #FF8A82; } .hold.pull .hold-bar i { background: #FF6961; }
+.hold.contested { border-color: rgba(251,146,60,.7); }
+.hold.contested .hold-bar i { background: #fb923c; animation: pulse .6s ease-in-out infinite alternate; }
+.hold.contested .ht small { color: #fdba74; font-weight: 700; }
+
+/* ====== BARU: prompt [E] + status memegang bendera ====== */
+.prompt { position: fixed; left: 50%; bottom: 150px; transform: translateX(-50%); padding: 7px 14px 7px 8px; border-radius: 16px;
+    display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.prompt .key { font-size: 12px; min-width: 24px; padding: 2px 7px; }
+.prompt small { color: rgba(255,255,255,.65); font-weight: 500; }
+.carry { position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%); padding: 6px 12px 6px 7px; border-radius: 14px;
+    display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.carry .fi { width: 24px; height: 24px; border-radius: 12px; display: grid; place-items: center; font-size: 12px; }
+.carry small { color: rgba(255,255,255,.62); font-weight: 500; }
+
+/* ====== BARU: penanda bendera di map menu ====== */
+.flagpin { font-size: 22px; filter: drop-shadow(0 2px 2px rgba(0,0,0,.6)); }
+.mode-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.mode-pick button { padding: 10px; border-radius: 10px; background: var(--card2); border: 1px solid var(--line); font-weight: 700; font-size: 13px; text-align: left; }
+.mode-pick button small { display: block; font-weight: 500; font-size: 11px; margin-top: 2px; }
+.mode-pick button.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.flagpt { display: flex; justify-content: space-between; align-items: center; background: var(--card2); border-radius: 10px; padding: 9px 11px; font-size: 13px; }
+.flagpt span { font-family: Consolas, monospace; color: var(--muted); font-size: 12px; }
+
+/* tab admin Bendera */
+.fhead, .frow { display: grid; grid-template-columns: 1.2fr 1.1fr 1.4fr 1fr 150px; gap: 12px; align-items: center; padding: 0 16px; }
+.fhead { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .6px; padding-bottom: 4px; }
+.frow { background: var(--card); border: 1px solid var(--line); border-radius: 12px; min-height: 62px; padding-top: 10px; padding-bottom: 10px; }
+.frow input { width: 100%; padding: 8px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--card2); color: var(--text); outline: none; font-family: Consolas, monospace; font-size: 12px; }
+.frow input:focus { border-color: var(--accent); }
+.pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--card2); color: var(--muted); display: inline-block; margin: 2px 4px 2px 0; }
+.pill.inv { color: var(--accent); } .pill.up { color: var(--green); }
+.on-dot { color: var(--green); font-size: 11px; } .off-dot { color: var(--muted); font-size: 11px; }
+</style>
+</head>
+<body class="game">
+<div class="city" id="city"><i style="height:60%"></i><i style="height:85%"></i><i style="height:45%"></i><i style="height:100%"></i><i style="height:70%"></i><i style="height:55%"></i><i style="height:90%"></i><i style="height:40%"></i><i style="height:75%"></i><i style="height:65%"></i></div>
+
+<!-- ======================= HUD (dalam game) ======================= -->
+<div class="hud" id="hud">
+    <div class="cd glass in war" id="cd">
+        <span class="cd-icon">⚔️</span>
+        <div class="cd-text"><div class="cd-title">Perang · La Mesa 🚩</div><div class="cd-desc" id="cd-desc">Cabut bendera Vagos, lalu tancapkan milikmu</div></div>
+        <span class="cd-timer" id="cd-timer">06:12</span>
+        <div class="cd-bar"><i style="transform:scaleX(.62)"></i></div>
+    </div>
+
+    <div class="sb glass in" id="sb">
+        <div class="sb-head">
+            <div><div class="sb-title">Rebut Bendera</div><div class="sb-zone">La Mesa</div></div>
+            <span class="sb-phase war">PERANG</span>
+        </div>
+        <div class="sb-flag" id="sb-flag"></div>
+        <div class="sb-rows" id="sb-rows"></div>
+        <div class="sb-foot"><span class="in-zone">● Dekat bendera · 24 m</span><span><span class="key">F7</span> sembunyikan</span></div>
+    </div>
+
+    <div class="prompt glass hidden" id="prompt"></div>
+    <div class="hold glass hidden" id="hold">
+        <div class="hold-top"><span class="hi" id="h-ic">🚩</span><div class="ht"><b id="h-t"></b><small id="h-s">Jangan bergerak · tetap di dekat tiang</small></div><span class="hs" id="h-n"></span></div>
+        <div class="hold-bar"><i id="h-bar"></i></div>
+    </div>
+    <div class="carry glass hidden" id="carry"><span class="fi" style="background:rgba(168,85,247,.45)">🚩</span>Memegang bendera <b>Ballas</b> <small>· tidak bisa pakai senjata / kendaraan</small> <span class="key">X</span><small>simpan</small></div>
+</div>
+
+<!-- ======================= MENU /peranggang (admin) ======================= -->
+<div class="panel hidden" id="panel">
+    <header>
+        <div class="brand"><span class="logo">⚔️</span><div><h1>GANG <span>WARS</span></h1><small>Forplay · Perebutan wilayah antar gang</small></div></div>
+        <div class="head-actions"><div class="mygang">🛡️ Admin</div><button class="icon-btn">✕</button></div>
+    </header>
+    <nav class="tabs">
+        <button data-mt="map" class="active">🗺️ Map</button>
+        <button>📍 Wilayah</button><button>⚔️ Perang</button><button>📜 Riwayat</button><button>🏆 Leaderboard</button><button>🎁 Reward</button>
+        <button data-mt="flags">🚩 Bendera <small style="color:inherit;opacity:.7">(admin)</small></button>
+    </nav>
+    <main>
+        <!-- MAP + editor -->
+        <section class="view" id="mv-map">
+            <div class="map-wrap" style="cursor:default">
+                <div style="position:absolute;inset:0;background:url(../html/map.jpg) 58% 66% / 520% no-repeat"></div>
+                <svg style="position:absolute;inset:0;width:100%;height:100%">
+                    <polygon class="draft" points="300,180 520,150 600,330 470,460 280,400"></polygon>
+                    <circle class="vtx first" cx="300" cy="180" r="6"></circle><circle class="vtx" cx="520" cy="150" r="6"></circle>
+                    <circle class="vtx" cx="600" cy="330" r="6"></circle><circle class="vtx" cx="470" cy="460" r="6"></circle><circle class="vtx" cx="280" cy="400" r="6"></circle>
+                </svg>
+                <div class="flagpin" style="position:absolute;left:428px;top:268px">🚩</div>
+                <div class="draw-hint" id="draw-hint">Klik kiri = tambah titik · Drag titik = geser · Klik kanan titik = hapus</div>
+            </div>
+            <aside class="side">
+                <div class="side-body scroll">
+                    <h3>Edit Wilayah</h3>
+                    <div class="field"><label>Nama wilayah</label><input value="La Mesa"></div>
+                    <div class="field"><label>Minimal peserta online (tiap gang)</label><input type="number" value="3"></div>
+                    <div class="section-t">Mode perang</div>
+                    <div class="mode-pick" id="mode-pick">
+                        <button data-mode="pts">🎯 Poin<small>kill + hadir di wilayah</small></button>
+                        <button data-mode="flag" class="on">🚩 Bendera<small>cabut lalu tancap</small></button>
+                    </div>
+                    <div id="flag-cfg">
+                        <div class="section-t" style="margin-bottom:6px">Titik bendera</div>
+                        <div class="flagpt"><b>🚩 Tiang</b><span>x 1124, y -1489, z 34</span></div>
+                        <div class="row2" style="margin-top:8px"><button class="btn" id="m-flagmap">🖱️ Klik di peta</button><button class="btn">📍 Posisi saya [F]</button></div>
+                        <div class="note" style="margin-top:8px">🚩 Posisi saya: menu ditutup, berdiri di tempat tiang lalu tekan <b>F</b>. Titik bendera wajib di dalam wilayah. Tiang tampil di dunia game sebagai pratinjau.</div>
+                    </div>
+                    <div class="section-t">Reward (nama item + jumlah)</div>
+                    <div class="items"><div class="item-row"><input value="money"><input type="number" value="25000"><button>✕</button></div></div>
+                    <div class="section-t">Titik wilayah (5) — min. 3</div>
+                    <div class="pts"><span>1: 1050, -1420</span><span>2: 1190, -1440</span><span>3: 1240, -1530</span><span>4: 1160, -1600</span><span>5: 1040, -1570</span></div>
+                </div>
+                <div class="side-foot"><button class="btn primary">Simpan Wilayah</button><button class="btn">Batal</button></div>
+            </aside>
+        </section>
+
+        <!-- TAB BENDERA (admin) -->
+        <section class="view col hidden" id="mv-flags">
+            <div class="toolbar">
+                <div class="filters"><button class="active">Semua gang</button><button>Belum punya model</button></div>
+                <div class="info">Item <b>bendera_gang</b> · hanya dari admin / mafia · bendera dicabut musuh kembali ke Boss</div>
+            </div>
+            <div class="fhead"><span>Gang</span><span>Boss</span><span>Model prop</span><span>Beredar</span><span></span></div>
+            <div class="list scroll" id="flag-list"></div>
+        </section>
+    </main>
+    <div class="toast hidden" id="toast"></div>
+</div>
+
+<!-- kontrol mockup -->
+<div class="mock">
+    <div><b>MOCKUP</b> · Rebut Bendera</div>
+    <div class="r">Layar: <button data-scr="game" class="on">Dalam game</button><button data-scr="menu">Menu admin</button></div>
+    <div class="r" id="game-ctl">Bendera:
+        <button data-fs="owned" class="on">Vagos berdiri</button><button data-fs="empty">Kosong</button><button data-fs="mine">Ballas berdiri</button>
+    </div>
+    <div class="r" id="game-ctl2">
+        <button id="b-pull">Tahan E: cabut</button><button id="b-plant">Tahan E: tancap</button><button id="b-cont">Musuh dekat</button><button id="b-carry">Pegang bendera</button>
+    </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const G = {
+    ballas:   { label: 'Ballas',   color: '#a855f7', role: 'penyerang', n: 4, has: true },
+    vagos:    { label: 'Vagos',    color: '#facc15', role: 'pemilik',   n: 5, has: true },
+    families: { label: 'Families', color: '#22c55e', role: 'penyerang', n: 2, has: false },
+};
+const MY = 'ballas';
+let flag = 'vagos', since = '02:41', contested = false, carrying = false, holdTimer = null;
+const dot = c => `<span class="dot" style="background:${c}"></span>`;
+
+function renderFlag() {
+    const f = $('#sb-flag');
+    if (flag) {
+        f.className = 'sb-flag';
+        f.innerHTML = `<span class="fi" style="background:${G[flag].color}55">🚩</span>
+            <div class="ft"><small>Bendera berdiri</small><b>${dot(G[flag].color)}${G[flag].label}</b><div class="act" style="color:rgba(255,255,255,.6);font-weight:600">sejak ${since}${flag === MY ? ' · pertahankan!' : ''}</div></div>`;
+    } else {
+        f.className = 'sb-flag empty';
+        f.innerHTML = `<span class="fi" style="background:rgba(255,255,255,.12)">🏳️</span>
+            <div class="ft"><small>Titik bendera</small><b>Kosong</b><div class="act">Waktu habis = Vagos (pemilik) tetap menang</div></div>`;
+    }
+    $('#sb-rows').innerHTML = Object.entries(G).map(([k, g], i) => `
+        <div class="sb-row ${k === MY ? 'mine' : ''}">
+            <span class="sb-pos">${i + 1}</span>
+            <div class="sb-g"><b>${dot(g.color)}${g.label}${flag === k ? '<span class="flagmark">🚩</span>' : ''}</b><small>${g.role} · 👤 ${g.n} dekat bendera</small></div>
+            <span class="sb-pts" style="font-size:11px;font-weight:600;color:${g.has ? '#4ade80' : 'rgba(255,255,255,.45)'}">${g.has ? 'punya 🚩' : 'tanpa 🚩'}</span>
+        </div>`).join('');
+    $('#cd-desc').textContent = flag === MY ? 'Benderamu berdiri · pertahankan sampai waktu habis'
+        : flag ? `Cabut bendera ${G[flag].label}, lalu tancapkan milikmu` : 'Titik kosong · tancapkan benderamu!';
+    renderPrompt();
+}
+
+function renderPrompt() {
+    const p = $('#prompt');
+    if (!$('#hold').classList.contains('hidden')) return p.classList.add('hidden');
+    p.classList.remove('hidden');
+    if (flag && flag !== MY) p.innerHTML = `<span class="key">E</span> Tahan untuk cabut bendera ${G[flag].label} <small>· 15 dtk</small>`;
+    else if (!flag && carrying) p.innerHTML = `<span class="key">E</span> Tahan untuk tancap bendera Ballas <small>· 20 dtk</small>`;
+    else if (!flag) p.innerHTML = `<span class="key" style="opacity:.5">E</span> <small>Pegang item bendera gangmu dulu untuk menancap</small>`;
+    else p.classList.add('hidden');
+    $('#carry').classList.toggle('hidden', !carrying);
+}
+
+function startHold(kind) {
+    clearInterval(holdTimer);
+    const total = kind === 'pull' ? 15 : 20;
+    if (kind === 'pull' && (!flag || flag === MY)) return alert('Mockup: pilih "Vagos berdiri" dulu');
+    if (kind === 'plant' && (flag || !carrying)) return alert('Mockup: pilih "Kosong" + "Pegang bendera" dulu');
+    let t = 0;
+    const h = $('#hold');
+    h.className = 'hold glass ' + (kind === 'pull' ? 'pull' : '');
+    $('#h-ic').textContent = kind === 'pull' ? '✊' : '🚩';
+    $('#h-t').textContent = kind === 'pull' ? `Mencabut bendera ${G[flag].label}` : 'Menancapkan bendera Ballas';
+    renderPrompt();
+    holdTimer = setInterval(() => {
+        h.classList.toggle('contested', contested);
+        $('#h-s').textContent = contested ? '⚠ Diperebutkan — ada musuh hidup dalam 10 m, progres berhenti' : 'Jangan bergerak · tetap di dekat tiang';
+        if (!contested) t += .25;
+        $('#h-bar').style.width = (t / total * 100) + '%';
+        $('#h-n').textContent = Math.ceil(total - t) + ' dtk';
+        if (t >= total) {
+            clearInterval(holdTimer); h.classList.add('hidden');
+            if (kind === 'pull') { flag = null; } else { flag = MY; since = '06:12'; carrying = false; }
+            setFs(flag === MY ? 'mine' : flag ? 'owned' : 'empty', true);
+        }
+    }, 250);
+}
+
+function setFs(fs, keep) {
+    document.querySelectorAll('[data-fs]').forEach(b => b.classList.toggle('on', b.dataset.fs === fs));
+    if (!keep) { clearInterval(holdTimer); $('#hold').classList.add('hidden'); flag = fs === 'owned' ? 'vagos' : fs === 'mine' ? MY : null; since = fs === 'mine' ? '06:12' : '02:41'; }
+    renderFlag();
+}
+document.querySelectorAll('[data-fs]').forEach(b => b.onclick = () => setFs(b.dataset.fs));
+$('#b-pull').onclick = () => startHold('pull');
+$('#b-plant').onclick = () => startHold('plant');
+$('#b-cont').onclick = e => { contested = !contested; e.target.classList.toggle('on', contested); };
+$('#b-carry').onclick = e => { carrying = !carrying; e.target.classList.toggle('on', carrying); renderPrompt(); };
+
+// ---------- menu admin ----------
+const FLAGS = [
+    { g: 'Ballas',   c: '#a855f7', boss: 'Darto Wijaya',  on: true,  model: 'f_flag_crew_3',  inv: 1, up: 1 },
+    { g: 'Vagos',    c: '#facc15', boss: 'Rizky Saputra', on: false, model: 'f_flag_crew_7',  inv: 0, up: 1 },
+    { g: 'Families', c: '#22c55e', boss: 'Bima Santoso',  on: true,  model: '',              inv: 0, up: 0 },
+];
+function renderFlags() {
+    $('#flag-list').innerHTML = FLAGS.map((f, i) => `
+        <div class="frow">
+            <span class="gang">${dot(f.c)}${f.g}</span>
+            <div><b style="font-size:13px">${f.boss}</b><div class="${f.on ? 'on-dot' : 'off-dot'}">● ${f.on ? 'online' : 'offline — item masuk saat login'}</div></div>
+            <div><input value="${f.model}" placeholder="prop_flag_us (default)"><div class="sub" style="margin-top:3px">${f.model ? 'addon f_addonprop/stream/gang_flags' : 'kosong = pakai model default'}</div></div>
+            <div><span class="pill inv">🎒 ${f.inv} di tas</span><span class="pill up">🚩 ${f.up} tertancap</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><button class="btn primary" data-give="${i}">＋ Beri ke Boss</button><button class="btn danger" style="padding:6px">Tarik semua</button></div>
+        </div>`).join('');
+    document.querySelectorAll('[data-give]').forEach(b => b.onclick = () => {
+        const f = FLAGS[+b.dataset.give]; f.inv++; renderFlags();
+        const t = $('#toast'); t.className = 'toast ok'; t.textContent = `Bendera ${f.g} diberikan ke ${f.boss}${f.on ? '' : ' (masuk saat login)'}`;
+        clearTimeout(t._h); t._h = setTimeout(() => t.classList.add('hidden'), 2500);
+    });
+}
+document.querySelectorAll('[data-mt]').forEach(b => b.onclick = () => {
+    document.querySelectorAll('[data-mt]').forEach(x => x.classList.toggle('active', x === b));
+    $('#mv-map').classList.toggle('hidden', b.dataset.mt !== 'map');
+    $('#mv-flags').classList.toggle('hidden', b.dataset.mt !== 'flags');
+});
+document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => {
+    document.querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x === b));
+    $('#flag-cfg').classList.toggle('hidden', b.dataset.mode !== 'flag');
+});
+document.querySelectorAll('[data-scr]').forEach(b => b.onclick = () => {
+    document.querySelectorAll('[data-scr]').forEach(x => x.classList.toggle('on', x === b));
+    const game = b.dataset.scr === 'game';
+    document.body.className = game ? 'game' : 'menu';
+    $('#hud').classList.toggle('hidden', !game); $('#city').classList.toggle('hidden', !game);
+    $('#game-ctl').classList.toggle('hidden', !game); $('#game-ctl2').classList.toggle('hidden', !game);
+    $('#panel').classList.toggle('hidden', game);
+});
+
+// timer palsu
+let left = 6 * 60 + 12;
+setInterval(() => { left = Math.max(0, left - 1); $('#cd-timer').textContent = String(Math.floor(left / 60)).padStart(2, '0') + ':' + String(left % 60).padStart(2, '0'); }, 1000);
+
+renderFlag(); renderFlags();
+</script>
+</body>
+</html>

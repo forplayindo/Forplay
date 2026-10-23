@@ -9,6 +9,7 @@ import { vehicle_engine_1, vehicle_engine_2, vehicle_engine_3, vehicle_engine_4 
 import { voice_1, voice_2 } from "./Partials/Voice";
 import { thirst_1, thirst_2, thirst_3, thirst_4 } from "./Partials/Thirts";
 import { nitro_1 } from "./Partials/Nitro";
+import { mandi_1, kencing_1, poop_1 } from "./Partials/Hygiene";
 
 interface IconProps {
   iconReq: string;
@@ -50,6 +51,9 @@ const iconMap: { [key: string]: JSX.Element } = {
   "thirst.4": thirst_4,
   zarg_health_armor: health_Zarg,
   "vehicle_nitro.1": nitro_1,
+  "mandi.1": mandi_1,
+  "kencing.1": kencing_1,
+  "poop.1": poop_1,
   "vehicle_engine.1": vehicle_engine_1,
   "vehicle_engine.2": vehicle_engine_2,
   "vehicle_engine.3": vehicle_engine_3,

@@ -199,9 +199,9 @@ function jail.sendToJail(source, months, officer)
     return true
 end
 
-if ACTIVE then
-    print(('^2[f_phone]^0 MDT jail bridge using %s (sentences sent in %s).')
-        :format(ACTIVE.resource, UNIT_OVERRIDE ~= 'auto' and UNIT_OVERRIDE or ACTIVE.unit))
-end
+-- if ACTIVE then
+--     print(('^2[f_phone]^0 MDT jail bridge using %s (sentences sent in %s).')
+--         :format(ACTIVE.resource, UNIT_OVERRIDE ~= 'auto' and UNIT_OVERRIDE or ACTIVE.unit))
+-- end
 
 return jail

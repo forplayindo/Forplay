@@ -78,8 +78,32 @@ end
 -- (bukan antri), coba lagi di siklus berikutnya.
 HygieneAnimLock = false
 
+local unarmedHash = `WEAPON_UNARMED`
+
+-- true kalau player sedang melakukan hal lain yang tidak boleh ditimpa animasi reaksi:
+-- pegang senjata, di kendaraan, emote rpemotes / handsup / pointing / tiarap, scenario,
+-- progressbar, ragdoll, berenang, jatuh, panjat
+local function HygieneOtherActivity()
+    local ped = PlayerPedId()
+    if IsPedInAnyVehicle(ped, true) or GetSelectedPedWeapon(ped) ~= unarmedHash then return true end
+    if IsPedUsingAnyScenario(ped) then return true end
+    if IsPedRagdoll(ped) or IsPedSwimming(ped) or IsPedFalling(ped) or IsPedClimbing(ped) or IsPedJumping(ped) then return true end
+    if lib.progressActive() then return true end
+    local ok, other = pcall(function()
+        local rp = exports.rpemotes
+        -- state 'currentEmote' rpemotes bisa nyangkut (tidak di-reset kalau emote berhenti
+        -- sendiri / di-ClearPedTasks script lain), jadi cek animasinya benar-benar masih jalan
+        local emote = rp:getCurrentEmote()
+        if emote and emote.dict and emote.anim and IsEntityPlayingAnim(ped, emote.dict, emote.anim, 3) then
+            return true
+        end
+        return rp:IsPlayerInHandsUp() or rp:IsPlayerPointing() or rp:IsPlayerProne() or rp:IsPlayerCrawling()
+    end)
+    return ok and other or false
+end
+
 function HygieneTryPlayReaction(durationMs, fn)
-    if HygieneAnimLock or HygieneIsBusy() then return false end
+    if HygieneAnimLock or HygieneIsBusy() or HygieneOtherActivity() then return false end
     HygieneAnimLock = true
     fn()
     CreateThread(function()

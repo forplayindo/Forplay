@@ -1,14 +1,12 @@
 import useData from "@/hooks/useData";
 import { Settings } from "@/pages/Settings";
-import { padNumber } from "@/utils/misc";
 import { useState } from "react";
 import { DragDropContainer } from "react-drag-drop-container-typescript";
-import { useTranslation } from "react-i18next";
 import { FaLocationCrosshairs } from "react-icons/fa6";
 
-export const NavigationWidget = () => {
-  const { t } = useTranslation();
-  const { Cinematic, NavigationWidget, ClientInfo, MusicInfo, Compass, MiniMap, HudStyle, VehicleInfo, onChangeHudPositions, isSettingsOpen, isEditorOpen } = useData();
+/** @param anchor default placement (CSS left/bottom/width) right above the GTA VI minimap, when the player hasn't dragged it */
+export const NavigationWidget = ({ anchor }: { anchor?: { left: string; bottom: string; width: string } }) => {
+  const { NavigationWidget, MiniMap, HudStyle, VehicleInfo, onChangeHudPositions, isSettingsOpen, isEditorOpen } = useData();
 
   let widgetBottomStyle = 300;
   if (MiniMap.onlyInVehicle && !VehicleInfo.entity) {
@@ -35,15 +33,16 @@ export const NavigationWidget = () => {
   if (positions.x) {
     posStyle.left = positions.x;
   } else {
-    posStyle.left = 16;
+    posStyle.left = anchor?.left ?? 16;
   }
+  if (anchor) posStyle.width = anchor.width;
   if (positions.y) {
     posStyle.top = positions.y;
     if (!isSettingsOpen) {
       posStyle.top += 324;
     }
   } else {
-    posStyle.bottom = widgetBottomStyle;
+    posStyle.bottom = anchor?.bottom ?? widgetBottomStyle;
   }
 
   const handleDragEnd = (key: string, x: number, y: number) => {
@@ -86,47 +85,7 @@ export const NavigationWidget = () => {
                 <Settings />
               </>
             )}
-            {NavigationWidget.active && NavigationWidget.show && !Cinematic.show && (
-              <div
-                className="w-full h-[51px] relative border-2 border-solid border-transparent rounded-sm overflow-hidden"
-                style={{
-                  background: "radial-gradient(circle, rgba(33, 33, 33, 0.6) 0%, rgba(13, 13, 13, 0.4) 100%)",
-                }}
-              >
-                <div className="relative w-full flex justify-between items-center z-10 h-full px-2">
-                  <div className="flex items-center gap-2 flex-grow w-full">
-                    <img src="images/icons/navigation.svg" alt="navigation" />
-                    <div className="overflow-hidden pr-1 min-w-0">
-                      <h1 className="text-xs 2k:text-sm font-bold whitespace-nowrap text-ellipsis overflow-hidden">{(NavigationWidget?.navigation.isDestinationActive && NavigationWidget?.navigation?.currentStreet) || Compass.street1 || t("location")}</h1>
-                      <h1 className="text-sm 2k:text-base font-bold whitespace-nowrap text-ellipsis overflow-hidden">{(NavigationWidget?.navigation.isDestinationActive && NavigationWidget?.navigation?.destinationStreet) || Compass.street2 || t("location")}</h1>
-                    </div>
-                  </div>
-                  {MusicInfo.isPlaying && (
-                    <div className="flex items-center justify-end gap-0.5 overflow-hidden w-full">
-                      <div className="scale-90">
-                        <img src="images/core/music.gif" alt="music_grd" />
-                      </div>
-                      <div className="p-1.5 rounded-full bg-black/25 w-2/3">
-                        <img className="w-full h-full min-w-full min-h-full" src="images/icons/music.svg" alt="music" />
-                      </div>
-                    </div>
-                  )}
-                  {!MusicInfo.isPlaying && (
-                    <div className="flex gap-2 items-center justify-end w-full">
-                      {ClientInfo.time.gameHours >= 6 && ClientInfo.time.gameHours < 18 ? <img src="images/icons/time_morning.svg" alt="morning" /> : <img className="mt-1" src="images/icons/time_night.svg" alt="night" />}
-                      <div>
-                        <h1 className="uppercase text-xs text-white 2k:text-sm font-sentic-text-bold font-bold">{t("time")}</h1>
-                        <h1 className="text-xs text-white 2k:text-sm font-medium">
-                          {padNumber(ClientInfo.time.gameHours)}
-                          {":"}
-                          {padNumber(ClientInfo.time.gameMinutes)}
-                        </h1>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            {/* location card moved to the top-right stack (ClientInfo), under Bank */}
           </div>
         </DragDropContainer>
       </div>

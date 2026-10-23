@@ -80,7 +80,7 @@ function locale.load(lang)
     for k in pairs(dict) do dict[k] = nil end
     flatten(nil, decoded, dict)
 
-    print(('^2[F_PHONE] Loaded locale: %s^0'):format(lang))
+    -- print(('^2[F_PHONE] Loaded locale: %s^0'):format(lang))
 end
 
 -- One-shot boot thread: loads the configured language (config.Locale, default 'en') shortly after start.

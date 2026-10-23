@@ -25,10 +25,17 @@ server_scripts {
 
 client_script 'client/init.lua'
 
+ui_page 'html/menu.html'
+
 files {
 	'locales/*.json',
 	'data/stations.lua',
 	'client/*.lua',
+	'shared/*.lua',
+	'html/hologram.html',
+	'html/menu.html',
+	'html/menu.css',
+	'html/menu.js',
 }
 
 ox_libs {

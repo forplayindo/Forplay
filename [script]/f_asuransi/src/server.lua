@@ -42,10 +42,25 @@ RegisterCommand(Config.Staff.Command, function(source)
 
 end)
 
+---Titik (x, y) di dalam poligon (ray casting).
+local function inPolygon(points, x, y)
+    local inside, j = false, #points
+    for i = 1, #points do
+        local a, b = points[i], points[j]
+        if (a.y > y) ~= (b.y > y) and x < (b.x - a.x) * (y - a.y) / (b.y - a.y) + a.x then inside = not inside end
+        j = i
+    end
+    return inside
+end
+
 local function isInSafeZone(coords)
     if Config.RemoveCarsInSafeZone then return false end
     for _, zone in ipairs(Config.safezone.zone) do
-        if #(coords - zone.coord) <= zone.radius then return true end
+        if zone.points then
+            if inPolygon(zone.points, coords.x, coords.y) then return true end
+        elseif #(coords - zone.coord) <= zone.radius then
+            return true
+        end
     end
     return false
 end

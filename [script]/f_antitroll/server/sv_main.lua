@@ -1,20 +1,10 @@
-print([[^1
-     _   _  _ _____ ___   _____ ___  ___  _    _
-    /_\ | \| |_   _|_ _| |_   _| _ \/ _ \| |  | |
-   / _ \| .` | | |  | |    | | |   / (_) | |__| |__
-  /_/ \_\_|\_| |_| |___|   |_| |_|_\\___/|____|____|
-          ^8by ZerX (github.com/ZerXGIT)^0
-^0---------------------[^2Tests^0]---------------------]])
+-- Banner + hasil test dimatikan biar console bersih; yang gagal tetap di-print.
+local okOxmysql, okFramework, okConfig = tests.checkForOxmysql(), tests.checkForFramework(), tests.checkForConfig()
 
-
-testPrint("Oxmysql is installed.", "Oxmysql is not installed!", tests.checkForOxmysql())
-testPrint(Config.Framework .. " is installed.", Config.Framework .. "is not installed!", tests.checkForFramework())
-testPrint("Config found.", "Config not found!", tests.checkForConfig())
-print([[^0---------------------[^2Tests^0]---------------------]])
-
-if tests.checkForOxmysql() and tests.checkForFramework() and tests.checkForConfig() then
-    cPrint("All tests passed!", "info")
-else
+if not (okOxmysql and okFramework and okConfig) then
+    testPrint("Oxmysql is installed.", "Oxmysql is not installed!", okOxmysql)
+    testPrint(Config.Framework .. " is installed.", Config.Framework .. "is not installed!", okFramework)
+    testPrint("Config found.", "Config not found!", okConfig)
     cPrint("^1One or more tests failed!^0", "error")
     return
 end

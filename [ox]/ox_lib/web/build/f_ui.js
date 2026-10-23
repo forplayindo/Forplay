@@ -36,9 +36,9 @@
 
   // ---------------- 2. blur ----------------
   var TIERS = {
-    high:   { fps: 60, ds: 4, passes: 2, spread: 1.5 },
-    medium: { fps: 30, ds: 6, passes: 2, spread: 1.2 },
-    low:    { fps: 20, ds: 8, passes: 1, spread: 1.5 },
+    high:   { fps: 30, ds: 6, passes: 1, spread: 0.8 },
+    medium: { fps: 24, ds: 8, passes: 1, spread: 0.6 },
+    low:    { fps: 20, ds: 8, passes: 1, spread: 0.5 },
   };
   var LOOK = { saturation: 1.3, brightness: 1.0 };
   var START_TIER = "off"; // mati sampai f_hud mengirim tier asli (pilih karakter tanpa blur, CPU lemah)
@@ -338,4 +338,63 @@
     wake();
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", start) : start();
+})();
+
+/* ==========================================================================
+   f_patch · teks [E] bergaya kartu tombol
+   "[E] - Buka garasi"            -> 1 kartu: kotak E + INTERAKSI / BUKA GARASI
+   "[E] Masuk [H] Kunci pintu"    -> 2 item terpisah (bukan satu kalimat panjang)
+   "Tekan [E] untuk masuk"        -> kotak E + MASUK
+   Teks tanpa [X] tetap tampil seperti biasa (markdown).
+   ========================================================================== */
+(function () {
+  var KEY = /\[([^\[\]\n]{1,12})\]/g;
+  var LEAD = /^[\s\-–—:|•·,]+/, TRAIL = /[\s\-–—:|•·,]+$/;
+  var cache = { text: null, segs: null };
+
+  function clean(s) {
+    return s.replace(/[*_`~]/g, "").replace(/\s+/g, " ").replace(LEAD, "").replace(TRAIL, "")
+      .replace(/^(untuk|to)\s+/i, "").replace(/\s+(atau|or)$/i, "");
+  }
+
+  window.fTextUiParse = function (text) {
+    if (typeof text !== "string") return null;
+    if (cache.text === text) return cache.segs;
+    var m, marks = [];
+    KEY.lastIndex = 0;
+    while ((m = KEY.exec(text))) marks.push({ key: m[1].trim(), start: m.index, end: m.index + m[0].length });
+    var segs = null;
+    if (marks.length) {
+      segs = marks.map(function (k, i) {
+        return { key: k.key, label: clean(text.slice(k.end, i + 1 < marks.length ? marks[i + 1].start : text.length)) };
+      });
+      if (segs.length === 1 && !segs[0].label) {
+        segs[0].label = clean(text.slice(0, marks[0].start).replace(/^\s*(tekan|press)\s*/i, ""));
+      }
+    }
+    cache = { text: text, segs: segs };
+    return segs;
+  };
+
+  window.fTextUiRender = function (text, h) {
+    var segs = window.fTextUiParse(text) || [];
+    return h("div", {
+      className: "f-tk-list",
+      children: segs.map(function (s, i) {
+        return h("div", {
+          className: "f-tk-item",
+          children: [
+            h("div", { className: "f-tk-key", children: s.key }, "k"),
+            h("div", {
+              className: "f-tk-txt",
+              children: [
+                h("span", { className: "f-tk-sub", children: "Interaksi" }, "s"),
+                h("span", { className: "f-tk-title", children: s.label }, "t"),
+              ],
+            }, "x"),
+          ],
+        }, i);
+      }),
+    });
+  };
 })();

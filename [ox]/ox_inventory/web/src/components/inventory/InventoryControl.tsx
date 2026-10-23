@@ -8,6 +8,7 @@ import { onGive } from '../../dnd/onGive';
 import { fetchNui } from '../../utils/fetchNui';
 import { Locale } from '../../store/locale';
 import UsefulControls from './UsefulControls';
+import KeyRing from './KeyRing';
 import { BrandLogo } from '../utils/icons/InventoryIcons';
 
 const formatAmount = (n: number) => (n > 0 ? n.toLocaleString('en-US') : '0');
@@ -112,6 +113,7 @@ const InventoryControl: React.FC = () => {
             {Locale.ui_give || 'Give'}
           </button>
         </div>
+        <KeyRing />
       </div>
 
       <button className="useful-controls-button" onClick={() => setInfoVisible(true)}>

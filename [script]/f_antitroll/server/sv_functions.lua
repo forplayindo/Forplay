@@ -19,7 +19,6 @@ function testPrint(stringPass, stringFail, passed)
 end
 
 function createTableIfNotExist()
-    cPrint("Checking if table exists...", "info")
     MySQL.query([[
     create table if not exists antitroll_time
     (
@@ -30,8 +29,6 @@ function createTableIfNotExist()
     );]], {}, function(result)
         if result and result.warningStatus == 0 then
             cPrint("Table does not exist but was created!", "warning")
-        else
-            cPrint("Table exists!", "info")
         end
     end)
 end

@@ -1,7 +1,7 @@
 import React from "react";
 import "./index.scss";
 import { useEffect, useState, useCallback } from "react";
-import { CarControl, Bucket, Music, Options, TypeOfBars, TypeOfVehicleHud } from "@/pages/Settings/Partials/Layers";
+import { CarControl, Bucket, Music, Options, TypeOfVehicleHud } from "@/pages/Settings/Partials/Layers";
 import { useVisibility } from "@/hooks/useVisibility";
 import { isEnvBrowser } from "@/utils/misc";
 import { fetchNui } from "@/utils/fetchNui";
@@ -45,16 +45,6 @@ export const Settings: React.FC = () => {
             >
               <div className="w-full h-full p-0.5 flex items-center justify-center" style={{ opacity: activePage == "bucket" ? 1 : 0.25 }}>
                 <img src="images/icons/bucket.svg" alt="bucket" />
-              </div>
-            </button>
-            <button
-              onClick={() => onChangePage("boxof")}
-              className={classNames("element", {
-                active: activePage == "boxof",
-              })}
-            >
-              <div className="w-full h-full p-0.5 flex items-center justify-center" style={{ opacity: activePage == "boxof" ? 1 : 0.25 }}>
-                <img src="images/icons/boxof.svg" alt="box-of" />
               </div>
             </button>
             <button
@@ -104,11 +94,6 @@ export const Settings: React.FC = () => {
           {activePage === "bucket" && (
             <div id="bucket">
               <Bucket />
-            </div>
-          )}
-          {activePage === "boxof" && (
-            <div id="boxof">
-              <TypeOfBars />
             </div>
           )}
           {activePage === "boxof-vehicle" && (

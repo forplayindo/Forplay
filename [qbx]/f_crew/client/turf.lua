@@ -1,296 +1,220 @@
--- f_crew client: blip wilayah gang di map + status perebutan di bawah tengah layar.
--- Blip dibuat saat server mengirim data (hanya ke anggota gang bertag 'gang') dan diperbarui per
--- zona saat ada perubahan. Semua waktu dihitung server dan dikirim ulang tiap tick; client hanya
--- menampilkan. Loop 1 detik hanya berjalan untuk anggota gang tersebut.
+-- f_crew client: Gang Wars. Menu /peranggang (+ radial), scoreboard + hitung mundur di layar, dan
+-- editor wilayah admin (titik dari posisi pemain + garis wilayah di dunia game).
 --
--- Layar: pilihan [J] Rebut / [X] Abaikan (setelah 1 menit di zona gang lain / bebas) ->
--- hitung mundur persiapan -> hitung mundur perebutan -> nama pemenang (5 detik).
+-- Ringan: tidak ada loop kecuali (1) cek pause menu 2x per detik selama scoreboard tampil dan
+-- (2) gambar garis wilayah tiap frame hanya saat admin sedang mode gambar. Semua data dari server;
+-- hitung mundur dihitung NUI dari sisa waktu yang dikirim server.
 
-local zoneList = require 'shared.zones'
+local HUD_KEY = 'F7' -- default tombol sembunyikan / tampilkan scoreboard (bisa diganti di Settings FiveM)
 
-local UNOWNED_COLOR = 0
-local WAR_COLOR = 1
-local DEATH_BAG = 'f_medical:deathState'
-local RESULT_MS = 5000
+local menuOpen = false
+local hudActive = false
+local hudHidden = false
+---@type { points: number[][], z: table<integer, number>, flag: number[]?, flagMode: boolean }?
+local drawing
 
----@type table<string, { areas: integer[], label: integer?, name: string }>
-local Blips = {}
----@type table<string, { o: string?, c: integer?, w: boolean }>
-local ZoneState = {}
-local cfg
----@type { zone: string, own: boolean, prompt: boolean, join: boolean, prepAt: integer?, warAt: integer? }?
-local presence
----@type { text: string, kind: string?, untilAt: integer }?
-local result
-local declined = {}  -- zona yang dipilih "Abaikan"; direset saat keluar zona
-local promptZone     -- zona yang pilihannya sedang tampil
-local lastZone
-local looping = false
-local shownText
-
--- Kotak zona yang sudah dirapikan, untuk tahu zona tempat pemain berada.
-local ZoneBoxes = {}
-for i = 1, #zoneList do
-    local def = zoneList[i]
-    local boxes = {}
-    for j = 1, #def.boxes do
-        local b = def.boxes[j]
-        boxes[j] = { math.min(b[1], b[3]), math.min(b[2], b[4]), math.max(b[1], b[3]), math.max(b[2], b[4]) }
-    end
-    ZoneBoxes[i] = { id = def.id, label = def.label, boxes = boxes }
+local function call(name, payload)
+    return lib.callback.await('f_crew:turf:call', false, name, payload) or { ok = false, err = 'Server tidak merespons.' }
 end
 
-local function zoneAt(x, y)
-    for i = 1, #ZoneBoxes do
-        local z = ZoneBoxes[i]
-        for j = 1, #z.boxes do
-            local r = z.boxes[j]
-            if x >= r[1] and x <= r[3] and y >= r[2] and y <= r[4] then return z end
+local function notify(text, kind)
+    lib.notify({ title = 'Gang Wars', description = text, type = kind or 'inform' })
+end
+
+local function myPos()
+    local p = GetEntityCoords(cache.ped)
+    return { math.floor(p.x * 100 + 0.5) / 100, math.floor(p.y * 100 + 0.5) / 100 }
+end
+
+-- Menu -----------------------------------------------------------------------------------------
+
+local function openMenu()
+    if menuOpen or drawing then return end
+    local res = call('data', true)
+    if not res.ok then return notify(res.err, 'error') end
+    menuOpen = true
+    SetNuiFocus(true, true)
+    SendNUIMessage({ action = 'open', data = res.data, pos = myPos() })
+end
+
+RegisterCommand('peranggang', openMenu, false)
+TriggerEvent('chat:addSuggestion', '/peranggang', 'Buka menu Gang Wars (perebutan wilayah)')
+
+local function closeMenu()
+    menuOpen = false
+    SetNuiFocus(false, false)
+end
+
+RegisterNUICallback('close', function(_, cb)
+    cb(true)
+    closeMenu()
+end)
+
+---Satu pintu untuk semua aksi menu: { name = string, payload = any }.
+---Bukan 'call': nama itu sudah dipakai app Crew di HP (client/main.lua) di resource yang sama.
+RegisterNUICallback('turfCall', function(data, cb)
+    if type(data) ~= 'table' or type(data.name) ~= 'string' then return cb({ ok = false, err = 'Data tidak valid.' }) end
+    local res = call(data.name, data.payload)
+    if res.ok and data.name == 'data' and type(res.data) == 'table' then res.data.pos = myPos() end
+    if not res.ok then print(('[f_crew] Gang Wars %s gagal: %s'):format(data.name, tostring(res.err))) end
+    cb(res)
+end)
+
+-- Editor admin: titik dari posisi pemain -------------------------------------------------------
+
+local function groundZ(x, y, fallback)
+    local found, z = GetGroundZFor_3dCoord(x, y, fallback + 80.0, false)
+    return found and z or fallback
+end
+
+local function drawOutline()
+    local ped = cache.ped
+    local pos = GetEntityCoords(ped)
+    local pts = drawing.points
+    local n = #pts
+    for i = 1, n do
+        local a = pts[i]
+        if not drawing.z[i] then drawing.z[i] = groundZ(a[1], a[2], pos.z) end
+    end
+    for i = 1, n do
+        local a, b = pts[i], pts[i % n + 1]
+        local za, zb = drawing.z[i], drawing.z[i % n + 1]
+        local near = #(vec2(a[1], a[2]) - pos.xy) < 400.0 or #(vec2(b[1], b[2]) - pos.xy) < 400.0
+        if near then
+            -- tiang di tiap titik + dinding tipis transparan antar titik
+            DrawLine(a[1], a[2], za - 1.0, a[1], a[2], za + 25.0, 91, 157, 255, 255)
+            if n >= 2 and (i < n or n >= 3) then
+                DrawLine(a[1], a[2], za + 0.3, b[1], b[2], zb + 0.3, 91, 157, 255, 255)
+                DrawPoly(a[1], a[2], za, b[1], b[2], zb, b[1], b[2], zb + 12.0, 91, 157, 255, 60)
+                DrawPoly(b[1], b[2], zb + 12.0, a[1], a[2], za + 12.0, a[1], a[2], za, 91, 157, 255, 60)
+                DrawPoly(b[1], b[2], zb + 12.0, b[1], b[2], zb, a[1], a[2], za, 91, 157, 255, 60)
+                DrawPoly(a[1], a[2], za, a[1], a[2], za + 12.0, b[1], b[2], zb + 12.0, 91, 157, 255, 60)
+            end
         end
     end
+    -- titik bendera (mode Rebut Bendera): tiang kuning
+    local f = drawing.flag
+    if f then
+        if not f[3] then f[3] = groundZ(f[1], f[2], pos.z) end
+        DrawLine(f[1], f[2], f[3], f[1], f[2], f[3] + 6.0, 255, 214, 10, 255)
+        DrawMarker(4, f[1], f[2], f[3] + 6.6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.2, 1.2, 1.2, 255, 214, 10, 220, false, true, 2, false, nil, nil, false) ---@diagnostic disable-line: param-type-mismatch
+    end
 end
 
--- Text UI ox_lib dipakai bersama script lain (prompt garasi dll): jangan menimpa / menutup milik mereka.
-local ICONS = {
-    war = { 'crosshairs', '#e5484d' },
-    prep = { 'hourglass-half', '#e0a100' },
-    prompt = { 'flag', nil },
-    done = { 'trophy', '#e0a100' },
-    error = { 'circle-exclamation', '#e5484d' },
-}
-
-local function showMine(text, kind)
-    local open, current = lib.isTextUIOpen()
-    if open and current ~= shownText then return end
-    local ic = ICONS[kind] or ICONS.prompt
-    lib.showTextUI(text, { position = 'bottom-center', icon = ic[1], iconColor = ic[2] })
-    shownText = text
+local function stopDrawing(reopen)
+    drawing = nil
+    SendNUIMessage({ action = 'drawHint', show = false })
+    if reopen then
+        menuOpen = true
+        SetNuiFocus(true, true)
+        SendNUIMessage({ action = 'drawReturn', pos = myPos() })
+    end
 end
 
-local function hideMine()
-    if not shownText then return end
-    local open, current = lib.isTextUIOpen()
-    if open and current == shownText then lib.hideTextUI() end
-    shownText = nil
-end
+---NUI (admin) keluar sebentar ke game untuk menaruh titik dari posisi sendiri.
+RegisterNUICallback('draw', function(data, cb)
+    cb(true)
+    if type(data) ~= 'table' or type(data.points) ~= 'table' then return end
+    local pts = {}
+    for i = 1, math.min(#data.points, 80) do
+        local p = data.points[i]
+        if type(p) == 'table' and tonumber(p[1]) and tonumber(p[2]) then pts[#pts + 1] = { tonumber(p[1]), tonumber(p[2]) } end
+    end
+    local flag = type(data.flag) == 'table' and tonumber(data.flag[1]) and tonumber(data.flag[2])
+        and { tonumber(data.flag[1]), tonumber(data.flag[2]), tonumber(data.flag[3]) } or nil
+    drawing = { points = pts, z = {}, flag = flag, flagMode = data.flagMode == true }
+    menuOpen = false
+    SetNuiFocus(false, false)
+    SendNUIMessage({ action = 'drawHint', show = true, flagMode = drawing.flagMode })
 
-local function mmss(ms)
-    local s = math.max(0, math.ceil(ms / 1000))
-    return ('%02d:%02d'):format(s // 60, s % 60)
-end
-
-local function hudLoop()
-    if looping then return end
-    looping = true
     CreateThread(function()
-        while cfg do
-            local now = GetGameTimer()
-            local state = LocalPlayer.state[DEATH_BAG]
-            local z
-            if state == nil or state == 1 then
-                local pos = GetEntityCoords(cache.ped)
-                z = zoneAt(pos.x, pos.y)
-            end
-            -- keluar / pindah zona: pilihan "Abaikan" hanya berlaku sampai keluar zona itu
-            local zid = z and z.id
-            if zid ~= lastZone then
-                if lastZone then declined[lastZone] = nil end
-                lastZone = zid
-            end
-            promptZone = nil
-
-            if result and now < result.untilAt then
-                showMine(result.text, result.kind)
-            elseif not z then
-                result = nil
-                hideMine()
-            else
-                result = nil
-                local st = ZoneState[z.id] or {}
-                local p = presence
-                if p and p.zone ~= z.id then p = nil end
-                -- perebutan / persiapan hanya dikirim server ke gang peserta
-                if p and p.warAt then
-                    showMine(('PEREBUTAN WILAYAH %s - %s'):format(z.label, mmss(p.warAt - now)), 'war')
-                elseif p and p.prepAt then
-                    local ms = p.prepAt - now
-                    showMine(('Persiapan rebut %s - %s  \nPoin tidak dihitung sebelum waktu persiapan habis'):format(
-                        z.label, ms > 0 and mmss(ms) or 'memulai...'), 'prep')
-                elseif p and p.prompt and not p.own and not declined[z.id] then
-                    promptZone = z.id
-                    if p.join then
-                        showMine(('%s sedang disiapkan untuk direbut  \n[J] Ikut rebut   [X] Abaikan'):format(z.label), 'prompt')
-                    else
-                        showMine(('%s (%s)  \n[J] Rebut wilayah   [X] Abaikan'):format(z.label, st.o or 'Bebas'), 'prompt')
-                    end
+        while drawing do
+            drawOutline()
+            DisableControlAction(0, 38, true) -- E
+            DisableControlAction(0, 47, true) -- G
+            DisableControlAction(0, 23, true) -- F
+            if drawing.flagMode and IsDisabledControlJustPressed(0, 23) then
+                -- titik bendera dari kaki pemain (z ikut disimpan supaya tiang pas di tanah / atap)
+                local p = GetEntityCoords(cache.ped)
+                local pt = { math.floor(p.x * 100 + 0.5) / 100, math.floor(p.y * 100 + 0.5) / 100, math.floor((p.z - 1.0) * 100 + 0.5) / 100 }
+                drawing.flag = pt
+                SendNUIMessage({ action = 'drawFlag', point = pt })
+                notify('Titik bendera ditandai.', 'success')
+            elseif IsDisabledControlJustPressed(0, 38) then
+                if #drawing.points >= 80 then
+                    notify('Maksimal 80 titik.', 'error')
                 else
-                    hideMine()
+                    local p = myPos()
+                    drawing.points[#drawing.points + 1] = p
+                    SendNUIMessage({ action = 'drawPoint', point = p, count = #drawing.points })
                 end
+            elseif IsDisabledControlJustPressed(0, 47) then
+                stopDrawing(true)
             end
-            Wait(1000)
+            Wait(0)
         end
-        hideMine()
-        looping = false
+    end)
+end)
+
+-- Scoreboard + hitung mundur -------------------------------------------------------------------
+
+local function watchPause()
+    CreateThread(function()
+        local paused = false
+        while hudActive do
+            local now = IsPauseMenuActive()
+            if now ~= paused then
+                paused = now
+                SendNUIMessage({ action = 'hudPause', paused = now })
+            end
+            Wait(500)
+        end
     end)
 end
 
-local function removeAll()
-    for _, b in pairs(Blips) do
-        for i = 1, #b.areas do
-            if DoesBlipExist(b.areas[i]) then RemoveBlip(b.areas[i]) end
-        end
-        if b.label and DoesBlipExist(b.label) then RemoveBlip(b.label) end
+RegisterNetEvent('f_crew:turf:hud', function(data)
+    if data and not hudActive then
+        hudActive = true
+        watchPause()
+    elseif not data then
+        hudActive = false
     end
-    Blips = {}
-end
+    SendNUIMessage({ action = 'hud', data = data, hidden = hudHidden, key = HUD_KEY })
+end)
 
-local function build()
-    for i = 1, #ZoneBoxes do
-        local def = ZoneBoxes[i]
-        local areas = {}
-        local bestArea, cx, cy = -1, 0.0, 0.0
-        for j = 1, #def.boxes do
-            local r = def.boxes[j]
-            local w, h = r[3] - r[1], r[4] - r[2]
-            local x, y = (r[1] + r[3]) / 2, (r[2] + r[4]) / 2
-            local blip = AddBlipForArea(x, y, 0.0, w, h)
-            SetBlipRotation(blip, 0)
-            -- display diatur di apply(): zona bebas hanya di peta besar, yang dikuasai / perang juga di minimap
-            -- short range: kalau tidak, GTA menempelkan setiap kotak di luar layar sebagai titik di tepi minimap
-            SetBlipAsShortRange(blip, true)
-            areas[#areas + 1] = blip
-            -- ikon nama diletakkan di tengah kotak terbesar
-            if w * h > bestArea then bestArea, cx, cy = w * h, x, y end
-        end
-        local label
-        if cfg.labels then
-            label = AddBlipForCoord(cx, cy, 0.0)
-            SetBlipSprite(label, cfg.sprite)
-            SetBlipScale(label, cfg.scale)
-            SetBlipAsShortRange(label, true)
-        end
-        Blips[def.id] = { areas = areas, label = label, name = def.label }
+RegisterNetEvent('f_crew:turf:hudDone', function(text)
+    hudActive = false
+    SendNUIMessage({ action = 'hudDone', text = text })
+end)
+
+RegisterCommand('peranggang_hud', function()
+    hudHidden = not hudHidden
+    SendNUIMessage({ action = 'hudToggle', hidden = hudHidden })
+end, false)
+RegisterKeyMapping('peranggang_hud', 'Gang Wars: sembunyikan / tampilkan scoreboard', 'keyboard', HUD_KEY)
+
+-- Radial menu (hanya anggota gang bertag 'gang') ------------------------------------------------
+
+local function syncRadial()
+    if LocalPlayer.state.crewTag == 'gang' then
+        lib.addRadialItem({ id = 'f_crew_gangwars', label = 'Gang Wars', icon = 'flag', onSelect = openMenu })
+    else
+        lib.removeRadialItem('f_crew_gangwars')
     end
 end
 
-local function apply(id, data)
-    local b = Blips[id]
-    if not b or type(data) ~= 'table' then return end
-    ZoneState[id] = { o = data.o, c = data.c, w = data.w == true }
-    local color = data.w and WAR_COLOR or data.c or UNOWNED_COLOR
-    local marked = data.w or data.o ~= nil
-    local alpha = marked and cfg.alpha or math.floor(cfg.alpha / 2)
-    for i = 1, #b.areas do
-        local blip = b.areas[i]
-        -- warna kotak hanya di peta pause menu (3). Di minimap HUD lapisan warna area tidak pas dengan
-        -- bingkai minimap kotak, jadi di sana cukup ikon zona (lihat label di bawah).
-        SetBlipDisplay(blip, 3)
-        SetBlipColour(blip, color)
-        SetBlipAlpha(blip, alpha)
-        SetBlipFlashes(blip, data.w == true)
-        if data.w then SetBlipFlashInterval(blip, 500) end
-    end
-    if b.label then
-        -- ikon zona dikuasai / diperebutkan juga di minimap (2), zona bebas hanya di peta besar (3)
-        SetBlipDisplay(b.label, marked and 2 or 3)
-        SetBlipColour(b.label, color)
-        SetBlipFlashes(b.label, data.w == true)
-        local key = 'FCREW_TURF_' .. id
-        local text = b.name .. ' - ' .. (data.w and 'PEREBUTAN' or data.o or 'Bebas')
-        AddTextEntry(key, text)
-        BeginTextCommandSetBlipName(key)
-        EndTextCommandSetBlipName(b.label)
-    end
-end
+-- f_radialmenu menjalankan lib.clearRadialItems() saat player loaded / mati / revive, jadi item
+-- didaftarkan ulang sesudahnya (sama seperti f_petshop / f_hygiene)
+local function reSync() SetTimeout(1500, syncRadial) end
 
----Data lengkap (atau nil = hapus semua, mis. keluar gang).
-RegisterNetEvent('f_crew:turf:all', function(payload)
-    if type(payload) ~= 'table' then
-        cfg, presence = nil, nil
-        ZoneState = {}
-        removeAll()
-        hideMine()
-        return
-    end
-    local rebuild = not cfg or cfg.labels ~= payload.labels or next(Blips) == nil
-    cfg = { alpha = payload.alpha or 90, labels = payload.labels == true, sprite = payload.sprite or 84, scale = payload.scale or 0.6 }
-    if rebuild then
-        removeAll()
-        build()
-    end
-    for id, data in pairs(payload.zones or {}) do apply(id, data) end
-    hudLoop()
+AddStateBagChangeHandler('crewTag', ('player:%s'):format(cache.serverId), function() SetTimeout(0, syncRadial) end)
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded', reSync)
+RegisterNetEvent('radialmenu:client:deadradial', function(isDead)
+    if not isDead then reSync() end
 end)
+syncRadial()
 
-RegisterNetEvent('f_crew:turf:zone', function(id, data)
-    if cfg then apply(id, data) end
-end)
-
----Dari server tiap tick saat berada di zona (nil = keluar zona).
----info: own = zona milik gang sendiri, prompt = boleh tampil pilihan Rebut, prep / war = sisa detik.
-RegisterNetEvent('f_crew:turf:presence', function(id, info)
-    if type(id) ~= 'string' or type(info) ~= 'table' then
-        presence = nil
-        return
-    end
-    local now = GetGameTimer()
-    presence = {
-        zone = id,
-        own = info.own == true,
-        prompt = info.prompt == true,
-        join = info.join == true,
-        prepAt = info.prep and now + info.prep * 1000 or nil,
-        warAt = info.war and now + info.war * 1000 or nil,
-    }
-end)
-
----Teks sementara dari server (pemenang / alasan gagal), tampil 5 detik.
-RegisterNetEvent('f_crew:turf:result', function(text, kind)
-    if type(text) ~= 'string' then return end
-    result = { text = text, kind = kind, untilAt = GetGameTimer() + RESULT_MS }
-    if presence then
-        -- status lama tidak berlaku lagi; tick server berikutnya mengirim yang baru
-        presence.warAt, presence.prepAt, presence.prompt = nil, nil, false
-    end
-    if kind == 'error' and lastZone then declined[lastZone] = true end
-end)
-
--- Pilihan di layar. Tombol bisa diganti pemain di Settings > Key Bindings > FiveM.
-lib.addKeybind({
-    name = 'fcrew_turf_yes',
-    description = 'Wilayah gang: rebut zona',
-    defaultKey = 'J', -- Y sudah dipakai cruise control
-    onPressed = function()
-        if not promptZone then return end
-        TriggerServerEvent('f_crew:turf:approve', promptZone)
-        declined[promptZone] = true -- jangan tampil lagi selagi menunggu balasan server
-        promptZone = nil
-        if presence then presence.prompt = false end
-    end,
-})
-
-lib.addKeybind({
-    name = 'fcrew_turf_no',
-    description = 'Wilayah gang: abaikan zona',
-    defaultKey = 'X',
-    onPressed = function()
-        if not promptZone then return end
-        declined[promptZone] = true
-        promptZone = nil
-        hideMine()
-    end,
-})
-
--- Blip tidak otomatis hilang saat resource berhenti: tanpa ini setiap restart f_crew meninggalkan
--- satu set blip lama (warna lama) di map.
 AddEventHandler('onResourceStop', function(res)
-    if res ~= GetCurrentResourceName() then return end
-    removeAll()
-    hideMine()
-end)
-
--- Setelah resource (re)start, data dari server bisa terkirim sebelum script ini siap: minta ulang.
-CreateThread(function()
-    Wait(5000)
-    TriggerServerEvent('f_crew:turf:request')
+    if res ~= cache.resource then return end
+    if menuOpen then SetNuiFocus(false, false) end
 end)

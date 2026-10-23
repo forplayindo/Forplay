@@ -1,6 +1,7 @@
 server = {}
 
 require 'modules.bridge.server'
+require 'modules.stress.server'
 
 local showOnlinePlayers = Config.DefaultHudSettings.client_info.server_info.showOnlinePlayers
 

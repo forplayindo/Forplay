@@ -5,8 +5,8 @@ game 'gta5'
 
 lua54 "yes"
 
-author 'GX | Nestor Ramos'
-name 'bk_asuransi'
+author 'Lintang Dev'
+name 'f_asuransi'
 
 ui_page 'web/index.html'
 
@@ -37,5 +37,3 @@ escrow_ignore {
     'config.lua',
     'custom/Notify.lua',
 }
----- my tebex: https://guxfiz.tebex.io/
----- my discord: https://discord.gg/kncN7Fr5KT

@@ -3,6 +3,7 @@
 --                                  clutch axle suspension brakes engine body tank ban semua
 --  /rusakkan                       kerusakan acak (untuk tes panel & efek)
 --  /kondisipenuh                   semua bagian kembali 100%
+--  /isistok [jumlah]               semua bahan Stok Gudang + jumlah (default 100)
 local cfg = require 'config.shared'
 local RESTRICT = 'group.admin'
 
@@ -109,4 +110,17 @@ lib.addCommand('kondisipenuh', {
     end
     setNative(src, veh, { engine = 100, body = 100, tank = 100, fixAll = true })
     exports.qbx_core:Notify(src, 'Semua bagian kendaraan 100%', 'success')
+end)
+
+lib.addCommand('isistok', {
+    help = 'Tambah semua bahan di Stok Gudang Bengkel (tes mekanik)',
+    params = {
+        { name = 'jumlah', type = 'number', help = 'jumlah per bahan (default 100)', optional = true },
+    },
+    restricted = RESTRICT,
+}, function(src, args)
+    if not Stock.Ready() then return exports.qbx_core:Notify(src, 'Stok gudang belum siap', 'error') end
+    local n = math.floor(math.max(1, math.min(10000, tonumber(args.jumlah) or 100)))
+    for _, def in ipairs(require('config.stock').items) do Stock.Add(def.item, n) end
+    exports.qbx_core:Notify(src, ('Semua bahan stok gudang +%d'):format(n), 'success')
 end)

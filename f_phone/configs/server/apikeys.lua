@@ -27,6 +27,6 @@
 -- Left blank here, the uploader falls back to the `sd_qbox_cdn_key` server convar.
 return {
     Giphy           = '',
-    FivemanageMedia = '',
+    FivemanageMedia = 'cK8WRDTXA3qhhUBJYSOD0vLOf84PC7rB',
     QboxCdn         = '',
 }

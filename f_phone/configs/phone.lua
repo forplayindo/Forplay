@@ -228,7 +228,7 @@ return {
     --     set sd_phone_turn_credential "your-password"
     --
     -- Set this false to silence the boot warning if you deliberately run STUN-only.
-    WarnAboutTurn = true,
+    WarnAboutTurn = false,
 
     -- Hold this key/button (while the phone is open) to free the mouse for
     -- camera rotation without closing the phone. Releasing it returns to the

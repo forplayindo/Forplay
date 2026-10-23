@@ -105,5 +105,8 @@
 	"ammo_type": "Jenis amunisi",
 	"component_slot_occupied": "Slot %s di senjata ini sudah terisi",
 	"open_crafting_bench": "Buka Meja Crafting",
-	"storage": "Penyimpanan"
+	"storage": "Penyimpanan",
+	"keyring_only": "Slot ini khusus untuk kunci mobil",
+	"ui_keyring": "Gantungan Kunci",
+	"ui_keyring_empty": "Tarik kunci ke sini"
 }

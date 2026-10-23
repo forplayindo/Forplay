@@ -5,8 +5,8 @@
    1 = the original (large) layout, 0.82 = current, 0.5 = half size.
    -------------------------------------------------------------------------- */
 
-$uiScale: 0.82;
-$textScale: 0.78;
+$uiScale: 0.7;
+$textScale: 0.65;
 
 $accent: #f3b354;
 $accentBright: #ffcd82;
@@ -20,7 +20,7 @@ $slotColor: rgba(20, 23, 26, 0.432);
 $slotColorHover: rgba(36, 42, 45, 0.699);
 $slotBorder: rgba(207, 175, 29, 0.404);
 
-$mainFont: 'Poppins', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$mainFont: 'Inter', 'Poppins', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
 $gridCols: 5;
 $gridRows: 5;
@@ -85,14 +85,22 @@ input:focus-visible {
 
 .inventory-wrapper {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   position: fixed;
   inset: 0;
-  /* leaves room for the docked hotbar underneath */
-  padding: 0 4vw 12vh;
+  padding: 0 4vw;
   box-sizing: border-box;
+  /* space between the panels and the docked hotbar underneath */
+  gap: 2.2vh * $uiScale;
+}
+
+.inventory-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   gap: 6vh * $uiScale;
 }
 
@@ -145,10 +153,10 @@ input:focus-visible {
 }
 
 .inventory-panel-title {
-  font-size: 2.3vh * $textScale;
+  font-size: 1.75vh * $textScale;
   line-height: 1.1;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: #ffffff;
   white-space: nowrap;
@@ -190,7 +198,7 @@ input:focus-visible {
 
 .inventory-panel-weight-value {
   font-size: 1.5vh * $textScale;
-  font-weight: 600;
+  font-weight: 500;
   color: $textColor;
   white-space: nowrap;
 }
@@ -282,7 +290,8 @@ input:focus-visible {
 
   p {
     font-size: 1.35vh * $textScale;
-    font-weight: 500;
+    white-space: nowrap;
+    font-weight: 400;
     color: rgba(255, 255, 255, 0.85);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
   }
@@ -297,7 +306,7 @@ input:focus-visible {
   color: #0d1514;
   font-family: $mainFont;
   font-size: 1.2vh * $textScale;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
   padding: 0.5vh * $uiScale 0.7vh * $uiScale;
   margin: 0.6vh * $uiScale 0 0 0.6vh * $uiScale;
@@ -314,11 +323,16 @@ input:focus-visible {
 }
 
 .inventory-slot-label-text {
-  white-space: nowrap;
+  /* long names wrap to a second line instead of being cut off */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 0.5vh * $uiScale 0.6vh * $uiScale;
-  font-weight: 500;
+  word-break: break-word;
+  line-height: 1.15;
+  padding: 0.45vh * $uiScale 0.5vh * $uiScale;
+  font-weight: 400;
   font-family: $mainFont;
   font-size: 1.4vh * $textScale;
   color: #edf2f1;
@@ -349,7 +363,7 @@ input:focus-visible {
 
   p {
     font-size: 1.5vh * $textScale;
-    font-weight: 600;
+    font-weight: 500;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
   }
 }
@@ -362,7 +376,7 @@ input:focus-visible {
 
   p {
     font-size: 1.5vh * $textScale;
-    font-weight: 600;
+    font-weight: 500;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
   }
 }
@@ -398,15 +412,15 @@ body.inv-dragging {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3vh * $uiScale;
-  width: 17vh * $uiScale;
+  gap: 2.4vh * $uiScale;
+  width: 24vh * $uiScale;
 }
 
 .inventory-brand {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 14vh * $uiScale;
+  height: 11vh * $uiScale;
   width: 100%;
 }
 
@@ -421,7 +435,7 @@ body.inv-dragging {
   fill: $accentBright;
   font-family: $mainFont;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0.18em;
 }
 
@@ -451,7 +465,7 @@ body.inv-dragging {
   color: #ffffff;
   font-family: $mainFont;
   font-size: 1.7vh * $textScale;
-  font-weight: 600;
+  font-weight: 500;
   text-align: center;
   letter-spacing: 0.06em;
   transition:
@@ -475,6 +489,133 @@ body.inv-dragging {
 
   &:hover {
     border-color: rgba(243, 179, 84, 0.7);
+    background-color: $accentSoft;
+    color: $accentBright;
+  }
+}
+
+/* ------------------------------------------------------------- key ring -- */
+
+.keyring {
+  display: flex;
+  flex-direction: column;
+  gap: 1vh * $uiScale;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1vh * $uiScale;
+  border-radius: 1.2vh * $uiScale;
+  background-color: $panelPlate;
+  border: 1px solid $slotBorder;
+}
+
+.keyring-header {
+  display: flex;
+  align-items: center;
+  gap: 0.9vh * $uiScale;
+  padding: 0 0.3vh * $uiScale;
+
+  svg {
+    flex: none;
+    width: 2.2vh * $uiScale;
+    height: 2.2vh * $uiScale;
+    fill: $accent;
+  }
+}
+
+.keyring-title {
+  flex: 1;
+  font-size: 1.5vh * $textScale;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.keyring-count {
+  font-size: 1.35vh * $textScale;
+  color: $textMuted;
+}
+
+/* scrolls only when the keys do not fit */
+.keyring-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6vh * $uiScale;
+  max-height: 27vh * $uiScale;
+  overflow-y: auto;
+}
+
+.keyring-item {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.9vh * $uiScale;
+  padding: 0.6vh * $uiScale 0.8vh * $uiScale;
+  border-radius: 0.9vh * $uiScale;
+  background-color: $slotColor;
+  border: 1px solid rgba(207, 175, 29, 0.25);
+  cursor: grab;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover,
+  &.is-over {
+    background-color: $slotColorHover;
+    border-color: rgba(243, 179, 84, 0.6);
+  }
+}
+
+.keyring-item-image {
+  flex: none;
+  width: 3.6vh * $uiScale;
+  height: 3.6vh * $uiScale;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.keyring-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2vh * $uiScale;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.keyring-item-plate {
+  align-self: flex-start;
+  padding: 0 0.5vh * $uiScale;
+  border-radius: 0.4vh * $uiScale;
+  background-color: $accentBright;
+  color: #0d1514;
+  font-size: 1.35vh * $textScale;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.keyring-item-name {
+  font-size: 1.3vh * $textScale;
+  color: $textColor;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.keyring-empty {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 5vh * $uiScale;
+  border: 1px dashed rgba(207, 175, 29, 0.3);
+  border-radius: 0.9vh * $uiScale;
+  font-size: 1.25vh * $textScale;
+  color: rgba(255, 255, 255, 0.35);
+
+  &.is-over {
+    border-color: rgba(243, 179, 84, 0.8);
     background-color: $accentSoft;
     color: $accentBright;
   }
@@ -513,13 +654,13 @@ body.inv-dragging {
 .inventory-close-action {
   color: $accent;
   font-size: 1.6vh * $textScale;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .inventory-close-target {
   color: #ffffff;
   font-size: 1.6vh * $textScale;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .inventory-close-button {
@@ -577,7 +718,7 @@ body.inv-dragging {
 
   p {
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   p:first-child {
@@ -699,7 +840,7 @@ body.inv-dragging {
   justify-content: space-between;
   align-items: center;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   color: #ffffff;
 }
 
@@ -782,9 +923,48 @@ $hotbarSize: 10.4vh * $uiScale;
   align-items: center;
   gap: 1.2vh * $uiScale;
 
-  /* Sits just under the inventory panels while the inventory is open. */
+  /* Rendered inside .inventory-wrapper, right under the panels; same size as the grid slots. */
   &.is-docked {
-    bottom: 13vh;
+    position: static;
+    width: auto;
+
+    .hotbar-item-slot {
+      width: $gridSize;
+      height: $gridSize;
+      background-size: 6.2vh * $uiScale;
+    }
+  }
+
+  /* Quick-view (hotbar key): stacked vertically at the right-center, smaller. */
+  &:not(.is-docked) {
+    bottom: auto;
+    top: 50%;
+    left: auto;
+    right: 2vh;
+    width: auto;
+    transform: translateY(-50%);
+
+    .hotbar-container {
+      flex-direction: column;
+      gap: 0.8vh * $uiScale;
+    }
+
+    .hotbar-item-slot {
+      width: $gridSize * 0.72;
+      height: $gridSize * 0.72;
+      background-size: 4vh * $uiScale;
+    }
+
+    .hotbar-slot-key {
+      bottom: auto;
+      top: 0.5vh * $uiScale;
+      font-size: 1.05vh * $textScale;
+    }
+
+    .hotbar-slot-header-wrapper .hotbar-slot-count,
+    .hotbar-slot-bottom .hotbar-slot-weight {
+      font-size: 1.05vh * $textScale;
+    }
   }
 }
 
@@ -814,7 +994,7 @@ $hotbarSize: 10.4vh * $uiScale;
   color: #0d1514;
   font-family: $mainFont;
   font-size: 1.25vh * $textScale;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.2;
   text-align: center;
 }
@@ -827,7 +1007,7 @@ $hotbarSize: 10.4vh * $uiScale;
 
   .hotbar-slot-count {
     font-size: 1.3vh * $textScale;
-    font-weight: 500;
+    font-weight: 400;
     color: rgba(255, 255, 255, 0.85);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
   }
@@ -842,7 +1022,7 @@ $hotbarSize: 10.4vh * $uiScale;
     align-self: flex-end;
     padding-right: 0.7vh * $uiScale;
     font-size: 1.25vh * $textScale;
-    font-weight: 500;
+    font-weight: 400;
     color: rgba(255, 255, 255, 0.72);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
   }
@@ -850,17 +1030,17 @@ $hotbarSize: 10.4vh * $uiScale;
 
 /* -------------------------------------------------------- notifications -- */
 
+/* Bottom-center row, just above the ox_lib progress bar (bottom 12%); max 10 (ItemNotifications.tsx). */
 .item-notification-container {
   display: flex;
-  overflow-x: scroll;
+  flex-direction: row;
   flex-wrap: nowrap;
   gap: $gridGap;
   position: absolute;
-  bottom: 20vh;
+  bottom: 21vh;
   left: 50%;
-  width: 100%;
-  margin-left: calc(50% - calc($gridSize / 2));
-  transform: translate(-50%);
+  transform: translateX(-50%);
+  pointer-events: none;
 }
 
 .item-notification-action-box {
@@ -876,8 +1056,9 @@ $hotbarSize: 10.4vh * $uiScale;
   p {
     font-size: 1.2vh * $textScale;
     padding: 0.4vh * $uiScale;
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: 0.04em;
+    white-space: nowrap;
   }
 }
 
@@ -923,6 +1104,19 @@ $hotbarSize: 10.4vh * $uiScale;
 .transition-slide-up-exit-active {
   transform: translateY(200px);
   transition: all 200ms;
+}
+
+/* Right-side quick hotbar slides in from the right instead. */
+.hotbar-wrapper:not(.is-docked) {
+  &.transition-slide-up-enter,
+  &.transition-slide-up-exit-active {
+    transform: translate(200px, -50%);
+  }
+
+  &.transition-slide-up-enter-active,
+  &.transition-slide-up-exit {
+    transform: translate(0, -50%);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

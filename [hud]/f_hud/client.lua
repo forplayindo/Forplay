@@ -15,6 +15,7 @@ local Music = require 'modules.music.client'
 local CarControl = require 'modules.car_control.client'
 local Seatbelt = require 'modules.seatbelt.client'
 local Blur = require 'modules.blur.client'
+require 'modules.stress.client'
 
 ---Sends message to the ReactUI.
 ---@param action string
@@ -162,7 +163,7 @@ RegisterNUICallback('nui:onLoadUI', function(_, resultCallback)
     resultCallback(true)
     client.uiLoad = true
     Blur.Resend()
-    lib.print.info('ok: client.SetupUI')
+    -- lib.print.info('ok: client.SetupUI')
 end)
 
 RegisterNUICallback('nui:hideFrame', function(_, resultCallback)
@@ -249,18 +250,9 @@ RegisterNUICallback('ui:onChangeCinematicMode', function(show, resultCallback)
     end
 end)
 
+-- Minimap GTA VI punya posisi tetap (Config.Minimap); edit_mini_map tidak dipakai
 RegisterNUICallback('ui:OpenEditMiniMap', function(_, resultCallback)
-    resultCallback(true)
-    if shared.IsResourceStart('edit_mini_map') then
-        SetNuiFocus(false, false)
-        client.SendReactMessage('ui:setSettingsOpen', false)
-        CreateThread(function()
-            local data = exports['edit_mini_map']:usePlacer(Hud.data.mini_map.style == 'circle' and 1 or 0)
-            client.SendReactMessage('ui:onMapPlacerEnd', data)
-            client.SendReactMessage('ui:setSettingsOpen', true)
-            SetNuiFocus(true, true)
-        end)
-    end
+    resultCallback(false)
 end)
 
 RegisterNUICallback('nui:onChangeMiniMapPlacer', function(data, resultCallback)

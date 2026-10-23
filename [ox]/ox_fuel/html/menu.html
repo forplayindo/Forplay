@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+	<meta charset="UTF-8">
+	<title>ox_fuel</title>
+	<link rel="stylesheet" href="menu.css">
+</head>
+<body>
+	<div id="panel" class="panel hidden">
+		<header>
+			<div class="brand"><span class="logo" id="logo">⛽</span><div><h1 id="title">Isi Bensin</h1><small id="veh">-</small></div></div>
+			<button class="x" id="close">✕</button>
+		</header>
+
+		<section class="body">
+			<div class="tank">
+				<div class="tank-bar"><div id="tankNow"></div><div id="tankAdd"></div></div>
+				<small id="tankText">0 / 0 L</small>
+			</div>
+
+			<div class="types" id="types"></div>
+
+			<div class="liters">
+				<div class="liters-top">
+					<span>Jumlah</span>
+					<div class="num"><input id="liters" type="number" min="1" step="1"><i id="unitInput">L</i></div>
+				</div>
+				<input id="slider" type="range" min="1" step="1">
+				<div class="quick">
+					<button data-l="5">5</button><button data-l="10">10</button><button data-l="20">20</button><button data-l="full">Penuh</button>
+				</div>
+			</div>
+
+			<div class="methods">
+				<button data-m="cash" class="active">💵 Cash<small id="cash">Rp 0</small></button>
+				<button data-m="bank">📱 Transfer<small id="bank">Rp 0</small></button>
+			</div>
+
+			<div class="total"><span id="unit">Rp 0 / L</span><b id="total">Rp 0</b></div>
+			<div id="msg" class="msg hidden"></div>
+			<button id="go" class="primary">Isi Sekarang</button>
+		</section>
+	</div>
+	<script src="menu.js"></script>
+</body>
+</html>

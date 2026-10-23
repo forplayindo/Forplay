@@ -7,6 +7,8 @@
 ]]
 
 function lib.versionCheck(repository)
+    if GetConvar('ox:versionCheck', 'true') == 'false' then return end
+
     local resource = GetInvokingResource() or GetCurrentResourceName()
 
     local currentVersion = GetResourceMetadata(resource, 'version', 0)
