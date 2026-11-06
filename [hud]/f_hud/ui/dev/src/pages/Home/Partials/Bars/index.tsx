@@ -8,6 +8,7 @@ import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { DragDropContainer } from "react-drag-drop-container-typescript";
 import { FaLocationCrosshairs } from "react-icons/fa6";
+import { RadioHud } from "./RadioHud";
 
 const ARMOR_SEGMENTS = 5;
 /** Default distance (px) of the status block from the bottom of the screen. */
@@ -103,6 +104,7 @@ export const BarsComponent = ({ anchorLeft, anchorWidth, onHeight, stackInline }
           </button>
         )}
         <div ref={blockRef} className="g6b" style={anchorWidth ? { width: anchorWidth } : undefined}>
+          {stackInline && <RadioHud />}
           {stackInline && <HygieneRow />}
           {stackInline && <LocationCard />}
           {!isAutoHidden(BarsInfo.armor) && <MainRow slot="armor" bar={BarsInfo.armor} label={t("armor")} segments={ARMOR_SEGMENTS} />}
@@ -193,6 +195,7 @@ const LocationCard = () => {
 /** Hygiene row on top of the location card, stacked right above the minimap (while the radar is shown). */
 export const MapTopStack = ({ left, bottom, width }: { left: string | number; bottom: string; width?: string }) => (
   <div className="absolute select-none g6-stack" style={{ left, bottom, width: width ?? 280 }}>
+    <RadioHud />
     <HygieneRow />
     <LocationCard />
   </div>

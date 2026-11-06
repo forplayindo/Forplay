@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type { MutableRefObject } from 'react';
 import { Briefcase, Clock, Crosshair, Home as HomeIcon, MapPin, Search } from 'lucide-react';
 
 import { useSessionState } from '@/hooks/useSessionState';
@@ -11,17 +12,39 @@ import type { Place } from '../data';
 import { estimateFare, rydeZoneName, useRydeLocations, useRydePricing } from '../rydeApi';
 import { money } from '../data';
 import { LiveDot, useSelfLocation } from '@/apps/maps/LiveDot';
+import type { SelfLocation } from '@/apps/maps/LiveDot';
 import { DropoffPin, MapView, Pin } from '../ui';
 
-export function Home() {
+// f_phone perf: the 300ms location stream re-renders only this dot, not the whole Ride page
+// (sheet, map, pins). Home reads the latest fix from meRef when it actually needs it.
+const SelfDot = memo(function SelfDot({ fallback, meRef, onFirstFix }: {
+    fallback: SelfLocation;
+    meRef: MutableRefObject<SelfLocation | null>;
+    onFirstFix: (p: SelfLocation) => void;
+}) {
+    const me = useSelfLocation(fallback);
+    meRef.current = me;
+    const hasFix = me !== null;
+    useEffect(() => { if (me) onFirstFix(me); }, [hasFix]); // eslint-disable-line react-hooks/exhaustive-deps
+    return me ? <LiveDot x={me.x} y={me.y} heading={me.h} /> : null;
+});
+
+export function Home({ active = true }: { active?: boolean }) {
     const g = useRyde();
     const locations = useRydeLocations();
     const pricing = useRydePricing();
     const defaultPickup = getDefaultPickup();
-    const me = useSelfLocation({ x: defaultPickup.x, y: defaultPickup.y, h: 0 });
-    const pickup: Place = me ? { ...defaultPickup, x: me.x, y: me.y } : defaultPickup;
+    const selfFallback = useMemo<SelfLocation>(() => ({ x: defaultPickup.x, y: defaultPickup.y, h: 0 }), [defaultPickup.x, defaultPickup.y]);
+    const meRef = useRef<SelfLocation | null>(null);
+    const currentPickup = (): Place => {
+        const me = meRef.current;
+        return me ? { ...defaultPickup, x: me.x, y: me.y } : defaultPickup;
+    };
+    const pickup = currentPickup();
     const [centerOn, setCenterOn] = useState<{ x: number; y: number } | null>(null);
-    useEffect(() => { if (me && !centerOn) setCenterOn({ x: me.x, y: me.y }); }, [me, centerOn]);
+    const onFirstFix = useCallback((p: SelfLocation) => {
+        setCenterOn(c => c ?? { x: p.x, y: p.y });
+    }, []);
     const [dropoff, setDropoff] = useSessionState<Place | null>('ryde:dropoff', null);
     const [picking, setPicking] = useState(false);
     const [placingDrop, setPlacingDrop] = useState(false);
@@ -40,7 +63,7 @@ export function Home() {
 
     function confirm() {
         if (!dropoff) return;
-        g.requestRide(pickup, dropoff);
+        g.requestRide(currentPickup(), dropoff);
         setDropoff(null);
     }
 
@@ -88,7 +111,7 @@ export function Home() {
                         placing={placingDrop}
                         onPlace={(x, y) => onPlaceDrop(x, y)}
                     >
-                        {me && <LiveDot x={me.x} y={me.y} heading={me.h} />}
+                        <SelfDot fallback={selfFallback} meRef={meRef} onFirstFix={onFirstFix} />
                         {dropoff && <Pin x={dropoff.x} y={dropoff.y}><DropoffPin /></Pin>}
                     </MapView>
                 </div>
@@ -149,7 +172,7 @@ export function Home() {
                 </div>
             )}
 
-            {picking && (
+            {active && picking && (
                 <Sheet title={t('ryde.whereTo', 'Where to?')} onClose={() => setPicking(false)} fit="content" className="bg-surface px-5 pt-3">
                     {() => (
                         <>
@@ -183,17 +206,17 @@ export function Home() {
                 </Sheet>
             )}
 
-            {dropoff && (
+            {active && dropoff && (() => { const est = estimateFare(pricing, pickup, dropoff); return (
                 <AlertDialog
                     title={t('ryde.requestARide', 'Request a ride?')}
                     message={t('ryde.requestRideFixedMessage', 'Ride to {name}, about {km} km. Fare {fare}, paid from your bank balance when the trip ends (metered if you get off early). The first driver to accept will pick you up.', {
-                        name: dropoff.name, km: estimateFare(pricing, pickup, dropoff).km.toFixed(1), fare: money(estimateFare(pricing, pickup, dropoff).fare),
+                        name: dropoff.name, km: est.km.toFixed(1), fare: money(est.fare),
                     })}
                     confirmLabel={t('ryde.requestRide', 'Request ride')}
                     onCancel={() => setDropoff(null)}
                     onConfirm={confirm}
                 />
-            )}
+            ); })()}
         </div>
     );
 }

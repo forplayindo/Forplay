@@ -48,6 +48,7 @@ const PAGES = [
     { id: 'reports', t: 'Laporan', i: 'flag', sub: 'Laporan warga dari /lapor', ok: () => can('reports.manage') },
     { id: 'pets', t: 'Pengajuan Hewan', i: 'heart', sub: 'Setujui / tolak pemain yang ingin memiliki hewan peliharaan', ok: () => S.role === 'owner' || S.role === 'admin' },
     { id: 'server', t: 'Server', i: 'server', sub: 'Cuaca, waktu, radio, stash, pengumuman', ok: () => ['server.weather', 'server.time', 'server.radio', 'server.stash', 'server.announce'].some(can) },
+    { id: 'wtune', t: 'Senjata', i: 'gun', sub: 'Atur damage & recoil per senjata · langsung berlaku tanpa restart', ok: () => S.role === 'owner' || S.role === 'admin' },
     { id: 'bans', t: 'Daftar Ban', i: 'ban', sub: 'Ban HWID dari panel & anti-cheat', ok: () => can('player.unban') },
     { id: 'dev', t: 'Developer', i: 'code', sub: 'Koordinat & entity', ok: () => can('dev.tools') },
     { sep: 'Owner', ok: isOwner },
@@ -76,7 +77,7 @@ function go(id) {
     renderNav();
     closeModal();
     const el = $('#page');
-    el.className = 'body' + (['players', 'items', 'veh'].includes(page) ? ' flush' : '') + (page === 'perms' ? ' flush col' : '') + (page === 'reports' ? ' chat' : '');
+    el.className = 'body' + (['players', 'items', 'veh', 'wtune'].includes(page) ? ' flush' : '') + (page === 'perms' ? ' flush col' : '') + (page === 'reports' ? ' chat' : '');
     el.onclick = el.oninput = el.onchange = el.onkeydown = null;
     el.innerHTML = '<div class="empty">Memuat…</div>';
     R[page](el);
@@ -1034,6 +1035,229 @@ R.logs = async (el) => {
         }
         const t = e.target.closest('[data-test]');
         if (t && !t.disabled) done(await req('logs_test', { ch: t.dataset.test }));
+    };
+};
+
+// ================================================================ SENJATA (Owner & Admin)
+// Badan / armor / kepala / recoil per senjata, angka langsung (bukan persen).
+const WT_CATS = [
+    { id: 'pistol', t: 'Pistol', c: 'var(--blue)' },
+    { id: 'smg', t: 'SMG', c: 'var(--purple)' },
+    { id: 'shotgun', t: 'Shotgun', c: 'var(--orange)' },
+    { id: 'rifle', t: 'Rifle', c: 'var(--green)' },
+    { id: 'lmg', t: 'LMG', c: 'var(--teal)' },
+    { id: 'sniper', t: 'Sniper', c: 'var(--red)' },
+    { id: 'heavy', t: 'Berat', c: 'var(--gray)' },
+];
+const WT_F = {
+    b: { t: 'Badan · Pengurangan Darah', sub: 'darah berkurang per peluru kena badan (darah penuh = 100)', i: 'heart', c: 'var(--green)', step: 1, min: 1, max: (w) => Math.max(100, Math.ceil(w.d.b * 3)), chip: 'Darah' },
+    a: { t: 'Badan · Pengurangan Armor', sub: 'armor berkurang per peluru selama armor masih ada (armor penuh = 100)', i: 'shield', c: 'var(--blue)', step: 1, min: 0, max: (w) => Math.max(100, Math.ceil(w.d.a * 3)), chip: 'Armor' },
+    h: { t: 'Kepala · Pengurangan Darah', sub: 'langsung ke darah, armor tidak melindungi kepala', i: 'skull', c: 'var(--red)', step: 5, min: 0, max: (w) => Math.max(300, Math.ceil(w.d.h * 1.5 / 10) * 10), chip: 'Kepala' },
+    r: { t: 'Recoil', sub: 'kamera naik per tembakan', i: 'gauge', c: 'var(--accent)', step: 0.1, min: 0, max: () => 2.5, chip: 'Recoil' },
+};
+const WT_K = ['b', 'a', 'h', 'r'];
+let wt = [], wtSel = 'weapon_pistol', wtCat = 'all', wtQ = '';
+
+const f1 = (n) => (Math.round(n * 10) / 10).toLocaleString('id-ID');
+const wtSaved = (w) => w.s || w.d;
+const wtCur = (w) => w.dr || wtSaved(w);
+const wtDirty = (w) => !!w.dr && WT_K.some((k) => w.dr[k] !== wtSaved(w)[k]);
+const wtFind = (n) => wt.find((w) => w.n === n);
+const wtLevel = (v) => v <= 0 ? 'Mati' : v < 0.3 ? 'Ringan' : v < 0.6 ? 'Sedang' : 'Berat';
+const wtNeed = (dmg, hp) => dmg <= 0 ? '—' : Math.ceil(hp / dmg);
+
+// badan dengan armor penuh: armor habis dulu, baru darah (sama dengan client/wtune.lua)
+function wtArmored(w, s) {
+    const a = s.a * w.p, b = s.b * w.p;
+    if (a <= 0 || b <= 0) return '—';
+    let armor = 100, hp = 100, n = 0;
+    while (hp > 0 && n < 999) { n++; if (armor > 0) armor -= a; else hp -= b; }
+    return n;
+}
+
+function wtResult(w, k, s) {
+    const pel = w.p > 1 ? ` <span class="t3">(semua ${w.p} pelet kena)</span>` : '';
+    if (k === 'b') return `Tanpa armor: <b>${wtNeed(s.b * w.p, 100)}</b> tembakan sampai jatuh${pel}`;
+    if (k === 'a') return `Armor penuh habis setelah <b>${wtNeed(s.a * w.p, 100)}</b> tembakan · total <b>${wtArmored(w, s)}</b> tembakan sampai jatuh${pel}`;
+    if (k === 'h') { const n = wtNeed(s.h, 100); return `<b>${n}</b> tembakan ke kepala${n === 1 ? ' <span class="t3">(langsung jatuh)</span>' : ''}`; }
+    return `Tingkat: <b>${wtLevel(s.r)}</b>`;
+}
+
+function wtRow(w) {
+    const cat = WT_CATS.find((c) => c.id === w.c) || WT_CATS[6];
+    const s = wtCur(w);
+    const chip = (k) => `<span class="chip ${s[k] !== w.d[k] ? 'accent' : ''}">${WT_F[k].chip} ${f1(s[k])}${(k === 'b' || k === 'a') && w.p > 1 ? '×' + w.p : ''}</span>`;
+    return `<button class="wt-row ${w.n === wtSel ? 'sel' : ''}" data-wt="${esc(w.n)}">
+        <span class="sq" style="--c:${cat.c}">${ic('gun')}</span>
+        <span class="t"><b>${esc(w.l)}</b><small>${esc(w.n)}</small></span>
+        <span class="chips">${wtDirty(w) ? '<span class="chip warn">Belum disimpan</span>' : ''}${WT_K.map(chip).join('')}</span>
+    </button>`;
+}
+
+function wtList() {
+    const q = wtQ.trim().toLowerCase();
+    const show = wt.filter((w) => (wtCat === 'all' || w.c === wtCat || (wtCat === 'custom' && (w.s || wtDirty(w))))
+        && (!q || w.l.toLowerCase().includes(q) || w.n.includes(q)));
+    $('#wtList').innerHTML = WT_CATS.map((c) => {
+        const rows = show.filter((w) => w.c === c.id);
+        return rows.length ? `<div><div class="group-h">${c.t}</div><div class="group">${rows.map(wtRow).join('')}</div></div>` : '';
+    }).join('') || '<div class="empty">Tidak ada senjata yang cocok.</div>';
+}
+
+function wtCats() {
+    const all = [{ id: 'all', t: 'Semua' }, ...WT_CATS, { id: 'custom', t: 'Sudah diubah' }];
+    $('#wtCats').innerHTML = all.map((c) => `<button data-cat="${c.id}" class="${c.id === wtCat ? 'active' : ''}">${c.t}</button>`).join('');
+}
+
+// perbarui satu baris saja supaya daftar tidak lompat ke atas
+function wtRefreshRow(w) {
+    const el = document.querySelector(`.wt-row[data-wt="${w.n}"]`);
+    if (el) el.outerHTML = wtRow(w);
+}
+
+function wtField(w, k) {
+    const f = WT_F[k], v = wtCur(w)[k], changed = v !== w.d[k];
+    let def = `Bawaan: <b>${f1(w.d[k])}</b>`;
+    if (k === 'h') def += ` <span class="t3">(${f1(w.d.b)} × ${f1(w.hs)})</span>`;
+    if (k === 'r' && w.d.r === 0) def += ' <span class="t3">(belum diatur di f_recoils)</span>';
+    return `<div class="card wt-fld ${changed ? 'changed' : ''}" data-k="${k}">
+        <div class="wt-fh"><span class="sq" style="--c:${f.c}">${ic(f.i)}</span>
+            <div class="t"><b>${f.t}</b><small>${f.sub}</small></div>
+            <span class="chip accent ${changed ? '' : 'hidden'}" data-tag>Diubah</span></div>
+        <div class="wt-ctl">
+            <button class="wt-stp" data-step="-1" title="Kurangi">−</button>
+            <input type="number" min="${f.min}" step="${f.step}" value="${v}">
+            <button class="wt-stp" data-step="1" title="Tambah">+</button>
+        </div>
+        <input type="range" min="0" max="${f.max(w)}" step="${f.step}" value="${v}">
+        <div class="wt-res" data-res>${wtResult(w, k, wtCur(w))}</div>
+        <div class="wt-def"><span>${def}</span><button class="b-plain wt-lnk" data-reset ${changed ? '' : 'disabled'}>Kembalikan</button></div>
+    </div>`;
+}
+
+function wtInsp() {
+    const w = wtFind(wtSel);
+    if (!w) { $('#wtInsp').innerHTML = '<div class="empty">Pilih senjata di kiri</div>'; return wtState(); }
+    $('#wtInsp').innerHTML = `
+        <div class="target wt-head">${img(IMG_ITEM + w.n.toUpperCase() + '.png', w.l, 'wt-img')}
+            <div class="t" style="flex:1;min-width:0"><b>${esc(w.l)}</b><small class="t-muted" style="display:block">${esc(w.n)}${w.p > 1 ? ` · ${w.p} pelet per tembakan` : ''}</small></div></div>
+        ${WT_K.map((k) => wtField(w, k)).join('')}
+        <p class="hint" id="wtDs"></p>`;
+    wtState();
+}
+
+function wtState() {
+    const w = wtFind(wtSel);
+    const dirty = !!w && wtDirty(w);
+    const ds = $('#wtDs');
+    if (ds) {
+        ds.className = 'hint ' + (dirty ? 't-orange' : 't-muted');
+        ds.textContent = dirty ? 'Ada perubahan yang belum disimpan. “Coba di Saya” hanya berlaku untukmu sampai panel ditutup.'
+            : w && w.s ? 'Tersimpan. Berlaku untuk semua pemain.' : 'Masih bawaan GTA.';
+    }
+    $('#wtMeta').textContent = w && w.by ? `Terakhir diubah oleh ${w.by} · ${w.at}` : 'Setiap perubahan tercatat di Log Discord';
+    $('#wtSave').disabled = !dirty;
+    $('#wtTry').disabled = !w;
+    $('#wtReset').disabled = !w || !WT_K.some((k) => wtCur(w)[k] !== w.d[k]);
+}
+
+// ubah satu pengaturan saja; from = 'n' (ketik) / 'r' (slider) supaya input yang sedang dipakai tidak ditimpa
+function wtSet(k, v, from) {
+    const w = wtFind(wtSel), f = WT_F[k];
+    if (!w || Number.isNaN(v)) return;
+    v = Math.round(Math.max(f.min, Math.min(k === 'r' ? 2.5 : 1000, v)) * 10) / 10;
+    w.dr = { ...wtCur(w), [k]: v };
+    const card = document.querySelector(`.wt-fld[data-k="${k}"]`);
+    if (from !== 'n') card.querySelector('input[type=number]').value = v;
+    if (from !== 'r') card.querySelector('input[type=range]').value = v;
+    const changed = v !== w.d[k];
+    card.classList.toggle('changed', changed);
+    card.querySelector('[data-tag]').classList.toggle('hidden', !changed);
+    card.querySelector('[data-reset]').disabled = !changed;
+    // armor & darah saling memengaruhi hasil "total tembakan"
+    document.querySelectorAll('.wt-fld').forEach((c) => { c.querySelector('[data-res]').innerHTML = wtResult(w, c.dataset.k, w.dr); });
+    wtState();
+    wtRefreshRow(w);
+}
+
+R.wtune = async (el) => {
+    el.innerHTML = `
+        <div class="wt">
+            <div class="wt-l">
+                <div class="wt-tools">
+                    <label class="search">${ic('search')}<input id="wtq" placeholder="Cari senjata… (nama / weapon_xxx)" value="${esc(wtQ)}"></label>
+                    <div class="filters" id="wtCats"></div>
+                </div>
+                <div class="wt-list" id="wtList"><div class="empty">Memuat…</div></div>
+            </div>
+            <div class="wt-r">
+                <div class="wt-body" id="wtInsp"></div>
+                <div class="wt-foot">
+                    <div class="row2">
+                        <button class="b b-gray" id="wtTry">${ic('bolt')}Coba di Saya</button>
+                        <button class="b b-red-tint" id="wtReset">${ic('return')}Semua Bawaan</button>
+                    </div>
+                    <button class="b b-filled b-block" id="wtSave">${ic('check')}Simpan &amp; Terapkan ke Semua</button>
+                    <div class="wt-meta" id="wtMeta"></div>
+                </div>
+            </div>
+        </div>`;
+    wtCats();
+    const r = await req('wtune');
+    if (page !== 'wtune') return;
+    if (!r || !r.ok) { $('#wtList').innerHTML = '<div class="empty">Gagal memuat.</div>'; return done(r); }
+    wt = r.list || [];
+    if (!wtFind(wtSel)) wtSel = wt[0]?.n;
+    wtList(); wtInsp();
+
+    el.oninput = (e) => {
+        if (e.target.id === 'wtq') { wtQ = e.target.value; return wtList(); }
+        const card = e.target.closest('.wt-fld');
+        if (!card || e.target.value === '') return;
+        wtSet(card.dataset.k, +e.target.value, e.target.type === 'number' ? 'n' : 'r');
+    };
+    el.onclick = async (e) => {
+        const row = e.target.closest('.wt-row');
+        if (row) {
+            const prev = wtFind(wtSel);
+            wtSel = row.dataset.wt;
+            if (prev) wtRefreshRow(prev);
+            wtRefreshRow(wtFind(wtSel));
+            return wtInsp();
+        }
+        const cb = e.target.closest('[data-cat]');
+        if (cb) { wtCat = cb.dataset.cat; wtCats(); return wtList(); }
+
+        const w = wtFind(wtSel);
+        if (!w) return;
+        const card = e.target.closest('.wt-fld');
+        if (card) {
+            const k = card.dataset.k;
+            const st = e.target.closest('[data-step]');
+            if (st) return wtSet(k, wtCur(w)[k] + WT_F[k].step * +st.dataset.step);
+            if (e.target.closest('[data-reset]')) return wtSet(k, w.d[k]);
+            return;
+        }
+        const b = e.target.closest('button');
+        if (!b || b.disabled) return;
+        if (b.id === 'wtTry') {
+            const s = wtCur(w);
+            if (done(await act('wtune_try', { name: w.n, ...s })))
+                toast(`Dicoba di kamu saja: ${w.l} · darah ${f1(s.b)} · armor ${f1(s.a)} · kepala ${f1(s.h)} · recoil ${f1(s.r)}. Berlaku untuk tembakanmu & saat kamu kena tembak, sampai panel ditutup.`);
+        } else if (b.id === 'wtReset') {
+            w.dr = { ...w.d };
+            wtRefreshRow(w); wtInsp();
+            toast('Semua pengaturan senjata ini dikembalikan ke bawaan. Tekan Simpan untuk menerapkan.');
+        } else if (b.id === 'wtSave') {
+            if (!wtDirty(w)) return;
+            b.disabled = true;
+            const res = await req('wtune_save', { name: w.n, ...w.dr });
+            if (done(res) && res.row) {
+                wt[wt.indexOf(w)] = res.row;
+                act('wtune_clear', { name: w.n });
+                wtRefreshRow(res.row); wtInsp();
+            } else wtState();
+        }
     };
 };
 

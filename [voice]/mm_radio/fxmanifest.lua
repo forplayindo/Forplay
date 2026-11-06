@@ -2,8 +2,8 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'Master Mind'
-version '0.2.1'
-description 'A beautiful Radio Resource for FiveM'
+version '0.4.0'
+description 'MM Radio - UI HUD Taktis ringan (vanilla JS, tanpa CDN)'
 repository 'https://github.com/SOH69/mm_radio'
 
 lua54 'yes'
@@ -30,7 +30,10 @@ server_script {
 }
 
 files {
-    'build/**',
+    'build/index.html',
+    'build/style.css',
+    'build/app.js',
+    'build/fonts/*.woff2',
     'locales/*.json'
 }
 

@@ -1,6 +1,102 @@
--- poop cuma bisa dilakukan di prop toilet (tidak ada animasi jongkok luar ruangan yang cocok),
--- jadi tidak ada opsi radial menu "dimana saja" seperti mandi/kencing - selalu lewat ox_target
--- di prop toilet
+-- poop di prop toilet lewat ox_target (duduk), atau sembarang tempat lewat menu radial (jongkok
+-- pakai animasi emote "shit" rpemotes, kotoran keluar otomatis)
+local function LoadAnim(dict)
+    RequestAnimDict(dict)
+    local timeout = GetGameTimer() + 2000
+    while not HasAnimDictLoaded(dict) and GetGameTimer() < timeout do Wait(0) end
+    return HasAnimDictLoaded(dict)
+end
+
+local function TryPoopAnywhere()
+    if HygieneState.isBathing or HygieneState.isPeeing or HygieneState.isPooping or HygieneState.isSleeping then return end
+    local ped = cache.ped
+    if IsPedInAnyVehicle(ped, false) then
+        HygieneNotify('Tidak bisa dilakukan di dalam kendaraan', 'error')
+        return
+    end
+    if HygieneNearbyPlayers(HygieneCoords(), Config.Poop.SafeDistance) > 0 then
+        HygieneNotify('Ada orang di sekitar, cari tempat yang lebih sepi', 'error')
+        return
+    end
+
+    HygieneState.isPooping = true
+    ClearPedTasks(ped)
+
+    -- celana dilepas sementara, sama seperti poop di toilet
+    local savedAppearance = exports['illenium-appearance']:getPedAppearance(ped)
+    HygieneUndressLegs(ped)
+
+    local anim, propCfg, fx = Config.Poop.AnywhereAnim, Config.Poop.AnywhereProp, Config.Poop.AnywhereEffect
+    if LoadAnim(anim.dict) then
+        TaskPlayAnim(ped, anim.dict, anim.clip, 8.0, -8.0, -1, 1, 0, false, false, false)
+    end
+
+    -- tisu di tangan (networked supaya player lain ikut lihat)
+    local prop
+    local model = joaat(propCfg.model)
+    if lib.requestModel(model, 2000) then
+        local c = GetEntityCoords(ped)
+        prop = CreateObject(model, c.x, c.y, c.z, true, true, false)
+        AttachEntityToEntity(prop, ped, GetPedBoneIndex(ped, propCfg.bone), propCfg.pos.x, propCfg.pos.y, propCfg.pos.z,
+            propCfg.rot.x, propCfg.rot.y, propCfg.rot.z, true, true, false, true, 1, true)
+        SetModelAsNoLongerNeeded(model)
+    end
+
+    -- kotoran keluar sendiri setelah jongkok sebentar (rpemotes: harus tahan G)
+    local fxHandle, active = nil, true
+    CreateThread(function()
+        Wait(fx.delay or 0)
+        if not active then return end
+        RequestNamedPtfxAsset(fx.dict)
+        local timeout = GetGameTimer() + 1500
+        while not HasNamedPtfxAssetLoaded(fx.dict) and GetGameTimer() < timeout do Wait(0) end
+        if not active or not HasNamedPtfxAssetLoaded(fx.dict) then return end
+        UseParticleFxAssetNextCall(fx.dict)
+        fxHandle = StartNetworkedParticleFxLoopedOnEntityBone(fx.name, ped, fx.offset.x, fx.offset.y, fx.offset.z,
+            fx.rot.x, fx.rot.y, fx.rot.z, GetPedBoneIndex(ped, fx.bone), fx.scale or 1.0, false, false, false)
+    end)
+
+    local finished = lib.progressBar({
+        duration = Config.Poop.PoopDuration,
+        label = 'Sedang buang air besar...',
+        canCancel = true,
+        disable = { move = true, car = true, combat = true },
+    })
+
+    active = false
+    if fxHandle then StopParticleFxLooped(fxHandle, false) end
+    RemoveNamedPtfxAsset(fx.dict)
+    if prop and DoesEntityExist(prop) then DeleteEntity(prop) end
+    ClearPedTasks(ped)
+    RemoveAnimDict(anim.dict)
+
+    -- kembalikan celana semula
+    exports['illenium-appearance']:setPedAppearance(ped, savedAppearance)
+
+    HygieneState.isPooping = false
+    if finished then
+        HygieneState.poop = 0
+    end
+    TriggerEvent('hygiene:client:RefreshHud')
+
+    if finished then
+        TriggerServerEvent('hygiene:server:FinishPoop')
+    else
+        HygieneNotify('Dibatalkan', 'error')
+    end
+end
+
+local function RegisterPoopRadial()
+    lib.addRadialItem({
+        id = 'hygiene_poop',
+        label = 'Buang Air Besar',
+        icon = 'poo',
+        onSelect = TryPoopAnywhere,
+    })
+end
+RegisterNetEvent('hygiene:client:RegisterRadial', RegisterPoopRadial)
+RegisterPoopRadial()
+
 local function TryPoop(propData)
     if HygieneState.isBathing or HygieneState.isPeeing or HygieneState.isPooping or HygieneState.isSleeping then return end
     local ped = cache.ped

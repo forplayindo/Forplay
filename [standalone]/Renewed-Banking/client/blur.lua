@@ -40,6 +40,7 @@ end)
 local function tierFromFps(fps, cur)
     local t = cfg.autoFps or { high = 75, medium = 45, low = 30 }
     local raw = (fps >= t.high and 'high') or (fps >= t.medium and 'medium') or (fps >= t.low and 'low') or 'off'
+    if raw == 'high' and not cfg.autoHigh then raw = 'medium' end -- sama dengan f_hud: auto paling tinggi medium
     if ORDER[raw] > ORDER[cur] and fps < t[raw] + 8 then return cur end
     return raw
 end

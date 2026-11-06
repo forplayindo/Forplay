@@ -8,8 +8,8 @@ return {
     -- SENGAJA TIDAK dihapus (catatan resmi / milik bersama):
     --   phone_mdt_*, police_tickets, bank_transactions, phone_bank_transactions, bank_loans,
     --   ems_bills, ems_pharmacy_orders, mechanic_bills, mechanic_shop_orders, cafe_orders,
-    --   petshop_purchases, phone_job_fires, phone_admin_*, darkchat_bans, darkchat_messages,
-    --   darkchat_rooms, phone_weazel_articles, crew_gangs (ketua gang), crew_turf, sayer_zones
+    --   phone_job_fires, phone_admin_*, darkchat_bans, darkchat_messages,
+    --   darkchat_rooms, phone_weazel_articles, crew_gangs (ketua gang), crew_turf
     deleteTables = {
         -- inti
         { 'playerskins', 'citizenid' },
@@ -19,7 +19,6 @@ return {
         { 'properties', 'owner' },
         { 'bank_accounts_new', 'id' },
         { 'ox_inventory', 'owner' },
-        { 'ox_inventory_settings', 'owner' },
         { 'vehicle_registrations', 'citizenid' },
         { 'mh_garage', 'owner' },
         -- script server
@@ -29,17 +28,12 @@ return {
         { 'darkchat_members', 'citizenid' },
         { 'darkchat_nicknames', 'citizenid' },
         { 'darkchat_reactions', 'citizenid' },
-        { 'economy_player_profiles', 'citizenid' },
         { 'f_pets', 'citizenid' },
-        { 'nn_petshop_pets', 'identifier' },
-        { 'nn_petshop_clothing', 'identifier' },
         { 'marketplace_listings', 'citizenid' },
         { 'pages_posts', 'citizenid' },
         { 'player_jobs_activity', 'citizenid' },
-        { 'sayer_gangs', 'citizenid' },
         { 'xt_prison', 'identifier' },
         { 'xt_prison_items', 'owner' },
-        { 'yphone_settings', 'citizen_id' },
         -- phone (f_phone)
         { 'phone_alarms', 'citizenid' },
         { 'phone_app_sessions', 'citizenid' },
@@ -96,15 +90,5 @@ return {
         { 'phone_timer_recents', 'citizenid' },
         { 'phone_voice_memos', 'citizenid' },
         { 'phone_wifi', 'citizenid' },
-        -- phone lama (npwd)
-        { 'npwd_calls', 'identifier' },
-        { 'npwd_marketplace_listings', 'identifier' },
-        { 'npwd_match_profiles', 'identifier' },
-        { 'npwd_match_views', 'identifier' },
-        { 'npwd_notes', 'identifier' },
-        { 'npwd_phone_contacts', 'identifier' },
-        { 'npwd_phone_gallery', 'identifier' },
-        { 'npwd_twitter_profiles', 'identifier' },
-        { 'npwd_twitter_tweets', 'identifier' },
     },
 }

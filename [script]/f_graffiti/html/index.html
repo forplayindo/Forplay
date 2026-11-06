@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_graffiti</title>
+    <link rel="stylesheet" href="ui/ios.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+        <symbol id="i-spray" viewBox="0 0 24 24"><rect x="5" y="9" width="8" height="12" rx="2"/><path d="M7 9V6h4v3M9 6V4M16 5h.01M19 3h.01M19 7h.01M17 9h.01"/></symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+    </svg>
+
+    <div id="panel" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo"><svg class="ic"><use href="#i-spray"/></svg></span><div><h1>Graffiti</h1><small id="sub"></small></div></div>
+            <div class="head-actions">
+                <span class="chip accent" id="pylox"></span>
+                <button class="circle close" data-close><svg class="ic"><use href="#i-x"/></svg></button>
+            </div>
+        </header>
+
+        <div class="toolbar">
+            <nav class="tabs" id="tabs">
+                <button data-tab="spray" class="active">Semprot</button>
+                <button data-tab="list" id="tab-list">Graffiti Gang</button>
+            </nav>
+        </div>
+        <div id="msg" class="banner hidden"></div>
+
+        <section id="view-spray" class="view">
+            <div id="full-note" class="notice warn hidden"></div>
+            <main id="designs" class="designs"></main>
+            <div class="foot">
+                <small id="pick-note">Pilih desain lalu tekan Semprot.</small>
+                <button id="spray-btn" class="b b-filled b-lg" disabled><svg class="ic"><use href="#i-spray"/></svg>Semprot</button>
+            </div>
+        </section>
+
+        <section id="view-list" class="view hidden">
+            <main id="list" class="list"></main>
+        </section>
+    </div>
+
+    <div id="hint" class="hint-bar hidden">
+        <span class="st" id="h-status"></span>
+        <span><b id="h-size"></b> m · <b id="h-rot"></b>°</span>
+        <span class="keys"><kbd>Scroll</kbd> ukuran <kbd>Q</kbd><kbd>E</kbd> putar <kbd>Klik Kiri</kbd> semprot <kbd>Klik Kanan</kbd> batal</span>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

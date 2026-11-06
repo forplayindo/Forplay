@@ -97,6 +97,10 @@ local function drawOutline()
     if f then
         if not f[3] then f[3] = groundZ(f[1], f[2], pos.z) end
         DrawLine(f[1], f[2], f[3], f[1], f[2], f[3] + 6.0, 255, 214, 10, 255)
+        if f[4] then -- arah kain bendera (sumbu X model setelah diputar heading)
+            local r = math.rad(f[4])
+            DrawLine(f[1], f[2], f[3] + 5.5, f[1] + math.cos(r) * 1.5, f[2] + math.sin(r) * 1.5, f[3] + 5.5, 255, 214, 10, 255)
+        end
         DrawMarker(4, f[1], f[2], f[3] + 6.6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.2, 1.2, 1.2, 255, 214, 10, 220, false, true, 2, false, nil, nil, false) ---@diagnostic disable-line: param-type-mismatch
     end
 end
@@ -121,7 +125,7 @@ RegisterNUICallback('draw', function(data, cb)
         if type(p) == 'table' and tonumber(p[1]) and tonumber(p[2]) then pts[#pts + 1] = { tonumber(p[1]), tonumber(p[2]) } end
     end
     local flag = type(data.flag) == 'table' and tonumber(data.flag[1]) and tonumber(data.flag[2])
-        and { tonumber(data.flag[1]), tonumber(data.flag[2]), tonumber(data.flag[3]) } or nil
+        and { tonumber(data.flag[1]), tonumber(data.flag[2]), tonumber(data.flag[3]), tonumber(data.flag[4]) } or nil
     drawing = { points = pts, z = {}, flag = flag, flagMode = data.flagMode == true }
     menuOpen = false
     SetNuiFocus(false, false)
@@ -134,9 +138,10 @@ RegisterNUICallback('draw', function(data, cb)
             DisableControlAction(0, 47, true) -- G
             DisableControlAction(0, 23, true) -- F
             if drawing.flagMode and IsDisabledControlJustPressed(0, 23) then
-                -- titik bendera dari kaki pemain (z ikut disimpan supaya tiang pas di tanah / atap)
+                -- titik tugu dari kaki pemain (z ikut disimpan supaya pas di tanah / atap, arah = hadap pemain)
                 local p = GetEntityCoords(cache.ped)
-                local pt = { math.floor(p.x * 100 + 0.5) / 100, math.floor(p.y * 100 + 0.5) / 100, math.floor((p.z - 1.0) * 100 + 0.5) / 100 }
+                local pt = { math.floor(p.x * 100 + 0.5) / 100, math.floor(p.y * 100 + 0.5) / 100, math.floor((p.z - 1.0) * 100 + 0.5) / 100,
+                    math.floor(GetEntityHeading(cache.ped) * 100 + 0.5) / 100 }
                 drawing.flag = pt
                 SendNUIMessage({ action = 'drawFlag', point = pt })
                 notify('Titik bendera ditandai.', 'success')

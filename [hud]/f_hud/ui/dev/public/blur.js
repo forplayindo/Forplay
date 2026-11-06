@@ -18,12 +18,13 @@
 
   // ---------------- quality tiers ----------------
   var TIERS = {
-    high:   { fps: 60, ds: 4, passes: 2, spread: 1.5, scan: 250 },
-    medium: { fps: 30, ds: 6, passes: 2, spread: 1.2, scan: 400 },
-    low:    { fps: 20, ds: 8, passes: 1, spread: 1.5, scan: 600 },
+    // cs = resolusi kanvas komposit (1 = penuh). Blur sudah lembut, jadi kanvas kecil tidak terlihat bedanya.
+    high:   { fps: 60, ds: 4, passes: 2, spread: 1.5, scan: 250, cs: 1 },
+    medium: { fps: 30, ds: 6, passes: 2, spread: 1.2, scan: 400, cs: 0.75 },
+    low:    { fps: 20, ds: 8, passes: 1, spread: 1.5, scan: 600, cs: 0.5 },
   };
   var LOOK = { saturation: 1.3, brightness: 1.0 };
-  var START_TIER = "medium"; // used until Lua sends the real tier
+  var START_TIER = "off"; // mati sampai Lua bilang HUD tampil (loading screen / pilih karakter = tidak ada blur)
   // ------------------------------------------------
 
   var SELECTOR = ".gl, #navigation-widget .h-\\[51px\\], [data-blur]";
@@ -99,8 +100,9 @@
   }
 
   // ---------- state ----------
-  var tier = null, T = null, W = 0, H = 0, lw = 0, lh = 0, fb = [], tx = [];
+  var tier = null, T = null, W = 0, H = 0, CW = 0, CH = 0, lw = 0, lh = 0, fb = [], tx = []; // CW/CH = layar (px CSS), W/H = kanvas
   var checks = 0, rects = [], count = 0, running = false, rafId = 0, scanTimer = 0, last = 0, frameGap = 0;
+  var sig = "", paused = false, onceId = 0; // sig = susunan panel terakhir (dipakai saat pause untuk tahu kapan perlu gambar ulang)
 
   function makeTarget() {
     var t = gl.createTexture();
@@ -117,36 +119,45 @@
   }
   function resize() {
     if (!T) return;
-    W = Math.max(1, window.innerWidth); H = Math.max(1, window.innerHeight);
+    CW = Math.max(1, window.innerWidth); CH = Math.max(1, window.innerHeight);
+    W = Math.max(1, Math.round(CW * T.cs)); H = Math.max(1, Math.round(CH * T.cs));
     canvas.width = W; canvas.height = H;
-    lw = Math.max(1, Math.round(W / T.ds)); lh = Math.max(1, Math.round(H / T.ds));
+    lw = Math.max(1, Math.round(CW / T.ds)); lh = Math.max(1, Math.round(CH / T.ds));
     tx.forEach(function (t) { gl.deleteTexture(t); }); fb.forEach(function (f) { gl.deleteFramebuffer(f); });
     var a = makeTarget(), b = makeTarget(); fb = [a[0], b[0]]; tx = [a[1], b[1]];
   }
   window.addEventListener("resize", resize);
 
   // ---------- panel scan (few times per second, not per frame) ----------
-  function rad(v, w, h) { return Math.min(parseFloat(v) || 0, w / 2, h / 2); }
+  function rad(v, w, h) { return Math.min(parseFloat(v) || 0, w / 2, h / 2) * T.cs; }
   function scanPanels() {
     var els = document.querySelectorAll(SELECTOR), out = [];
     for (var i = 0; i < els.length && out.length < MAX; i++) {
       var el = els[i], r = el.getBoundingClientRect();
-      if (r.width < 2 || r.height < 2 || r.bottom < 0 || r.top > H || r.right < 0 || r.left > W) continue;
+      if (r.width < 2 || r.height < 2 || r.bottom < 0 || r.top > CH || r.right < 0 || r.left > CW) continue;
       var cs = getComputedStyle(el);
       if (cs.visibility === "hidden" || parseFloat(cs.opacity) === 0) continue;
-      var y = H - r.bottom;
+      var y = CH - r.bottom, k = T.cs;
       // low-res scissor box with margin so the blur never samples stale pixels
       var M = Math.ceil(T.passes * 6 * T.spread) + 4;
       var sx = Math.max(0, Math.floor(r.left / T.ds) - M), sy = Math.max(0, Math.floor(y / T.ds) - M);
       var ex = Math.min(lw, Math.ceil(r.right / T.ds) + M), ey = Math.min(lh, Math.ceil((y + r.height) / T.ds) + M);
       out.push({
-        r: [r.left, y, r.width, r.height],
+        r: [r.left * k, y * k, r.width * k, r.height * k],
         c: [rad(cs.borderTopRightRadius, r.width, r.height), rad(cs.borderBottomRightRadius, r.width, r.height), rad(cs.borderTopLeftRadius, r.width, r.height), rad(cs.borderBottomLeftRadius, r.width, r.height)],
         s: [sx, sy, Math.max(0, ex - sx), Math.max(0, ey - sy)],
       });
     }
     rects = out; count = out.length;
+    // saat pause (menu Pengaturan terbuka) loop gambar berhenti; kalau susunan panel berubah
+    // (mis. Cash/Bank di-hide) gambar ulang SEKALI supaya bekas blur panel lama hilang
+    var ns = out.map(function (o) { return o.r.map(Math.round).join(","); }).join("|");
+    if (ns !== sig) { sig = ns; if (paused) drawOnce(); }
     if (count === 0) clearCanvas();
+  }
+  function drawOnce() {
+    if (onceId) return;
+    onceId = requestAnimationFrame(function () { onceId = 0; if (paused) render(); });
   }
 
   function clearCanvas() {
@@ -165,12 +176,16 @@
     rafId = requestAnimationFrame(draw);
     if (ts - last < frameGap || count === 0) return;
     last = ts;
+    render();
+  }
+  function render() {
+    if (count === 0) return clearCanvas();
     gl.activeTexture(gl.TEXTURE0);
     gl.enable(gl.SCISSOR_TEST);
 
     // 1. downsample (panel areas only)
     gl.bindFramebuffer(gl.FRAMEBUFFER, fb[0]); gl.viewport(0, 0, lw, lh);
-    gl.useProgram(pDown); gl.uniform1i(u.downT, 0); gl.uniform2f(u.downPx, T.ds * 0.25 / W, T.ds * 0.25 / H);
+    gl.useProgram(pDown); gl.uniform1i(u.downT, 0); gl.uniform2f(u.downPx, T.ds * 0.25 / CW, T.ds * 0.25 / CH);
     gl.bindTexture(gl.TEXTURE_2D, gameTex);
     eachScissor(function () { gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); });
 
@@ -199,16 +214,28 @@
   }
 
   function stop() {
-    running = false;
+    running = false; paused = false;
     if (rafId) cancelAnimationFrame(rafId);
     if (scanTimer) clearInterval(scanTimer);
     rafId = 0; scanTimer = 0; rects = []; count = 0;
     if (W) clearCanvas();
   }
 
+  // "pause" = berhenti menggambar tapi biarkan frame terakhir (mis. menu Settings terbuka)
+  // scan panel tetap jalan pelan (murah, tanpa GPU) supaya hide/unhide di Pengaturan langsung ikut ter-update
+  function pause() {
+    if (!running) return;
+    running = false; paused = true;
+    if (rafId) cancelAnimationFrame(rafId);
+    if (scanTimer) clearInterval(scanTimer);
+    rafId = 0;
+    scanTimer = setInterval(scanPanels, 300);
+    tier = "pause";
+  }
   function setTier(name) {
+    if (name === "pause") return pause();
     if (name === tier) return;
-    tier = name;
+    tier = name; paused = false;
     root.classList.remove("hud-blur-on", "hud-lite");
     if (!TIERS[name]) { // "off"
       stop(); canvas.style.display = "none";

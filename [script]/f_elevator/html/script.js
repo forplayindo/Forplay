@@ -5,6 +5,8 @@ createApp({
         return {
             floors: [],
             currentFloor: 1,
+            currentIndex: 0,
+            targetIndex: null,
             isAnimating: false,
             activeButton: null,
             animationInterval: null,
@@ -91,6 +93,7 @@ createApp({
             if (this.activeButton !== null) return;
 
             this.targetFloor = floor.number;
+            this.targetIndex = index;
             this.targetFloorButton = index;
 
             this.targetFloorCode = floor.code ? String(floor.code) : null;
@@ -103,7 +106,7 @@ createApp({
             }
         },
         proceedToFloor(floor) {
-            if (this.targetFloor !== this.currentFloor && !this.isAnimating) {
+            if (this.targetIndex !== this.currentIndex && !this.isAnimating) {
                 const coords = {
                     x: Math.round(floor.pos.x * 100) / 100,
                     y: Math.round(floor.pos.y * 100) / 100,
@@ -120,7 +123,7 @@ createApp({
                 }
                 this.activeButton = this.targetFloorButton;
                 
-                setTimeout(() => this.animateFloorChange(this.currentFloor, this.targetFloor, coords), this.startDelay);
+                setTimeout(() => this.animateFloorChange(this.currentIndex, this.targetIndex, coords), this.startDelay);
             }
         },
         openModal() {
@@ -142,15 +145,20 @@ createApp({
                 }, 3000);
             }
         },
+        // label lantai bebas: angka (1, 2) atau teks (G, B1, LG, R)
         updateFloorDisplay(floor) {
-            const floorStr = floor.toString();
-            if (floorStr.length === 1) {
+            const floorStr = String(floor ?? '').toUpperCase();
+            if (floorStr.length <= 1) {
                 this.digit1 = floorStr;
                 this.digit2 = '';
             } else {
-                this.digit1 = floorStr[0];
-                this.digit2 = floorStr[1];
+                this.digit1 = floorStr.slice(0, -1);
+                this.digit2 = floorStr.slice(-1);
             }
+        },
+        indexOfFloor(number) {
+            const i = this.floors.findIndex((f) => String(f.number) === String(number));
+            return i < 0 ? 0 : i;
         },
         animateFloorChange(from, to, pos) {
             this.isAnimating = true;
@@ -160,10 +168,11 @@ createApp({
             this.directionDownActive = step === -1;
 
             this.animationInterval = setInterval(() => {
-                this.currentFloor += step;
+                this.currentIndex += step;
+                this.currentFloor = this.floors[this.currentIndex].number;
                 this.updateFloorDisplay(this.currentFloor);
 
-                if (this.currentFloor === to) {
+                if (this.currentIndex === to) {
                     clearInterval(this.animationInterval);
                     this.directionUpActive = false;
                     this.directionDownActive = false;
@@ -197,7 +206,7 @@ createApp({
                 this.isAnimating = false;
                 
                 if (this.activeButton !== null) {
-                    const currentFloorData = this.floors[this.currentFloor];
+                    const currentFloorData = this.floors[this.currentIndex];
                     if (currentFloorData && currentFloorData.pos) {
                         const pos = {
                             x: Math.round(currentFloorData.pos.x * 100) / 100,
@@ -217,6 +226,7 @@ createApp({
         initializeElevatorUI(data) {
             this.floors = data.floors;
             this.currentFloor = data.current;
+            this.currentIndex = this.indexOfFloor(data.current);
             this.updateFloorDisplay(this.currentFloor);
         },
         isActiveFloor(index) {

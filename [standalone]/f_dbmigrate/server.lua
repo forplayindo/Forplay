@@ -11,7 +11,6 @@ local MONEY_COLUMNS = {
     { 'cafe_promos', 'price' },
     { 'cityhall_requests', 'price' },
     { 'crew_bank_log', 'amount' },
-    { 'economy_price_history', 'price' },
     { 'ems_bills', 'total' },
     { 'ems_pharmacy_orders', 'total' },
     { 'ems_prices', 'price' },
@@ -30,7 +29,6 @@ local MONEY_COLUMNS = {
     { 'properties', 'price' },
     { 'vehicle_financing', 'balance' },
     { 'vehicle_financing', 'paymentamount' },
-    { 'yphone_banking_transactions', 'amount' },
 }
 
 local function buildDefinition(col)

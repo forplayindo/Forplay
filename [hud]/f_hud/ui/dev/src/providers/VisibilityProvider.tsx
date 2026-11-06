@@ -35,7 +35,6 @@ export const VisibilityProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       >
         {children}
       </main>
-      {isEnvBrowser() && <div className="fixed inset-0 -z-10 bg-cover bg-center" style={{ backgroundImage: "url(images/core/miko.png)" }}></div>}
     </VisibilityCtx.Provider>
   );
 };

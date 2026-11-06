@@ -1,2 +1,0 @@
--- Compatibility placeholder for manifests from the accessory-fitting update.
--- Accessory fit helpers now load with shared/utils.lua.

@@ -364,6 +364,9 @@ CreateThread(function()
         })
     end
     if world and world.items then addItems(world.items) end
+    if world and world.lifted then
+        for id, l in pairs(world.lifted) do FLJ.setLift(tonumber(id), l.front, l.back) end
+    end
 end)
 
 AddEventHandler('onResourceStop', function(resource)

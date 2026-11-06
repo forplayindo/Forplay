@@ -602,7 +602,8 @@ end
 
 ---@param cmd string
 ---@param target number|'all'
-function Pet.command(cmd, target)
+---@param radius number? luas area jaga (meter) dari panel
+function Pet.command(cmd, target, radius)
     target = target or 'all'
     if cmd == 'dismiss' then return Pet.dismiss(target ~= 'all' and tonumber(target) or nil) end
     if cmd == 'summonAll' then return Pet.summonAll() end
@@ -626,10 +627,11 @@ function Pet.command(cmd, target)
     if cmd == 'attack' or cmd == 'guard' then
         local p = Pet.list[tonumber(target)]
         if not exists(p) or p.row.dead then return end
-        if cmd == 'guard' and p.guard then return Pet.stopGuard(p) end
-        CreateThread(function()
-            if cmd == 'attack' then Pet.pickTarget(p) else Pet.placeGuard(p) end
-        end)
+        if cmd == 'guard' then
+            if p.guard then return Pet.stopGuard(p) end
+            return Pet.placeGuard(p, radius)
+        end
+        CreateThread(function() Pet.pickTarget(p) end)
         return
     end
 
@@ -1048,6 +1050,39 @@ local function backToPost(p)
     changed()
 end
 
+-- Grup relasi khusus saat menyerang. Grup FPETSHOP berstatus "companion" dengan PLAYER, dan AI GTA
+-- menolak TaskCombatPed ke target yang dianggap teman (hewan lalu kabur / lari ke arah lain).
+-- Selama menyerang hewan pindah ke grup ini yang membenci grup target, lalu dikembalikan.
+local atkGroup, atkHated
+local function makeHostile(p, target)
+    if not atkGroup then
+        local _, hash = AddRelationshipGroup('FPETSHOP_ATK')
+        atkGroup = hash
+    end
+    local tg = GetPedRelationshipGroupHash(target)
+    if atkHated and atkHated ~= tg then
+        ClearRelationshipBetweenGroups(5, atkGroup, atkHated) -- jangan terus membenci grup target lama (mis. PLAYER)
+    end
+    atkHated = tg
+    SetRelationshipBetweenGroups(5, atkGroup, tg)
+    SetPedRelationshipGroupHash(p.ped, atkGroup)
+end
+
+local function restoreGroup(p)
+    if exists(p) and relGroup then SetPedRelationshipGroupHash(p.ped, relGroup) end
+end
+
+local function fightAttributes(ped)
+    SetPedFleeAttributes(ped, 0, false)
+    SetPedCombatAttributes(ped, 5, true)    -- berani melawan target bersenjata walau tak bersenjata
+    SetPedCombatAttributes(ped, 46, true)   -- selalu bertarung
+    SetPedCombatAttributes(ped, 17, false)  -- jangan selalu kabur
+    SetPedCombatAttributes(ped, 58, true)   -- jangan kabur dari pertarungan
+    SetPedCombatAbility(ped, 2)             -- profesional
+    SetPedCombatMovement(ped, 3)            -- menyerbu (offensive)
+    SetPedCombatRange(ped, 0)               -- jarak dekat
+end
+
 local function attack(p, ped)
     if not validTarget(p, ped) then return false end
     if IsPedAPlayer(ped) then
@@ -1060,14 +1095,14 @@ local function attack(p, ped)
     p.fetching, p.trickToken, p.attackTarget = nil, nil, token
     if not p.guard then p.mode = 'attack' end
     ClearPedTasks(p.ped)
-    SetPedCombatAttributes(p.ped, 46, true) -- selalu bertarung, tidak kabur
-    SetPedCombatAttributes(p.ped, 5, true)
-    SetPedFleeAttributes(p.ped, 0, false)
+    fightAttributes(p.ped)
+    makeHostile(p, ped)
     TaskCombatPed(p.ped, ped, 0, 16)
     changed()
 
     CreateThread(function()
         local deadline = GetGameTimer() + Config.Attack.maxTime * 1000
+        local nextRetask = GetGameTimer() + 1000
         while p.attackTarget == token and exists(p) and not p.row.dead do
             if not DoesEntityExist(ped) or IsPedDeadOrDying(ped, true) or GetGameTimer() > deadline
                 or #(GetEntityCoords(p.ped) - GetEntityCoords(ped)) > Config.Attack.range
@@ -1075,10 +1110,23 @@ local function attack(p, ped)
                 or (p.guard and #(GetEntityCoords(ped) - p.guard.pos) > p.guard.radius * 2.0) then
                 break
             end
+            -- tugas serang terputus (dibatalkan AI / kehilangan kontrol jaringan): ulangi
+            if GetGameTimer() > nextRetask then
+                nextRetask = GetGameTimer() + 1000
+                if GetScriptTaskStatus(p.ped, `SCRIPT_TASK_COMBAT`) == 7 and NetworkHasControlOfEntity(p.ped) then
+                    fightAttributes(p.ped)
+                    TaskCombatPed(p.ped, ped, 0, 16)
+                end
+            end
             Wait(250)
         end
-        if p.attackTarget ~= token then return end -- dibatalkan perintah lain
+        if p.attackTarget ~= token then
+            -- dibatalkan perintah lain; kembalikan grup kecuali sudah ada serangan baru
+            if not p.attackTarget then restoreGroup(p) end
+            return
+        end
         p.attackTarget = nil
+        restoreGroup(p)
         if exists(p) then ClearPedTasks(p.ped) end
         backToPost(p)
     end)
@@ -1111,39 +1159,51 @@ function Pet.pickTarget(p)
     end
 end
 
--- tentukan luas area (panah atas/bawah) lalu Enter; hewan menjaga di tempatnya sekarang
-function Pet.placeGuard(p)
-    if not Pet.canFight(p.cfg) or p.vehicle then return end
-    TriggerEvent('f_petshop:client:closeUi')
+-- luas area diisi angka di panel (meter); hewan menjaga di tempatnya sekarang
+function Pet.placeGuard(p, radius)
+    if not Pet.canFight(p.cfg) or p.vehicle or not exists(p) or p.row.dead then return end
     local r = Config.Attack.guardRadius
-    local radius = r.default
-    lib.showTextUI('[↑/↓] Ubah luas area  \n[Enter] Jaga di sini  \n[Backspace] Batal', { icon = 'shield-dog' })
-    local ok = false
-    while exists(p) and not p.row.dead do
-        local c = GetEntityCoords(p.ped)
-        DrawMarker(1, c.x, c.y, c.z - 0.95, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, radius * 2, radius * 2, 0.6,
-            243, 179, 84, 90, false, false, 2, false, nil, nil, false)
-        if IsControlJustPressed(0, 172) then radius = math.min(r.max, radius + r.step) end
-        if IsControlJustPressed(0, 173) then radius = math.max(r.min, radius - r.step) end
-        if IsControlJustPressed(0, 191) then ok = true break end
-        if IsControlJustPressed(0, 177) or IsControlJustPressed(0, 194) then break end
-        Wait(0)
-    end
-    lib.hideTextUI()
-    if not ok or not exists(p) or p.row.dead then return end
+    radius = math.floor(tonumber(radius) or r.default)
+    radius = math.max(r.min, math.min(r.max, radius))
 
     ensureControl(p.ped, 500)
     local token = { pos = GetEntityCoords(p.ped), radius = radius }
     p.fetching, p.trickToken, p.attackTarget, p.guard = nil, nil, nil, token
     p.mode = 'guard'
     ClearPedTasks(p.ped)
+    SetBlockingOfNonTemporaryEvents(p.ped, true)
+    SetPedFleeAttributes(p.ped, 0, false)
+    SetPedCombatAttributes(p.ped, 17, false)
+    SetPedCombatAttributes(p.ped, 58, true)
     TaskStandStill(p.ped, -1)
     notify(('%s menjaga area (%d m). Teman di Daftar Teman tidak diserang.'):format(p.row.name, radius), 'success')
     changed()
 
+    -- tampilkan lingkaran area 5 detik sebagai tanda
+    CreateThread(function()
+        local untilT = GetGameTimer() + 5000
+        local c = token.pos
+        while GetGameTimer() < untilT and p.guard == token do
+            DrawMarker(1, c.x, c.y, c.z - 0.95, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, radius * 2.0, radius * 2.0, 0.6,
+                243, 179, 84, 90, false, false, 2, false, nil, nil, false)
+            Wait(0)
+        end
+    end)
+
     -- hanya PEMAIN yang masuk area yang diserang (NPC lewat tidak diganggu)
     CreateThread(function()
         while p.guard == token and exists(p) and not p.row.dead do
+            -- tidak sedang menyerang: tetap di pos (kalau bergeser / kabur, kembali lalu diam)
+            if not p.attackTarget and NetworkHasControlOfEntity(p.ped) then
+                local dist = #(GetEntityCoords(p.ped) - token.pos)
+                if dist > 2.0 then
+                    if GetScriptTaskStatus(p.ped, `SCRIPT_TASK_GO_STRAIGHT_TO_COORD`) == 7 then
+                        TaskGoStraightToCoord(p.ped, token.pos.x, token.pos.y, token.pos.z, 2.0, 15000, 0.0, 0.5)
+                    end
+                elseif GetScriptTaskStatus(p.ped, `SCRIPT_TASK_STAND_STILL`) == 7 then
+                    TaskStandStill(p.ped, -1)
+                end
+            end
             if not p.attackTarget then
                 for _, pl in ipairs(lib.getNearbyPlayers(token.pos, token.radius, false)) do
                     local sid = GetPlayerServerId(pl.id)

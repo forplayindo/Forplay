@@ -1,8 +1,8 @@
 Config = {}
 
-Config.Command = 'blips' -- /blips, hanya license di bawah ini
+Config.Command = 'blips' -- /blips, Owner/Admin di f_admin + license di bawah ini
 
--- License pemain yang boleh membuka /blips (lihat di txAdmin > Players > Identifiers, yang diawali "license:").
+-- License tambahan yang boleh membuka /blips (lihat di txAdmin > Players > Identifiers, yang diawali "license:").
 Config.AllowedLicenses = {
      'license:3b28ac3d7f015e6e6983866188d94dedf79c0271',
 }

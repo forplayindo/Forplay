@@ -1,0 +1,40 @@
+/* f_graffiti — gaya dasar dari ui/ios.css */
+.panel { width: min(780px, 94vw); height: min(600px, 90vh); }
+.toolbar .tabs { width: 320px; }
+.view { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+#full-note { margin: 10px 20px 0; }
+
+.designs { flex: 1; overflow-y: auto; padding: 14px 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; align-content: start; }
+.designs > .empty { grid-column: 1 / -1; }
+.design { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 14px; background: var(--cell); border: 2px solid transparent; text-align: left; }
+.design:hover { background: var(--cell-2); }
+.design.sel { border-color: var(--accent); }
+.design b { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.art { aspect-ratio: 1; border-radius: 10px; display: grid; place-items: center; overflow: hidden;
+    background: repeating-conic-gradient(rgba(255, 255, 255, .05) 0 25%, transparent 0 50%) 0 0 / 16px 16px, var(--fill); }
+.art img { max-width: 92%; max-height: 92%; object-fit: contain; }
+
+.foot { display: flex; align-items: center; gap: 14px; padding: 12px 20px 20px; border-top: 1px solid var(--sep); }
+.foot small { flex: 1; }
+.foot .b { width: 200px; }
+
+.list { grid-template-columns: 1fr; }
+.row-g { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; background: var(--cell); }
+.row-g .art { width: 56px; height: 56px; flex: none; aspect-ratio: auto; border-radius: 10px; }
+.row-g .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.row-g .t b { font-size: 14px; font-weight: 600; }
+.row-g .t small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row-g .t .loc { display: flex; align-items: center; gap: 4px; color: var(--label); font-size: 12px; }
+.row-g .t .loc .ic { width: 13px; height: 13px; color: var(--accent); }
+.row-g .del { flex: none; }
+.row-g .del.armed { background: var(--red); color: #fff; }
+
+/* petunjuk saat membidik (tanpa fokus NUI) */
+.hint-bar { position: absolute; left: 50%; bottom: 6vh; transform: translateX(-50%); display: flex; align-items: center; gap: 14px;
+    padding: 10px 16px; border-radius: 16px; background: var(--bg); font-size: 13px; white-space: nowrap; box-shadow: 0 6px 18px rgba(0, 0, 0, .3); }
+.hint-bar .st { font-weight: 700; }
+.hint-bar .st.ok { color: var(--green); }
+.hint-bar .st.far, .hint-bar .st.none { color: var(--orange); }
+.hint-bar .keys { color: var(--label-2); }
+kbd { display: inline-block; min-width: 22px; padding: 2px 6px; margin: 0 2px 0 6px; border-radius: 6px; background: var(--fill-2);
+    color: var(--label); font: 600 11px var(--font); text-align: center; }

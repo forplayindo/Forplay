@@ -101,7 +101,7 @@ Config.DisableProps = {
 }
 
 ---@type string[]
-Config.Aces = {} -- list of ace permissions used for blacklisting
+Config.Aces = { "admin" } -- list of ace permissions used for blacklisting (admin = boleh pilih semua ped)
 
 Config.Blips = {
     ["clothing"] = {

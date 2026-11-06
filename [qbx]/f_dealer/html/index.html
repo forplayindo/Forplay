@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_dealer</title>
+    <link rel="stylesheet" href="ui/ios.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+        <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17H3v-5l2-5h14l2 5v5h-2"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/><path d="M9.5 17h5M3 12h18"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></symbol>
+        <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+        <symbol id="i-cash" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 10v4M18 10v4"/></symbol>
+        <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18"/></symbol>
+        <symbol id="i-ticket" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M13 6v12" stroke-dasharray="2 2"/></symbol>
+        <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.3-9.3M17 6l3 3M14 9l2 2"/></symbol>
+        <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+        <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+        <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
+        <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M10 2h4"/></symbol>
+    </svg>
+
+    <!-- ===================== TOKO ===================== -->
+    <div id="shop" class="hidden">
+        <aside class="dk-side dk-left">
+            <header>
+                <div class="brand"><span class="logo"><svg class="ic"><use href="#i-car"/></svg></span><div><h1 id="title">Dealer</h1><small>Pilih kendaraan impianmu</small></div></div>
+                <div class="head-actions">
+                    <button class="circle hidden" id="btn-admin" title="Admin dealer"><svg class="ic"><use href="#i-shield"/></svg></button>
+                    <button class="circle close" id="btn-close"><svg class="ic"><use href="#i-x"/></svg></button>
+                </div>
+            </header>
+            <div class="dk-search search"><svg class="ic"><use href="#i-search"/></svg><input id="q" type="text" placeholder="Cari kendaraan"></div>
+            <div id="cats" class="dk-cats filters"></div>
+            <div id="vlist" class="dk-list"></div>
+        </aside>
+
+        <div id="stage" class="dk-stage">
+            <div class="dk-hint"><svg class="ic"><use href="#i-rotate"/></svg>Seret untuk memutar · Scroll untuk zoom</div>
+        </div>
+
+        <aside class="dk-side dk-right">
+            <div id="detail" class="dk-detail hidden">
+                <div class="dk-dh">
+                    <span id="d-cat" class="chip accent">-</span>
+                    <h2 id="d-name">-</h2>
+                    <small id="d-brand">-</small>
+                    <div id="d-price" class="dk-price num">-</div>
+                </div>
+                <div>
+                    <div class="group-h">Performa</div>
+                    <div class="group dk-stats" id="stats"></div>
+                </div>
+                <div id="d-note" class="notice hidden"></div>
+                <div class="spacer"></div>
+                <div class="dk-btns">
+                    <button id="btn-test" class="b b-gray b-lg"><svg class="ic"><use href="#i-flag"/></svg><span id="btn-test-t">Test Drive</span></button>
+                    <button id="btn-main" class="primary b-lg">Beli</button>
+                </div>
+            </div>
+            <div id="detail-empty" class="empty">Pilih kendaraan di sebelah kiri</div>
+        </aside>
+
+        <!-- modal: pembayaran / tiket donasi -->
+        <div id="modal" class="dk-modal hidden">
+            <div class="panel dk-modal-box">
+                <header>
+                    <div class="brand"><span class="logo" id="m-ic"><svg class="ic"><use href="#i-cash"/></svg></span><div><h1 id="m-title">Pembayaran</h1><small id="m-sub">-</small></div></div>
+                    <div class="head-actions"><button class="circle close" id="m-close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+                </header>
+                <section class="dk-modal-body">
+                    <div id="m-pay">
+                        <div class="dk-total"><small>Total harga</small><b id="m-price" class="num">-</b></div>
+                        <div class="dk-methods">
+                            <button data-m="cash" class="dk-method"><svg class="ic"><use href="#i-cash"/></svg><span><b>Tunai</b><small id="m-cash" class="num">-</small></span></button>
+                            <button data-m="bank" class="dk-method"><svg class="ic"><use href="#i-bank"/></svg><span><b>Bank</b><small id="m-bank" class="num">-</small></span></button>
+                        </div>
+                    </div>
+                    <div id="m-ticket" class="hidden">
+                        <p class="dk-lead">Kendaraan donasi diberikan setelah admin mengecek tiket Discord kamu. Masukkan nomor tiket donasi, 1 tiket hanya untuk 1 kendaraan.</p>
+                        <label><span>Nomor tiket Discord</span><input id="m-ticket-in" type="text" maxlength="32" placeholder="contoh: 0123"></label>
+                        <p class="dk-lead small">Hasilnya dikirim ke email HP kamu. Kalau disetujui, kembali ke dealer dan tekan "Ambil Kendaraan".</p>
+                    </div>
+                    <div id="m-msg" class="msg hidden"></div>
+                    <button id="m-ok" class="primary b-lg">Konfirmasi</button>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== ADMIN ===================== -->
+    <div id="admin" class="panel dk-admin hidden">
+        <header>
+            <button class="circle hidden" id="a-back" title="Kembali ke dealer"><svg class="ic"><use href="#i-back"/></svg></button>
+            <div class="brand"><span class="logo"><svg class="ic"><use href="#i-shield"/></svg></span><div><h1>Admin Dealer</h1><small>Kendaraan yang dijual & permintaan donasi</small></div></div>
+            <div class="seg dk-tabs" id="a-tabs">
+                <button data-tab="veh" class="active">Kendaraan</button>
+                <button data-tab="req">Permintaan Donasi <span id="a-badge" class="bubble hidden">0</span></button>
+            </div>
+            <div class="head-actions"><button class="circle close" id="a-close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+        </header>
+        <div class="toolbar">
+            <div class="search"><svg class="ic"><use href="#i-search"/></svg><input id="a-q" type="text" placeholder="Cari"></div>
+            <div id="a-filter" class="seg dk-filter hidden">
+                <button data-f="pending" class="active">Menunggu</button>
+                <button data-f="approved">Disetujui</button>
+                <button data-f="all">Semua</button>
+            </div>
+            <div id="a-catf" class="dk-catf"><select id="a-cat"></select></div>
+            <button id="a-add" class="b b-filled b-sm"><svg class="ic"><use href="#i-plus"/></svg>Tambah Kendaraan</button>
+        </div>
+        <div id="a-msg" class="banner hidden"></div>
+        <div id="a-list" class="list"></div>
+
+        <aside id="sheet" class="sheet hidden">
+            <div class="sheet-head"><h2 id="s-title">Tambah Kendaraan</h2><button class="circle close" id="s-close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+            <div class="sheet-body">
+                <div id="s-pick">
+                    <label><span>Cari model (dari qbx_core)</span></label>
+                    <div class="search dk-s-search"><svg class="ic"><use href="#i-search"/></svg><input id="s-q" type="text" placeholder="nama / spawn code"></div>
+                    <div id="s-results" class="group dk-results"></div>
+                </div>
+                <div id="s-chosen" class="dk-chosen hidden">
+                    <span class="dk-thumb" id="s-img"></span>
+                    <div><b id="s-label">-</b><small id="s-model">-</small></div>
+                </div>
+                <label><span>Kategori</span><select id="s-cat"></select></label>
+                <label id="s-price-l"><span>Harga (Rupiah)</span><input id="s-price" type="number" min="1" step="1"></label>
+                <small id="s-price-f" class="hint num"></small>
+                <div id="s-donasi" class="notice hidden">Kendaraan donasi tidak dijual. Pemain hanya bisa test drive dan mengajukan dengan nomor tiket Discord.</div>
+            </div>
+            <div class="sheet-foot">
+                <div id="s-msg" class="msg hidden"></div>
+                <button id="s-save" class="primary b-lg">Simpan</button>
+                <button id="s-del" class="b b-red-tint b-lg hidden">Hapus dari Dealer</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- ===================== TIMER TEST DRIVE ===================== -->
+    <div id="timer" class="dk-timer hidden">
+        <svg class="ic"><use href="#i-timer"/></svg>
+        <div><b>Test Drive <span id="t-left" class="num">1:00</span></b><small>Turun dari kendaraan untuk selesai lebih cepat</small></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -100,7 +100,8 @@ end
 function ApplyDamageEffects()
     if DeathState ~= sharedConfig.deathState.ALIVE then return end
     for bodyPartKey, injury in pairs(Injuries) do
-        if isLegDamaged(bodyPartKey, injury.severity) then
+        -- jatuh saat lari hanya untuk kaki yang pincang (ditembak di kaki saat pendarahan level 2+)
+        if injury.limp and isLegDamaged(bodyPartKey, injury.severity) then
             if legCount >= config.legInjuryTimer then
                 chancePedFalls(cache.ped)
                 legCount = 0

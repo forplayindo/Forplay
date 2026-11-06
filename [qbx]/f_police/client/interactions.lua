@@ -6,13 +6,11 @@ exports('IsHandcuffed', function()
     return QBX.PlayerData.metadata.ishandcuffed
 end)
 
+-- suara borgol / ziptie / lepas borgol diputar server (police:server:CuffPlayer, ReleaseCuffs) ke pemain sekitar
 local function handCuffAnimation()
-    TriggerServerEvent('InteractSound_SV:PlayOnSource', QBX.PlayerData.metadata.ishandcuffed and 'Cuff' or 'Uncuff', 0.2)
-
     lib.requestAnimDict('mp_arrest_paired')
     Wait(100)
     TaskPlayAnim(cache.ped, 'mp_arrest_paired', 'cop_p2_back_right', 3.0, 3.0, -1, 48, 0, false, false, false)
-    TriggerServerEvent('InteractSound_SV:PlayOnSource', 'Cuff', 0.2)
     Wait(3500)
     TaskPlayAnim(cache.ped, 'mp_arrest_paired', 'exit', 3.0, 3.0, -1, 48, 0, false, false, false)
     RemoveAnimDict('mp_arrest_paired')
@@ -21,7 +19,6 @@ end
 local function getCuffedAnimation(playerId)
     local cuffer = GetPlayerPed(GetPlayerFromServerId(playerId))
     local heading = GetEntityHeading(cuffer)
-    TriggerServerEvent('InteractSound_SV:PlayOnSource', 'Cuff', 0.2)
     lib.requestAnimDict('mp_arrest_paired')
     local offset = GetOffsetFromEntityInWorldCoords(cuffer, 0.0, 0.45, 0.0)
     SetEntityCoords(cache.ped, offset.x, offset.y, offset.z, true, false, false, false)
@@ -285,7 +282,6 @@ local function uncuffSelf()
     DetachEntity(cache.ped, true, false)
     TriggerServerEvent('police:server:SetHandcuffStatus', false)
     ClearPedTasksImmediately(cache.ped)
-    TriggerServerEvent('InteractSound_SV:PlayOnSource', 'Uncuff', 0.2)
     exports.qbx_core:Notify(locale('success.uncuffed'), 'success')
 end
 

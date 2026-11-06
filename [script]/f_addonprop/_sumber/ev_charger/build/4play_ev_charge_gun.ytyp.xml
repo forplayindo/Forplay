@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CMapTypes>
+ <extensions />
+ <archetypes>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="50" />
+   <flags value="549453856" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.035" y="-0.062324" z="-0.193726" />
+   <bbMax x="0.035" y="0.243" z="0.081285" />
+   <bsCentre x="0" y="0.090338" z="-0.05622" />
+   <bsRadius value="0.208419" />
+   <hdTextureDist value="50" />
+   <name>4play_ev_charge_gun</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary />
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>4play_ev_charge_gun</assetName>
+   <extensions />
+  </Item>
+ </archetypes>
+ <name>4play_ev_charge_gun</name>
+ <dependencies />
+ <compositeEntityTypes itemType="CCompositeEntityType" />
+</CMapTypes>

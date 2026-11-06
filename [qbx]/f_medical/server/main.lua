@@ -4,6 +4,8 @@ local logger = require '@qbx_core.modules.logger'
 ---@class Injury
 ---@field severity integer
 ---@field weaponHash number
+---@field limp? boolean luka kaki yang bikin pincang (kena saat pendarahan level 2+)
+---@field stabilized? boolean
 
 ---@class PlayerStatus
 ---@field injuries table<BodyPartKey, Injury>

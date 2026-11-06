@@ -9,7 +9,8 @@
       "no_vehicle_nearby": "No Vehicle Nearby For Flipping.",
       "is_handcuffed": "You are handcuffed.",
       "is_fastened": "You wear a seat belt.",
-      "vehicle_radio_off": "Vehicle Radio Turned Off"
+      "vehicle_radio_off": "Vehicle Radio Turned Off",
+      "cannot_push": "This vehicle cannot be pushed."
    },
    "success": {
       "cruise_control_enabled": "Cruise control enabled",
@@ -40,7 +41,11 @@
       "teleport_current_level_indication": "(You're Here)"
    },
    "actions": {
-      "push_vehicle": "Press [~g~SHIFT~w~] and [~g~E~w~] to push the vehicle until [~g~SHIFT~w~] release",
+      "push_vehicle": "[W] Push  ·  [A/D] Steer  ·  [X] Stop",
       "toggle_cruise_control": "Toggle Cruise Control"
+   },
+   "target": {
+      "push_vehicle": "Push Vehicle",
+      "flip_vehicle": "Flip Vehicle"
    }
 }

@@ -164,32 +164,62 @@ end
 ---------------------------------------------------------------------------
 -- memanggul
 ---------------------------------------------------------------------------
+-- batang besar yang sedang diangkat berdua: id -> { front, back }; semua client menggambar batangnya di antara kedua pemain
+local lifted = {}
+
+local function setLift(id, front, back)
+    lifted[id] = front and { front = front, back = back } or nil
+    TriggerClientEvent('f_lumberjack:client:lift', -1, id, front, back)
+end
+
 local function startCarry(src, id, item, role, partner)
     carrying[src] = { id = id, item = item, role = role, partner = partner, since = GetGameTimer() }
-    TriggerClientEvent('f_lumberjack:client:carry', src, { id = id, kind = item.kind, role = role, partner = partner })
+    TriggerClientEvent('f_lumberjack:client:carry', src, {
+        id = id, kind = item.kind, role = role, partner = partner,
+        x = item.x, y = item.y, z = item.z, h = item.h,
+    })
 end
 
 local function endCarry(src)
-    if not carrying[src] then return end
+    local c = carrying[src]
+    if not c then return end
     carrying[src] = nil
+    if lifted[c.id] then setLift(c.id) end
     TriggerClientEvent('f_lumberjack:client:carry', src, nil)
 end
 
--- kayu yang dipanggul jatuh ke tanah: di depan pemain (potongan) / di belakang pemain depan (batang besar)
+local function pedPose(src)
+    local ped = src and GetPlayerPed(src)
+    if not ped or ped == 0 or not DoesEntityExist(ped) then return end
+    return GetEntityCoords(ped), GetEntityHeading(ped)
+end
+
+-- kayu yang dipanggul jatuh ke tanah: di depan pemain (potongan) / di antara kedua pengangkat (batang besar)
 local function dropCarry(src)
     local c = carrying[src]
     if not c then return end
     local item = c.item
-    local front = c.role == 'front' and src or c.role == 'back' and c.partner or src
     endCarry(src)
     if c.partner then endCarry(c.partner) end
 
-    local ped = GetPlayerPed(front)
-    if ped and ped ~= 0 and DoesEntityExist(ped) then
-        local p, h = GetEntityCoords(ped), GetEntityHeading(ped)
-        local r = math.rad(h)
-        local d = item.kind == 'trunk' and -2.0 or 0.8
-        item.x, item.y, item.z, item.h = p.x - math.sin(r) * d, p.y + math.cos(r) * d, p.z - 1.0, h
+    if item.kind == 'trunk' then
+        local f = pedPose(c.role == 'front' and src or c.partner)
+        local b = pedPose(c.role == 'back' and src or c.partner)
+        if f and b then
+            local dx, dy = f.x - b.x, f.y - b.y
+            item.x, item.y, item.z = (f.x + b.x) / 2, (f.y + b.y) / 2, (f.z + b.z) / 2 - 1.0
+            if dx * dx + dy * dy > 0.01 then item.h = math.deg(math.atan(-dx, dy)) end
+        else
+            local p, h = pedPose(src)
+            if not p then p, h = pedPose(c.partner) end
+            if p then item.x, item.y, item.z, item.h = p.x, p.y, p.z - 1.0, h end
+        end
+    else
+        local p, h = pedPose(src)
+        if p then
+            local r = math.rad(h)
+            item.x, item.y, item.z, item.h = p.x - math.sin(r) * 0.8, p.y + math.cos(r) * 0.8, p.z - 1.0, h
+        end
     end
     item.front, item.back, item.claimAt = nil, nil, nil
     items[c.id] = item
@@ -689,7 +719,7 @@ lib.callback.register('f_lumberjack:server:world', function()
     local avail, list = {}, {}
     for i, t in ipairs(trees) do avail[i] = t.available end
     for id, item in pairs(items) do list[id] = public(item) end
-    return { trees = avail, items = list }
+    return { trees = avail, items = list, lifted = lifted }
 end)
 
 local function wearChainsaw(src)
@@ -851,6 +881,7 @@ lib.callback.register('f_lumberjack:server:claimTrunk', function(src, id, role)
     local front, back = role == 'front' and src or other, role == 'back' and src or other
     startCarry(front, id, item, 'front', back)
     startCarry(back, id, item, 'back', front)
+    setLift(id, front, back)
     return { ok = true }
 end)
 
@@ -876,18 +907,22 @@ RegisterNetEvent('f_lumberjack:server:drop', function()
     end
 end)
 
--- kayu yang dipanggul masuk ke bak (batang: oleh pemain depan, butuh 3 slot)
+-- kayu yang dipanggul masuk ke bak (batang: oleh salah satu pengangkat, rekannya harus masih memegang & dekat; butuh 3 slot)
 lib.callback.register('f_lumberjack:server:load', function(src)
     local c = carrying[src]
     local crew = getCrew(src)
-    if not c or not crew or crew.phase ~= 'work' or c.role == 'back' or not truckValid(crew) then return { ok = false } end
+    if not c or not crew or crew.phase ~= 'work' or not truckValid(crew) then return { ok = false } end
     if crew.unloading then return { ok = false, msg = 'Bak sedang dibongkar.' } end
     if (crew.cargo or 0) > 0 then return { ok = false, msg = 'Truk masih membawa papan. Bongkar dulu di markas Paleto.' } end
     if GetGameTimer() - c.since < config.minCarryMs then return { ok = false } end
     if not behindTruck(crew, src) then return { ok = false, msg = 'Berdiri di belakang bak truk.' } end
-    if c.role == 'front' then
+    if c.role ~= 'piece' then
         local p = c.partner and carrying[c.partner]
         if not p or p.id ~= c.id then return { ok = false } end
+        local me, other = pedCoords(src), pedCoords(c.partner)
+        if not me or not other or #(me - other) > config.liftPartnerDistance then
+            return { ok = false, msg = 'Rekanmu terlalu jauh dari batang.' }
+        end
     end
     local n = units(c.item)
     if crew.bed + n > crew.cap then

@@ -7,13 +7,13 @@ return {
         offDutyPay = false,
         grades = {
             [0] = {
-                name = 'Pekerja Lepas',
+                name = 'Tidak Bekerja',
                 payment = 25000 -- warga sipil tanpa gaji: harus kerja sampingan (sampah, kurir) untuk dapat uang
             },
         },
     },
     ['police'] = {
-        label = 'LSPD',
+        label = 'Polisi',
         type = 'leo',
         defaultDuty = false,
         offDutyPay = false,
@@ -301,7 +301,7 @@ return {
         },
     },
     ['cafe'] = {
-        label = 'Kafe',
+        label = 'Warmindo',
         defaultDuty = false,
         offDutyPay = false,
         grades = {

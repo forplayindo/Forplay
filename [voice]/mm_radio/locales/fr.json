@@ -8,7 +8,6 @@
     "jammer_notify_description": "Vous avez été brouillé par la station %.2f MHz",
     "toggle_defean": "Radio assourdie",
     "toggle_undeafen": "Radio non assourdie",
-    
     "ui": {
         "header": "À LA RADIO",
         "frequency": "Fréquence",
@@ -27,6 +26,28 @@
         "radio_settings": "Paramètres radio",
         "move_radio": "Déplacer radio",
         "allow_move": "Déplacement",
-        "overlay_settings": "Paramètres de superposition"
+        "overlay_settings": "Paramètres de superposition",
+        "name": "Name on radio",
+        "radio_size": "Radio size",
+        "overlay_size": "Overlay size",
+        "overlay": "Overlay",
+        "no_signal": "NO SIGNAL (JAMMED)",
+        "enter_freq": "Enter frequency",
+        "no_members": "No one here yet",
+        "no_channels": "Empty",
+        "tap_change": "tap to change",
+        "channel": "Channel",
+        "signal": "Signal",
+        "location": "Location",
+        "active": "active",
+        "signal_good": "Good",
+        "signal_jammed": "Jammed",
+        "cancel": "Cancel",
+        "join": "Join",
+        "back": "Back",
+        "fav": "Fav",
+        "mute": "Mute",
+        "target": "Target",
+        "tab_settings": "Setup"
     }
 }

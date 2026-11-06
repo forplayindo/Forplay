@@ -5,8 +5,16 @@ local tank = {}
 local typeById = {}
 for i = 1, #config.fuelTypes do typeById[config.fuelTypes[i].id] = config.fuelTypes[i] end
 
--- "jenis BBM" untuk kendaraan listrik (harga per kWh)
-tank.electricType = { id = 'listrik', label = 'Listrik', price = config.electric.price, color = '#facc15' }
+-- "jenis BBM" untuk kendaraan listrik = mode pengisian (normal / fast), harga per kWh
+tank.electricModes = config.electric.modes
+
+local modeById = {}
+for i = 1, #config.electric.modes do modeById[config.electric.modes[i].id] = config.electric.modes[i] end
+
+---@param id string
+function tank.electricMode(id)
+	return modeById[id]
+end
 
 ---@param id string
 function tank.fuelType(id)

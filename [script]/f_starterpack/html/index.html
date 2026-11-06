@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_starterpack</title>
+    <link rel="stylesheet" href="ui/ios.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+        <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></symbol>
+        <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.3-9.3M17 6l3 3M14 9l2 2"/></symbol>
+        <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17H3v-5l2-5h14l2 5v5h-2"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/><path d="M9.5 17h5M3 12h18"/></symbol>
+        <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
+    </svg>
+
+    <div id="panel" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo"><svg class="ic"><use href="#i-gift"/></svg></span><div><h1 id="title">Selamat Datang</h1><small>Starterpack Warga Baru</small></div></div>
+            <div class="head-actions"><button class="circle close" id="close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+        </header>
+
+        <section class="body">
+            <p id="message" class="lead"></p>
+
+            <div id="vehicle" class="veh hidden">
+                <div class="veh-img"><img id="veh-img" alt=""><svg class="ic fallback hidden"><use href="#i-car"/></svg></div>
+                <div class="veh-info">
+                    <small>Kendaraan pertama</small>
+                    <strong id="veh-label">-</strong>
+                    <span class="veh-note"><svg class="ic"><use href="#i-key"/></svg>Langsung dikendarai, kunci masuk tas</span>
+                </div>
+            </div>
+
+            <div>
+                <div class="group-h">Isi paket</div>
+                <div id="items" class="group"></div>
+            </div>
+
+            <div id="msg" class="msg hidden"></div>
+            <button id="claim" class="primary b-lg">Klaim Starterpack</button>
+        </section>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

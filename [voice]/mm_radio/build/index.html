@@ -1,16 +1,94 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- FontAwesome Icons Import -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
-    <title>MM RADIO</title>
-    <script type="module" crossorigin src="./index.js"></script>
-    <link rel="stylesheet" href="./index.css">
-  </head>
-  <body>
-    <div id="app"></div>
-    
-  </body>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>MM RADIO</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<div id="radio" class="radio" hidden>
+  <div class="ant"></div>
+  <div class="knob" id="knob" title="Scroll: volume"></div>
+  <button class="topbtn" id="muteKey" title="Mute"></button>
+  <div class="ptt"></div>
+  <div class="vside">
+    <button id="vUp" title="Volume +">+</button>
+    <button id="vDn" title="Volume −">&minus;</button>
+  </div>
+
+  <div class="body" id="body">
+    <div class="bezel">
+      <div class="scr">
+        <i class="cr tl"></i><i class="cr tr"></i><i class="cr bl"></i><i class="cr br"></i>
+        <div class="st"><span id="time">--:--</span><span id="volTx">VOL 30</span><span id="batTx">BAT 100</span></div>
+
+        <section class="pg" data-pg="main">
+          <button class="fbox" id="freqBtn">
+            <span class="fl"><span id="fLbl"></span><span id="fHint"></span></span>
+            <span class="fv"><b id="freq">---.--</b><small>MHz</small></span>
+          </button>
+          <div class="info">
+            <span class="k" id="kCh"></span><span class="k" id="kSig"></span>
+            <span id="chn">—</span><span id="sig">—</span>
+            <span class="k" id="kLoc"></span><span class="k" id="kMem"></span>
+            <span id="street">—</span><span id="memCount">0</span>
+          </div>
+          <div class="tx" id="txRow"><span id="txName">TX · —</span><span class="rec">&#9679; LIVE</span></div>
+          <div class="wave" id="wave"></div>
+          <div class="msg" id="msg"></div>
+        </section>
+
+        <section class="pg" data-pg="pad" hidden>
+          <div class="k" id="padLbl"></div>
+          <div class="ebox"><b id="entry">—</b><small>MHz</small></div>
+          <div class="ename" id="entryName"></div>
+          <div class="keys" id="keys"></div>
+          <div class="pact"><button class="ghost" id="padCancel"></button><button class="solid" id="padOk"></button></div>
+        </section>
+
+        <section class="pg" data-pg="members" hidden>
+          <div class="hrow"><span class="k" id="memTitle"></span><button class="chip" id="ovBtn"></button></div>
+          <ul class="list" id="memList"></ul>
+        </section>
+
+        <section class="pg" data-pg="channels" hidden>
+          <div class="hrow"><span class="k" id="favTitle"></span></div>
+          <ul class="list chl" id="favList"></ul>
+          <div class="hrow"><span class="k" id="recTitle"></span></div>
+          <ul class="list chl" id="recList"></ul>
+        </section>
+
+        <section class="pg" data-pg="settings" hidden>
+          <label class="f"><span class="k" id="sName"></span>
+            <span class="inl"><input id="nameIn" maxlength="24" spellcheck="false"><button class="chip" id="saveBtn"></button></span>
+          </label>
+          <label class="f"><span class="k" id="sRadioSize"></span><input type="range" id="radioSize" min="25" max="75"></label>
+          <label class="f" id="ovSizeRow"><span class="k" id="sOvSize"></span><input type="range" id="ovSize" min="25" max="75"></label>
+          <label class="chk"><input type="checkbox" id="dragChk"><span id="sDrag"></span></label>
+          <label class="chk"><input type="checkbox" id="moveChk"><span id="sMove"></span></label>
+          <label class="chk"><input type="checkbox" id="clickChk"><span id="sClick"></span></label>
+        </section>
+
+        <nav class="tabs" id="tabs">
+          <button data-go="main"></button><button data-go="members"></button><button data-go="channels"></button><button data-go="settings"></button>
+        </nav>
+        <i class="glare"></i>
+      </div>
+    </div>
+
+    <div class="hw">
+      <button class="hk" id="hBack"></button>
+      <button class="hk" id="hFav"></button>
+      <button class="hk red" id="hOff"></button>
+    </div>
+    <div class="grille"><i></i><i></i><i></i></div>
+  </div>
+</div>
+
+<div id="ov" class="ov" hidden></div>
+<div id="toast" class="toast" hidden></div>
+
+<script src="./app.js"></script>
+</body>
 </html>

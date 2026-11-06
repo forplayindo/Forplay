@@ -92,7 +92,10 @@ end)
 -- Setup elevator points
 local function SetupElevatorPoints()
     for elevatorName, elevatorData in pairs(config.elevators) do
-        for _, floor in ipairs(elevatorData) do
+        for i, floor in ipairs(elevatorData) do
+            if floor.number == nil then
+                print(('^1[f_elevator] %s lantai ke-%d: number kosong. Teks harus pakai tanda kutip, mis. number = \'B1\'^0'):format(elevatorName, i))
+            end
             local point = lib.points.new({
                 coords = floor.pos,
                 distance = config.interact_dist,
@@ -136,7 +139,7 @@ end)
 
 -- Handler
 AddEventHandler('onResourceStop', function(resourceName)
-    if cache.ped ~= resourceName then return end
+    if GetCurrentResourceName() ~= resourceName then return end
     if textUIShown then lib.hideTextUI() end
     if isUIOpen then CloseUI() end
 end)

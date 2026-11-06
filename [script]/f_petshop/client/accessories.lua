@@ -134,13 +134,31 @@ local function syncLeash(ped, s)
     leashes[ped] = { holder = holder, hand = hand }
 end
 
+local SEGMENTS = 10
+
+local function cross(a, b)
+    return vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+end
+
+-- DrawLine selalu 1 piksel; tali digambar sebagai pita (DrawPoly) yang menghadap kamera
+-- supaya punya tebal nyata. Tiap segitiga digambar dua arah karena DrawPoly hanya satu sisi.
+local function quad(a1, a2, b1, b2, r, g, b)
+    DrawPoly(a1.x, a1.y, a1.z, a2.x, a2.y, a2.z, b1.x, b1.y, b1.z, r, g, b, 255)
+    DrawPoly(a2.x, a2.y, a2.z, b2.x, b2.y, b2.z, b1.x, b1.y, b1.z, r, g, b, 255)
+    DrawPoly(a1.x, a1.y, a1.z, b1.x, b1.y, b1.z, a2.x, a2.y, a2.z, r, g, b, 255)
+    DrawPoly(a2.x, a2.y, a2.z, b1.x, b1.y, b1.z, b2.x, b2.y, b2.z, r, g, b, 255)
+end
+
 local drawing = false
 local function drawLeashes()
     if drawing then return end
     drawing = true
     CreateThread(function()
         local r, g, b = table.unpack(Config.Leash.color)
+        local half = (Config.Leash.width or 0.025) / 2
+        local pts, sides = {}, {}
         while next(leashes) do
+            local cam = GetFinalRenderedCamCoord()
             for ped, l in pairs(leashes) do
                 if DoesEntityExist(ped) and DoesEntityExist(l.hand) then
                     local hand = GetEntityCoords(l.hand)
@@ -149,12 +167,20 @@ local function drawLeashes()
                     if dist > 0.05 and dist < 20.0 then
                         -- tali melengkung ke bawah (makin jauh makin kendur, maks 45 cm)
                         local sag = math.min(0.45, 0.12 + dist * 0.04)
-                        local last = hand
-                        for i = 1, 10 do
-                            local t = i / 10
-                            local p = hand + (neck - hand) * t - vec3(0.0, 0.0, 4 * sag * t * (1 - t))
-                            DrawLine(last.x, last.y, last.z, p.x, p.y, p.z, r, g, b, 255)
-                            last = p
+                        for i = 0, SEGMENTS do
+                            local t = i / SEGMENTS
+                            pts[i] = hand + (neck - hand) * t - vec3(0.0, 0.0, 4 * sag * t * (1 - t))
+                        end
+                        -- arah samping tiap titik = tegak lurus arah tali & arah pandang kamera
+                        for i = 0, SEGMENTS do
+                            local dir = pts[math.min(i + 1, SEGMENTS)] - pts[math.max(i - 1, 0)]
+                            local side = cross(dir, pts[i] - cam)
+                            local len = #side
+                            sides[i] = len > 0.0001 and side * (half / len) or vec3(0.0, 0.0, half)
+                        end
+                        for i = 0, SEGMENTS - 1 do
+                            local a, c = pts[i], pts[i + 1]
+                            quad(a + sides[i], a - sides[i], c + sides[i + 1], c - sides[i + 1], r, g, b)
                         end
                     end
                 end

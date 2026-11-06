@@ -1,4 +1,5 @@
--- Minimap: square f_hud mask (stream/rectangle.ytd) on the GTA VI map style (stream/minimap.gfx + minimap.ytd).
+-- Minimap: square f_hud mask (stream/rectangle.ytd) on the postal map tiles streamed by [standalone]/f_postalcode.
+-- The old GTA VI style (minimap.gfx + minimap.ytd) is kept in resources/backups/f_hud_gta6_minimap.
 -- Also feeds the NUI overlay (waypoint distance) and the layout of the status block / location card around the map.
 
 local Minimap = {}
@@ -101,7 +102,8 @@ local function getWaypointDistance()
 end
 
 -- The game's satnav (distance + direction arrow, bottom-left) is replaced by our own distance label.
--- SHOW_SATNAV is renamed in stream/minimap.gfx; HIDE_SATNAV also hides the arrow that is visible by default.
+-- With the vanilla minimap.gfx the game can re-show the satnav on a route, so HIDE_SATNAV is re-sent every tick
+-- (the patched GTA VI gfx renamed SHOW_SATNAV; it is in resources/backups/f_hud_gta6_minimap).
 local minimapMovie
 local function hideSatnav()
     if not minimapMovie or not HasScaleformMovieLoaded(minimapMovie) then

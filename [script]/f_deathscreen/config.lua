@@ -58,7 +58,7 @@ Config.AiDoctor = {
     Enabled       = true,
     MaxEms        = 0,       -- dokter AI datang kalau jumlah EMS on duty <= angka ini
     Price         = 150000,   -- dipotong dari BANK; saldo kurang = tidak bisa dipanggil
-    Label         = '4PLAY Hospital', -- nama pengirim email tagihan
+    Label         = 'Ocean Hospital', -- nama pengirim email tagihan
     Model         = 's_m_m_doctor_01',
     SpawnDistance = 25.0,    -- jarak dokter muncul dari player (meter)
     ArriveTimeout = 45,      -- detik; kalau dokter nyangkut, dipindah ke samping player

@@ -1,18 +1,20 @@
--- Visual corong + selang untuk semua player yang sedang memegang selang (statebag 'fuelHose')
+-- Visual corong + selang untuk semua player yang sedang memakai selang (statebag 'fuelHose')
+-- statebag: { pump = { x, y, z }, electric = boolean?, plug = netId kendaraan? } (plug = corong tertancap di kendaraan)
 local config = require 'config'
+local plug = require 'client.plug'
+local chargers = require 'client.chargers'
 local hose = {}
 
-local NOZZLE = `prop_cs_fuel_nozle`
-local active = {} -- [serverId] = { ped, pump, nozzle, rope }
+local active = {} -- [serverId] = { ped, pump, kind, plug, nozzle, rope, top }
 local syncing = false
-local localValue -- nilai selang player sendiri (tidak menunggu replikasi statebag)
-local wanted = {} -- [serverId] = vector3 pompa: player yang sedang memegang selang
+local wanted = {} -- [serverId] = { pump, electric, plug }: player yang sedang memakai selang
 local SLACK = 0.4 -- kendur selang (m); panjang rope selalu = jarak pompa->corong + SLACK, supaya tidak menjuntai tembus lantai
 
 -- pompa bensin + charger listrik
 local anchorModels = {}
 for i = 1, #config.pumpModels do anchorModels[#anchorModels + 1] = config.pumpModels[i] end
-for i = 1, #config.electric.chargerModels do anchorModels[#anchorModels + 1] = config.electric.chargerModels[i] end
+anchorModels[#anchorModels + 1] = config.electric.chargerModel.full
+anchorModels[#anchorModels + 1] = config.electric.chargerModel.empty
 
 local function findPump(coords)
 	for i = 1, #anchorModels do
@@ -31,33 +33,59 @@ local function clear(id)
 	active[id] = nil
 end
 
-local function attachNozzle(h)
-	AttachEntityToEntity(h.nozzle, h.ped, GetPedBoneIndex(h.ped, 18905), 0.11, 0.02, 0.02, -80.0, -90.0, 15.0, true, true, false, true, 1, true)
+local function plugVehicle(netId)
+	if not netId or not NetworkDoesEntityExistWithNetworkId(netId) then return end
+	local vehicle = NetworkGetEntityFromNetworkId(netId)
+	return vehicle ~= 0 and DoesEntityExist(vehicle) and vehicle or nil
 end
 
-local function build(ped, pump)
-	lib.requestModel(NOZZLE)
+---Corong di kendaraan (tertancap) atau di tangan
+local function attachNozzle(h)
+	DetachEntity(h.nozzle, false, false)
 
-	local c = GetEntityCoords(ped)
-	local nozzle = CreateObject(NOZZLE, c.x, c.y, c.z, false, true, false)
-	SetModelAsNoLongerNeeded(NOZZLE)
+	local vehicle = plugVehicle(h.plug)
+	if vehicle then return plug.attach(h.nozzle, vehicle, h.kind) end
+
+	local o = plug.hand(h.kind)
+	AttachEntityToEntity(h.nozzle, h.ped, GetPedBoneIndex(h.ped, 18905), o[1], o[2], o[3], o[4], o[5], o[6], true, true, false, true, o[7] or 1, true)
+end
+
+local function tipOf(h)
+	local tip = config.nozzles[h.kind].tip
+	return GetOffsetFromEntityInWorldCoords(h.nozzle, tip.x, tip.y, tip.z)
+end
+
+local function build(ped, w)
+	local kind = w.electric and 'electric' or 'petrol'
+	local model = config.nozzles[kind].model
+	lib.requestModel(model)
+
+	local c = w.pump
+	local nozzle = CreateObject(model, c.x, c.y, c.z, false, true, false)
+	SetModelAsNoLongerNeeded(model)
 	SetEntityCollision(nozzle, false, false)
 
-	local h = { ped = ped, pump = pump, nozzle = nozzle }
+	local h = { ped = ped, pump = w.pump, kind = kind, plug = w.plug, nozzle = nozzle }
 	attachNozzle(h)
 	-- rope TIDAK di-attach ke entity pompa: tarikan fisik rope bisa merusak pompa -> pompa meledak.
 	-- kedua ujung dipin manual tiap frame (lihat thread di bawah).
-	local pumpEntity = findPump(pump)
-	local height = pumpEntity and config.pumpAnchor[GetEntityModel(pumpEntity)] or config.hose.anchorHeight
-	local top = pumpEntity and GetOffsetFromEntityInWorldCoords(pumpEntity, 0.0, 0.0, height)
-		or pump + vec3(0.0, 0.0, height)
+	local pumpEntity = findPump(w.pump)
+	local anchor = pumpEntity and config.pumpAnchor[GetEntityModel(pumpEntity)] or config.hose.anchorHeight
+	local top
+
+	if not pumpEntity then
+		top = w.pump + vec3(0.0, 0.0, anchor)
+	elseif type(anchor) == 'vector3' then
+		top = GetOffsetFromEntityInWorldCoords(pumpEntity, anchor.x, anchor.y, anchor.z)
+	else
+		top = GetOffsetFromEntityInWorldCoords(pumpEntity, 0.0, 0.0, anchor)
+	end
 
 	RopeLoadTextures()
 	local timeout = GetGameTimer() + 2000
 	while not RopeAreTexturesLoaded() and GetGameTimer() < timeout do Wait(0) end
 
-	local tip = GetOffsetFromEntityInWorldCoords(nozzle, 0.0, -0.033, -0.195)
-	local length = #(top - tip) + SLACK
+	local length = #(top - tipOf(h)) + SLACK
 	local rope = AddRope(top.x, top.y, top.z, 0.0, 0.0, 0.0, length, 1, config.hose.length + SLACK, 0.5, 1.0, false, false, false, 1.0, false)
 
 	ActivatePhysics(rope)
@@ -80,17 +108,27 @@ function hose.sync()
 end
 
 function syncOnce()
+	-- charger yang pistolnya sedang dipakai -> model tanpa pistol (sebelum build, supaya anchor selang ketemu)
+	chargers.refresh(wanted)
+
 	local myCoords = GetEntityCoords(cache.ped)
 
-	for id, pump in pairs(wanted) do
+	for id, w in pairs(wanted) do
 		local player = GetPlayerFromServerId(id)
 		local ped = player ~= -1 and GetPlayerPed(player) or 0
 		local h = active[id]
+		local plugged = plugVehicle(w.plug)
+		-- corong tertancap tetap terlihat walau pemiliknya pergi jauh; di tangan butuh ped-nya
+		local visible = #(w.pump - myCoords) < 80.0 and (plugged or (ped ~= 0 and DoesEntityExist(ped)))
 
-		if ped ~= 0 and DoesEntityExist(ped) and #(GetEntityCoords(ped) - myCoords) < 80.0 then
-			if not h or h.ped ~= ped or h.pump ~= pump or not DoesEntityExist(h.nozzle) then
+		if visible then
+			if not h or h.pump ~= w.pump or h.kind ~= (w.electric and 'electric' or 'petrol') or not DoesEntityExist(h.nozzle)
+				or (not plugged and h.ped ~= ped) then
 				clear(id)
-				active[id] = build(ped, pump)
+				active[id] = build(ped, w)
+			elseif h.plug ~= w.plug or h.ped ~= ped then
+				h.plug, h.ped = w.plug, ped
+				attachNozzle(h)
 			end
 		elseif h then
 			clear(id) -- jauh / keluar jangkauan; dibuat lagi saat mendekat
@@ -102,7 +140,7 @@ function syncOnce()
 	end
 end
 
--- Loop hanya hidup selama ada player yang memegang selang. Tidak ada selang = tidak ada loop sama sekali.
+-- Loop hanya hidup selama ada player yang memakai selang. Tidak ada selang = tidak ada loop sama sekali.
 local syncLoop, ropeLoop = false, false
 
 local function startRopeLoop()
@@ -114,7 +152,7 @@ local function startRopeLoop()
 		while next(active) do
 			for _, h in pairs(active) do
 				if h.rope and DoesEntityExist(h.nozzle) then
-					local tip = GetOffsetFromEntityInWorldCoords(h.nozzle, 0.0, -0.033, -0.195)
+					local tip = tipOf(h)
 					RopeForceLength(h.rope, #(h.top - tip) + SLACK)
 
 					local last = GetRopeVertexCount(h.rope) - 1
@@ -134,24 +172,31 @@ local function startSyncLoop()
 	syncLoop = true
 
 	CreateThread(function()
-		while next(wanted) or next(active) do
+		repeat
 			hose.sync()
 			if next(active) then startRopeLoop() end
 			Wait(500)
-		end
+		until not next(wanted) and not next(active)
 
+		hose.sync() -- terakhir: kembalikan model charger
 		syncLoop = false
 	end)
 end
 
 ---@param id integer server id
----@param value table? { x, y, z } pompa, nil = selang dikembalikan
+---@param value table? statebag fuelHose, nil = selang dikembalikan
 local function setWanted(id, value)
-	wanted[id] = value and vec3(value[1], value[2], value[3]) or nil
+	local p = type(value) == 'table' and value.pump
+
+	if type(p) == 'table' and tonumber(p[1]) and tonumber(p[2]) and tonumber(p[3]) then
+		wanted[id] = { pump = vec3(p[1], p[2], p[3]), electric = value.electric or nil, plug = tonumber(value.plug) }
+	else
+		wanted[id] = nil
+	end
 	startSyncLoop()
 end
 
--- player lain ambil / kembalikan selang. Server id dibaca dari nama bag ("player:12"),
+-- player lain ambil / tancap / kembalikan selang. Server id dibaca dari nama bag ("player:12"),
 -- jadi tetap tercatat walau player itu belum masuk jangkauan.
 AddStateBagChangeHandler('fuelHose', nil, function(bagName, _, value)
 	local id = tonumber(bagName:match('^player:(%d+)$'))
@@ -159,7 +204,7 @@ AddStateBagChangeHandler('fuelHose', nil, function(bagName, _, value)
 	setWanted(id, value)
 end)
 
--- resource (re)start: catat player yang sudah memegang selang
+-- resource (re)start: catat player yang sudah memakai selang
 CreateThread(function()
 	local players = GetActivePlayers()
 
@@ -170,11 +215,22 @@ CreateThread(function()
 	end
 end)
 
----@param pump vector3?
-function hose.setLocal(pump)
-	localValue = pump and { pump.x, pump.y, pump.z } or nil
-	LocalPlayer.state:set('fuelHose', localValue, true)
-	setWanted(cache.serverId, localValue)
+---Pistol charger di titik ini sedang dipakai player lain
+---@param pump vector3
+function hose.takenByOther(pump)
+	for id, w in pairs(wanted) do
+		if id ~= cache.serverId and #(w.pump - pump) < 1.0 then return true end
+	end
+	return false
+end
+
+---@param pump vector3? nil = selang dikembalikan
+---@param electric boolean?
+---@param plugNet integer? netId kendaraan tempat corong tertancap
+function hose.setLocal(pump, electric, plugNet)
+	local value = pump and { pump = { pump.x, pump.y, pump.z }, electric = electric or nil, plug = plugNet } or nil
+	LocalPlayer.state:set('fuelHose', value, true)
+	setWanted(cache.serverId, value)
 
 	-- tunggu sync lain (yang mungkin sedang load model/rope) selesai, lalu sync langsung
 	local timeout = GetGameTimer() + 3000
@@ -182,6 +238,12 @@ function hose.setLocal(pump)
 	hose.sync()
 	if next(active) then startRopeLoop() end
 end
+
+-- /coloktes (config.plugDebug): tempel ulang corong sendiri dengan nilai baru
+AddEventHandler('ox_fuel:plugDebug', function()
+	local h = active[cache.serverId]
+	if h and DoesEntityExist(h.nozzle) then attachNozzle(h) end
+end)
 
 AddEventHandler('onResourceStop', function(resource)
 	if resource ~= cache.resource then return end

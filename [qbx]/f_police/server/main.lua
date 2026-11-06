@@ -313,8 +313,19 @@ end
 ---@param by integer
 function ReleaseCuffs(target, by)
     AllowUncuff(target)
+    -- suara terdengar pemain di sekitar (xsound emulator interact-sound); ziptie dilepas tangan tidak berbunyi klik
+    if Player(target).state.cuffType ~= 'zip' then
+        TriggerClientEvent('InteractSound_CL:PlayWithinDistance', -1, target, 5.0, 'Uncuff', 0.3)
+    end
     TriggerClientEvent('police:client:Uncuffed', target, by)
 end
+
+---Dipakai f_admin (borgol diri sendiri): lepas borgol lewat jalur resmi server.
+exports('ReleaseCuffs', function(target)
+    local player = exports.qbx_core:GetPlayer(tonumber(target) or -1)
+    if not player or not player.PlayerData.metadata.ishandcuffed then return end
+    ReleaseCuffs(player.PlayerData.source, player.PlayerData.source)
+end)
 
 AddEventHandler('QBCore:Server:PlayerLoaded', function(player)
     AllowUncuff(player.PlayerData.source, 30)
@@ -354,6 +365,7 @@ lib.callback.register('police:server:CuffPlayer', function(src, cuffedSrc, isSof
     if zip and not player.Functions.RemoveItem(item, 1) then return end
 
     Player(cuffedSrc).state:set('cuffType', zip and 'zip' or 'cuff', true)
+    TriggerClientEvent('InteractSound_CL:PlayWithinDistance', -1, cuffedSrc, 5.0, zip and 'ziptie' or 'Cuff', 0.3)
     if isSoftcuff then AllowUncuff(cuffedSrc, 15) end -- the one escape skill check
     TriggerClientEvent('police:client:GetCuffed', cuffedPlayer.PlayerData.source, player.PlayerData.source, isSoftcuff)
 

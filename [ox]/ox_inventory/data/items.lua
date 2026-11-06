@@ -64,7 +64,7 @@ return {
 	},
 
 	['painkillers'] = {
-		label = 'Obat Pereda Nyeri',
+		label = 'Painkillers',
 		weight = 50,
 		degrade = 4320, -- 3 hari
 		description = 'Menahan rasa nyeri sementara. Tidak menyembuhkan luka.',
@@ -96,19 +96,19 @@ return {
 	},
 
 	['hemostatic'] = {
-		label = 'Kasa Hemostatik',
+		label = 'Kasa',
 		weight = 120,
 		description = 'Menghentikan pendarahan berat. Dipakai EMS.',
 	},
 
 	['splint'] = {
-		label = 'Bidai',
+		label = 'Splint',
 		weight = 400,
 		description = 'Menstabilkan tulang retak / patah. Dipakai EMS.',
 	},
 
 	['suture'] = {
-		label = 'Alat Jahit Luka',
+		label = 'Alat Jahit',
 		weight = 200,
 		description = 'Menjahit luka terbuka di kepala, leher & badan. Dipakai EMS.',
 	},
@@ -238,7 +238,7 @@ return {
 	},
 
 	['etoll_card'] = {
-		label = 'Kartu E-Toll',
+		label = 'E-Toll',
 		weight = 10,
 		stack = false,
 		description = 'Kartu bayar gerbang tol. Saldo tersimpan di kartu; isi ulang di loket tol atau minimarket.',
@@ -290,12 +290,14 @@ return {
     label = 'Borgol',
     weight = 300,
     description = 'Borgol besi, dibuka dengan kunci polisi, lockpick, atau pemotong besi',
+    client = { image = 'WEAPON_HANDCUFFS.png' },
 },
 
 ['zipties'] = {
-    label = 'Tali Pengikat',
+    label = 'Zipties',
     weight = 20,
     description = 'Pengikat tangan sekali pakai',
+    client = { image = 'ziptie.png' },
 },
 
 ['bolt_cutter'] = {
@@ -422,7 +424,7 @@ return {
 	},
 
 	['armour'] = {
-		label = 'Rompi Antipeluru',
+		label = 'Armour',
 		weight = 3000,
 		stack = false,
 		client = {
@@ -519,35 +521,35 @@ return {
 -- tidak kadaluarsa karena di-strip oleh hook f_cafe)
 -----------------------------------------------------------------------
 ['cafe_burger'] = {
-    label = 'Classic Beef Burger', weight = 100, degrade = 4320,
+    label = 'Beef Burger', weight = 100, degrade = 4320,
     description = 'Burger daging sapi dengan keju. Kadaluarsa 3 hari.',
     client = { status = { hunger = 15, stress = -2 }, usetime = 5000,
         anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger', flag = 49 },
         prop = { model = `prop_cs_burger_01`, bone = 18905, pos = vec3(0.13, 0.05, 0.02), rot = vec3(-50.0, 16.0, 60.0) } },
 },
 ['cafe_hotdog'] = {
-    label = 'Hot Dog Sausage', weight = 100, degrade = 4320,
+    label = 'Hot Dog', weight = 100, degrade = 4320,
     description = 'Hot dog sosis dengan mustard. Kadaluarsa 3 hari.',
     client = { status = { hunger = 15, stress = -2 }, usetime = 5000,
         anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger', flag = 49 },
         prop = { model = `prop_cs_hotdog_01`, bone = 18905, pos = vec3(0.13, 0.05, 0.02), rot = vec3(-50.0, 16.0, 60.0) } },
 },
 ['cafe_nachos'] = {
-    label = 'Loaded Nachos', weight = 100, degrade = 4320,
+    label = 'Nachos', weight = 100, degrade = 4320,
     description = 'Nachos dengan keju leleh dan salsa. Kadaluarsa 3 hari.',
     client = { status = { hunger = 15, stress = -2 }, usetime = 5000,
         anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger', flag = 49 },
         prop = { model = `prop_taco_01`, bone = 60309, pos = vec3(-0.017, 0.007, -0.021), rot = vec3(107.98, -105.03, 55.78) } },
 },
 ['cafe_donut'] = {
-    label = 'Glazed Donut', weight = 80, degrade = 4320,
+    label = 'Donut', weight = 80, degrade = 4320,
     description = 'Donat glaze manis. Kadaluarsa 3 hari.',
     client = { status = { hunger = 15, stress = -2 }, usetime = 4000,
         anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger', flag = 49 },
         prop = { model = `prop_amb_donut`, bone = 18905, pos = vec3(0.13, 0.05, 0.02), rot = vec3(-50.0, 16.0, 60.0) } },
 },
 ['cafe_sandwich'] = {
-    label = 'Fresh Sandwich', weight = 100, degrade = 4320,
+    label = 'Sandwich', weight = 100, degrade = 4320,
     description = 'Sandwich ayam dan keju. Kadaluarsa 3 hari.',
     client = { status = { hunger = 15, stress = -2 }, usetime = 5000,
         anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger', flag = 49 },
@@ -596,28 +598,28 @@ return {
         } },
 },
 ['cafe_cappuccino'] = {
-    label = 'Classic Cappuccino', weight = 120, degrade = 4320,
+    label = 'Cappuccino', weight = 120, degrade = 4320,
     description = 'Cappuccino hangat dengan kayu manis. Kadaluarsa 3 hari.',
     client = { status = { thirst = 15, stress = -2 }, usetime = 5000,
         anim = { dict = 'mp_player_intdrink', clip = 'loop', flag = 49 },
         prop = { model = `prop_cup_warmindo`, bone = 60309, pos = vec3(0.01, -0.03, -0.13), rot = vec3(5.0, 5.0, -180.5) } },
 },
 ['cafe_colafloat'] = {
-    label = 'Iced Cola Float', weight = 120, degrade = 4320,
+    label = 'Cola Float', weight = 120, degrade = 4320,
     description = 'Cola dingin dengan es krim vanila. Kadaluarsa 3 hari.',
     client = { status = { thirst = 15, stress = -2 }, usetime = 5000,
         anim = { dict = 'mp_player_intdrink', clip = 'loop', flag = 49 },
         prop = { model = `prop_cup_warmindo`, bone = 60309, pos = vec3(0.01, -0.03, -0.13), rot = vec3(5.0, 5.0, -180.5) } },
 },
 ['cafe_milkshake'] = {
-    label = 'Chocolate Milkshake', weight = 120, degrade = 4320,
+    label = 'Milkshake Cokelat', weight = 120, degrade = 4320,
     description = 'Milkshake coklat dingin. Kadaluarsa 3 hari.',
-    client = { status = { thirst = 25, stress = -2 }, usetime = 5000,
+    client = { status = {thirst = 25, stress = -2 }, usetime = 5000,
         anim = { dict = 'mp_player_intdrink', clip = 'loop', flag = 49 },
         prop = { model = `prop_cup_warmindo`, bone = 60309, pos = vec3(0.01, -0.03, -0.13), rot = vec3(5.0, 5.0, -180.5) } },
 },
 ['cafe_orangejuice'] = {
-    label = 'Fresh Orange Juice', weight = 120, degrade = 4320,
+    label = 'Orange Juice', weight = 120, degrade = 4320,
     description = 'Jus jeruk segar. Kadaluarsa 3 hari.',
     client = { status = { thirst = 25, stress = -2 }, usetime = 5000,
         anim = { dict = 'mp_player_intdrink', clip = 'loop', flag = 49 },
@@ -645,7 +647,7 @@ return {
         prop = { model = `prop_cup_warmindo`, bone = 60309, pos = vec3(0.01, -0.03, -0.13), rot = vec3(5.0, 5.0, -180.5) } },
 },
 ['cafe_jusalpukat'] = {
-    label = 'Jus Alpukat Jumbo', weight = 300, degrade = 4320,
+    label = 'Jus Alpukat', weight = 300, degrade = 4320,
     description = 'Jus alpukat gelas jumbo dengan susu coklat. Kadaluarsa 3 hari.',
     client = { status = { thirst = 50, stress = -1 }, usetime = 7000,
         anim = { dict = 'mp_player_intdrink', clip = 'loop', flag = 49 },
@@ -686,7 +688,7 @@ return {
 ['jahe']             = { label = 'Jahe',             weight = 50,  description = 'Bahan baku cafe.' },
 ['kelapa_muda']      = { label = 'Kelapa Muda',      weight = 400, description = 'Bahan baku cafe.' },
 ['alpukat']          = { label = 'Alpukat',          weight = 150, description = 'Bahan baku cafe.' },
-['susu_kental_manis'] = { label = 'Susu Kental Manis', weight = 200, description = 'Bahan baku cafe.' },
+['susu_kental_manis'] = { label = 'SKM', weight = 200, description = 'Bahan baku cafe.' },
 
 -- Bahan baku (bengkel mekanik, recycle, scrapyard, house robbery)
 ['metalscrap'] = { label = 'Besi Bekas', weight = 100, description = 'Potongan logam bekas. Bahan perbaikan mesin.' },
@@ -708,18 +710,18 @@ return {
 
 -- Peralatan kendaraan (vehiclehandler). Dijual di toko bengkel mekanik.
 ['repairkit'] = {
-    label = 'Alat Perbaikan', weight = 2500, close = true,
+    label = 'Repair Kit', weight = 2500, close = true,
     description = 'Perbaikan darurat: mesin naik ke 50% supaya bisa jalan ke bengkel. Berdiri di depan kap mesin.',
     server = { export = 'vehiclehandler.repairkit' },
 },
 ['tirekit'] = {
-    label = 'Alat Tambal Ban', weight = 1000, close = true,
+    label = 'Tire Kit', weight = 1000, close = true,
     description = 'Tambal ban yang bocor. Berdiri di dekat ban. Keausan ban tetap perlu mekanik.',
     server = { export = 'vehiclehandler.tirekit' },
 },
 ['cleaningkit'] = {
-    label = 'Alat Pembersih', weight = 250, close = true,
-    description = 'Membersihkan kendaraan.',
+    label = 'Cleaning Kit', weight = 250, close = true,
+    description = 'Membersihkan kendaraan, atau graffiti di tembok (10x).',
     server = { export = 'vehiclehandler.cleaningkit' },
 },
 
@@ -733,6 +735,13 @@ return {
     label = 'Bendera Gang', weight = 2000, stack = false, close = true,
     description = 'Bendera gang. Pakai untuk memegang, tancapkan saat Rebut Bendera.',
     client = { export = 'f_crew.useFlag' },
+},
+
+-- Graffiti gang (f_graffiti). 1 kaleng = 3 semprotan (sisa di metadata.uses). Hanya anggota gang.
+['pylox'] = {
+    label = 'Pylox', weight = 300, stack = true, close = true,
+    description = 'Cat semprot untuk graffiti gang. 1 kaleng = 3 semprotan.',
+    client = { export = 'f_graffiti.usePylox' },
 },
 
 -- Tambang (f_mining). Bijih tidak bisa dijual: lebur di tungku lobby tambang -> batangan, jual di pengepul.

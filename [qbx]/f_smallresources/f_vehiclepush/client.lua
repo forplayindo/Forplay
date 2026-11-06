@@ -2,13 +2,15 @@
 
 local config = lib.loadJson('f_vehiclepush.config')
 local dict = 'missfinale_c2ig_11'
-local pressed = {
-    e = false,
-    shift = false
-}
+local clip = 'pushcar_offcliff_m'
+
+-- tombol saat mendorong: W dorong, A/D belok, X berhenti
+local KEY_PUSH, KEY_LEFT, KEY_RIGHT, KEY_STOP = 32, 34, 35, 73
+local BLOCKED = { 21, 22, 23, 24, 25, 30, 31, 33, 36, 44, 140, 141, 142, 257, 263 }
 
 ---@type Direction
 local pushingControl = nil
+local pushing = false
 
 ---@param vehicle number
 ---@return boolean
@@ -72,19 +74,6 @@ local function isVehicleValid(vehicle)
 end
 
 ---@param vehicle number
-local function vehicleValidityThread(vehicle)
-    CreateThread(function()
-        while pressed.e and pressed.shift do
-            Wait(500)
-            if not isVehicleValid(vehicle) then
-                pressed.e = false
-                pressed.shift = false
-            end
-        end
-    end)
-end
-
----@param vehicle number
 ---@param direction Direction
 local function taskControlVehicle(vehicle, direction)
     if NetworkGetEntityOwner(vehicle) == cache.playerId then
@@ -97,20 +86,18 @@ local function taskControlVehicle(vehicle, direction)
     end
 end
 
-local function pushVehicle()
-    if cache.vehicle then return end
+---@param vehicle number
+local function startPushing(vehicle)
+    if pushing or cache.vehicle then return end
+    if not isVehicleValid(vehicle) then
+        return exports.qbx_core:Notify(locale('error.cannot_push'), 'error')
+    end
 
     local ped = cache.ped
-    local vehicle, vehicleCoords = lib.getClosestVehicle(GetEntityCoords(ped), 3.0)
-    if not vehicle then return end
-
-    if IsEntityAttachedToEntity(cache.ped, vehicle) or not isVehicleValid(vehicle) then return end
-
-    vehicleValidityThread(vehicle)
-
-    if not pressed.e or not pressed.shift then return end
+    pushing = true
 
     local pedCoords = GetEntityCoords(ped)
+    local vehicleCoords = GetEntityCoords(vehicle)
     local boneIndex = GetPedBoneIndex(ped, 6286)
     local dimensions = GetModelDimensions(GetEntityModel(vehicle))
     local vehicleForwardVector = GetEntityForwardVector(vehicle)
@@ -124,39 +111,70 @@ local function pushVehicle()
             false, false, true, 0, true)
     end
 
-    lib.playAnim(ped, dict, 'pushcar_offcliff_m', 2.0, -8.0, -1, 35, 0, false, false, false)
+    lib.playAnim(ped, dict, clip, 2.0, -8.0, -1, 35, 0, false, false, false)
+    lib.showTextUI(locale('actions.push_vehicle'))
 
     local direction = isInFront and 'front' or 'back'
-    taskControlVehicle(vehicle, direction)
 
     CreateThread(function()
-        local wheelsDirection = ''
-        while pressed.shift and not cache.vehicle do
-            local newDirection = nil
+        ---@type Direction
+        local current = nil
+        local nextCheck = 0
 
-            if IsDisabledControlPressed(0, 34) then
-                newDirection = 'left'
-            elseif IsDisabledControlPressed(0, 9) then
-                newDirection = 'right'
+        while pushing and not cache.vehicle and DoesEntityExist(vehicle) do
+            for i = 1, #BLOCKED do
+                DisableControlAction(0, BLOCKED[i], true)
+            end
+            DisableControlAction(0, KEY_PUSH, true)
+            DisableControlAction(0, KEY_LEFT, true)
+            DisableControlAction(0, KEY_RIGHT, true)
+
+            ---@type Direction
+            local wanted = nil
+            if IsDisabledControlPressed(0, KEY_PUSH) then
+                if IsDisabledControlPressed(0, KEY_LEFT) then
+                    wanted = 'left'
+                elseif IsDisabledControlPressed(0, KEY_RIGHT) then
+                    wanted = 'right'
+                else
+                    wanted = direction
+                end
             end
 
-            if newDirection and wheelsDirection ~= newDirection then
-                wheelsDirection = newDirection
-                taskControlVehicle(vehicle, wheelsDirection)
+            if wanted ~= current then
+                -- dari diam selalu mulai dengan arah dorong, karena loop pemilik memakai nilai pertama untuk arah laju
+                if not current and wanted ~= direction then
+                    taskControlVehicle(vehicle, direction)
+                end
+                current = wanted
+                taskControlVehicle(vehicle, wanted)
+            end
+
+            if IsDisabledControlJustPressed(0, KEY_STOP) or IsControlJustPressed(0, KEY_STOP) then
+                pushing = false
+            end
+
+            local now = GetGameTimer()
+            if now > nextCheck then
+                nextCheck = now + 500
+                if not isVehicleValid(vehicle) then pushing = false end
             end
 
             Wait(0)
         end
 
+        if current and DoesEntityExist(vehicle) then
+            taskControlVehicle(vehicle)
+        end
+
         DetachEntity(ped, false, false)
-        StopAnimTask(ped, dict, 'pushcar_offcliff_m', 2.0)
+        StopAnimTask(ped, dict, clip, 2.0)
         FreezeEntityPosition(ped, false)
-        taskControlVehicle(vehicle)
+        lib.hideTextUI()
 
         pushingControl = nil
+        pushing = false
     end)
-
-    return vehicle
 end
 
 AddStateBagChangeHandler('pushVehicle', nil, function(bagName, _, value)
@@ -173,35 +191,17 @@ AddStateBagChangeHandler('pushVehicle', nil, function(bagName, _, value)
     vehicleControl(entity, value)
 end)
 
-lib.addKeybind({
-    name = 'push_vehicle_e',
-    description = 'Tombol pertama untuk mendorong kendaraan',
-    defaultKey = 'E',
-    onPressed = function()
-        pressed.e = true
-        if not pressed.shift then return end
-
-        pushVehicle()
-    end,
-    onReleased = function()
-        pressed.e = false
-    end
-})
-
-lib.addKeybind({
-    name = 'push_vehicle',
-    description = 'Tombol kedua untuk mendorong kendaraan',
-    defaultKey = 'LSHIFT',
-    onPressed = function(self)
-        pressed.shift = true
-        if not pressed.e then return end
-
-        self.vehicle = pushVehicle()
-    end,
-    onReleased = function(self)
-        pressed.shift = false
-        if self.vehicle then
-            taskControlVehicle(self.vehicle)
-        end
-    end
+exports.ox_target:addGlobalVehicle({
+    {
+        name = 'f_vehiclepush:push',
+        icon = 'fa-solid fa-hands',
+        label = locale('target.push_vehicle'),
+        distance = 2.5,
+        canInteract = function(entity)
+            return not pushing and not cache.vehicle and not IsEntityAttachedToEntity(cache.ped, entity) and isVehicleValid(entity)
+        end,
+        onSelect = function(data)
+            startPushing(data.entity)
+        end,
+    },
 })

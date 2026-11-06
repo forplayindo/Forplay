@@ -7,8 +7,10 @@ return {
 
     interact_dist = 1.5,
 
+    -- Urutkan lantai dari PALING BAWAH ke PALING ATAS (lift naik/turun mengikuti urutan ini).
+    -- number = label tombol & layar: angka atau teks, mis. 'B1', 'G', 1, 2, 'R'.
     elevators = {
-        ['4Play Hospital'] = {
+        ['Ocean Hospital'] = {
             {
                 number = 1, -- floor
                 name = 'Ground Floor', -- or false

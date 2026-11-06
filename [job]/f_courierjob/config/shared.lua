@@ -1,5 +1,5 @@
 return {
-    maxCrew = 2,
+    maxCrew = 4, -- 1 supir + sampai 3 pengantar (paket per titik = anggota - 1)
 
     -- loket Cari Pekerjaan di balai kota (f_cityhall office jobCenter)
     jobCentre = vec3(256.18, -412.04, 46.77),
@@ -17,7 +17,7 @@ return {
         pile = vec4(74.0, 118.0, 79.2, 160.0), -- tumpukan paket (prop lokal) saat fase muat
     },
 
-    -- stops = jumlah titik per zona, big = paket besar (hanya kalau kru 2 orang), bonus = % gaji
+    -- stops = jumlah titik per zona, big = titik paket besar (kru 2+ orang, 1 besar = 2 kecil), bonus = % gaji
     difficulties = {
         { key = 'easy', label = 'Easy', desc = 'Dalam kota, dekat depot', stops = { kota = 6 }, big = 1, bonus = 0 },
         { key = 'medium', label = 'Medium', desc = 'Kota sampai pinggiran', stops = { kota = 4, pinggir = 5 }, big = 2, bonus = 10 },

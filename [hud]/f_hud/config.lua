@@ -178,7 +178,7 @@ Config.Stress = {
 Config.HideGTAHudComponents = true -- sembunyikan HUD bawaan GTA (nama/kelas kendaraan "Karin Sultan, Sport", nama area, jalan, uang)
 --Works with `HideGTAHudComponents` Components. | Can be used to fix the map if it is broken.
 Config.HavePostalMap        = false
---[[ Minimap gaya GTA VI (stream/minimap.gfx, minimap.ytd, gta6_graphics.ytd).
+--[[ Minimap memakai peta postal dari [standalone]/f_postalcode (gaya GTA VI lama di backups/f_hud_gta6_minimap).
      Status darah/lapar/haus/suara/armor tampil di bawah minimap, jadi peta dinaikkan (y negatif = naik). ]]
 Config.Minimap              = {
     --[[ Nilai bawaan minimap "rectangle" asli f_hud (1080p). mask & blur: x relatif terhadap x minimap,
@@ -189,7 +189,7 @@ Config.Minimap              = {
     arrow = { x = 0.0, y = 0.0 },
     lift = -0.003,                  -- negatif = minimap turun (mendekati bar status), positif = naik
     area = { left = 0.0148, bottom = 0.0972, w = 0.2944, h = 0.1787 }, -- diukur in-game 1920x1080: peta x 16-334, y 782-975
-    zoom = 1000,
+    zoom = 1100,                    -- zoom peta postal (f_postalcode tidak lagi mengatur zoom sendiri)
     routeColor = { 247, 115, 164 }, -- garis GPS pink
     showNorth = false,              -- ikon N bawaan disembunyikan (seperti gta6_hud)
     radius = 30,                    -- px, sudut lapisan malam (samakan dengan sudut peta)

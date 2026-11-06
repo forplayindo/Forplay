@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Car, Clock, MapPin, Trophy, User } from 'lucide-react';
 
 import { t } from '@/i18n';
@@ -26,15 +26,30 @@ export function Ryde({ onClose: _onClose }: { onClose: () => void }) {
 function Shell() {
     const g = useRyde();
     const PUSH = 'ios-push 0.34s cubic-bezier(0.32,0.72,0,1)';
+    // f_phone perf: the Ride tab (map) stays mounted once visited and is only hidden on
+    // other tabs, so switching back doesn't rebuild the map and re-decode every tile.
+    const onHome = g.tab === 'home';
+    const [homeSeen, setHomeSeen] = useState(onHome);
+    useEffect(() => { if (onHome) setHomeSeen(true); }, [onHome]);
     return (
         <div className="absolute inset-0 flex flex-col bg-base font-sf">
             <div className="relative min-h-0 flex-1">
-                <div key={g.tab} className="absolute inset-0" style={{ animation: PUSH }}>
-                    {g.tab === 'home' && <Home />}
-                    {g.tab === 'activity' && <Activity />}
-                    {g.tab === 'driver' && <Driver />}
-                    {g.tab === 'leaderboard' && <Leaderboard />}
-                </div>
+                {(homeSeen || onHome) && (
+                    <div
+                        className="absolute inset-0"
+                        aria-hidden={!onHome}
+                        style={onHome ? { animation: PUSH } : { visibility: 'hidden', pointerEvents: 'none' }}
+                    >
+                        <Home active={onHome} />
+                    </div>
+                )}
+                {!onHome && (
+                    <div key={g.tab} className="absolute inset-0" style={{ animation: PUSH }}>
+                        {g.tab === 'activity' && <Activity />}
+                        {g.tab === 'driver' && <Driver />}
+                        {g.tab === 'leaderboard' && <Leaderboard />}
+                    </div>
+                )}
 
                 {!g.accountOpen && (
                     <button

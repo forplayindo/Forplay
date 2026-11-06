@@ -24,10 +24,14 @@ $mainFont: 'Inter', 'Poppins', 'Roboto', -apple-system, BlinkMacSystemFont, 'Seg
 
 $gridCols: 5;
 $gridRows: 5;
-$gridSize: 12.2vh * $uiScale;
+$gridSize: 14vh * $uiScale;
 $gridGap: 0.85vh * $uiScale;
 $containerSize: calc(#{$gridRows} * #{$gridSize} + #{$gridRows - 1} * #{$gridGap});
 $panelWidth: calc(#{$gridCols} * #{$gridSize} + #{$gridCols - 1} * #{$gridGap});
+
+/* 3D tilt of the left/right panels (mockup: 20deg, perspective 1600px at 1080p) */
+$panelTilt: 20deg;
+$panelPerspective: 148vh;
 
 body {
   margin: 0;
@@ -101,7 +105,7 @@ input:focus-visible {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 6vh * $uiScale;
+  gap: 15vh * $uiScale;
 }
 
 /* ---------------------------------------------------------------- panel -- */
@@ -111,6 +115,18 @@ input:focus-visible {
   flex-direction: column;
   width: $panelWidth;
   gap: 1.6vh * $uiScale;
+
+  /* Tilted towards the centre column, hinged on the outer edge. The close button lives in the
+     right panel's topbar, so it tilts along with that panel. 0deg = flat. */
+  &.is-left {
+    transform: perspective($panelPerspective) rotateY($panelTilt);
+    transform-origin: left center;
+  }
+
+  &.is-right {
+    transform: perspective($panelPerspective) rotateY(-$panelTilt);
+    transform-origin: right center;
+  }
 }
 
 .inventory-panel-header {
@@ -153,7 +169,7 @@ input:focus-visible {
 }
 
 .inventory-panel-title {
-  font-size: 1.75vh * $textScale;
+  font-size: 2.1vh * $textScale;
   line-height: 1.1;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -237,8 +253,8 @@ input:focus-visible {
 .inventory-slot {
   background-color: $slotColor;
   background-repeat: no-repeat;
-  background-position: center 36%;
-  background-size: 6.2vh * $uiScale;
+  background-position: center 44%;
+  background-size: 7.6vh * $uiScale;
   border-radius: 1.1vh * $uiScale;
   border: 1px solid $slotBorder;
   image-rendering: -webkit-optimize-contrast;
@@ -289,7 +305,7 @@ input:focus-visible {
   gap: 0.6vh * $uiScale;
 
   p {
-    font-size: 1.35vh * $textScale;
+    font-size: 1.7vh * $textScale;
     white-space: nowrap;
     font-weight: 400;
     color: rgba(255, 255, 255, 0.85);
@@ -334,7 +350,7 @@ input:focus-visible {
   padding: 0.45vh * $uiScale 0.5vh * $uiScale;
   font-weight: 400;
   font-family: $mainFont;
-  font-size: 1.4vh * $textScale;
+  font-size: 1.7vh * $textScale;
   color: #edf2f1;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
@@ -382,8 +398,8 @@ input:focus-visible {
 }
 
 .item-drag-preview {
-  width: 8.4vh * $uiScale;
-  height: 8.4vh * $uiScale;
+  width: 10vh * $uiScale;
+  height: 10vh * $uiScale;
   z-index: 1;
   position: fixed;
   pointer-events: none;
@@ -391,7 +407,7 @@ input:focus-visible {
   left: 0;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 7.4vh * $uiScale;
+  background-size: 9vh * $uiScale;
   image-rendering: -webkit-optimize-contrast;
   will-change: transform;
   backface-visibility: hidden;
@@ -931,7 +947,7 @@ $hotbarSize: 10.4vh * $uiScale;
     .hotbar-item-slot {
       width: $gridSize;
       height: $gridSize;
-      background-size: 6.2vh * $uiScale;
+      background-size: 7.6vh * $uiScale;
     }
   }
 
@@ -950,8 +966,8 @@ $hotbarSize: 10.4vh * $uiScale;
     }
 
     .hotbar-item-slot {
-      width: $gridSize * 0.72;
-      height: $gridSize * 0.72;
+      width: 12.2vh * $uiScale * 0.72;
+      height: 12.2vh * $uiScale * 0.72;
       background-size: 4vh * $uiScale;
     }
 
@@ -964,6 +980,14 @@ $hotbarSize: 10.4vh * $uiScale;
     .hotbar-slot-header-wrapper .hotbar-slot-count,
     .hotbar-slot-bottom .hotbar-slot-weight {
       font-size: 1.05vh * $textScale;
+    }
+
+    /* small slots: one line of name */
+    .inventory-slot-label-text {
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+      padding: 0.3vh * $uiScale 0.4vh * $uiScale;
+      font-size: 1.1vh * $textScale;
     }
   }
 }
@@ -980,13 +1004,14 @@ $hotbarSize: 10.4vh * $uiScale;
   width: $hotbarSize;
   height: $hotbarSize;
   background-size: 5.6vh * $uiScale;
-  background-position: center 36%;
+  background-position: center 44%;
 }
 
 .hotbar-slot-key {
+  /* top-left so it doesn't cover the item name at the bottom */
   position: absolute;
   left: 0.5vh * $uiScale;
-  bottom: 1.3vh * $uiScale;
+  top: 0.5vh * $uiScale;
   min-width: 1.9vh * $uiScale;
   padding: 0.3vh * $uiScale 0.5vh * $uiScale;
   border-radius: 0.6vh * $uiScale;
@@ -1006,7 +1031,7 @@ $hotbarSize: 10.4vh * $uiScale;
   padding: 0.7vh * $uiScale 0.8vh * $uiScale 0;
 
   .hotbar-slot-count {
-    font-size: 1.3vh * $textScale;
+    font-size: 1.7vh * $textScale;
     font-weight: 400;
     color: rgba(255, 255, 255, 0.85);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
@@ -1021,7 +1046,7 @@ $hotbarSize: 10.4vh * $uiScale;
   .hotbar-slot-weight {
     align-self: flex-end;
     padding-right: 0.7vh * $uiScale;
-    font-size: 1.25vh * $textScale;
+    font-size: 1.7vh * $textScale;
     font-weight: 400;
     color: rgba(255, 255, 255, 0.72);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);

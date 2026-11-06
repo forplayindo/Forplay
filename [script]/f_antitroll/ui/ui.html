@@ -1,34 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
     <head>
         <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="ios.css" />
         <link rel="stylesheet" href="css/app.css" />
-        <script
-        defer
-        src="https://unpkg.com/alpinejs@3.10.4/dist/cdn.min.js"
-        ></script>
-        <script src="js/app.js" type="text/javascript"></script>
-        <title>endzone-</title>
-        <style>
-            ::-webkit-scrollbar {
-                display: none;
-            }
-        </style>
+        <title>f_antitroll</title>
     </head>
-    <body x-data="main()" x-init="listen()">
-        <div class="content" x-show="show" x-transition>
-            <div class="main-text">
-                <h1 class="newPlayer">Kamu Pemain Baru.</h3>
-                <h2 class="description">
-                    Bermainlah bersama kami beberapa waktu dulu. <br>
-                    Sampai saat itu, kamu belum bisa memukul dan menembak.
-                </h2>
+    <body>
+        <div class="at-banner" id="banner">
+            <div class="at-head">
+                <div class="at-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+                </div>
+                <div class="at-title">Kamu Warga Baru</div>
             </div>
-            <div class="timer">
-                <a class="timer"><span x-text="minleft"></span> min</a>
+            <div class="at-desc">
+                Bermainlah bersama kami beberapa waktu dulu. Sampai saat itu, kamu belum bisa memukul dan menembak.
+            </div>
+            <!-- timer di baris sendiri supaya judul dapat seluruh lebar (tidak terpotong "...") -->
+            <div class="at-foot">
+                <span class="at-foot-lbl">Sisa waktu</span>
+                <div class="at-timer">
+                    <span class="at-num num" id="minleft">60</span>
+                    <span class="at-unit">menit</span>
+                </div>
             </div>
         </div>
+        <script src="js/app.js"></script>
     </body>
 </html>

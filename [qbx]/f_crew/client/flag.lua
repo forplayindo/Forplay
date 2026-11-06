@@ -16,6 +16,8 @@ local DEFAULT_HAND = 'prop_golfflag'
 local DRAW_DIST = 150.0                -- bendera tertancap dibuat dalam jarak ini
 local TEXT_DIST = 25.0                 -- nama gang di atas bendera tertancap
 local PROMPT_SLACK = 0.3               -- prompt muncul sedikit lebih dekat dari batas server
+local PEDESTAL_MODEL = 'tugu_flag_pedestal' -- tugu di titik bendera (f_addonprop/stream/gang_flags)
+local SOCKET_Z = 0.46                  -- dasar lubang tiang di atas tugu (meter dari tanah)
 
 -- Posisi bendera di tangan (bone SKEL_R_Hand). Atur di game: /benderapos x y z rx ry rz
 local BONE = 57005
@@ -29,6 +31,7 @@ local war           -- data HUD terakhir kalau gang saya sedang perang bendera
 local acting = false
 local heldProps = {} -- server id -> { obj, model, ped }
 local planted = {}   -- zone id -> { obj, key, top, label, rgb }
+local pedestals = {} -- zone id -> { obj?, key, z = tanah, socket = z tancap }
 
 local function call(name, payload)
     return lib.callback.await('f_crew:turf:call', false, name, payload) or { ok = false, err = 'Server tidak merespons.' }
@@ -309,7 +312,7 @@ RegisterNetEvent('f_crew:flag:event', function(text)
     if type(text) == 'string' then notify(text) end
 end)
 
--- Bendera tertancap (semua pemain) -------------------------------------------------------------
+-- Tugu + bendera tertancap (semua pemain) ------------------------------------------------------
 
 local function deletePlanted(id)
     local p = planted[id]
@@ -318,22 +321,49 @@ local function deletePlanted(id)
     planted[id] = nil
 end
 
-local function flagKey(f) return ('%s:%s:%s:%s:%s'):format(f.m, f.x, f.y, f.l, f.c) end
+local function deletePedestal(id)
+    local t = pedestals[id]
+    if not t then return end
+    if t.obj and DoesEntityExist(t.obj) then DeleteEntity(t.obj) end
+    pedestals[id] = nil
+end
+
+local function groundZ(x, y, refZ)
+    local found, gz = GetGroundZFor_3dCoord(x, y, refZ + 50.0, false)
+    return found and gz or refZ - 1.0
+end
+
+local function pointKey(p) return ('%s:%s:%s:%s'):format(p.x, p.y, p.z, p.h) end
+
+---Tugu selalu berdiri di titik bendera. Tanpa model (f_addonprop mati) bendera tetap ditancap di tanah.
+local function spawnPedestal(id, p, pos)
+    local z = p.z or groundZ(p.x, p.y, pos.z)
+    local t = { key = pointKey(p), z = z, socket = z }
+    local hash = loadModel(PEDESTAL_MODEL)
+    if hash then
+        t.obj = CreateObject(hash, p.x, p.y, z, false, false, false)
+        SetEntityHeading(t.obj, p.h or 0.0)
+        FreezeEntityPosition(t.obj, true)
+        SetModelAsNoLongerNeeded(hash)
+        t.socket = z + SOCKET_Z
+    end
+    pedestals[id] = t
+end
+
+local function flagKey(f, socket) return ('%s:%s:%s:%s:%s:%s:%s'):format(f.m, f.x, f.y, f.h, f.l, f.c, socket) end
 
 local function spawnPlanted(id, f, pos)
     local hash = loadModel(f.m) or loadModel(DEFAULT_MODEL)
     if not hash then return end
-    local z = f.z
-    if not z then
-        local found, gz = GetGroundZFor_3dCoord(f.x, f.y, pos.z + 50.0, false)
-        z = found and gz or pos.z - 1.0
-    end
+    local t = pedestals[id]
+    local z = t and t.socket or f.z or groundZ(f.x, f.y, pos.z)
     local obj = CreateObject(hash, f.x, f.y, z, false, false, false)
+    SetEntityHeading(obj, f.h or 0.0)
     local _, max = GetModelDimensions(hash)
     SetModelAsNoLongerNeeded(hash)
     FreezeEntityPosition(obj, true)
     local r, g, b = hexRgb(f.c)
-    planted[id] = { obj = obj, key = flagKey(f), top = vec3(f.x, f.y, z + max.z + 0.5), label = f.l or '', rgb = { r, g, b } }
+    planted[id] = { obj = obj, key = flagKey(f, t and t.socket), top = vec3(f.x, f.y, z + max.z + 0.5), label = f.l or '', rgb = { r, g, b } }
 end
 
 local texting = false
@@ -365,13 +395,31 @@ end
 
 CreateThread(function()
     while true do
+        local points = GlobalState.crewFlagPoints or {}
         local flags = GlobalState.crewFlags or {}
         local pos = GetEntityCoords(cache.ped)
         local near = false
+        -- tugu dulu: bendera memakai z lubang tugu
+        for id, pt in pairs(points) do
+            local t = pedestals[id]
+            if t and t.key ~= pointKey(pt) then
+                deletePedestal(id)
+                t = nil
+            end
+            if #(pos.xy - vec2(pt.x, pt.y)) < DRAW_DIST then
+                if not t then spawnPedestal(id, pt, pos) end
+            elseif t then
+                deletePedestal(id)
+            end
+        end
+        for id in pairs(pedestals) do
+            if not points[id] then deletePedestal(id) end
+        end
         for id, f in pairs(flags) do
             local d = #(pos.xy - vec2(f.x, f.y))
             local p = planted[id]
-            if p and p.key ~= flagKey(f) then
+            local t = pedestals[id]
+            if p and p.key ~= flagKey(f, t and t.socket) then
                 deletePlanted(id)
                 p = nil
             end
@@ -406,5 +454,6 @@ AddEventHandler('onResourceStop', function(res)
     if res ~= cache.resource then return end
     for sid in pairs(heldProps) do deleteHeld(sid) end
     for id in pairs(planted) do deletePlanted(id) end
+    for id in pairs(pedestals) do deletePedestal(id) end
     if myHold then StopAnimTask(cache.ped, HOLD_ANIM[1], HOLD_ANIM[2], 2.0) end
 end)

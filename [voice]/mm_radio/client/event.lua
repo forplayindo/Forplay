@@ -40,7 +40,8 @@ RegisterNetEvent('mm_radio:client:use', function(slot)
         channelName = Shared.RadioNames,
         insideJammerZone = Radio.signalJammed,
         battery = battery,
-        overlay = Shared.Overlay
+        overlay = Shared.Overlay,
+        closeKey = Radio:GetCloseKey()
     })
     UpdateTime()
     if userdata.allowMovement then
@@ -183,6 +184,7 @@ RegisterNetEvent('mm_radio:client:removejammer', function(id)
 end)
 
 RegisterNetEvent('mm_radio:client:remove', function()
+    if not Radio.usingRadio then return end
     SetNuiFocus(false, false)
     if Radio.userData[Radio.identifier].allowMovement then
         SetNuiFocusKeepInput(false)
@@ -208,7 +210,32 @@ RegisterNetEvent("mm_radio:client:recharge", function()
     TriggerServerEvent('mm_radio:server:rechargeBattery')
 end)
 
+-- Emote saat bicara di radio: rpemotes "wt4" (Walkie Talkie 4, radio di tangan).
+-- Animasi bawaan pma-voice (pegang mic bahu) dimatikan supaya tidak bentrok.
+local RADIO_EMOTE = 'wt4'
+local radioEmoteOn = false
+
+CreateThread(function()
+    while GetResourceState('pma-voice') ~= 'started' do Wait(500) end
+    exports['pma-voice']:setDisableRadioAnim(true)
+end)
+
+local function radioEmote(talking)
+    if GetResourceState('rpemotes') ~= 'started' then return end
+    if talking then
+        local current = LocalPlayer.state.currentEmote
+        if current and current ~= RADIO_EMOTE then return end -- emote lain (duduk, dll.) tidak diganggu
+        exports.rpemotes:EmoteCommandStart(RADIO_EMOTE)
+        radioEmoteOn = true
+    elseif radioEmoteOn then
+        radioEmoteOn = false
+        if LocalPlayer.state.currentEmote == RADIO_EMOTE then exports.rpemotes:EmoteCancel() end
+    end
+end
+
 RegisterNetEvent("pma-voice:radioActive", function(talkingState)
+    radioEmote(talkingState)
+    if not Radio.onRadio then return end
     Radio:SendSvelteMessage("updateRadioTalking", {
         radioId = tostring(Radio.playerServerID),
         radioTalking = talkingState
@@ -216,6 +243,7 @@ RegisterNetEvent("pma-voice:radioActive", function(talkingState)
 end)
 
 RegisterNetEvent("pma-voice:setTalkingOnRadio", function(source, talkingState)
+    if not Radio.onRadio then return end
     Radio:SendSvelteMessage("updateRadioTalking", {
         radioId = tostring(source),
         radioTalking = talkingState
@@ -245,10 +273,10 @@ RegisterNetEvent('QBCore:Client:OnJobUpdate', function(job)
     Radio:Init(player)
 end)
 
+-- Event ini terpicu sangat sering (lapar/haus, dll). Cukup baca status mati;
+-- pengecekan item radio sudah ditangani ox_inventory:updateInventory.
 RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
-    if Radio.playerLoaded then
-        Wait(1000)
-        Radio:doRadioCheck(val.items)
+    if Radio.playerLoaded and val and val.metadata then
         Radio.PlayerDead = val.metadata.isdead or val.metadata.inlaststand
     end
 end)
@@ -268,7 +296,7 @@ RegisterNetEvent("ND:updateCharacter", function(character)
 end)
 
 AddEventHandler('ox_inventory:updateInventory', function()
-    Radio:doRadioCheck()
+    Radio:queueRadioCheck()
 end)
 
 AddEventHandler('gameEventTriggered', function(event, data)

@@ -40,39 +40,4 @@ for station, pumps in pairs(stations) do
 	})
 end
 
--- Stasiun charger kendaraan listrik: charger (prop bawaan GTA) dicari di sekitar titik saat player mendekat
-if config.electric.enabled then
-	local chargerModel = {}
-	for i = 1, #config.electric.chargerModels do chargerModel[config.electric.chargerModels[i]] = true end
-
-	local function findChargers(center)
-		local found = {}
-		local objects = GetGamePool('CObject')
-
-		for i = 1, #objects do
-			local obj = objects[i]
-			if chargerModel[GetEntityModel(obj)] then
-				local coords = GetEntityCoords(obj)
-				if #(coords - center) <= config.electric.stationRadius then found[#found + 1] = coords end
-			end
-		end
-
-		-- prop tidak ditemukan (map custom): pakai titik stasiun sebagai charger
-		if #found == 0 then found[1] = center end
-		return found
-	end
-
-	for i = 1, #config.electric.stations do
-		lib.points.new({
-			coords = config.electric.stations[i],
-			distance = 60,
-			electric = true,
-			pumps = {},
-			onEnter = function(point)
-				point.pumps = findChargers(point.coords)
-				onEnterStation(point)
-			end,
-			onExit = onExitStation,
-		})
-	end
-end
+-- charger kendaraan listrik: client/chargers.lua (posisi di data/chargers.lua)

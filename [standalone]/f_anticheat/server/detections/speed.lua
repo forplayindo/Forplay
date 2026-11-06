@@ -3,6 +3,24 @@ if not Config.Speed.enabled then return end
 ---@type table<integer, { coords: vector3, time: integer, strikes: integer }>
 local last = {}
 
+---A ped carried along by a vehicle without sitting in it: attached (trunk, carried, hostage)
+---or standing on the roof/bed of a moving vehicle. Only called once on-foot already violated,
+---so the vehicle scan stays off the hot path.
+---@param ped integer
+---@param coords vector3
+---@param speed number ped horizontal speed (m/s) over the last sample
+---@return boolean
+local function ridingVehicle(ped, coords, speed)
+    if GetEntityAttachedTo(ped) ~= 0 then return true end
+    for _, veh in ipairs(GetAllVehicles()) do
+        if #(GetEntityCoords(veh) - coords) < 8.0 then
+            local v = GetEntityVelocity(veh)
+            if math.sqrt(v.x * v.x + v.y * v.y) > speed * 0.5 then return true end
+        end
+    end
+    return false
+end
+
 local function checkPlayer(source)
     local ped = GetPlayerPed(source --[[@as string]])
     if ped == 0 or not DoesEntityExist(ped) then
@@ -32,11 +50,12 @@ local function checkPlayer(source)
     local horizontalSpeed = math.sqrt(dx * dx + dy * dy) / dt
     local verticalSpeed = math.abs(dz) / dt
 
+    local totalSpeed = math.sqrt(dx * dx + dy * dy + dz * dz) / dt
     local inVehicle = GetVehiclePedIsIn(ped, false) ~= 0
+    local riding = false
     local violated
 
     if inVehicle then
-        local totalSpeed = math.sqrt(dx * dx + dy * dy + dz * dz) / dt
         violated = totalSpeed > Config.Speed.maxSpeedInVehicleMs
     else
         violated = horizontalSpeed > Config.Speed.maxSpeedOnFootMs
@@ -45,6 +64,11 @@ local function checkPlayer(source)
         if violated and verticalSpeed > horizontalSpeed then
             violated = verticalSpeed > Config.Speed.maxSpeedFallingMs
         end
+        -- riding on/attached to a vehicle moves at vehicle speed, judge it by the vehicle limit
+        if violated and ridingVehicle(ped, coords, horizontalSpeed) then
+            riding = true
+            violated = totalSpeed > Config.Speed.maxSpeedInVehicleMs
+        end
     end
 
     if violated then
@@ -52,7 +76,7 @@ local function checkPlayer(source)
         entry.strikes = entry.strikes + 1
         if entry.strikes >= Config.Speed.requiredConsecutive then
             Punish.Flag(source, 'speed', Config.Speed.points, ('moved %.1fm in %.2fs (%s)'):format(
-                math.sqrt(dx * dx + dy * dy + dz * dz), dt, inVehicle and 'vehicle' or 'on foot'))
+                math.sqrt(dx * dx + dy * dy + dz * dz), dt, inVehicle and 'vehicle' or riding and 'riding vehicle' or 'on foot'))
             -- player may have disconnected while Punish.Flag was logging (async DB insert),
             -- which clears their entry via the playerDropped handler below
             entry = last[source]

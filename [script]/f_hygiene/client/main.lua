@@ -201,17 +201,22 @@ RegisterNetEvent('hygiene:client:RefreshHud', function()
     if desperate and not desperateAnimActive then
         desperateAnimActive = true
         CreateThread(function()
-            local dict, clip = Config.Desperate.AnimDict, Config.Desperate.AnimClip
-            RequestAnimDict(dict)
-            local timeout = GetGameTimer() + 2000
-            while not HasAnimDictLoaded(dict) and GetGameTimer() < timeout do Wait(0) end
-
             -- dimainkan sebentar tiap Config.Desperate.Interval (bukan loop terus), gantian sama
             -- reaksi lain lewat HygieneTryPlayReaction. Kalau giliran ini ke-skip (busy/lock),
             -- coba lagi 1 detik kemudian, bukan nunggu satu interval penuh
             local D = Config.Desperate
+            local poopTurn = false
             while desperateAnimActive do
-                if not HasAnimDictLoaded(dict) then RequestAnimDict(dict) end
+                -- kebelet poop pakai animasi "puke", kencing pegang selangkangan; dua-duanya 100% = gantian
+                local pee, poop = HygieneState.kencing >= 100, HygieneState.poop >= 100
+                poopTurn = poop and (not pee or not poopTurn)
+                local dict = poopTurn and D.PoopAnimDict or D.AnimDict
+                local clip = poopTurn and D.PoopAnimClip or D.AnimClip
+                if not HasAnimDictLoaded(dict) then
+                    RequestAnimDict(dict)
+                    local timeout = GetGameTimer() + 2000
+                    while not HasAnimDictLoaded(dict) and GetGameTimer() < timeout do Wait(0) end
+                end
                 local played = HasAnimDictLoaded(dict) and HygieneTryPlayReaction(D.Duration, function()
                     local ped = PlayerPedId()
                     TaskPlayAnim(ped, dict, clip, 3.0, 3.0, -1, 49, 0, false, false, false)
@@ -226,7 +231,8 @@ RegisterNetEvent('hygiene:client:RefreshHud', function()
                 while desperateAnimActive and GetGameTimer() < waitUntil do Wait(1000) end
             end
 
-            RemoveAnimDict(dict)
+            RemoveAnimDict(D.AnimDict)
+            RemoveAnimDict(D.PoopAnimDict)
             ClearPedSecondaryTask(PlayerPedId())
         end)
     elseif not desperate and desperateAnimActive then
@@ -241,6 +247,9 @@ local function StopDesperateAnim()
     local D = Config.Desperate
     if IsEntityPlayingAnim(ped, D.AnimDict, D.AnimClip, 3) then
         StopAnimTask(ped, D.AnimDict, D.AnimClip, 2.0)
+    end
+    if IsEntityPlayingAnim(ped, D.PoopAnimDict, D.PoopAnimClip, 3) then
+        StopAnimTask(ped, D.PoopAnimDict, D.PoopAnimClip, 2.0)
     end
 end
 

@@ -8,7 +8,7 @@ for _, n in ipairs({
     'items', 'give_items', 'vehicles', 'give_vehicle', 'veh_spawn', 'veh_save', 'veh_plate', 'money', 'weapons',
     'self_back', 'world', 'weather', 'time', 'radio', 'stash',
     'reports', 'report_open', 'report_claim', 'report_reply', 'report_close', 'bans', 'unban',
-    'pets', 'pets_decide',
+    'pets', 'pets_decide', 'wtune', 'wtune_save',
     'lapor_mine', 'lapor_send', 'lapor_read', 'lapor_reply',
 }) do ALLOWED[n] = true end
 local LAPOR = { lapor_mine = true, lapor_send = true, lapor_read = true, lapor_reply = true }
@@ -21,6 +21,7 @@ function CloseNui()
     nuiOpen = false
     SetNuiFocus(false, false)
     SendNUIMessage({ action = 'close' })
+    if ClearWeaponPreview then ClearWeaponPreview() end
 end
 
 local function notify(msg, kind) lib.notify({ description = msg, type = kind or 'inform' }) end
@@ -55,6 +56,7 @@ end)
 RegisterNUICallback('close', function(_, cb)
     nuiOpen = false
     SetNuiFocus(false, false)
+    if ClearWeaponPreview then ClearWeaponPreview() end
     cb(1)
 end)
 

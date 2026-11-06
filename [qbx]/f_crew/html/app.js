@@ -415,6 +415,7 @@ function openRules(z, mode) {
                 <span>Bunuh anggota gang peserta lain</span><span>+${c.kill}</span>
                 <span>Jual narkoba di pojokan</span><span>+${c.drug}</span>
                 <span>Hotwire mobil</span><span>+${c.car}</span>
+                <span>Graffiti di wilayah (dibersihkan musuh: −${c.graffiti})</span><span>+${c.graffiti}</span>
             </div>`}
             <label class="agree"><input type="checkbox" id="agree"> Saya mengerti dan setuju dengan aturan perang</label>
         </div>

@@ -4,7 +4,7 @@
 --  * Semua petugas EMS on duty bisa melihat stok di Menu Kasir.
 return {
     job = 'ambulance',
-    label = '4PLAY Hospital',
+    label = 'Ocean Hospital',
 
     -- Titik kasir (boleh lebih dari satu, semua memakai data yang sama).
     -- SEMENTARA: atur dengan /vec3 sambil berdiri di depan meja kasir.

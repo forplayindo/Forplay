@@ -162,4 +162,7 @@ end)
 ---@param state boolean | nil
 exports('SetSeatBeltState', seatbelt.ToggleSeatBelt)
 
+---Status sabuk pengaman saat ini (dipakai f_radialmenu: tidak bisa pindah kursi selama terpasang)
+exports('IsSeatbeltOn', seatbelt.GetCurrentState)
+
 return seatbelt

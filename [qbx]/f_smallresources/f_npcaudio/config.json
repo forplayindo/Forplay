@@ -1,0 +1,7 @@
+{
+    "muteSpeech": true,
+    "mutePain": false,
+    "muteTrafficRadio": true,
+    "disablePoliceScanner": true,
+    "interval": 1500
+}

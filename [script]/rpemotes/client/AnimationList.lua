@@ -3130,6 +3130,284 @@ RP.Dances = {
             onFootFlag = AnimFlag.LOOP
         }
     },
+    ["pfoutwest"] = {
+        "pazeee@fournite@outwest@animations",
+        "pazeee@fournite@outwest@clip",
+        "4play Outwest",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfrollie"] = {
+        "pazeee@fournite@rollie@animations",
+        "pazeee@fournite@rollie@clip",
+        "4play Rollie",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfthesquabble"] = {
+        "pazeee@fournite@thesquabble@animations",
+        "pazeee@fournite@thesquabble@clip",
+        "4play Thesquabble",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfbillybounce"] = {
+        "pazeee@fournite@billybounce@animations",
+        "pazeee@fournite@billybounce@clip",
+        "4play Billybounce",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfmaximumbounce"] = {
+        "pazeee@fournite@maximumbounce@animations",
+        "pazeee@fournite@maximumbounce@clip",
+        "4play Maximumbounce",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfstuck"] = {
+        "pazeee@fournite@stuck@animations",
+        "pazeee@fournite@stuck@clip",
+        "4play Stuck",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfsocks"] = {
+        "pazeee@fournite@socks@animations",
+        "pazeee@fournite@socks@clip",
+        "4play Socks",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfpullup"] = {
+        "pazeee@fournite@pullup@animations",
+        "pazeee@fournite@pullup@clip",
+        "4play Pullup",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfchickenwingit"] = {
+        "pazeee@fournite@chickenwingit@animations",
+        "pazeee@fournite@chickenwingit@clip",
+        "4play Chickenwingit",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfsavage"] = {
+        "pazeee@fournite@savage@animations",
+        "pazeee@fournite@savage@clip",
+        "4play Savage",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfimdiamond"] = {
+        "pazeee@fournite@imdiamond@animations",
+        "pazeee@fournite@imdiamond@clip",
+        "4play Imdiamond",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfitsdynamite"] = {
+        "pazeee@fournite@itsdynamite@animations",
+        "pazeee@fournite@itsdynamite@clip",
+        "4play Itsdynamite",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pftoosieslide"] = {
+        "pazeee@fournite@toosieslide@animations",
+        "pazeee@fournite@toosieslide@clip",
+        "4play Toosieslide",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pftherenegade"] = {
+        "pazeee@fournite@therenegade@animations",
+        "pazeee@fournite@therenegade@clip",
+        "4play Therenegade",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfdontstartnow"] = {
+        "pazeee@fournite@dontstartnow@animations",
+        "pazeee@fournite@dontstartnow@clip",
+        "4play Dontstartnow",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfambitious"] = {
+        "pazeee@fournite@ambitious@animations",
+        "pazeee@fournite@ambitious@clip",
+        "4play Ambitious",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pflunarparty"] = {
+        "pazeee@fournite@lunarparty@animations",
+        "pazeee@fournite@lunarparty@clip",
+        "4play Lunarparty",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfhitit"] = {
+        "pazeee@fournite@hitit@animations",
+        "pazeee@fournite@hitit@clip",
+        "4play Hitit",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfnocure"] = {
+        "pazeee@fournite@nocure@animations",
+        "pazeee@fournite@nocure@clip",
+        "4play Nocure",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfclickclickflash"] = {
+        "pazeee@fournite@clickclickflash@animations",
+        "pazeee@fournite@clickclickflash@clip",
+        "4play Clickclickflash",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfwannaseeme"] = {
+        "pazeee@fournite@wannaseeme@animations",
+        "pazeee@fournite@wannaseeme@clip",
+        "4play Wannaseeme",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfheadbanger"] = {
+        "pazeee@fournite@headbanger@animations",
+        "pazeee@fournite@headbanger@clip",
+        "4play Headbanger",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+            PtfxBone = 31086,
+            PtfxNoProp = true,
+            PtfxAsset = "core",
+            PtfxName = "fire_wrecked_train",
+            PtfxPlacement = {
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.25
+            },
+            PtfxWait = 200,
+            PtfxCanHold = true
+        }
+    },
+    ["pfrage"] = {
+        "pazeee@fournite@rage@animations",
+        "pazeee@fournite@rage@clip",
+        "4play Rage",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+            Prop = 'v_ilev_fos_mic',
+            PropBone = 28422,
+            PropPlacement = {
+                0.1300,
+                -0.1400,
+                -0.24,
+                -70.0,
+                15.0,
+                0.0
+            },
+            PtfxAsset = "core",
+            PtfxName = "fire_petroltank_car",
+            PtfxPlacement = {
+                -0.65,
+                0.05,
+                1.0,
+                -270.0,
+                90.0,
+                0.0,
+                2.5
+            },
+            PtfxWait = 200,
+            PtfxCanHold = true
+        }
+    },
+    ["pfbigdawgs"] = {
+        "pazeee@fournite@bigdawgs@animations",
+        "pazeee@fournite@bigdawgs@clip",
+        "4play Bigdawgs",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+        }
+    },
+    ["pfbigdawgsmove"] = {
+        "pazeee@fournite@bigdawgsmove@animations",
+        "pazeee@fournite@bigdawgsmove@clip",
+        "4play Bigdawgs Move",
+        AnimationOptions =
+        {
+            EmoteLoop = true,
+            Flag = 47,
+            PtfxNoProp = true,
+            PtfxAsset = "core",
+            PtfxName = "exp_grd_train",
+            PtfxPlacement = {
+                0.0,
+                0.2,
+                -0.9,
+                0.0,
+                0.0,
+                0.0,
+                0.25
+            },
+            PtfxWait = 200,
+            PtfxCanHold = true
+        }
+    },
 }
 
 

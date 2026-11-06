@@ -17,6 +17,7 @@ return {
     treeDistance = 8.0,         -- jarak penebang ke pohon
     itemDistance = 6.0,         -- jarak pemain ke potongan kayu di tanah (ambil)
     trunkDistance = 9.0,        -- jarak pemain ke titik tengah batang besar (potong / angkat), batangnya panjang
+    liftPartnerDistance = 16.0, -- batang berdua: kedua pengangkat harus sedekat ini saat memasukkan ke bak
     loadDistance = 10.0,        -- jarak pemain ke tengah truk saat memasukkan (harus di belakang truk; flatbed panjang)
     stationDistance = 9.0,      -- truk ke titik stasiun olah
 

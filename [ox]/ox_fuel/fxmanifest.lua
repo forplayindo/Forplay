@@ -32,6 +32,8 @@ files {
 	'html/ui/fonts/*.woff2',
 	'locales/*.json',
 	'data/stations.lua',
+	'data/chargers.lua',
+	'data/plugs.lua',
 	'client/*.lua',
 	'shared/*.lua',
 	'html/hologram.html',

@@ -274,12 +274,23 @@ local function publishFlags()
     for id, z in pairs(Zones) do
         if z.flag and z.flagPt and Gangs[z.flag] then
             list[id] = {
-                x = z.flagPt[1], y = z.flagPt[2], z = z.flagPt[3],
+                x = z.flagPt[1], y = z.flagPt[2], z = z.flagPt[3], h = z.flagPt[4],
                 m = flagModel(z.flag), l = gangLabel(z.flag), c = gangColor(z.flag),
             }
         end
     end
     GlobalState.crewFlags = list
+end
+
+---Tugu di setiap titik bendera (selalu berdiri, bendera ditancap di atasnya). Berubah hanya saat admin edit wilayah.
+local function publishPoints()
+    local list = {}
+    for id, z in pairs(Zones) do
+        if z.mode == 'flag' and z.flagPt then
+            list[id] = { x = z.flagPt[1], y = z.flagPt[2], z = z.flagPt[3], h = z.flagPt[4] }
+        end
+    end
+    GlobalState.crewFlagPoints = list
 end
 
 local function holdState(gang)
@@ -392,6 +403,7 @@ local function endWar(z)
     z.battle = nil
     Battles[z.id] = nil
     battleCount = math.max(0, battleCount - 1)
+    TriggerEvent('f_crew:server:warEnded', z.id) -- f_graffiti menghapus graffiti perang wilayah ini
     z.cooldownUntil = os.time() + T.WarCooldownMinutes * 60
     z.dirty = true
 
@@ -698,6 +710,42 @@ function turf.activity(src, activity)
     z.battle.points[s.gang] = z.battle.points[s.gang] + act.points
 end
 
+-- Graffiti perang (f_graffiti) -----------------------------------------------------------------
+
+---Wilayah perang (fase perang, mode poin) tempat gang pemain ikut dan titik x, y berada di dalamnya.
+---@return string? zoneId, string? label
+function turf.graffitiZone(src, x, y)
+    if not ready or not T.Enabled or battleCount == 0 or (T.WarGraffitiPoints or 0) <= 0 then return nil end
+    local s = Sessions[src]
+    if not s or not isTurfGang(s.gang) then return nil end
+    local z = battleOf(s.gang)
+    if not z or z.battle.phase ~= 'war' or z.mode == 'flag' then return nil end
+    if GetPlayerRoutingBucket(src) ~= 0 or not inZone(z, x, y) then return nil end
+    return z.id, z.label
+end
+
+---Gang pemain kalau ia peserta perang yang sedang berjalan di wilayah ini.
+---@return string?
+function turf.graffitiParticipant(zoneId, src)
+    local z = Zones[zoneId]
+    local s = Sessions[src]
+    local b = z and z.battle
+    if not b or b.phase ~= 'war' or not s or b.points[s.gang] == nil then return nil end
+    return s.gang
+end
+
+---Poin graffiti: sign 1 = semprot, -1 = dibersihkan. Poin tidak bisa di bawah 0.
+---@return boolean
+function turf.graffitiPoints(zoneId, gang, sign)
+    local z = Zones[zoneId]
+    local b = z and z.battle
+    if not b or b.phase ~= 'war' or z.mode == 'flag' or b.points[gang] == nil then return false end
+    local pts = (T.WarGraffitiPoints or 0) * (sign < 0 and -1 or 1)
+    b.points[gang] = math.max(0, b.points[gang] + pts)
+    pushHud(z)
+    return true
+end
+
 -- Pembunuhan saat perang: korban & pembunuh dari gang peserta yang berbeda, korban di wilayah itu.
 AddStateBagChangeHandler(DEATH_BAG, nil, function(bagName, _, value)
     if not ready or not T.Enabled or battleCount == 0 then return end
@@ -876,6 +924,7 @@ local function menuData(src, full)
         cfg = {
             prep = T.PrepMinutes, war = T.WarMinutes, cooldown = math.floor(T.WarCooldownMinutes / 60),
             maxWars = T.MaxWars, presence = T.WarPresencePoints, kill = T.WarKillPoints,
+            graffiti = T.WarGraffitiPoints or 0,
             drug = T.Activities.drugselling and T.Activities.drugselling.points or 0,
             car = T.Activities.carjacking and T.Activities.carjacking.points or 0,
             defaultMin = T.DefaultMinPlayers, maxItems = T.MaxRewardItems, history = T.HistoryLimit,
@@ -1055,7 +1104,11 @@ local function saveZone(src, data)
         if not x or not y or x ~= x or y ~= y then return fail('Tentukan titik bendera dulu.') end
         if not inPoly(points, x, y) then return fail('Titik bendera harus di dalam wilayah.') end
         local r = function(v) return math.floor(v * 100 + 0.5) / 100 end
-        flagPt = { r(x), r(y), (h and h == h and math.abs(h) < 3000) and r(h) or nil }
+        local zOk = h and h == h and math.abs(h) < 3000
+        flagPt = { r(x), r(y), zOk and r(h) or nil }
+        -- arah tugu/kain (dari [F] posisi saya); hanya kalau z ada supaya array JSON tidak bolong
+        local hd = zOk and tonumber(f[4])
+        if hd and hd == hd then flagPt[4] = r(hd % 360) end
     end
 
     local z = type(data.id) == 'string' and Zones[data.id] or nil
@@ -1090,6 +1143,7 @@ local function saveZone(src, data)
     end
     rebuildOrder()
     publishFlags()
+    publishPoints()
     return ok(true)
 end
 
@@ -1100,6 +1154,7 @@ local function deleteZone(src, id)
     if z.battle then return fail('Wilayah sedang diperebutkan, tunggu sampai selesai.') end
     Zones[id] = nil
     rebuildOrder()
+    publishPoints()
     if z.flag then
         giveFlag(z.flag, ('Wilayah %s dihapus admin, bendera gangmu dikembalikan.'):format(z.label))
         publishFlags()
@@ -1434,6 +1489,7 @@ function turf.start(ctx)
         end
     end
     publishFlags()
+    publishPoints()
     -- state bag pemain bertahan walau resource restart: bendera di tangan dilepas
     for _, id in ipairs(GetPlayers()) do
         local p = Player(tonumber(id) --[[@as integer]])

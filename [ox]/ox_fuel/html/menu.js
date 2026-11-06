@@ -41,7 +41,9 @@ function render() {
 	const u = data.unit || 'L';
 	$('tankText').textContent = `${fmtL(data.current)} ${u} + ${l} ${u}  /  ${data.tank} ${u}`;
 
-	$('unit').textContent = `${rp(type.price)} / ${u}  ×  ${l} ${u}`;
+	// mode charger: tampilkan perkiraan lama mengisi
+	const eta = type.rate ? `  ·  ±${Math.max(1, Math.ceil(l / type.rate))} dtk` : '';
+	$('unit').textContent = `${rp(type.price)} / ${u}  ×  ${l} ${u}${eta}`;
 	$('total').textContent = rp(total);
 
 	const msg = $('msg');
@@ -63,7 +65,7 @@ function buildTypes() {
 		const el = document.createElement('button');
 		el.className = 'type' + (t.id === type.id ? ' active' : '');
 		el.style.setProperty('--c', t.color);
-		const sub = t.ron ? `RON ${t.ron}` : (data.unit || 'L');
+		const sub = t.ron ? `RON ${t.ron}` : (t.sub || data.unit || 'L');
 		el.innerHTML = `<b>${t.label}</b><span class="ron">${sub}</span><span class="price">${rp(t.price)}</span>`;
 		el.onclick = () => { type = t; buildTypes(); render(); };
 		box.appendChild(el);
@@ -80,7 +82,7 @@ function open(d) {
 	$('title').textContent = d.electric ? 'Isi Daya' : 'Isi Bensin';
 	$('logo').innerHTML = `<svg class="ic"><use href="#${d.electric ? 'i-plug' : 'i-fuel'}"/></svg>`;
 	$('unitInput').textContent = u;
-	$('types').classList.toggle('single', d.types.length === 1);
+	$('types').style.gridTemplateColumns = `repeat(${Math.min(3, d.types.length)}, 1fr)`;
 	document.querySelectorAll('.quick button').forEach((b) => {
 		b.textContent = b.dataset.l === 'full' ? 'Penuh' : `${b.dataset.l} ${u}`;
 	});

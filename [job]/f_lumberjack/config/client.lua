@@ -39,9 +39,25 @@ return {
         -- pos dari titik tengah pemain: x kanan, y depan, z atas; rot.z ditambah otomatis supaya sisi panjang searah badan
         pieceAnim = { dict = 'missfinale_c2mcs_1', clip = 'fin_c2_mcs_1_camman' },
         piece = { bone = 0, pos = vec3(0.24, -0.3, 0.72), rot = vec3(0.0, 0.0, 0.0) },
-        trunkAnim = { dict = 'missfbi4prepp1', clip = 'idle' },                             -- batang di bahu kanan
-        trunk = { frontEnd = vec3(0.25, 0.6, 0.55) },   -- ujung depan batang besar dari pemain depan, memanjang ke belakang
-        backGap = 1.2,          -- pemain belakang sejauh ini dari ujung belakang batang (ke arah dalam)
+        -- batang besar berdua: tiap pemain jalan sendiri (searah jalan), batang dipanggul di bahu kanan,
+        -- digambar di antara bahu kedua pemain; jaraknya dijaga seperti tongkat kaku
+        trunkAnim = { dict = 'missfbi4prepp1', clip = 'idle' },
+        trunk = {
+            -- titik atas bahu kanan dari tengah pemain: x kanan, y depan, z atas. Pusat batang otomatis digeser
+            -- sejauh jari-jari batang ke kanan & ke atas, jadi kulit batang menempel di bahu dan tidak menutupi muka.
+            -- Masih menutupi muka → besarkan x; batang melayang di atas bahu → kecilkan z.
+            shoulder = vec3(0.2, 0.0, 0.5),
+            lift = 0.85,        -- pusat batang naik sekian × jari-jari di atas titik bahu (1.0 = tepat di atas bahu)
+            endInset = 0.7,     -- jarak titik pegang ke ujung batang
+            slack = 0.3,        -- toleransi jarak (m) sebelum mulai menarik / mendorong
+            pullRate = 0.55,    -- kecepatan animasi jalan saat menjauh dari rekan dan batang sudah tegang (berat)
+            pushRate = 0.45,    -- kecepatan animasi jalan saat mendorong ke arah rekan (menahan)
+            dragSpeed = 1.0,    -- m/dtk maksimal pemain ikut tertarik saat rekan menjauh
+            pushSpeed = 0.6,    -- m/dtk maksimal pemain terdorong saat rekan mendorong
+            breakDist = 3.0,    -- lebih jauh dari panjang batang + ini selama breakMs → batang jatuh
+            breakMs = 1500,
+            setupMs = 5000,     -- maksimal waktu jalan ke ujung batang sebelum mulai mengangkat
+        },
     },
 
     -- animasi tumbang: berputar di titik potong, berhenti setinggi jari-jari batang di atas tanah, kemiringan diukur sejauh probe

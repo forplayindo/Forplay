@@ -429,6 +429,8 @@ function bar(label, value, color) {
 }
 
 let selected = 'all'; // 'all' atau id hewan aktif
+let guardForm = null; // id hewan yang sedang diisi luas area jaganya
+let guardValue = null; // angka yang sedang diketik (tidak hilang saat panel diperbarui)
 
 function petStatus(p) {
     const hungerColor = p.hunger <= 20 ? 'var(--red)' : 'var(--gold)';
@@ -443,6 +445,12 @@ function petStatus(p) {
 }
 
 function renderPanel(d) {
+    const typing = document.activeElement && document.activeElement.id === 'guard-radius';
+    renderPanelInner(d);
+    if (typing && $('guard-radius')) $('guard-radius').focus();
+}
+
+function renderPanelInner(d) {
     const active = d.pets.filter((p) => p.active);
     if (selected !== 'all' && !active.some((p) => String(p.id) === String(selected))) selected = 'all';
     const box = $('active');
@@ -484,8 +492,16 @@ function renderPanel(d) {
                 ${one && one.canFight && !one.inVehicle ? `<span class="side-label">Pertahanan</span>
                 <div class="cmds two">
                     <button class="cmd ${one.mode === 'attack' ? 'on' : ''}" data-cmd="attack"><span>⚔️</span>Serang</button>
-                    <button class="cmd ${one.guarding ? 'on' : ''}" data-cmd="guard"><span>🛡️</span>${one.guarding ? 'Berhenti Jaga' : 'Jaga Area'}</button>
-                </div>` : ''}
+                    <button class="cmd ${one.guarding || String(guardForm) === String(one.id) ? 'on' : ''}" data-cmd="guard"><span>🛡️</span>${one.guarding ? 'Berhenti Jaga' : 'Jaga Area'}</button>
+                </div>
+                ${!one.guarding && String(guardForm) === String(one.id) ? `<div class="guard-form">
+                    <label>Luas area (${d.guard.min}–${d.guard.max} m)</label>
+                    <div class="guard-row">
+                        <input id="guard-radius" type="number" min="${d.guard.min}" max="${d.guard.max}" step="1" value="${guardValue ?? d.guard.default}" inputmode="numeric">
+                        <button class="guard-ok" data-guard-ok="${one.id}">Jaga di sini</button>
+                        <button class="guard-cancel" data-guard-cancel>Batal</button>
+                    </div>
+                </div>` : ''}` : ''}
                 ${tricks ? `<span class="side-label">Trik</span>
                 <div class="cmds">${tricks.map((t) => `<button class="cmd" data-trick="${esc(t.id)}" data-pet="${one.id}"><span>${esc(t.icon)}</span>${esc(t.label)}</button>`).join('')}</div>` : ''}`;
         }
@@ -522,10 +538,58 @@ $('cmds').addEventListener('click', async (e) => {
         if (d) { lastPanel = d; renderPanel(d); }
         return;
     }
+    if (e.target.closest('button[data-guard-cancel]')) {
+        guardForm = null;
+        if (lastPanel) renderPanel(lastPanel);
+        return;
+    }
+    const ok = e.target.closest('button[data-guard-ok]');
+    if (ok) return submitGuard(ok.dataset.guardOk);
+
     const b = e.target.closest('button[data-cmd]');
     if (!b) return;
+    // Jaga Area: isi angka dulu di panel (kecuali sedang menjaga = berhenti jaga)
+    if (b.dataset.cmd === 'guard') {
+        const one = lastPanel && lastPanel.pets.find((p) => String(p.id) === String(selected));
+        if (one && !one.guarding) {
+            guardForm = String(guardForm) === String(one.id) ? null : one.id;
+            guardValue = null;
+            renderPanel(lastPanel);
+            const inp = $('guard-radius');
+            if (inp) { inp.focus(); inp.select(); }
+            return;
+        }
+    }
+    guardForm = null;
     const d = await post('command', { cmd: b.dataset.cmd, target: selected });
     if (d) { lastPanel = d; renderPanel(d); }
+});
+
+async function submitGuard(id) {
+    const inp = $('guard-radius');
+    const g = lastPanel.guard;
+    let r = Math.round(Number(inp && inp.value));
+    if (!Number.isFinite(r) || r < g.min) r = g.min;
+    if (r > g.max) r = g.max;
+    guardForm = null;
+    guardValue = null;
+    const d = await post('command', { cmd: 'guard', target: id, radius: r });
+    if (d) { lastPanel = d; renderPanel(d); }
+}
+
+$('cmds').addEventListener('keydown', (e) => {
+    if (e.target.id !== 'guard-radius') return;
+    if (e.key === 'Enter') { e.preventDefault(); submitGuard(guardForm); }
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); guardForm = null; if (lastPanel) renderPanel(lastPanel); }
+});
+
+// batasi isian ke min–max saat diketik
+$('cmds').addEventListener('input', (e) => {
+    if (e.target.id !== 'guard-radius' || !lastPanel) return;
+    const g = lastPanel.guard;
+    const v = e.target.value.replace(/[^0-9]/g, '');
+    if (v !== '' && Number(v) > g.max) e.target.value = g.max;
+    guardValue = e.target.value;
 });
 
 async function summon(id, btn) {

@@ -48,7 +48,7 @@ function SetDeathState(deathState)
     TriggerServerEvent('hospital:server:SetDeathStatus', deathState ~= sharedConfig.deathState.ALIVE)
 end
 
-BleedTickTimer, AdvanceBleedTimer = 0, 0
+BleedTickTimer = 0
 FadeOutTimer, BlackoutTimer = 0, 0
 
 ---@type number
@@ -92,10 +92,11 @@ lib.callback.register('f_medical:client:killPlayer', function()
     SetEntityHealth(cache.ped, 0)
 end)
 
+---Pincang hanya dari luka kaki yang ditandai `limp` (lihat damage.lua), bukan dari causeLimp.
 ---@return boolean isInjuryCausingLimp if injury causes a limp and is damaged.
 local function isInjuryCausingLimp()
-    for bodyPartKey in pairs(Injuries) do
-        if sharedConfig.bodyParts[bodyPartKey].causeLimp then
+    for _, injury in pairs(Injuries) do
+        if injury.limp then
             return true
         end
     end
@@ -134,6 +135,16 @@ end
 --- TODO: this export should not check any conditions, but force the ped to limp instead.
 exports('MakePedLimp', MakePedLimp)
 
+---Pincang kalau masih ada luka kaki `limp`, kalau tidak jalan normal lagi.
+local function updateLimp()
+    if isInjuryCausingLimp() then
+        MakePedLimp()
+    else
+        ResetPedMovementClipset(cache.ped, 0.0)
+        SetPlayerSprint(cache.playerId, true)
+    end
+end
+
 local function resetMinorInjuries()
     for bodyPartKey, injury in pairs(Injuries) do
         if injury.severity <= 2 then
@@ -145,13 +156,12 @@ local function resetMinorInjuries()
     if BleedLevel <= 2 then
         SetBleedLevel(0)
         BleedTickTimer = 0
-        AdvanceBleedTimer = 0
         FadeOutTimer = 0
         BlackoutTimer = 0
     end
 
     SendBleedAlert()
-    MakePedLimp()
+    updateLimp()
     doLimbAlert()
 end
 
@@ -162,14 +172,13 @@ local function resetAllInjuries()
     NumInjuries = 0
     SetBleedLevel(0)
     BleedTickTimer = 0
-    AdvanceBleedTimer = 0
     FadeOutTimer = 0
     BlackoutTimer = 0
 
     WeaponsThatDamagedPlayer = {}
 
     SendBleedAlert()
-    MakePedLimp()
+    updateLimp()
     doLimbAlert()
     -- non-blocking: kalau response hilang (resource restart / reconnect), revive tidak ikut tertahan 5 menit
     lib.callback('f_medical:server:resetHungerAndThirst', false, function() end)
@@ -183,16 +192,12 @@ end
 
 exports('SendBleedAlert', SendBleedAlert)
 
----adds a bleed to the player and alerts them. Total bleed level maxes at 4.
----@param level 1|2|3|4 speed of the bleed
-function ApplyBleed(level)
-    if BleedLevel == 4 then return end
-    local newBleedLevel = level + BleedLevel
-    if newBleedLevel > 4 then
-        SetBleedLevel(4)
-    else
-        SetBleedLevel(newBleedLevel)
-    end
+---Naikkan tingkat pendarahan ke `level` lalu beri notif. Tidak pernah menurunkan: turun hanya lewat pengobatan.
+---@param level integer 1-4
+function RaiseBleedTo(level)
+    if level <= BleedLevel then return end
+    SetBleedLevel(level)
+    BleedLevel = level
     SendBleedAlert()
 end
 
@@ -202,12 +207,7 @@ local function refreshInjuryState()
     local count = 0
     for _ in pairs(Injuries) do count += 1 end
     NumInjuries = count
-    if isInjuryCausingLimp() then
-        MakePedLimp()
-    else
-        ResetPedMovementClipset(cache.ped, 0.0)
-        SetPlayerSprint(cache.playerId, true)
-    end
+    updateLimp()
 end
 
 -- Event di bawah dipicu SERVER (f_medical exports) setelah tindakan EMS divalidasi.
@@ -226,7 +226,7 @@ RegisterNetEvent('f_medical:client:setBleed', function(level)
     SetBleedLevel(level)
     BleedLevel = level
     if level == 0 then
-        BleedTickTimer, AdvanceBleedTimer, FadeOutTimer, BlackoutTimer = 0, 0, 0, 0
+        BleedTickTimer, FadeOutTimer, BlackoutTimer = 0, 0, 0
     end
 end)
 

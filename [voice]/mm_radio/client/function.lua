@@ -119,21 +119,47 @@ function Radio:connecttoradio(channel)
     end
 end
 
+local function collectSlots(result)
+    -- ox_inventory:Search mengembalikan array slot (1 item) atau {nama = {slot..}} (banyak item)
+    if type(result) ~= 'table' then return {} end
+    if result[1] or next(result) == nil then return result end
+    local out = {}
+    for _, slots in pairs(result) do
+        for i = 1, #slots do out[#out+1] = slots[i] end
+    end
+    return out
+end
+
 function Radio:doRadioCheck(_)
     self.batteryData = {}
     self.hasRadio = false
-    local playerItems = exports.ox_inventory:Search('slots', Shared.RadioItem)
-    for _, v in pairs(playerItems) do
+    local slots = collectSlots(exports.ox_inventory:Search('slots', Shared.RadioItem))
+    for i = 1, #slots do
+        local v = slots[i]
         if lib.table.contains(Shared.RadioItem, v.name) then
             self.hasRadio = true
-            if v.metadata?.radioId or v.info?.radioId then
-                self.batteryData[#self.batteryData+1] = v['metadata'].radioId
+            local id = v.metadata and v.metadata.radioId
+            if id then
+                self.batteryData[#self.batteryData+1] = id
             end
         end
     end
     if not self.hasRadio and self.onRadio then
         Radio:leaveradio()
     end
+end
+
+-- Gabungkan banyak update inventory beruntun jadi satu pengecekan
+local radioCheckPending = false
+function Radio:queueRadioCheck()
+    if radioCheckPending then return end
+    radioCheckPending = true
+    SetTimeout(500, function()
+        radioCheckPending = false
+        if Radio.playerLoaded or LocalPlayer.state.isLoggedIn then
+            Radio:doRadioCheck()
+        end
+    end)
 end
 
 function Radio:leaveradio()
@@ -162,7 +188,8 @@ function Radio:update()
         channelName = Shared.RadioNames,
         insideJammerZone = self.signalJammed,
         battery = battery,
-        overlay = Shared.Overlay
+        overlay = Shared.Overlay,
+        closeKey = self:GetCloseKey()
     })
 end
 
@@ -456,18 +483,27 @@ end
 
 exports('LeaveRadio', LeaveRadio)
 
-lib.addKeybind({
+-- Tombol yang sama untuk buka DAN tutup radio
+RadioKeybind = lib.addKeybind({
     name = 'radio',
-    description = 'Tekan = untuk buka Radio',
+    description = 'Buka / tutup Radio',
     defaultKey = 'EQUALS',
     onPressed = function()
-        if not Radio.usingRadio then
-            if Radio.hasRadio then
-                TriggerEvent('mm_radio:client:use')
-            end
+        if Radio.usingRadio then
+            -- terpakai saat "bisa jalan saat radio terbuka" aktif (game tetap menerima tombol)
+            TriggerEvent('mm_radio:client:remove')
+        elseif Radio.hasRadio then
+            TriggerEvent('mm_radio:client:use')
         end
     end
 })
+
+-- Huruf/simbol tombol radio saat ini (mis. "=") untuk dikenali UI saat layar radio memegang keyboard
+function Radio:GetCloseKey()
+    local ok, key = pcall(function() return RadioKeybind:getCurrentKey() end)
+    if ok and type(key) == 'string' and #key == 1 then return key end
+    return '='
+end
 
 lib.addKeybind({
     name = '+channel',
@@ -494,8 +530,10 @@ lib.addKeybind({
 if Shared.Battery.state then
     CreateThread(function()
         while true do
-            TriggerServerEvent('mm_radio:server:consumeBattery', Radio.batteryData)
             Wait(Shared.Battery.depletionTime * 60000)
+            if Radio.onRadio and #Radio.batteryData > 0 then
+                TriggerServerEvent('mm_radio:server:consumeBattery', Radio.batteryData)
+            end
         end
     end)
 end

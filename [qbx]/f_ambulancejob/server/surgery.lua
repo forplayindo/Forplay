@@ -58,7 +58,7 @@ end
 ---Item lapangan pada luka yang perlu operasi: luka tetap ada, ditandai distabilkan.
 function StabilizeInjury(target, part, injury)
     Player(target).state:set(BODY_PREFIX .. part, {
-        severity = injury.severity, weaponHash = injury.weaponHash, stabilized = true,
+        severity = injury.severity, weaponHash = injury.weaponHash, stabilized = true, limp = injury.limp,
     }, true)
 end
 

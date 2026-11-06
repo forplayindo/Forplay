@@ -15,6 +15,7 @@ local Music = require 'modules.music.client'
 local CarControl = require 'modules.car_control.client'
 local Seatbelt = require 'modules.seatbelt.client'
 local Blur = require 'modules.blur.client'
+local RadioHud = require 'modules.radio.client'
 require 'modules.stress.client'
 
 ---Sends message to the ReactUI.
@@ -39,6 +40,7 @@ end
 
 --Opens the page of Hud settings.
 local function openHudSettings()
+    Blur.Suspend('settings', true)
     SetNuiFocus(true, true)
     client.SendReactMessage('ui:setSettingsOpen', true)
 end
@@ -163,11 +165,13 @@ RegisterNUICallback('nui:onLoadUI', function(_, resultCallback)
     resultCallback(true)
     client.uiLoad = true
     Blur.Resend()
+    RadioHud.Resend()
     -- lib.print.info('ok: client.SetupUI')
 end)
 
 RegisterNUICallback('nui:hideFrame', function(_, resultCallback)
     SetNuiFocus(false, false)
+    Blur.Suspend('settings', false)
     client.SendReactMessage('ui:setSettingsOpen', false)
     resultCallback(true)
 end)

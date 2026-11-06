@@ -70,16 +70,7 @@ local function showRadial(id, option)
 
     currentRadial = radial
 
-    -- Hide current menu and allow for transition
-    SendNUIMessage({
-        action = 'openRadialMenu',
-        data = false
-    })
-
-    Wait(100)
-
-    -- If menu was closed during transition, don't open the submenu
-    if not isOpen then return end
+    -- f_patch: radial instan, tanpa sembunyi + jeda 100 ms
 
     SendNUIMessage({
         action = 'openRadialMenu',
@@ -336,16 +327,7 @@ RegisterNUICallback('radialBack', function(_, cb)
 
     currentRadial = nil
 
-    -- Hide current menu and allow for transition
-    SendNUIMessage({
-        action = 'openRadialMenu',
-        data = false
-    })
-
-    Wait(100)
-
-    -- If menu was closed during transition, don't open the submenu
-    if not isOpen then return end
+    -- f_patch: radial instan, tanpa sembunyi + jeda 100 ms
 
     SendNUIMessage({
         action = 'openRadialMenu',
@@ -369,7 +351,7 @@ RegisterNUICallback('radialClose', function(_, cb)
 end)
 
 RegisterNUICallback('radialTransition', function(_, cb)
-    Wait(100)
+    -- f_patch: radial instan, tanpa jeda
 
     -- If menu was closed during transition, don't open the submenu
     if not isOpen then return cb(false) end

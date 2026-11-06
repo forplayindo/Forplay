@@ -57,21 +57,15 @@ exports('MakePlayerFadeOut', makePlayerFadeOut)
 
 local function applyBleedEffects()
     if not QBX.PlayerData then return end
-    local bleedDamage = BleedLevel * config.bleedDamageTimer
+    local bleedDamage = config.bleedDamage[BleedLevel] or 0
     ApplyDamageToPed(cache.ped, bleedDamage, false)
     SendBleedAlert()
+    -- Hp ikut dikurangi supaya damage.lua tidak menganggap ini damage baru (level tidak naik sendiri)
     Hp -= bleedDamage
     local randX = math.random() + math.random(-1, 1)
     local randY = math.random() + math.random(-1, 1)
     local coords = GetOffsetFromEntityInWorldCoords(cache.ped, randX, randY, 0)
     TriggerServerEvent('evidence:server:CreateBloodDrop', QBX.PlayerData.citizenid, QBX.PlayerData.metadata.bloodtype, coords)
-
-    if AdvanceBleedTimer >= config.advanceBleedTimer then
-        ApplyBleed(1)
-        AdvanceBleedTimer = 0
-    else
-        AdvanceBleedTimer += 1
-    end
 end
 
 ---reduce bleeding by level. Bleed level cannot be negative.
@@ -93,7 +87,7 @@ exports('RemoveBleed', removeBleed)
 local function handleBleeding()
     if DeathState ~= sharedConfig.deathState.ALIVE or BleedLevel <= 0 then return end
     if FadeOutTimer + 1 == config.fadeOutTimer then
-        if BlackoutTimer + 1 == config.blackoutTimer then
+        if BlackoutTimer + 1 >= config.blackoutTimer then
             makePlayerBlackout()
             BlackoutTimer = 0
         else
@@ -114,7 +108,6 @@ local function bleedTick(ped)
         local currPos = GetEntityCoords(ped, true)
         local moving = #(prevPos.xy - currPos.xy)
         if (moving > 1 and not cache.vehicle) and BleedLevel > 2 then
-            AdvanceBleedTimer += config.bleedMovementAdvance
             BleedTickTimer += config.bleedMovementTick
             prevPos = currPos
         else

@@ -161,7 +161,7 @@ CreateThread(function()
     end
 end)
 
--- animasi kibas lalat saat HUD mandi >= FliesPercent (lalat + dengungnya di thread sync di bawah)
+-- animasi tepuk lalat saat HUD mandi >= FliesPercent (lalat + suara + reaksi sekitar di thread sync di bawah)
 local fliesActive = false
 
 RegisterNetEvent('hygiene:client:RefreshHud', function()
@@ -173,7 +173,7 @@ RegisterNetEvent('hygiene:client:RefreshHud', function()
             local timeout = GetGameTimer() + 2000
             while not HasAnimDictLoaded(dict) and GetGameTimer() < timeout do Wait(0) end
 
-            -- gerakan kibas cuma sekali tiap Config.Mandi.FliesInterval biar tidak terlalu sering, dan gantian
+            -- gerakan tepuk cuma sekali tiap Config.Mandi.FliesInterval biar tidak terlalu sering, dan gantian
             -- sama animasi reaksi lain (batuk/muntah) lewat HygieneTryPlayReaction
             while fliesActive do
                 HygieneTryPlayReaction(3500, function()
@@ -193,10 +193,12 @@ RegisterNetEvent('hygiene:client:RefreshHud', function()
     end
 end)
 
--- lalat (particle) + dengung buat SEMUA player kotor di sekitar, termasuk diri sendiri. Sumbernya
--- statebag hygieneFlies yang di-set server, jadi player lain ikut lihat & dengar.
--- Dengung: satu audio loop di NUI, volume ikut jarak player kotor terdekat
+-- lalat (particle) buat SEMUA player kotor di sekitar, termasuk diri sendiri. Sumbernya statebag
+-- hygieneFlies yang di-set server. Suara nyamuk + reaksi kibas player sekitar dipicu saat ped kotor
+-- itu MULAI main animasi tepuk lalat (animasinya sudah sync bawaan GTA), jadi tanpa event network
 local fliesFx = {} -- [serverId] = { ped = ped, handle = handle }
+local fliesSwatting = {} -- [serverId] = true selama ped itu sedang main animasi tepuk
+local lastReaction = 0
 
 local function StopFliesFx(sid)
     local cur = fliesFx[sid]
@@ -218,12 +220,30 @@ local function StartFliesFx(ped)
     return StartParticleFxLoopedOnEntity(fx.name, ped, fx.offset.x, fx.offset.y, fx.offset.z, 0.0, 0.0, 0.0, fx.scale, false, false, false)
 end
 
+local function TryFliesReaction()
+    local R = Config.Mandi.FliesReaction
+    if LocalPlayer.state.hygieneFlies or cache.vehicle then return end
+    if GetGameTimer() - lastReaction < R.Cooldown then return end
+    CreateThread(function()
+        RequestAnimDict(R.Anim.dict)
+        local timeout = GetGameTimer() + 2000
+        while not HasAnimDictLoaded(R.Anim.dict) and GetGameTimer() < timeout do Wait(0) end
+        if not HasAnimDictLoaded(R.Anim.dict) then return end
+        local played = HygieneTryPlayReaction(R.Duration, function()
+            TaskPlayAnim(cache.ped, R.Anim.dict, R.Anim.anim, 8.0, -8.0, -1, 48, 0, false, false, false)
+        end)
+        if played then lastReaction = GetGameTimer() end
+        RemoveAnimDict(R.Anim.dict)
+    end)
+end
+
 CreateThread(function()
     local S = Config.Mandi.FliesSync
-    local lastVolume = 0
+    local swatDict, swatAnim = Config.Mandi.FliesAnim.dict, Config.Mandi.FliesAnim.anim
     while true do
-        local myCoords = GetEntityCoords(cache.ped)
-        local seen, nearest = {}, nil
+        local myPed = cache.ped
+        local myCoords = GetEntityCoords(myPed)
+        local seen, soundDist, react = {}, nil, false
 
         for _, id in ipairs(GetActivePlayers()) do
             local sid = GetPlayerServerId(id)
@@ -232,13 +252,20 @@ CreateThread(function()
                 local dist = #(myCoords - GetEntityCoords(ped))
                 if dist <= S.Distance then
                     seen[sid] = true
-                    if not nearest or dist < nearest then nearest = dist end
                     local cur = fliesFx[sid]
                     if not cur or cur.ped ~= ped or not DoesParticleFxLoopedExist(cur.handle) then
                         StopFliesFx(sid)
                         local handle = StartFliesFx(ped)
                         if handle then fliesFx[sid] = { ped = ped, handle = handle } end
                     end
+
+                    -- baru mulai tepuk lalat -> bunyi nyamuk (+ reaksi kalau ped orang lain & dekat)
+                    local swatting = IsEntityPlayingAnim(ped, swatDict, swatAnim, 3)
+                    if swatting and not fliesSwatting[sid] then
+                        if not soundDist or dist < soundDist then soundDist = dist end
+                        if ped ~= myPed and dist <= Config.Mandi.FliesReaction.Distance then react = true end
+                    end
+                    fliesSwatting[sid] = swatting or nil
                 end
             end
         end
@@ -246,15 +273,15 @@ CreateThread(function()
         for sid in pairs(fliesFx) do
             if not seen[sid] then StopFliesFx(sid) end
         end
+        for sid in pairs(fliesSwatting) do
+            if not seen[sid] then fliesSwatting[sid] = nil end
+        end
 
-        local volume = 0
-        if nearest then
-            volume = math.floor(S.Volume * (1.0 - nearest / S.Distance) * 100 + 0.5) / 100
+        if soundDist then
+            local volume = math.floor(S.Volume * (1.0 - soundDist / S.Distance) * 100 + 0.5) / 100
+            if volume > 0 then SendNUIMessage({ action = 'flies', volume = volume }) end
         end
-        if volume ~= lastVolume then
-            lastVolume = volume
-            SendNUIMessage({ action = 'flies', volume = volume })
-        end
+        if react then TryFliesReaction() end
 
         Wait(S.Tick)
     end

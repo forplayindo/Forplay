@@ -212,11 +212,12 @@ local loops = {
 
 local function toggle(k)
     local on = not state[k]
+    if k == 'cuff' then on = not LocalPlayer.state.cuffed end -- ikut status borgol asli (bisa juga diborgol polisi)
     if not allowed(k, on) then return { ok = false } end
     local radarRunning = state.names or state.blips
     state[k] = on
     if k == 'cuff' then
-        TriggerEvent('police:client:GetCuffed', cache.serverId, true)
+        if on then TriggerEvent('police:client:GetCuffed', cache.serverId, true) end -- lepas: server f_admin -> f_police
     elseif on and loops[k] and not ((k == 'names' or k == 'blips') and radarRunning) then
         CreateThread(loops[k])
     end

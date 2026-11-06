@@ -4,23 +4,23 @@
 
 @font-face {
   font-family: "microgramma-d-extended";
-  src: url("/fonts/microgramma-d-extended/microgramma-d-extended.otf") format("OpenType");
+  src: url("/fonts/microgramma-d-extended/microgramma-d-extended.woff2") format("woff2");
 }
 @font-face {
   font-family: "sentic-text-black";
-  src: url("/fonts/sentic-text-black/sentic-text-black.otf") format("OpenType");
+  src: url("/fonts/sentic-text-black/sentic-text-black.woff2") format("woff2");
 }
 @font-face {
   font-family: "sentic-text-bold";
-  src: url("/fonts/sentic-text-bold/sentic-text-bold.otf") format("OpenType");
+  src: url("/fonts/sentic-text-bold/sentic-text-bold.woff2") format("woff2");
 }
 @font-face {
   font-family: "sentic-text-light";
-  src: url("/fonts/sentic-text-light/sentic-text-light.otf") format("OpenType");
+  src: url("/fonts/sentic-text-light/sentic-text-light.woff2") format("woff2");
 }
 @font-face {
   font-family: "ticking-timebomb";
-  src: url("/fonts/ticking-timebomb/ticking-timebomb.ttf") format("TrueType");
+  src: url("/fonts/ticking-timebomb/ticking-timebomb.woff2") format("woff2");
 }
 
 :root {

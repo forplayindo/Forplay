@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<style>
+@font-face { font-family: 'Sentic'; font-weight: 700; src: url('sentic-text-bold.woff2') format('woff2'); }
+@font-face { font-family: 'Sentic'; font-weight: 300; src: url('sentic-text-light.woff2') format('woff2'); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #111; font-family: 'Sentic', 'Segoe UI', sans-serif; color: #fff; display: flex; gap: 18px; padding: 18px; }
+.col { display: flex; flex-direction: column; gap: 8px; }
+.title { font-size: 15px; font-weight: 700; color: #f3b354; letter-spacing: .02em; }
+.sub { font-size: 11px; font-weight: 300; color: rgba(255,255,255,.7); width: 560px; line-height: 1.4; }
+.shot { position: relative; width: 560px; height: 460px; background: url('bg.png'); border-radius: 6px; overflow: hidden; }
+.anchor { position: absolute; left: 16px; bottom: 192px; width: 318px; display: flex; flex-direction: column; gap: 4px; }
+
+/* kaca gelap sama dengan kartu lokasi f_hud */
+.glass { background: rgba(16, 20, 28, .58); border: 1px solid rgba(255,255,255,.08); border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+.ico { width: 26px; height: 26px; border-radius: 5px; background: #f3b354; display: grid; place-items: center; flex: none; }
+.ico svg { width: 15px; height: 15px; fill: none; stroke: #1d1406; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.dim { color: rgba(255,255,255,.55); }
+.wave { display: flex; align-items: center; gap: 2px; height: 14px; }
+.wave i { display: block; width: 3px; border-radius: 2px; background: #f3b354; }
+.tx { font-size: 8.5px; font-weight: 700; color: #1d1406; background: #f3b354; border-radius: 3px; padding: 1px 4px; letter-spacing: .06em; }
+
+/* A: kartu per pembicara */
+.a-row { display: flex; align-items: center; gap: 9px; padding: 6px 9px 6px 6px; }
+.a-txt { flex: 1; min-width: 0; line-height: 1.15; }
+.a-k { font-size: 8.5px; letter-spacing: .08em; text-transform: uppercase; }
+.a-n { font-size: 12px; font-weight: 700; }
+
+/* B: daftar anggota */
+.b-head { display: flex; align-items: center; gap: 8px; padding: 6px 9px 6px 6px; border-bottom: 1px solid rgba(255,255,255,.07); }
+.b-freq { font-size: 12px; font-weight: 700; }
+.b-cnt { margin-left: auto; font-size: 9px; }
+.b-list { padding: 4px 0 5px; }
+.b-row { display: flex; align-items: center; gap: 8px; padding: 3px 10px; font-size: 10.5px; border-left: 3px solid transparent; }
+.b-row.on { border-left-color: #f3b354; background: rgba(243,179,84,.12); font-weight: 700; }
+.b-row .id { font-size: 8.5px; width: 22px; }
+.b-row .wave { margin-left: auto; }
+
+/* C: pil ringkas */
+.c-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.c-pill { display: inline-flex; align-items: center; gap: 7px; padding: 4px 10px 4px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.c-dot { width: 8px; height: 8px; border-radius: 50%; background: #f3b354; box-shadow: 0 0 0 3px rgba(243,179,84,.25); }
+.c-freq { font-size: 9px; font-weight: 300; }
+</style>
+</head>
+<body>
+<!-- A -->
+<div class="col">
+  <div class="title">A — Kartu Bicara</div>
+  <div class="sub">Muncul hanya saat ada yang bicara di radio, hilang 1 detik setelah selesai. Bisa sampai 3 orang bertumpuk.</div>
+  <div class="shot"><div class="anchor">
+    <div class="glass a-row">
+      <div class="ico"><svg viewBox="0 0 24 24"><path d="M6 8h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/><path d="M8 8 17 3"/><circle cx="15" cy="15" r="2.5"/><path d="M7 13h3M7 16h3"/></svg></div>
+      <div class="a-txt"><div class="a-k dim">Radio 101.5 MHz</div><div class="a-n">Sora Ajah</div></div>
+      <div class="wave"><i style="height:5px"></i><i style="height:11px"></i><i style="height:14px"></i><i style="height:8px"></i><i style="height:12px"></i></div>
+      <span class="tx">TX</span>
+    </div>
+    <div class="glass a-row">
+      <div class="ico"><svg viewBox="0 0 24 24"><path d="M6 8h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/><path d="M8 8 17 3"/><circle cx="15" cy="15" r="2.5"/><path d="M7 13h3M7 16h3"/></svg></div>
+      <div class="a-txt"><div class="a-k dim">Radio 101.5 MHz</div><div class="a-n">Budi Santoso</div></div>
+      <div class="wave"><i style="height:9px"></i><i style="height:13px"></i><i style="height:6px"></i><i style="height:12px"></i><i style="height:7px"></i></div>
+      <span class="tx">TX</span>
+    </div>
+  </div></div>
+</div>
+
+<!-- B -->
+<div class="col">
+  <div class="title">B — Daftar Anggota</div>
+  <div class="sub">Tampil selama kamu di channel radio. Semua anggota terlihat (maks 6), yang bicara disorot kuning + gelombang.</div>
+  <div class="shot"><div class="anchor">
+    <div class="glass">
+      <div class="b-head">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M6 8h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/><path d="M8 8 17 3"/><circle cx="15" cy="15" r="2.5"/><path d="M7 13h3M7 16h3"/></svg></div>
+        <div class="b-freq">101.5 <span class="dim" style="font-size:9px;font-weight:300">MHz</span></div>
+        <div class="b-cnt dim">4 anggota</div>
+      </div>
+      <div class="b-list">
+        <div class="b-row on"><span class="id dim">#1</span>Sora Ajah<div class="wave"><i style="height:5px"></i><i style="height:11px"></i><i style="height:14px"></i><i style="height:8px"></i></div></div>
+        <div class="b-row"><span class="id dim">#7</span>Budi Santoso</div>
+        <div class="b-row"><span class="id dim">#12</span>Rina Kartika</div>
+        <div class="b-row"><span class="id dim">#23</span>Joko Widodo</div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- C -->
+<div class="col">
+  <div class="title">C — Pil Ringkas</div>
+  <div class="sub">Paling kecil: satu pil per orang yang bicara, muncul hanya saat bicara. Tidak menutupi pemandangan.</div>
+  <div class="shot"><div class="anchor"><div class="c-wrap">
+    <div class="glass c-pill"><span class="c-dot"></span>Sora Ajah<span class="c-freq dim">101.5</span></div>
+    <div class="glass c-pill"><span class="c-dot"></span>Budi Santoso<span class="c-freq dim">101.5</span></div>
+  </div></div></div>
+</div>
+</body>
+</html>

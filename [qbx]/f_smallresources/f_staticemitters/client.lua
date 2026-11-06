@@ -8,6 +8,23 @@ if not config.enabled then return end
 
 local emitterGroupsData = {}
 
+local function isEmitterDisabled(groupOptions, emitterOptions)
+    return config.disableAll or groupOptions.disable or emitterOptions.disable
+end
+
+-- dijalankan untuk SEMUA pemain (dulu hanya ikut terpasang kalau admin, karena ada di registerMenus)
+local function applyEmitters()
+    for gameBuild, emitterGroups in pairs(config.gameBuild) do
+        if currentGameBuild >= gameBuild then
+            for _, groupOptions in pairs(emitterGroups) do
+                for emitterName, emitterOptions in pairs(groupOptions.emitters) do
+                    setStaticEmitterEnabled(emitterName, not isEmitterDisabled(groupOptions, emitterOptions))
+                end
+            end
+        end
+    end
+end
+
 local function registerMenus()
     local mainOptions = {}
     local submenus = {}
@@ -48,18 +65,15 @@ local function registerMenus()
     for gameBuild, emitterGroups in pairs(config.gameBuild) do
         if currentGameBuild >= gameBuild then
             for emitterGroup, emitterGroupOptions in pairs(emitterGroups) do
-                local groupDisable = emitterGroupOptions.disable
                 local submenuOptions = {}
                 local optionIndex = 0
                 local emitters = {}
 
                 for emitterName, emitterOptions in pairs(emitterGroupOptions.emitters) do
                     optionIndex = optionIndex + 1
-                    local emitterDisable = groupDisable or emitterOptions.disable
+                    local emitterDisable = isEmitterDisabled(emitterGroupOptions, emitterOptions)
                     local pos = emitterOptions.position
                     local posStr = ('%.2f, %.2f, %.2f'):format(pos.x, pos.y, pos.z)
-
-                    setStaticEmitterEnabled(emitterName, not emitterDisable)
 
                     submenuOptions[optionIndex] = {
                         label = emitterName,
@@ -105,6 +119,8 @@ end
 
 CreateThread(function()
     while not NetworkIsSessionStarted() do Wait(500) end
+
+    applyEmitters()
 
     local isAllowed = lib.callback.await('f_staticemitters:server:IsPlayerAceAllowed', false)
 

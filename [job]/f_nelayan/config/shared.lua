@@ -57,5 +57,6 @@ return {
         crateFull = `f_nelayan_peti_ikan`,
         crateEmpty = `f_nelayan_peti_kosong`,
         shoal = `p_shoalfish_s`,
+        ropeAnchor = `prop_golf_ball`,  -- titik ikat tali di tangan saat menarik jaring (tak terlihat)
     },
 }

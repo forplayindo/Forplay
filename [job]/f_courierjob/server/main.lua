@@ -129,28 +129,39 @@ local function pileSpot(i)
     return vec3(p.x + rx * side + fx * fwd, p.y + ry * side + fy * fwd, p.z)
 end
 
--- solo: 1 small package per stop. Duo: every stop gets 2 small (one each) or 1 big (carried together)
+-- one member drives, the rest deliver: every stop gets 1 small package per deliverer
+-- (solo 1, 2 orang 1, 3 orang 2, 4 orang 3). A big stop swaps 2 small for 1 big carried
+-- together (kru 2 orang: the driver gets out to help). Every stop pays packageWorth x members,
+-- split over its packages by weight (big = 2), so pay per person stays the same at any crew size.
 local function buildPackages(crew)
     local diff = difficulties[crew.difficulty]
-    local duo = #crew.members >= 2
+    local members = #crew.members
+    local deliverers = math.max(1, members - 1)
     local bigStops = {}
-    if duo then
+    if members >= 2 then
         local order = {}
         for i = 1, #crew.route do order[i] = i end
         order = shuffled(order)
         for i = 1, math.min(diff.big or 0, #order) do bigStops[order[i]] = true end
     end
+    local stopWorth = config.packageWorth * members * crew.mult
 
     local list = {}
     for stop = 1, #crew.route do
-        for _ = 1, duo and not bigStops[stop] and 2 or 1 do
+        local big = bigStops[stop]
+        local small = big and math.max(0, deliverers - 2) or deliverers
+        local weight = (big and 2 or 0) + small
+        local function add(isBig)
             list[#list + 1] = {
                 stop = stop,
-                big = bigStops[stop] or nil,
+                big = isBig or nil,
                 sign = math.random() < config.signChance or nil,
+                worth = math.floor(stopWorth * (isBig and 2 or 1) / weight),
                 state = 'ground', -- ground (pile / dropped) -> held -> van -> done
             }
         end
+        if big then add(true) end
+        for _ = 1, small do add(false) end
     end
     for i, pkg in ipairs(list) do pkg.pos = pileSpot(i) end
     return list
@@ -674,7 +685,7 @@ lib.callback.register('f_courierjob:server:deliver', function(src)
     end
     pkg.state, pkg.front, pkg.back = 'done', nil, nil
 
-    local worth = math.floor(config.packageWorth * (pkg.big and 2 or 1) * crew.mult)
+    local worth = pkg.worth
     crew.pool += worth
 
     for _, p in ipairs(crew.packages) do

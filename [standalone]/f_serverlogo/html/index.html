@@ -27,8 +27,9 @@ const CONFIG = {
   tagline: 'ROLEPLAY',
   opacity: 0.9,        // transparansi ala logo TV
   duration: 12.8,      // detik per loop
-  // ukuran panel info HUD f_hud @1080p (ClientInfo: PANEL_W, right 12, LOGO_SAFE_TOP) — logo dibuat selebar panel itu
-  hudWidth: 192, hudRight: 13, hudTop: 116,
+  // ukuran panel info HUD f_hud @1080p (ClientInfo: PANEL_W, right 12, LOGO_SAFE_TOP) — logo dibuat selebar panel itu,
+  // tepi kiri & kanan logo pas dengan tepi panel. Ubah bersama glass.css .gl-info width + ClientInfo PANEL_W/LOGO_SAFE_TOP.
+  hudWidth: 224, hudRight: 12, hudTop: 127,
   hudGap: 5           // jarak bawah logo ke panel info (px @1080p)
 };
 // ====================================
@@ -89,6 +90,7 @@ const CONFIG = {
     const a = e.data && e.data.action;
     if ((a === 'showLogo' || a === 'show4play') && !el.classList.contains('on')) { el.classList.add('on'); fit(); fontsReady.then(() => document.fonts.ready).then(fit); loop(); }
     if (a === 'hideLogo' || a === 'hide4play') { stop(); el.classList.remove('on'); }
+    if (a === 'pause') el.style.visibility = e.data.paused ? 'hidden' : '';
   });
 })();
 </script>

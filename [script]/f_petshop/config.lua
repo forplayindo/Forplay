@@ -220,7 +220,8 @@ Config.Supplies = {
 Config.Leash = {
     item = 'pet_leash',
     kinds = { dog_big = true, dog_small = true, cat = true, small = true },
-    color = { 95, 72, 48 }, -- warna tali (RGB)
+    color = { 120, 82, 45 }, -- warna tali (RGB)
+    width = 0.025,           -- tebal tali (meter); 0.02 = tipis, 0.04 = tebal
 }
 
 -- Hewan TIDAK dibeli: pemain mencoba dulu, lalu mengajukan kepemilikan yang disetujui Admin / Owner
@@ -242,7 +243,7 @@ Config.Attack = {
     range    = 40.0,            -- jarak maksimal pilih target / kejar (meter)
     maxTime  = 20,              -- detik; serangan berhenti otomatis setelah ini
     stopWhenDown = true,        -- berhenti menyerang saat target jatuh / pingsan
-    guardRadius  = { min = 3.0, max = 20.0, default = 8.0, step = 1.0 },
+    guardRadius  = { min = 1, max = 10, default = 5 }, -- meter, diisi angka di panel
     guardCooldown = 10,         -- detik sebelum pemain yang sama diserang lagi saat jaga area
     -- job yang bisa dicentang di Daftar Teman (tidak diserang saat jaga area)
     friendJobs = { 'police', 'ambulance' },

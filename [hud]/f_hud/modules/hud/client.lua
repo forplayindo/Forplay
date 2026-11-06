@@ -10,6 +10,7 @@ local Voice = require 'modules.voice.client'
 local CarControl = require 'modules.car_control.client'
 local Seatbelt = require 'modules.seatbelt.client'
 local Minimap = require 'modules.minimap.client'
+local Blur = require 'modules.blur.client'
 
 -- hygiene bars: values and the F3 show/hide state come from f_hygiene
 local function setHygiene(data)
@@ -44,6 +45,7 @@ Hud.data = lib.load('data.hud') --[[@type iHud]]
 
 local screenResolution = { x = 0, y = 0 }
 local isPauseActive = false
+local invHidden = false -- HUD hidden while ox_inventory is open
 local oldVehicle = nil
 local isPlayerDeath = false
 
@@ -320,6 +322,7 @@ end
 -- Radar display or hidden by options
 function Hud.CheckRadarDisplay()
     DisplayRadar(false)
+    if invHidden then return end
     if client.IsPlayerLoaded() and client.uiLoad then
         if not Hud.data.cinematic.show then
             if Hud.data.mini_map.onlyInVehicle then
@@ -346,6 +349,7 @@ end
 -- Sets the visibility of the HUD UI element
 ---@param state boolean visible (true) or hidden (false)
 function Hud.SetVisible(state)
+    Blur.Suspend('hidden', not state)
     if state then
         Hud.CheckRadarDisplay()
     else
@@ -392,16 +396,25 @@ CreateThread(function()
     end
 end)
 -- Updates priority data
--- Only pushes to NUI when something actually changed (idle = no NUI traffic, no React re-render)
-local lastPayload = nil
+-- Only pushes the sections that actually changed (idle = no NUI traffic; speedometer change = only vehicle_info)
+-- these are the only sections the NUI reads from ui:setHudData
+local HUD_SECTIONS = { 'client_info', 'compass', 'navigation_widget', 'vehicle_info', 'bars', 'hygiene' }
+local lastSections = {}
 local function pushHudData()
-    local payload = json.encode(Hud.data)
-    if payload ~= lastPayload then
-        lastPayload = payload
-        SendNuiMessage('{"action":"ui:setHudData","data":' .. payload .. '}')
+    local parts = {}
+    for i = 1, #HUD_SECTIONS do
+        local key = HUD_SECTIONS[i]
+        local encoded = json.encode(Hud.data[key])
+        if encoded ~= lastSections[key] then
+            lastSections[key] = encoded
+            parts[#parts + 1] = ('"%s":%s'):format(key, encoded)
+        end
+    end
+    if #parts > 0 then
+        SendNuiMessage('{"action":"ui:setHudData","data":{' .. table.concat(parts, ',') .. '}}')
     end
 end
-Hud.ForcePush = function() lastPayload = nil end
+Hud.ForcePush = function() lastSections = {} end
 
 --- Fill and push all data right away on login instead of waiting for the next loop tick (up to 1s)
 function Hud.RefreshNow()
@@ -411,7 +424,7 @@ function Hud.RefreshNow()
     updateCompassHeading()
     updateBars()
     updateVehicleInfo()
-    lastPayload = nil
+    Hud.ForcePush()
     pushHudData()
 end
 
@@ -458,6 +471,16 @@ CreateThread(function()
         end
         Wait(1000)
     end
+end)
+
+-- Hide the HUD + minimap while ox_inventory is open: the native screenblur cannot blur NUI,
+-- so the HUD would sit on top of the inventory. Event-driven (statebag), no loop.
+AddStateBagChangeHandler('invOpen', ('player:%s'):format(GetPlayerServerId(PlayerId())), function(_, _, value)
+    value = value and true or false
+    if value == invHidden then return end
+    invHidden = value
+    if not (client.load and client.uiLoad) or isPauseActive then return end
+    Hud.SetVisible(not value)
 end)
 
 -- Hide GTA components if option is active

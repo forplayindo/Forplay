@@ -11,10 +11,9 @@ Config.Mandi = {
     FliesPercent = 85,                -- persen HUD saat lalat mulai mengelilingi player
     BathDuration = 10000,              -- 10 detik durasi animasi mandi
 
-    -- animasi kibas-kibas bau/lalat (animasi bawaan GTA "Stinker", pengganti mosquitoes_singleanimation
-    -- yang escrow). Upper body saja, jadi tetap bisa jalan
-    FliesAnim = { dict = 'anim@mp_player_intupperstinker', anim = 'idle_a' },
-    FliesInterval = 20000, -- animasi kibas dimainkan sekali tiap 20 detik
+    -- animasi tepuk lalat player yang kotor (dari resource escrow mosquitoes_singleanimation - jangan dihapus)
+    FliesAnim = { dict = 'cm@insect@clip', anim = 'insect_clip' },
+    FliesInterval = 60000, -- animasi tepuk lalat dimainkan sekali tiap 60 detik (suara nyamuk ikut bunyi bareng)
 
     -- efek visual lalat beneran (particle bawaan GTA), nempel di ped selama kotor
     FliesEffect = {
@@ -24,11 +23,21 @@ Config.Mandi = {
         scale = 1.0,
     },
 
-    -- lalat + dengung ikut terlihat/terdengar player lain di sekitar (lewat statebag dari server)
+    -- lalat ikut terlihat player lain di sekitar (lewat statebag dari server). Suara nyamuk
+    -- (html/sounds/nyamuk.wav) bunyi tiap kali player kotor main animasi tepuk lalat
     FliesSync = {
-        Distance = 15.0, -- radius lalat ditampilkan & dengungnya terdengar
-        Volume = 0.6,    -- volume dengung maksimal (0.0 - 1.0), makin jauh makin pelan
+        Distance = 15.0, -- radius lalat ditampilkan & suara nyamuk terdengar
+        Volume = 0.6,    -- volume suara maksimal (0.0 - 1.0), makin jauh makin pelan
         Tick = 500,      -- ms, interval cek player kotor di sekitar
+    },
+
+    -- reaksi player LAIN yang dekat player kotor: kibas bau (animasi bawaan GTA "Stinker"),
+    -- dimainkan pas player kotor itu tepuk lalat, maksimal sekali tiap Cooldown
+    FliesReaction = {
+        Anim = { dict = 'anim@mp_player_intupperstinker', anim = 'idle_a' },
+        Distance = 5.0,   -- radius player sekitar ikut bereaksi
+        Cooldown = 60000, -- ms, jeda minimal antar reaksi
+        Duration = 3500,  -- ms, lama kunci animasi reaksi
     },
 
     -- animasi proses mandi (dipakai baik mandi di air maupun di shower)
@@ -52,7 +61,7 @@ Config.Kencing = {
     ReminderPercent = 70,
     DesperatePercent = 100,
     PeeDuration = 6000,        -- 6 detik
-    SafeDistance = 5.0,        -- jarak minimal dari player lain untuk kencing sembarang tempat
+    SafeDistance = 10.0,        -- jarak minimal dari player lain untuk kencing sembarang tempat
 
     PeeAnim = { dict = 'misscarsteal2peeing', clip = 'peeing_loop' },                          -- male
     -- wanita kencing SEMBARANGAN (bukan di toilet) - pose jongkok. CODE_HUMAN_MEDIC_KNEEL sempat
@@ -96,8 +105,28 @@ Config.Poop = {
     ReminderPercent = 70,
     DesperatePercent = 100,
     PoopDuration = 6000,       -- 6 detik
+    SafeDistance = 15.0,        -- jarak minimal dari player lain untuk poop sembarang tempat
 
-    -- poop cuma bisa di prop toilet (tidak ada animasi jongkok luar ruangan yang cocok).
+    -- poop SEMBARANG TEMPAT (menu radial): animasi, tisu & efek sama dengan emote "shit" rpemotes,
+    -- bedanya kotoran langsung keluar selama progress bar (tidak perlu tekan G)
+    AnywhereAnim = { dict = 'missfbi3ig_0', clip = 'shit_loop_trev' },
+    AnywhereProp = {
+        model = 'prop_toilet_roll_01',
+        bone = 28422,
+        pos = vector3(0.07, -0.02, -0.21),
+        rot = vector3(0.0, 0.0, 0.0),
+    },
+    AnywhereEffect = {
+        dict = 'scr_amb_chop',
+        name = 'ent_anim_dog_poo',
+        bone = 11816,
+        offset = vector3(0.0, 0.0, -0.1),
+        rot = vector3(0.0, 0.0, 0.0),
+        scale = 1.3,
+        delay = 1500,          -- ms setelah mulai jongkok baru kotoran keluar
+    },
+
+    -- poop di prop toilet (ox_target):
     -- animasi Trevor duduk toilet asli (dict/clip mentah lewat TaskPlayAnim) - posisinya sudah
     -- dikalibrasi & terkonfirmasi pas lewat SeatOffset di bawah.
     ToiletAnim = {
@@ -178,12 +207,15 @@ Config.Blips = {
 }
 
 ---------------------------------------------------------------------------
--- ANIMASI "KEBELET" (dipakai bersama oleh kencing & poop saat 100%) - animasi nempel di atas
--- jalan normal (upper body, loop), bukan clipset gaya jalan
+-- ANIMASI "KEBELET" saat kencing / poop 100% - animasi nempel di atas jalan normal (upper body),
+-- bukan clipset gaya jalan. Kencing = pegang selangkangan, poop = emote rpemotes "puke"
+-- (cross_arms@dark, animasinya saja tanpa efek muntah). Keduanya 100% = gantian.
 ---------------------------------------------------------------------------
 Config.Desperate = {
-    AnimDict = 'mp_player_int_uppergrab_crotch',
+    AnimDict = 'mp_player_int_uppergrab_crotch',     -- kencing
     AnimClip = 'mp_player_int_grab_crotch',
+    PoopAnimDict = 'cross_arms@dark',                -- poop (anim stream dari rpemotes)
+    PoopAnimClip = 'cross_arms_clip',
     Interval = 30000, -- dimainkan sekali tiap 30 detik
     Duration = 4000,  -- lama animasi tiap kali main
 }

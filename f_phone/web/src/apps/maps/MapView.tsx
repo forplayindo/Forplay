@@ -104,6 +104,14 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
     const mapStyles = getMapStyles();
     const style = mapStyles.find(s => s.id === styleId) ?? mapStyles[0];
 
+    // f_phone perf: hold the tile images back until the app-open / tab-push animation
+    // (~340ms) has played, so JPEG decode doesn't fight the animation for the frame.
+    const [tilesReady, setTilesReady] = useState(false);
+    useEffect(() => {
+        const id = window.setTimeout(() => setTilesReady(true), 360);
+        return () => window.clearTimeout(id);
+    }, []);
+
     const [prevStyle, setPrevStyle] = useState<MapStyle | null>(null);
     const styleFadeTimer = useRef<number | null>(null);
     useEffect(() => () => { if (styleFadeTimer.current) window.clearTimeout(styleFadeTimer.current); }, []);
@@ -418,14 +426,16 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
                 }}
             >
                 <div className="absolute inset-0" style={{ background: '#0b2838' }} />
-                {prevStyle && (
+                {tilesReady && prevStyle && (
                     <div className="absolute inset-0">
                         <TileGrid style={prevStyle} side={side} pow={pow} scale={scale} tx={Math.round(tx / 64) * 64} ty={Math.round(ty / 64) * 64} vpW={vw} vpH={vh} />
                     </div>
                 )}
+                {tilesReady && (
                 <div key={style.id} className={prevStyle ? 'absolute inset-0 animate-fade-in' : 'absolute inset-0'}>
                     <TileGrid style={style} side={side} pow={pow} scale={scale} tx={Math.round(tx / 64) * 64} ty={Math.round(ty / 64) * 64} vpW={vw} vpH={vh} />
                 </div>
+                )}
                 {style.wash && (
                     <div className="absolute inset-0" style={{ background: style.wash, pointerEvents: 'none' }} />
                 )}
@@ -606,20 +616,25 @@ const TileGrid = memo(function TileGrid({ style, side, pow, scale, tx, ty, vpW, 
 }) {
     const sideP  = side * pow;
     const scaleP = scale / pow;
+    // f_phone perf: the always-on full-grid backdrop only needs to cover the map at ~2x
+    // (the auto-center zoom). A phone-sized map (side <= 1024) gets z1 = 4 tiles instead
+    // of z2 = 16 tiles of 1024px; deeper zoom still streams viewport-culled detail tiles.
+    const backdropZ = side <= stylePx(style.tiles) ? 1 : BACKDROP_Z;
 
     const backdrop = useMemo(
-        () => (side ? tileLayer(style, BACKDROP_Z, sideP, scaleP, 0, 0, vpW, vpH, `${style.tiles}bg`, true) : []),
-        [style, sideP, vpW, vpH],
+        () => (side ? tileLayer(style, backdropZ, sideP, scaleP, 0, 0, vpW, vpH, `${style.tiles}bg${backdropZ}`, true) : []),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [style, sideP, vpW, vpH, backdropZ],
     );
 
     if (!side) return null;
 
     const maxZ = styleMaxZoom(style.tiles);
     const need = Math.ceil(Math.log2(Math.max(1, (side * scale) / stylePx(style.tiles))));
-    const detailZ = Math.max(BACKDROP_Z, Math.min(maxZ, need));
+    const detailZ = Math.max(backdropZ, Math.min(maxZ, need));
 
     const detail: ReactNode[] = [];
-    for (let z = Math.max(BACKDROP_Z + 1, detailZ - 1); z <= detailZ; z++) {
+    for (let z = Math.max(backdropZ + 1, detailZ - 1); z <= detailZ; z++) {
         detail.push(
             ...tileLayer(style, z, sideP, scaleP, tx, ty, vpW, vpH, `${style.tiles}${z}`, false),
         );

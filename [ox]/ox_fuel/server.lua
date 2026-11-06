@@ -208,12 +208,14 @@ local function trim(text)
 	return (text:gsub('^%s+', ''):gsub('%s+$', ''))
 end
 
+-- posisi charger sama dengan yang di-spawn client (data/chargers.lua)
+local chargers = lib.load('data.chargers')
+
 local function isNearCharger(coords)
 	if not config.electric.enabled then return false end
-	local maxDistance = config.electric.stationRadius + config.hose.length
 
-	for i = 1, #config.electric.stations do
-		if #(coords - config.electric.stations[i]) <= maxDistance then return true end
+	for i = 1, #chargers do
+		if #(coords - chargers[i].xyz) <= config.hose.length + 2.0 then return true end
 	end
 
 	return false
@@ -262,6 +264,19 @@ lib.callback.register('ox_fuel:quote', function(source, netid)
 	local current = litersIn(vehicle, size)
 	local data = exports.qbx_core:GetVehiclesByHash(model)
 
+	-- tombol mode charger: tampilkan lama isi penuh di bawah nama (menu menghitung perkiraan detik dari rate)
+	local types = config.fuelTypes
+	if electric then
+		types = {}
+		for i = 1, #tank.electricModes do
+			local mode = tank.electricModes[i]
+			types[i] = {
+				id = mode.id, label = mode.label, price = mode.price, color = mode.color,
+				rate = size / mode.fullTime, sub = ('Penuh ±%s mnt'):format(formatLiters(mode.fullTime / 60)),
+			}
+		end
+	end
+
 	return {
 		label = ('%s · %s'):format(data and data.name or 'Kendaraan', trim(GetVehicleNumberPlateText(vehicle))),
 		tank = size,
@@ -269,8 +284,8 @@ lib.callback.register('ox_fuel:quote', function(source, netid)
 		free = size - current,
 		electric = electric,
 		unit = electric and 'kWh' or 'L',
-		types = electric and { tank.electricType } or config.fuelTypes,
-		lastType = Entity(vehicle).state.fuelType,
+		types = types,
+		lastType = not electric and Entity(vehicle).state.fuelType or nil,
 		cash = player.PlayerData.money.cash or 0,
 		bank = player.PlayerData.money.bank or 0,
 	}
@@ -285,7 +300,7 @@ lib.callback.register('ox_fuel:start', function(source, netid, typeId, liters, m
 
 	local fuelType
 	if electric then
-		fuelType = typeId == tank.electricType.id and tank.electricType
+		fuelType = tank.electricMode(typeId)
 	else
 		fuelType = tank.fuelType(typeId)
 	end
@@ -300,14 +315,18 @@ lib.callback.register('ox_fuel:start', function(source, netid, typeId, liters, m
 		return { error = locale(method == 'cash' and 'refuel_cannot_afford' or 'bank_not_enough') }
 	end
 
-	local rate = electric and config.electric.kwhPerTick or config.litersPerTick
+	-- kecepatan isi per refillTick: charger = baterai penuh dalam fullTime detik (fast lebih cepat), bensin selalu sama
+	local rate = electric and size * config.refillTick / (fuelType.fullTime * 1000) or config.litersPerTick
 
 	orders[source] = {
 		vehicle = vehicle, type = fuelType, liters = liters, method = method, size = size, rate = rate,
-		electric = electric, startedAt = GetGameTimer(),
+		electric = electric, startedAt = GetGameTimer(), position = GetEntityCoords(vehicle),
 	}
 
-	return { liters = liters, size = size, rate = rate, startPercent = Entity(vehicle).state.fuel or 0, price = fuelType.price }
+	return {
+		liters = liters, size = size, rate = rate, startPercent = Entity(vehicle).state.fuel or 0, price = fuelType.price,
+		title = electric and (fuelType.holo or 'CHARGER') or 'SPBU',
+	}
 end)
 
 ---@param claimed number liter menurut client (dibatasi pesanan & waktu yang berlalu)
@@ -356,9 +375,9 @@ RegisterNetEvent('ox_fuel:finish', function(claimed)
 	local order = orders[source]
 	if not order then return end
 
-	local coords = GetEntityCoords(GetPlayerPed(source))
-
-	if not DoesEntityExist(order.vehicle) or #(coords - GetEntityCoords(order.vehicle)) > 8.0 or not atStation(coords, order.electric) then
+	-- corong ditancap lalu ditinggal: player boleh di mana saja, yang dicek kendaraannya masih di tempat mengisi
+	-- (client berhenti begitu kendaraan bergeser 0,5 m; jumlah tetap dibatasi pesanan & waktu di finishOrder)
+	if not DoesEntityExist(order.vehicle) or #(GetEntityCoords(order.vehicle) - order.position) > 25.0 then
 		orders[source] = nil
 		return
 	end

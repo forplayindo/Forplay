@@ -65,8 +65,16 @@ return {
 	-- Kendaraan listrik (adaptasi caticus-fuelsystem): isi daya di stasiun charger, bukan pompa bensin
 	electric = {
 		enabled = true,
-		price = 2000,       -- Rp per kWh (75 kWh penuh = Rp 150.000, sedikit lebih murah dari bensin)
-		kwhPerTick = 0.5,   -- 0.5 kWh / 250 ms = 2 kWh/detik
+		-- Mode pengisian daya, dipilih di menu charger (urutan = urutan tombol, yang pertama jadi default)
+		--  price    = Rp per kWh
+		--  fullTime = detik untuk 0 -> 100%, sama untuk semua ukuran baterai (isi sebagian = proporsional)
+		--  holo     = judul hologram saat mengisi
+		modes = {
+			-- 75 kWh penuh: Rp 150.000, 2 menit
+			{ id = 'normal', label = 'Normal', price = 2000, fullTime = 120, color = '#facc15', holo = 'CHARGER' },
+			-- 75 kWh penuh: Rp 225.000, 1 menit (2x lebih cepat, 50% lebih mahal)
+			{ id = 'fast', label = 'Fast Charging', price = 3000, fullTime = 60, color = '#f97316', holo = 'FAST CHARGER' },
+		},
 		batteryDefault = 75, -- kWh
 		batteryModels = {},  -- per model: ['neon'] = 80,
 		-- model listrik (nama spawn). Mobil listrik addon: tambahkan di sini.
@@ -78,25 +86,47 @@ return {
 		-- pemakaian baterai per detik menurut RPM (persen / 10), dari caticus Config.KwUsage
 		usage = { [1.0] = 1.4, [0.9] = 1.2, [0.8] = 1.0, [0.7] = 0.9, [0.6] = 0.8, [0.5] = 0.7, [0.4] = 0.5, [0.3] = 0.4, [0.2] = 0.001, [0.1] = 0.001, [0.0] = 0.0 },
 		usageMultiplier = 1.0,
-		-- model charger bawaan GTA di titik supercharger (hash dari caticus)
-		chargerModels = { 1467552538 },
-		stationRadius = 30.0, -- charger dicari dalam radius ini dari titik stasiun
-		-- titik stasiun charger (caticus Config.SuperchargerStations)
-		stations = {
-			vec3(153.4138, 6592.721, 30.8449),
-			vec3(2697.205, 3277.662, 54.24057),
-			vec3(-2534.736, 2345.22, 32.05991),
-			vec3(645.1025, 280.3252, 102.1716),
-			vec3(-729.0958, -911.1166, 18.01393),
-		},
+		-- Prop charger (f_addonprop stream/ev_charger). Posisi di data/chargers.lua, di-spawn lokal oleh client/chargers.lua.
+		-- full = pistol tergantung di holster, empty = pistol sedang dipakai (model ditukar otomatis)
+		chargerModel = { full = `4play_ev_charge_station`, empty = `4play_ev_charge_station_empty` },
 	},
 
-	-- tinggi ujung selang per model pompa (dari caticus); model lain pakai hose.anchorHeight
+	-- titik keluar selang per model pompa: angka = tinggi di atas pivot (dari caticus), vec3 = offset dari pivot.
+	-- model lain pakai hose.anchorHeight
 	pumpAnchor = {
 		[`prop_gas_pump_1a`] = 2.3, [`prop_gas_pump_1b`] = 2.3, [`prop_gas_pump_1c`] = 2.3, [`prop_gas_pump_1d`] = 2.3,
 		[`prop_vintage_pump`] = 1.8, [`prop_gas_pump_old2`] = 1.6, [`prop_gas_pump_old3`] = 1.6,
-		[1467552538] = 1.6,
+		[`4play_ev_charge_station`] = vec3(0.30, 0.0, 0.36), -- cable gland di sisi kanan bawah
+		[`4play_ev_charge_station_empty`] = vec3(0.30, 0.0, 0.36),
 	},
+
+	-- Corong / pistol: dipegang di tangan, lalu ditancap ke kendaraan (gaya lc_fuel) dan bisa ditinggal.
+	--  hand  = offset x y z + rotasi x y z di tulang tangan kiri (18905), [7] = rotationOrder
+	--  tip   = titik sambungan selang di corong (offset model)
+	--  rot   = rotasi corong saat menancap di sisi KIRI kendaraan (sisi kanan otomatis +180 di z)
+	--  shift = corong dimundurkan sejauh ini (offset model) saat menancap: ujung colokan lebih panjang dari prop lc_fuel
+	-- Kalibrasi di game: plugDebug = true lalu /coloktes (lihat client/plug.lua)
+	nozzles = {
+		petrol = {
+			model = `prop_cs_fuel_nozle`,
+			hand = { 0.11, 0.02, 0.02, -80.0, -90.0, 15.0, 1 },
+			tip = vec3(0.0, -0.033, -0.195),
+			rot = vec3(-45.0, 0.0, -90.0),
+		},
+		-- model dibangun dengan pivot & arah sama dengan prop_eletricpistol lc_fuel (pangkal kabel di bawah pegangan,
+		-- colokan ke +Y), jadi angka tangan & tancap lc_fuel dipakai apa adanya
+		electric = {
+			model = `4play_ev_charge_gun`,
+			hand = { 0.13, 0.04, 0.01, -42.0, -115.0, -63.42, 0 },
+			tip = vec3(0.0, -0.033, -0.195),
+			rot = vec3(-45.0, 0.0, -90.0),
+			shift = vec3(0.0, 0.18, 0.0),
+		},
+	},
+	-- titik tancap per model kendaraan (data/plugs.lua, dari lc_fuel); model lain pakai ini.
+	--  offset dari tulang tutup tangki: forward / right / up (meter), distance = jarak player ke titik tancap
+	plugDefault = { distance = 1.2, nozzleOffset = { forward = 0.0, right = -0.15, up = 0.5 } },
+	plugDebug = false,
 
 	-- Ukuran tangki (liter) per kategori kendaraan (qbx_core shared/vehicles.lua)
 	tankDefault = 60.0,

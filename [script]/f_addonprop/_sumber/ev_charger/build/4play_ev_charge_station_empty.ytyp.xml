@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CMapTypes>
+ <extensions />
+ <archetypes>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="100" />
+   <flags value="549453856" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.385" y="-0.2495" z="0" />
+   <bbMax x="0.409" y="0.245" z="1.937" />
+   <bsCentre x="0.012" y="-0.00225" z="0.9685" />
+   <bsRadius value="1.075516" />
+   <hdTextureDist value="100" />
+   <name>4play_ev_charge_station_empty</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary>4play_ev_charge_station_empty</physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>4play_ev_charge_station_empty</assetName>
+   <extensions />
+  </Item>
+ </archetypes>
+ <name>4play_ev_charge_station_empty</name>
+ <dependencies />
+ <compositeEntityTypes itemType="CCompositeEntityType" />
+</CMapTypes>

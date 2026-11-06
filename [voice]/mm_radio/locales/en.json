@@ -9,7 +9,6 @@
     "toggle_defean": "Radio Deafened",
     "toggle_undeafen": "Radio Undeafened",
     "failed_mute": "Failed to Mute Player",
-    
     "ui": {
         "header": "IN RADIO",
         "frequency": "Frequency",
@@ -29,6 +28,28 @@
         "move_radio": "Move Radio",
         "allow_move": "Allow Move",
         "overlay_settings": "Overlay Settings",
-		"enableClicks": "Radio Sound"
+        "enableClicks": "Radio Sound",
+        "name": "Name on radio",
+        "radio_size": "Radio size",
+        "overlay_size": "Overlay size",
+        "overlay": "Overlay",
+        "no_signal": "NO SIGNAL (JAMMED)",
+        "enter_freq": "Enter frequency",
+        "no_members": "No one here yet",
+        "no_channels": "Empty",
+        "tap_change": "tap to change",
+        "channel": "Channel",
+        "signal": "Signal",
+        "location": "Location",
+        "active": "active",
+        "signal_good": "Good",
+        "signal_jammed": "Jammed",
+        "cancel": "Cancel",
+        "join": "Join",
+        "back": "Back",
+        "fav": "Fav",
+        "mute": "Mute",
+        "target": "Target",
+        "tab_settings": "Setup"
     }
 }

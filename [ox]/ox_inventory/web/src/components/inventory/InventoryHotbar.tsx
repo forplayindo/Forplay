@@ -11,6 +11,7 @@ import { onDrop } from '../../dnd/onDrop';
 import { onUse } from '../../dnd/onUse';
 import { closeTooltip } from '../../store/tooltip';
 import { getHotbarItems } from '../../store/hotbar';
+import { Items } from '../../store/items';
 
 const formatWeight = (weight: number) => {
   if (!weight || weight <= 0) return '';
@@ -80,6 +81,11 @@ const HotbarSlot: React.FC<{ item: Slot; hotkey: number }> = ({ item, hotkey }) 
           <div className="hotbar-slot-bottom">
             <p className="hotbar-slot-weight">{formatWeight(item.weight)}</p>
             {item?.durability !== undefined && <WeightBar percent={item.durability} durability />}
+            <div className="inventory-slot-label-box">
+              <div className="inventory-slot-label-text">
+                {item.metadata?.label ? item.metadata.label : Items[item.name]?.label || item.name}
+              </div>
+            </div>
           </div>
         </div>
       )}

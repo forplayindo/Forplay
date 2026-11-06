@@ -1,6 +1,15 @@
 Config.Peds = {
     pedConfig = {
+        -- semua pemain: hanya model freemode (karakter MP)
         {
+            peds = {
+                "mp_m_freemode_01",
+                "mp_f_freemode_01",
+            }
+        },
+        -- ped lain hanya untuk admin (ace "admin", lihat Config.Aces)
+        {
+            aces = { "admin" },
             peds = {
                 "a_c_boar",
                 "a_c_boar_02",
@@ -772,7 +781,6 @@ Config.Peds = {
                 "mp_f_execpa_01",
                 "mp_f_execpa_02",
                 "mp_f_forgery_01",
-                "mp_f_freemode_01",
                 "mp_f_helistaff_01",
                 "mp_f_meth_01",
                 "mp_f_misty_01",
@@ -791,7 +799,6 @@ Config.Peds = {
                 "mp_m_famdd_01",
                 "mp_m_fibsec_01",
                 "mp_m_forgery_01",
-                "mp_m_freemode_01",
                 "mp_m_g_vagfun_01",
                 "mp_m_marston_01",
                 "mp_m_meth_01",

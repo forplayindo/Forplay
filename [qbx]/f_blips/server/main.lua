@@ -10,7 +10,12 @@ local pending = 0
 local validCategory = {}
 for _, c in ipairs(Config.Categories) do validCategory[c] = true end
 
+-- Owner/Admin di f_admin, atau license di Config.AllowedLicenses (cadangan kalau f_admin mati)
 local function isAdmin(src)
+    if GetResourceState('f_admin') == 'started' then
+        local role = exports.f_admin:GetRole(src)
+        if role == 'owner' or role == 'admin' then return true end
+    end
     local license = GetPlayerIdentifierByType(src, 'license')
     return license ~= nil and allowed[license:lower()] == true
 end

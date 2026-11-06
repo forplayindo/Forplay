@@ -8,12 +8,12 @@
   "use strict";
 
   var TIERS = {
-    high:   { fps: 60, ds: 4, passes: 2, spread: 1.5, scan: 500 },
-    medium: { fps: 30, ds: 6, passes: 2, spread: 1.2, scan: 700 },
-    low:    { fps: 20, ds: 8, passes: 1, spread: 1.5, scan: 900 },
+    high:   { fps: 60, ds: 4, passes: 2, spread: 1.5, scan: 500, cs: 1 },
+    medium: { fps: 30, ds: 6, passes: 2, spread: 1.2, scan: 700, cs: 0.75 },
+    low:    { fps: 20, ds: 8, passes: 1, spread: 1.5, scan: 900, cs: 0.5 },
   };
   var LOOK = { saturation: 1.3, brightness: 1.0 };
-  var START_TIER = "medium";
+  var START_TIER = "off"; // mati sampai Lua mengirim tier (loading screen tanpa blur)
 
   var MAX = 40;
   var isGame = !!window.invokeNative;
@@ -117,7 +117,7 @@
   function resize() {
     if (!T) return;
     W = Math.max(1, window.innerWidth); H = Math.max(1, window.innerHeight);
-    canvas.width = W; canvas.height = H;
+    canvas.width = Math.max(1, Math.round(W * T.cs)); canvas.height = Math.max(1, Math.round(H * T.cs)); // kanvas komposit lebih kecil (cs), koordinat tetap px layar
     lw = Math.max(1, Math.round(W / T.ds)); lh = Math.max(1, Math.round(H / T.ds));
     tx.forEach(function (t) { gl.deleteTexture(t); }); fb.forEach(function (f) { gl.deleteFramebuffer(f); });
     var a = makeTarget(), b = makeTarget(); fb = [a[0], b[0]]; tx = [a[1], b[1]];
@@ -182,7 +182,7 @@
   function clearCanvas() {
     if (!W) return;
     gl.disable(gl.SCISSOR_TEST);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
   }
   function eachLowScissor(fn) { for (var i = 0; i < count; i++) { var s = rects[i].s; gl.scissor(s[0], s[1], s[2], s[3]); fn(); } }
@@ -214,7 +214,7 @@
     }
 
     gl.disable(gl.SCISSOR_TEST);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
     gl.enable(gl.SCISSOR_TEST);
     gl.useProgram(pComp); gl.uniform1i(u.compT, 0); gl.bindTexture(gl.TEXTURE_2D, tx[0]);
@@ -222,7 +222,7 @@
     if (checks < 5) { checks++; if (gl.getError() !== gl.NO_ERROR) { console.warn("[rb-blur] GL error -> blur disabled"); setTier("off"); return; } }
     for (var k = 0; k < count; k++) {
       var q = rects[k];
-      gl.scissor(q.sc[0], q.sc[1], q.sc[2], q.sc[3]);
+      var sk = T.cs; gl.scissor(Math.floor(q.sc[0] * sk), Math.floor(q.sc[1] * sk), Math.ceil(q.sc[2] * sk) + 1, Math.ceil(q.sc[3] * sk) + 1);
       gl.uniform4fv(u.r, q.r); gl.uniform4fv(u.rf, q.r); gl.uniform4fv(u.c, q.c); gl.uniform4fv(u.fz, q.fz); gl.uniform1f(u.op, q.op);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }

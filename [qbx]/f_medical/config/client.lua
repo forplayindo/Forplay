@@ -19,11 +19,13 @@ return {
     weaponClasses = weaponClasses,
     fadeOutTimer = 2, -- How many bleed ticks occur before fadeout happens
     blackoutTimer = 10, -- How many bleed ticks occur before blacking out
-    bleedDamageTimer = 8, -- The base damage that is multiplied by bleed level everytime a bleed tick occurs
-    advanceBleedTimer = 10, -- How many bleed ticks occur before bleed level increases
+    -- Pendarahan ditentukan dari sisa darah (%) saat kena damage, hanya kalau TIDAK pakai armor.
+    -- Darah di bawah angka ke-n = level n. Level hanya naik saat kena damage baru, tidak naik sendiri.
+    bleedThresholds = { 35, 25, 15, 8 }, -- sedikit berdarah / berdarah / banyak berdarah / pendarahan hebat
+    bleedDamage = { 2, 3, 4, 5 }, -- darah yang hilang tiap bleed tick untuk level 1/2/3/4
+    limpBleedLevel = 2, -- pincang hanya kalau ditembak di kaki saat pendarahan sudah level ini atau lebih
     bleedTickRate = 30, -- How much time, in seconds, between bleed ticks
     bleedMovementTick = 10, -- How many seconds is taken away from the bleed tick rate if the player is walking, jogging, or sprinting
-    bleedMovementAdvance = 3, -- How much time moving while bleeding adds
     armorDamage = 5, -- Minumum damage done to armor before checking for injuries
     messageTimer = 12, -- How long it will take to display limb/bleed message
     alertShowInfo = 2, -- How many injuries a player must have before being alerted about them
@@ -47,12 +49,6 @@ return {
         [weaponClasses.EXPLOSIVE] = true,
     },
 
-    criticalAreas = { -- Define body areas that will always cause bleeding if wearing armor or not
-        UPPER_BODY = { armored = false },
-        LOWER_BODY = { armored = true },
-        SPINE = { armored = true },
-    },
-
     ---@class StaggerArea Defined body areas that will always cause staggering if wearing armor or not
     ---@field armored boolean
     ---@field major number
@@ -68,7 +64,6 @@ return {
         RFOOT = { armored = true, major = 100, minor = 100 },
     },
 
-    majorArmoredBleedChance = 45, -- The chance, in percent, that a player will get a bleed effect when taking heavy damage while wearing armor
     minorInjurWeapons = { -- Define which weapons cause small injuries
         [weaponClasses.SMALL_CALIBER] = true,
         [weaponClasses.MEDIUM_CALIBER] = true,
@@ -86,14 +81,6 @@ return {
     },
 
     damageMinorToMajor = 35, -- How much damage would have to be applied for a minor weapon to be considered a major damage event. Put this at 100 if you want to disable it
-    alwaysBleedChanceWeapons = { -- Define which weapons will always cause bleedign
-        [weaponClasses.SMALL_CALIBER] = true,
-        [weaponClasses.MEDIUM_CALIBER] = true,
-        [weaponClasses.CUTTING] = true,
-        [weaponClasses.WILDLIFE] = false,
-    },
-
-    alwaysBleedChance = 70, -- Set the chance out of 100 that if a player is hit with a weapon, that also has a random chance, it will cause bleeding
 
     ---@type table<number, string>
     bones = { -- Correspond bone hash numbers to their label

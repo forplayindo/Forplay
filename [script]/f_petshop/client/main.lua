@@ -104,7 +104,8 @@ local function panelData()
         }
         ::continue::
     end
-    return { pets = pets, carrying = Pet.isCarrying() }
+    local gr = Config.Attack.guardRadius
+    return { pets = pets, carrying = Pet.isCarrying(), guard = { min = gr.min, max = gr.max, default = gr.default } }
 end
 
 ---@param selectId number? hewan yang langsung dipilih (dibuka dari target hewan)
@@ -388,7 +389,7 @@ end)
 -- target = id hewan atau 'all'
 RegisterNUICallback('command', function(data, cb)
     local target = data.target == 'all' and 'all' or tonumber(data.target)
-    Pet.command(data.cmd, target)
+    Pet.command(data.cmd, target, tonumber(data.radius))
     if data.cmd == 'dismiss' then refreshOwned() end
     cb(panelData())
 end)

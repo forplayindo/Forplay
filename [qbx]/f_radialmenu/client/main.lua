@@ -206,9 +206,9 @@ end)
 RegisterNetEvent('radialmenu:client:ChangeSeat', function(id, label)
     local isSeatFree = IsVehicleSeatFree(cache.vehicle, id - 2)
     local speed = GetEntitySpeed(cache.vehicle)
-    local hasHarness = exports.f_seatbelt:HasHarness()
-    if hasHarness then
-        return exports.qbx_core:Notify(locale('error.race_harness_on'), 'error')
+    -- seatbelt ada di f_hud (f_seatbelt & harness balap sudah tidak ada)
+    if GetResourceState('f_hud') == 'started' and exports.f_hud:IsSeatbeltOn() then
+        return exports.qbx_core:Notify(locale('error.seatbelt_on'), 'error')
     end
 
     if not isSeatFree then

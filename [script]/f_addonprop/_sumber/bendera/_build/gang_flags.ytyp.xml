@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CMapTypes>
+ <extensions />
+ <archetypes>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="150" />
+   <flags value="0" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.7" y="-0.7" z="0.0" />
+   <bbMax x="0.7" y="0.7" z="0.516" />
+   <bsCentre x="0.0" y="0.0" z="0.258" />
+   <bsRadius value="1.023017" />
+   <hdTextureDist value="50" />
+   <name>tugu_flag_pedestal</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary>tugu_flag_pedestal</physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>tugu_flag_pedestal</assetName>
+   <extensions />
+  </Item>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="150" />
+   <flags value="0" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.03" y="-0.05488932" z="0.0" />
+   <bbMax x="1.22514617" y="0.08332177" z="2.821" />
+   <bsCentre x="0.597573085" y="0.014216225000000002" z="1.4105" />
+   <bsRadius value="1.545359" />
+   <hdTextureDist value="50" />
+   <name>flag_on_pole</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary>flag_on_pole</physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>flag_on_pole</assetName>
+   <extensions />
+  </Item>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="150" />
+   <flags value="0" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.03" y="-0.05488932" z="0.0" />
+   <bbMax x="1.22514617" y="0.08332177" z="2.821" />
+   <bsCentre x="0.597573085" y="0.014216225000000002" z="1.4105" />
+   <bsRadius value="1.545359" />
+   <hdTextureDist value="50" />
+   <name>gangflag_contoh</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary>gangflag_contoh</physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>gangflag_contoh</assetName>
+   <extensions />
+  </Item>
+ </archetypes>
+ <name>gang_flags</name>
+ <dependencies />
+ <compositeEntityTypes itemType="CCompositeEntityType" />
+</CMapTypes>

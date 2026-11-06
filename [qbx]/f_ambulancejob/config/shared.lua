@@ -50,7 +50,7 @@ return {
         ---@type table<string, {coords: vector3, checkIn?: vector3|vector3[], beds: Bed[]}>
         hospitals = {
             pillbox = {
-                label = '4PLAY Hospital',
+                label = 'Ocean Hospital',
                 coords = vec3(-2786.37, -69.65, 17.61),
                 checkIn = vec3(-2786.37, -69.65, 17.61),
                 beds = {
@@ -76,7 +76,7 @@ return {
         },
 
         stations = {
-            {label = '4PLAY Hospital', coords = vec4(-2783.23, -66.29, 17.61, 322.73)},
+            {label = 'Ocean Hospital', coords = vec4(-2783.23, -66.29, 17.61, 322.73)},
         }
     },
 }

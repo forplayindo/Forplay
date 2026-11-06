@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup Info HUD Besar</title>
+<style>
+@font-face { font-family: "sentic-text-bold"; src: url("../ui/build/fonts/sentic-text-bold/sentic-text-bold.woff2") format("woff2"); }
+@font-face { font-family: Anton; src: url("../../../[standalone]/f_serverlogo/html/fonts/Anton.woff2") format("woff2"); font-display: block; }
+@font-face { font-family: "Chakra Petch"; font-weight: 700; src: url("../../../[standalone]/f_serverlogo/html/fonts/ChakraPetch-Bold.woff2") format("woff2"); font-display: block; }
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; color: #fff; font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  background: #0d1117;
+}
+.page { padding: 20px 16px 40px; }
+h1 { margin: 0 0 4px; font-size: 18px; }
+.note { font-size: 13px; opacity: .75; margin: 0 0 16px; max-width: 900px; line-height: 1.5; }
+.stages { display: flex; gap: 14px; flex-wrap: wrap; }
+.stage-wrap { display: flex; flex-direction: column; gap: 8px; }
+.stage-title { font-size: 13px; font-weight: 700; }
+.stage-title small { display: block; font-weight: 500; opacity: .65; font-size: 12px; margin-top: 2px; }
+/* potongan pojok kanan atas layar 1080p, ukuran asli (1px = 1px game @1080p) */
+.stage {
+  position: relative; width: 340px; height: 440px; overflow: hidden; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  background:
+    radial-gradient(ellipse at 20% 120%, rgba(243,179,84,.28), transparent 55%),
+    linear-gradient(180deg, #5b7d9a 0%, #8fa9b9 40%, #b8a27e 72%, #5d4e3a 100%);
+}
+.stage::after { content: "tepi kanan layar"; position: absolute; right: 4px; bottom: 4px; font-size: 10px; opacity: .5; }
+.ctl { display: flex; flex-direction: column; gap: 6px; font-size: 12px; width: 340px; }
+.ctl label { display: flex; align-items: center; gap: 8px; }
+.ctl input { flex: 1; }
+.ctl b { width: 54px; text-align: right; }
+.spec { font: 12px ui-monospace, Consolas, monospace; opacity: .8; width: 340px; line-height: 1.5; }
+
+/* ======== salinan glass.css (dibuat pakai variabel --w lebar, --f skala font, --h skala tinggi baris) ======== */
+.hud { position: absolute; right: 12px; --f: 1; --h: 1; --w: 196px; }
+.gl {
+  background: rgba(16, 20, 28, 0.34); border: 1px solid rgba(255, 255, 255, 0.10); border-radius: 16px;
+  color: #fff; font-family: "sentic-text-bold", "Segoe UI", system-ui, sans-serif; overflow: hidden;
+}
+.gl-round { border-radius: 999px; }
+.gl--cash { background: rgba(60, 190, 110, 0.38); }
+.gl--bank { background: rgba(70, 130, 220, 0.38); }
+.gl--accent { border: 1.5px solid rgba(190, 242, 100, 0.9); }
+.gl-info { width: var(--w); display: flex; flex-direction: column; gap: calc(5px * var(--h)); }
+.gl-info .gl:not(.gl-round) { border-radius: calc(10px * var(--h)); }
+.gl-row { display: flex; align-items: center; gap: calc(5px * var(--h)); }
+.gl-bubble { width: calc(36px * var(--h)); height: calc(36px * var(--h)); min-width: calc(36px * var(--h));
+  display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
+.gl-bubble .k { font-size: calc(7px * var(--f)); letter-spacing: .08em; color: rgba(255,255,255,.68); }
+.gl-bubble .v { font-size: calc(11px * var(--f)); font-weight: 800; margin-top: 1px; }
+.gl-bubble--online .v { font-size: calc(10px * var(--f)); color: #d9f99d; }
+.gl-bubble--online svg { width: calc(8px * var(--f)); height: calc(8px * var(--f)); margin-top: 1px; fill: #d9f99d; }
+.gl-card { flex: 1; min-width: 0; height: calc(36px * var(--h)); display: flex; align-items: center; gap: 6px; padding: 0 5px 0 calc(8px * var(--h)); }
+/* line-height 1.2 + overflow:hidden memotong ekor huruf g/j/y/p → dibuat 1.4 supaya ekornya muat */
+.gl-card .txt { flex: 1; min-width: 0; line-height: 1.3; }
+/* ruang ekstra di bawah huruf (padding) supaya ekor g/j/y/p tidak terpotong oleh overflow:hidden;
+   margin negatif mengembalikan jarak antar baris seperti semula */
+.gl-card .t1, .gl-card .t2 { padding-bottom: .35em; margin-bottom: -.35em; }
+.gl-card .t1 { font-size: calc(9.5px * var(--f)); font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gl-card .t2 { font-size: calc(8px * var(--f)); color: rgba(255,255,255,.68); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px; }
+.gl-card .t2 > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.gl-card .t2 img { width: calc(8px * var(--f)); height: calc(8px * var(--f)); opacity: .8; }
+.gl-idbox { min-width: calc(20px * var(--h)); height: calc(20px * var(--h)); padding: 0 4px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.12); font-size: calc(9.5px * var(--f)); font-weight: 800; }
+.gl-money { height: calc(28px * var(--h)); display: flex; align-items: center; gap: 6px; padding: 0 calc(10px * var(--h)); }
+.gl-money .ico { width: calc(12px * var(--f)); height: calc(12px * var(--f)); display: flex; }
+.gl-money .ico img { width: 100%; height: 100%; }
+.gl-money .lbl { font-size: calc(9.5px * var(--f)); font-weight: 700; }
+.gl-money .amt { margin-left: auto; font-size: calc(10.5px * var(--f)); font-weight: 800; letter-spacing: .02em; }
+.gl-realtime { font-size: calc(8px * var(--f)); color: rgba(255,255,255,.68); text-align: right; padding-right: 6px; }
+
+/* ======== salinan f_serverlogo/style.css (statis, tanpa animasi) ======== */
+.l4p { --u: calc(var(--size, 1) * 1px); position: absolute; top: var(--top); right: var(--right); opacity: .9; pointer-events: none;
+  --accent: #f3b354; --accent-light: #f9d9a8; --accent-glow: rgba(243,179,84,.55); }
+.l4p .wrap { position: relative; }
+.l4p .glow { filter: drop-shadow(0 calc(3*var(--u)) 0 rgba(0,0,0,.45)) drop-shadow(0 0 calc(6*var(--u)) var(--accent-glow)); }
+.l4p .row { display: flex; align-items: center; gap: calc(16*var(--u)); transform: skewX(-10deg); }
+.l4p .badge { width: calc(124*var(--u)); height: calc(124*var(--u)); background: var(--accent); display: flex; align-items: center; justify-content: center;
+  box-shadow: inset 0 calc(-8*var(--u)) 0 rgba(0,0,0,.22), inset 0 calc(3*var(--u)) 0 rgba(255,255,255,.25); }
+.l4p .n { font-family: Anton, sans-serif; font-size: calc(112*var(--u)); line-height: 1; color: #fff; margin-top: calc(4*var(--u)); }
+.l4p .col { display: flex; flex-direction: column; align-items: flex-start; gap: calc(6*var(--u)); }
+.l4p .play { font-family: Anton, sans-serif; font-size: calc(108*var(--u)); line-height: .92; letter-spacing: calc(2*var(--u)); color: #fff; }
+.l4p .tag { display: flex; align-items: center; gap: calc(12*var(--u)); }
+.l4p .line { height: calc(4*var(--u)); width: calc(56*var(--u)); background: var(--accent); }
+.l4p .txt { font-family: "Chakra Petch", sans-serif; font-weight: 700; font-size: calc(22*var(--u)); letter-spacing: .42em; color: #fff; white-space: pre; }
+.guide { position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,.35); font-size: 10px; padding-left: 4px; opacity: .7; }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Mockup — Info HUD kanan atas lebih besar + logo ikut</h1>
+  <p class="note">
+    Tiap kotak = pojok kanan atas layar 1080p di ukuran asli. Panel tetap nempel di kanan, jadi kalau dilebarin
+    tambahnya ke <b>kiri</b>. Logo 4PLAY selalu dibuat selebar panel, jadi ikut membesar dan panel turun sedikit
+    (garis putus-putus = batas atas panel / <code>LOGO_SAFE_TOP</code>). Jarak logo dari atas layar tetap sama.
+  </p>
+  <div class="stages" id="stages"></div>
+</div>
+
+<template id="tpl">
+  <div class="stage-wrap">
+    <div class="stage-title"></div>
+    <div class="stage">
+      <div class="guide"></div>
+      <div class="l4p"><div class="wrap"><div class="glow"><div class="row">
+        <div class="badge"><span class="n">4</span></div>
+        <div class="col"><div class="play">PLAY</div><div class="tag"><i class="line"></i><span class="txt">ROLEPLAY</span></div></div>
+      </div></div></div></div>
+      <div class="hud"><div class="gl-info">
+        <div class="gl-row">
+          <div class="gl gl-round gl-bubble gl-bubble--online gl--accent">
+            <span class="v">48</span>
+            <svg viewBox="0 0 24 24"><path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm-8 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm0 2c-2.3 0-7 1.2-7 3.5V19h14v-2.5C15 14.2 10.3 13 8 13Zm8 0c-.3 0-.6 0-1 .1a4.2 4.2 0 0 1 2 3.4V19h6v-2.5c0-2.3-4.7-3.5-7-3.5Z"/></svg>
+          </div>
+          <div class="gl gl-card"><div class="txt">
+            <div class="t1">Kepolisian | Brigadir Polisi</div>
+            <div class="t2">Tanpa Geng</div>
+          </div></div>
+        </div>
+        <div class="gl-row">
+          <div class="gl gl-round gl-bubble"><span class="k">FRI</span><span class="v">6</span></div>
+          <div class="gl gl-card">
+            <div class="gl-idbox">12</div>
+            <div class="txt">
+              <div class="t1">Budi Santoso Wijaya</div>
+            </div>
+          </div>
+        </div>
+        <div class="gl gl--cash gl-money"><span class="ico"><img src="../ui/build/images/icons/coin.svg" alt=""></span><span class="lbl">Cash</span><span class="amt">Rp 1.250.000</span></div>
+        <div class="gl gl--bank gl-money"><span class="ico"><img src="../ui/build/images/icons/bank.svg" alt=""></span><span class="lbl">Bank</span><span class="amt">Rp 125.400.000</span></div>
+        <div class="gl-realtime">06/11/2026 21:45</div>
+      </div></div>
+    </div>
+  </div>
+</template>
+
+<script>
+const LOGO_TOP_NOW = 41;   // jarak logo dari atas layar sekarang (116 - 5 - tinggi logo ±70)
+const GAP = 5;
+const VARIANTS = [
+  { name: 'Sekarang (+kartu 36)', sub: 'lebar 196 · font 100%', w: 196, f: 1, h: 1 },
+  { name: 'Opsi A', sub: 'lebar 224 · font 115%', w: 224, f: 1.15, h: 1.1 },
+  { name: 'Opsi B', sub: 'lebar 248 · font 130%', w: 248, f: 1.3, h: 1.2 },
+  { name: 'Coba sendiri', sub: 'geser slider', w: 236, f: 1.2, h: 1.15, custom: true },
+];
+
+// sama dengan fit() di f_serverlogo: lebar logo (setelah skew) = lebar panel, tepi kanan sejajar panel
+function fitLogo(el, width, right) {
+  const wrap = el.querySelector('.wrap'), row = el.querySelector('.row');
+  const persp = row.querySelector('.badge'), play = row.querySelector('.play'), txt = row.querySelector('.txt');
+  el.style.setProperty('--size', 1);
+  const t = Math.tan(10 * Math.PI / 180), cy = row.offsetHeight / 2;
+  const ls = parseFloat(getComputedStyle(txt).letterSpacing) || 0;
+  const pos = e => { let x = 0, y = 0; for (; e && e !== wrap && e !== el; e = e.offsetParent) { x += e.offsetLeft; y += e.offsetTop; } return { x, y }; };
+  const pp = pos(persp), pl = pos(play), pt = pos(txt);
+  const left = pp.x - (pp.y + persp.offsetHeight - cy) * t;
+  const r = Math.max(pl.x + play.offsetWidth - 2 + (cy - pl.y) * t, pt.x + txt.offsetWidth - ls + (cy - pt.y) * t);
+  const w = el.offsetWidth, h = row.offsetHeight;
+  const s = (width - 4) / (r - left);
+  el.style.setProperty('--size', s);
+  el.style.setProperty('--right', (right + 1 - (w - r) * s) + 'px');
+  return h * s; // tinggi logo
+}
+
+function apply(node, v) {
+  const hud = node.querySelector('.hud'), logo = node.querySelector('.l4p'), guide = node.querySelector('.guide');
+  hud.style.setProperty('--w', v.w + 'px');
+  hud.style.setProperty('--f', v.f);
+  hud.style.setProperty('--h', v.h);
+  const lh = fitLogo(logo, v.w, 12);
+  const safeTop = Math.round(LOGO_TOP_NOW + lh + GAP);
+  logo.style.setProperty('--top', LOGO_TOP_NOW + 'px');
+  hud.style.top = safeTop + 'px';
+  guide.style.top = safeTop + 'px';
+  guide.textContent = 'LOGO_SAFE_TOP ' + safeTop;
+  node.querySelector('.stage-title').innerHTML = v.name + '<small>' + (v.custom ? `lebar ${v.w} · font ${Math.round(v.f * 100)}% · tinggi baris ${Math.round(v.h * 100)}%` : v.sub) + '</small>';
+  const spec = node.querySelector('.spec');
+  if (spec) spec.textContent = `PANEL_W=${v.w}  font x${v.f}  baris x${v.h}  logo ±${Math.round(lh)}px tinggi  LOGO_SAFE_TOP=${safeTop}`;
+}
+
+const root = document.getElementById('stages'), tpl = document.getElementById('tpl');
+const nodes = VARIANTS.map(v => {
+  const node = tpl.content.firstElementChild.cloneNode(true);
+  const spec = document.createElement('div'); spec.className = 'spec'; node.appendChild(spec);
+  if (v.custom) {
+    const ctl = document.createElement('div'); ctl.className = 'ctl';
+    [['w', 'Lebar', 196, 300, 2], ['f', 'Font', 1, 1.5, 0.05], ['h', 'Baris', 1, 1.4, 0.05]].forEach(([k, label, min, max, step]) => {
+      const l = document.createElement('label');
+      l.innerHTML = `${label}<input type="range" min="${min}" max="${max}" step="${step}" value="${v[k]}"><b>${v[k]}</b>`;
+      const inp = l.querySelector('input'), b = l.querySelector('b');
+      inp.oninput = () => { v[k] = +inp.value; b.textContent = inp.value; apply(node, v); };
+      ctl.appendChild(l);
+    });
+    node.appendChild(ctl);
+  }
+  root.appendChild(node);
+  return [node, v];
+});
+const run = () => nodes.forEach(([n, v]) => apply(n, v));
+run();
+Promise.all([document.fonts.load('108px Anton'), document.fonts.load('700 22px "Chakra Petch"'), document.fonts.load('10px sentic-text-bold')]).then(run).catch(run);
+</script>
+</body>
+</html>

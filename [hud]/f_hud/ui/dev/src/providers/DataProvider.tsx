@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DataContextProps } from "@/types/DataProviderTypes";
 import { useNuiEvent } from "@/hooks/useNuiEvent";
@@ -18,7 +18,9 @@ import { fetchNui } from "@/utils/fetchNui";
 import "./debug.g";
 import { BarColors } from "@/utils/misc";
 
-export const DataCtx = createContext<DataContextProps>({} as DataContextProps);
+/** Context berisi store yang tetap (bukan value baru tiap render); lihat hooks/useData */
+export type DataStore = { value: DataContextProps; listeners: Set<() => void> };
+export const DataCtx = createContext<DataStore>({ value: {} as DataContextProps, listeners: new Set() });
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -815,5 +817,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     hygieneVisible,
   };
 
-  return <DataCtx.Provider value={value}>{children}</DataCtx.Provider>;
+  const storeRef = useRef<DataStore>();
+  if (!storeRef.current) storeRef.current = { value, listeners: new Set() };
+  storeRef.current.value = value;
+  useLayoutEffect(() => {
+    storeRef.current!.listeners.forEach((check) => check());
+  });
+
+  return <DataCtx.Provider value={storeRef.current}>{children}</DataCtx.Provider>;
 };

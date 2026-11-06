@@ -1,0 +1,116 @@
+:root {
+  --accent: #F3B354;
+  --accent-soft: rgba(243, 179, 84, 0.14);
+  --accent-line: rgba(243, 179, 84, 0.45);
+  --bg: rgba(14, 16, 22, 0.94);
+  --text: #F2F3F7;
+  --muted: #9AA1B2;
+  --meta: #B3B9C7;
+  --ok: #6EE7B7;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  color: var(--text);
+  user-select: none;
+}
+
+#root { position: fixed; inset: 0; pointer-events: none; }
+
+.cl { position: absolute; left: 0; top: 0; display: none; }
+.cl.show { display: block; }
+
+.cl-line {
+  position: absolute; left: 0; top: 0;
+  width: 2px; margin-left: -1px;
+  background: var(--accent); opacity: .85;
+  transform-origin: 50% 0;
+  will-change: transform, height;
+}
+
+.cl-dot {
+  position: absolute; left: 0; top: 0;
+  width: 8px; height: 8px; margin: -4px 0 0 -4px;
+  border-radius: 50%; background: var(--accent);
+  will-change: transform;
+}
+
+.cl-card {
+  position: absolute; left: 0; top: 0;
+  width: 400px;
+  background: var(--bg);
+  border: 1px solid var(--accent-line);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, .55);
+  transform-origin: 50% 100%;
+  will-change: transform;
+  transition: opacity .6s ease;
+}
+.cl.fading .cl-card, .cl.fading .cl-line, .cl.fading .cl-dot { opacity: .55; }
+
+.cl-head { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+
+.cl-icon {
+  width: 36px; height: 36px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; background: var(--accent-soft); border: 1px solid rgba(243,179,84,.4);
+}
+
+.cl-who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cl-nameRow { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.cl-name { font-size: 19px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cl-sid { font-size: 15px; font-weight: 500; color: var(--muted); }
+.cl-meta { font-size: 15px; color: var(--meta); white-space: nowrap; }
+
+.cl-tag { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; flex-shrink: 0; }
+.cl-tag b { font-size: 14px; font-weight: 800; letter-spacing: .14em; color: #fff; }
+.cl-tag span { font-size: 11px; font-weight: 800; letter-spacing: .1em; color: var(--accent); }
+
+.cl-sep { height: 1px; background: rgba(255, 255, 255, .07); }
+
+.cl-disc { display: flex; align-items: center; gap: 10px; padding: 10px 14px; min-height: 52px; }
+.cl-dicon {
+  width: 28px; height: 28px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px; background: rgba(88, 101, 242, .2);
+}
+.cl-disc.none .cl-dicon { background: rgba(255, 255, 255, .06); }
+.cl-dtext { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.cl-dlabel { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.cl-did { font-family: "JetBrains Mono", Consolas, monospace; font-size: 16px; color: #E8EAF0; }
+.cl-disc.none .cl-did { font-family: inherit; color: var(--muted); }
+
+.cl-btn {
+  display: flex; align-items: center; gap: 7px;
+  height: 36px; padding: 0 12px 0 7px;
+  border-radius: 7px; border: 1px solid rgba(255, 255, 255, .14);
+  background: rgba(255, 255, 255, .06);
+  font-size: 15px; font-weight: 600; color: var(--text);
+  opacity: .45; transition: opacity .15s;
+}
+.cl-btn kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 24px; height: 24px; padding: 0 5px; border-radius: 4px;
+  background: var(--text); color: #111318;
+  font: 800 13px Inter, "Segoe UI", sans-serif;
+}
+.cl.ready .cl-btn { opacity: 1; }
+.cl.copied .cl-btn { opacity: 1; border-color: rgba(52, 211, 153, .5); background: rgba(52, 211, 153, .12); color: var(--ok); padding: 0 12px; }
+.cl.copied .cl-btn kbd { display: none; }
+.cl-check { display: none; }
+.cl.copied .cl-check { display: block; }
+
+.cl-bar { height: 3px; background: rgba(255, 255, 255, .06); }
+.cl-bar i {
+  display: block; height: 3px; background: var(--accent);
+  transform-origin: 0 50%;
+  will-change: transform;
+}

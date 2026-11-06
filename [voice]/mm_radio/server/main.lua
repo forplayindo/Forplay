@@ -124,21 +124,34 @@ RegisterNetEvent('mm_radio:server:addallowedchannel', function(id, allowedChanne
     end
 end)
 
+-- Kirim daftar anggota hanya ke pemain di channel itu (dulu dikirim ke SEMUA pemain: -1)
+local function syncChannel(channel)
+    local list = channels[channel]
+    if not list then return end
+    if next(list) == nil then
+        channels[channel] = nil
+        return
+    end
+    for id in pairs(list) do
+        TriggerClientEvent('mm_radio:client:radioListUpdate', tonumber(id), list, channel)
+    end
+end
+
 RegisterNetEvent('mm_radio:server:addToRadioChannel', function(channel, username)
     local src = source
+    if type(channel) ~= 'number' then return end
     if not channels[channel] then
         channels[channel] = {}
     end
     channels[channel][tostring(src)] = {name = username, isTalking = false}
-    TriggerClientEvent('mm_radio:client:radioListUpdate', -1, channels[channel], channel)
+    syncChannel(channel)
 end)
 
 RegisterNetEvent('mm_radio:server:removeFromRadioChannel', function(channel)
     local src = source
-
     if not channels[channel] then return end
     channels[channel][tostring(src)] = nil
-    TriggerClientEvent('mm_radio:client:radioListUpdate', -1, channels[channel], channel)
+    syncChannel(channel)
 end)
 
 AddEventHandler('onResourceStop', function(resourceName)
@@ -160,7 +173,7 @@ AddEventHandler("playerDropped", function()
     for id, channel in pairs (channels) do
         if channel[tostring(plyid)] then
             channels[id][tostring(plyid)] = nil
-            TriggerClientEvent('mm_radio:client:radioListUpdate', -1, channels[id], id)
+            syncChannel(id)
             break
         end
     end

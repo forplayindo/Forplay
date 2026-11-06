@@ -3,13 +3,24 @@ local sharedConfig = require 'config.shared'
 local playerArmor = nil
 local damageEffectsEnabled = true
 local WEAPONS = exports.qbx_core:GetWeapons()
+local LEG_PARTS = { LLEG = true, RLEG = true, LFOOT = true, RFOOT = true }
+
+---Pincang hanya kalau kaki yang kena DAN pendarahan sudah >= limpBleedLevel saat itu.
+---Tanda `limp` menempel di luka kaki sampai lukanya diobati.
+---@param bodyPartKey BodyPartKey
+---@return boolean
+local function shouldLimp(bodyPartKey)
+    return LEG_PARTS[bodyPartKey] == true and BleedLevel >= config.limpBleedLevel
+end
 
 ---Increases severity of an injury
 ---@param bodyPartKey BodyPartKey
 local function upgradeInjury(bodyPartKey)
     local injury = Injuries[bodyPartKey]
-    if injury.severity >= 4 then return end
-    injury.severity += 1
+    local limp = shouldLimp(bodyPartKey)
+    if injury.severity >= 4 and (injury.limp or not limp) then return end
+    if injury.severity < 4 then injury.severity += 1 end
+    if limp then injury.limp = true end
     SetInjury(bodyPartKey, injury)
 end
 
@@ -18,7 +29,7 @@ end
 ---@param weaponHash number
 local function createInjury(bodyPartKey, weaponHash)
     local severity = math.random(1, 3)
-    SetInjury(bodyPartKey, {severity = severity, weaponHash = weaponHash} )
+    SetInjury(bodyPartKey, {severity = severity, weaponHash = weaponHash, limp = shouldLimp(bodyPartKey) or nil} )
     NumInjuries += 1
 end
 
@@ -75,62 +86,38 @@ local function applyStaggerEffect(ped, isArmored, chance, armor)
     SetPedToRagdoll(ped, 1500, 2000, 3, true, true, false)
 end
 
----applies a minor bleed if player has no armor and is hit in a critical area.
----also makes player stagger if hit in a certain body part.
----@param ped number
----@param bodyPartKey BodyPartKey body part where player is damaged
----@param armor number
-local function applyImmediateMinorEffects(ped, bodyPartKey, armor)
-    if config.criticalAreas[bodyPartKey] and armor <= 0 then
-       ApplyBleed(1)
-    end
-
-    local staggerArea = config.staggerAreas[bodyPartKey]
-    if not staggerArea then return end
-    applyStaggerEffect(ped, staggerArea.armored, staggerArea.minor, armor)
-end
-
----Applies bleed with probability based on armor and location hit. Also applies stagger effect.
----@param ped number
----@param bodyPartKey BodyPartKey body part where player is damaged
----@param armor number
-local function applyImmediateMajorEffects(ped, bodyPartKey, armor)
-    local criticalArea = config.criticalAreas[bodyPartKey]
-    if criticalArea then
-        if armor > 0 and criticalArea.armored then
-            if math.random(100) <= math.ceil(config.majorArmoredBleedChance) then
-                ApplyBleed(1)
-            end
-        else
-            ApplyBleed(1)
-        end
-    else
-        if armor > 0 then
-            if math.random(100) < (config.majorArmoredBleedChance) then
-                ApplyBleed(1)
-            end
-        elseif math.random(100) < (config.majorArmoredBleedChance * 2) then
-            ApplyBleed(1)
-        end
-    end
-
-    local staggerArea = config.staggerAreas[bodyPartKey]
-    if not staggerArea then return end
-    applyStaggerEffect(ped, staggerArea.armored, staggerArea.major, armor)
-end
-
----Apply bleeds and staggers effects on damage taken, taking into account armor.
+---Apply stagger effect on damage taken, taking into account armor.
+---Pendarahan tidak lagi dari area tubuh/senjata, lihat checkBleedFromBlood.
 ---@param ped number
 ---@param bodyPartKey BodyPartKey
 ---@param weaponClass WeaponClass
 ---@param damageDone number
 local function applyImmediateEffects(ped, bodyPartKey, weaponClass, damageDone)
+    local staggerArea = config.staggerAreas[bodyPartKey]
+    if not staggerArea then return end
     local armor = GetPedArmour(ped)
     if config.minorInjurWeapons[weaponClass] and damageDone < config.damageMinorToMajor then
-        applyImmediateMinorEffects(ped, bodyPartKey, armor)
+        applyStaggerEffect(ped, staggerArea.armored, staggerArea.minor, armor)
     elseif config.majorInjurWeapons[weaponClass] or (config.minorInjurWeapons[weaponClass] and damageDone >= config.damageMinorToMajor) then
-        applyImmediateMajorEffects(ped, bodyPartKey, armor)
+        applyStaggerEffect(ped, staggerArea.armored, staggerArea.major, armor)
     end
+end
+
+---Tingkat pendarahan dari sisa darah saat kena damage (semua jenis damage, termasuk jatuh/tabrakan).
+---Pakai armor sebelum/sesudah kena = tidak berdarah. Level hanya naik, turun lewat pengobatan.
+---@param ped number
+---@param health number
+---@param armor number
+local function checkBleedFromBlood(ped, health, armor)
+    if armor > 0 or DeathState ~= sharedConfig.deathState.ALIVE then return end
+    local maxBlood = GetEntityMaxHealth(ped) - 100
+    if maxBlood <= 0 then return end
+    local blood = (health - 100) / maxBlood * 100
+    local level = 0
+    for i, limit in ipairs(config.bleedThresholds) do
+        if blood < limit then level = i end
+    end
+    if level > 0 then RaiseBleedTo(level) end
 end
 
 ---Apply bleeds, injure the body part hit, make ped limp/stagger
@@ -169,10 +156,6 @@ local function applyDamage(ped, damageDone, isArmorDamaged)
         elseif not isBodyHitOrWeakWeapon and isDamagingEvent(damageDone, weaponClass) then
             checkDamage(ped, bone, weaponHash, weaponClass, damageDone)
         end
-    elseif config.alwaysBleedChanceWeapons[weaponClass]
-        and math.random(100) < config.alwaysBleedChance
-        and not checkBodyHitOrWeakWeapon(isArmorDamaged, bodypart, weaponClass) then
-        ApplyBleed(1)
     end
 
     return weaponHash
@@ -203,6 +186,9 @@ local function checkForDamage()
 
     if isArmorDamaged or isHealthDamaged then
         local damageDone = (Hp - health)
+        if damageDone > 0 then
+            checkBleedFromBlood(cache.ped, health, math.max(playerArmor, armor))
+        end
         local weaponHash = applyDamage(cache.ped, damageDone, isArmorDamaged)
         if weaponHash and not WeaponsThatDamagedPlayer[weaponHash] then
             TriggerEvent('chat:addMessage', {

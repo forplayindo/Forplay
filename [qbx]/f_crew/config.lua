@@ -88,6 +88,9 @@ return {
         -- Poin perebutan (hanya dihitung selama masa perebutan, bukan saat persiapan)
         WarPresencePoints = 1,  -- per menit untuk tiap anggota yang hidup di zona
         WarKillPoints = 10,     -- membunuh anggota gang lain di zona itu
+        -- graffiti perang (f_graffiti): semprot di wilayah = +poin; dibersihkan gang peserta = -poin
+        -- (pembersih netral / polisi tidak mengubah poin). Graffiti perang dihapus saat perang selesai.
+        WarGraffitiPoints = 1,
         -- cooldown = menit per pemain per aktivitas
         Activities = {
             drugselling = { points = 3, cooldown = 1 }, -- jual narkoba di pojokan (f_drugs)

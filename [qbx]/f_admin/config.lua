@@ -99,6 +99,7 @@ Config.Logs = {
     { key = 'server',   label = 'Cuaca / waktu / stash / pengumuman', on = true },
     { key = 'report',   label = 'Laporan warga ditutup', on = false },
     { key = 'pet',      label = 'Setujui / tolak pengajuan hewan', on = true, ch = 'ekonomi' },
+    { key = 'wtune',    label = 'Ubah damage & recoil senjata', on = true },
 }
 
 -- Laporan warga (/lapor, /report)

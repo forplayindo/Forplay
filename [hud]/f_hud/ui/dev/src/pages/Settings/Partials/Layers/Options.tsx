@@ -200,13 +200,7 @@ const Options = () => {
       value: ClientInfo.extra_currency.show,
       onChange: () => toggleClientInfoShowValue("extra_currency"),
     },
-    {
-      active: ClientInfo.active && ClientInfo.radio.active,
-      icon: "images/icons/radio.svg",
-      label: t("radio"),
-      value: ClientInfo.radio.show,
-      onChange: () => toggleClientInfoShowValue("radio"),
-    },
+    // toggle Radio dihapus: radio tidak tampil lagi di info HUD (sudah ada HUD radio di kiri)
     {
       active: ClientInfo.active && ClientInfo.time.active,
       icon: "images/icons/time_morning.svg",

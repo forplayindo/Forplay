@@ -359,6 +359,7 @@ local function disbandGang(g, receiver, withCooldown, reason)
     turf.release(g.name)
     removeFromCache(g)
     exports.qbx_core:RemoveGang(g.name)
+    TriggerEvent('f_crew:server:gangDisbanded', g.name) -- f_graffiti menghapus graffiti gang ini
 
     audit(nil, 'CrewDisband', ('%s (%s) dibubarkan (%s), %d anggota, kas Rp %d ke %s'):format(
         g.label, g.name, reason, #members, balance or 0, receiver or '-'))
@@ -1124,6 +1125,23 @@ end)
 exports('AddTurfActivity', function(src, activity)
     if not ready then return end
     turf.activity(src, activity)
+end)
+
+-- Graffiti perang (f_graffiti). Hanya bisa dipanggil resource server.
+-- exports.f_crew:GetWarGraffitiZone(src, x, y) -> zoneId?, label?
+-- exports.f_crew:GetWarParticipant(zoneId, src) -> gang?
+-- exports.f_crew:AddWarGraffitiPoints(zoneId, gang, 1 | -1) -> boolean
+exports('GetWarGraffitiZone', function(src, x, y)
+    if not ready then return nil end
+    return turf.graffitiZone(tonumber(src) or -1, tonumber(x) or 0, tonumber(y) or 0)
+end)
+exports('GetWarParticipant', function(zoneId, src)
+    if not ready then return nil end
+    return turf.graffitiParticipant(zoneId, tonumber(src) or -1)
+end)
+exports('AddWarGraffitiPoints', function(zoneId, gang, sign)
+    if not ready then return false end
+    return turf.graffitiPoints(zoneId, gang, tonumber(sign) or 1)
 end)
 
 -- Apakah pemain online anggota crew bertag 'gang' (bukan 'community'). Dipakai f_police (rampok).

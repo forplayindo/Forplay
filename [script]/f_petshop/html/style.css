@@ -96,6 +96,13 @@ label input { width: 100%; }
 .cmd.wide { grid-column: span 3; flex-direction: row; justify-content: center; gap: 8px; font-size: 13px; }
 .cmd.span2 { grid-column: span 2; }
 .cmds.two { grid-template-columns: repeat(2, 1fr); }
+.guard-form { display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 12px; background: var(--fill); }
+.guard-form label { color: var(--label-2); font-size: 12px; }
+.guard-row { display: grid; grid-template-columns: 64px 1fr auto; gap: 6px; }
+.guard-row input { text-align: center; height: 34px; }
+.guard-row button { height: 34px; padding: 0 12px; border-radius: 10px; font-size: 13px; font-weight: 600; }
+.guard-ok { background: var(--accent); color: #fff; }
+.guard-cancel { background: var(--fill-2); }
 .side-view { display: flex; flex-direction: column; gap: 12px; min-height: 0; overflow-y: auto; }
 .side-row .link + .link { margin-left: 10px; }
 #friends .group > .row { min-height: 40px; }

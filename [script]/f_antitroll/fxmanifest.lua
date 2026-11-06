@@ -17,6 +17,8 @@ files {
     "ui/ui.html",
     "ui/js/app.js",
     "ui/css/app.css",
+    "ui/ios.css",
+    "ui/fonts/*.woff2",
 }
 
 

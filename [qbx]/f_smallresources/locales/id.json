@@ -9,7 +9,8 @@
       "no_vehicle_nearby": "Tidak ada kendaraan di dekatmu untuk dibalikkan.",
       "is_handcuffed": "Kamu sedang diborgol.",
       "is_fastened": "Kamu sedang memakai sabuk pengaman.",
-      "vehicle_radio_off": "Radio kendaraan dimatikan"
+      "vehicle_radio_off": "Radio kendaraan dimatikan",
+      "cannot_push": "Kendaraan ini tidak bisa didorong."
    },
    "success": {
       "cruise_control_enabled": "Cruise control dinyalakan",
@@ -40,7 +41,11 @@
       "teleport_current_level_indication": "(Kamu di sini)"
    },
    "actions": {
-      "push_vehicle": "Tekan [~g~SHIFT~w~] dan [~g~E~w~] untuk mendorong kendaraan sampai [~g~SHIFT~w~] dilepas",
+      "push_vehicle": "[W] Dorong  ·  [A/D] Belok  ·  [X] Berhenti",
       "toggle_cruise_control": "Nyalakan/matikan Cruise Control"
+   },
+   "target": {
+      "push_vehicle": "Dorong Kendaraan",
+      "flip_vehicle": "Balikkan Kendaraan"
    }
 }

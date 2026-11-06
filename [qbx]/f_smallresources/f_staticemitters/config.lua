@@ -1,5 +1,6 @@
 return {
     enabled = true,
+    disableAll = true, -- matikan SEMUA emitter (musik toko/bar/TV/boombox di jalan). false = ikut 'disable' per grup/emitter
     menu = {
         copyToClipboard = true,
     },

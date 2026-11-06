@@ -30,3 +30,10 @@ data_file 'DLC_ITYP_REQUEST' 'stream/lumberjack/17mov_woodpallet.ytyp'
 data_file 'DLC_ITYP_REQUEST' 'stream/kelapa/f_kelapa_pohon.ytyp'
 data_file 'DLC_ITYP_REQUEST' 'stream/kelapa/f_kelapa_buah.ytyp'
 data_file 'DLC_ITYP_REQUEST' 'stream/kelapa/f_kelapa_peti.ytyp'
+-- bendera gang (f_crew): tugu_flag_pedestal + flag_on_pole + gangflag_<nama>, dibuat ulang oleh _tools/build_gangflag.py
+data_file 'DLC_ITYP_REQUEST' 'stream/gang_flags/gang_flags.ytyp'
+-- charger mobil listrik (ox_fuel): station lengkap / kosong (pistol diambil) + pistol charger,
+-- dibuat dari _sumber/ev_charger/*.glb (lihat _sumber/ev_charger/README.txt)
+data_file 'DLC_ITYP_REQUEST' 'stream/ev_charger/4play_ev_charge_station.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/ev_charger/4play_ev_charge_station_empty.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/ev_charger/4play_ev_charge_gun.ytyp'

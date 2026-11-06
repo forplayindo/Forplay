@@ -15,7 +15,6 @@ h1 { font-size: 17px; }
 #tankText { font-variant-numeric: tabular-nums; }
 
 .types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.types.single { grid-template-columns: 1fr; }
 .type { display: flex; flex-direction: column; gap: 1px; padding: 8px 4px; border-radius: 12px; background: var(--cell); text-align: center; transition: box-shadow .12s; }
 .type b { font-size: 12px; font-weight: 600; }
 .type .ron { font-size: 10px; color: var(--label-2); }

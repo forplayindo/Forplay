@@ -47,3 +47,14 @@ Panel mana pun yang punya class `gl` atau atribut `data-blur` otomatis ikut di-b
 - Tier low/off juga mematikan animasi CSS yang berulang terus.
 - Player bisa pilih sendiri: /hudblur auto | high | medium | low | off  (tersimpan per player)
 - config.lua -> Config.Blur untuk default server dan batas FPS.
+
+## Optimasi performa (2026-11-03)
+- Blur: mulai `off` sampai karakter spawn & HUD tampil; `off` saat HUD tersembunyi / pause menu / layar gelap;
+  `pause` (frame terakhir dibiarkan) saat menu Settings terbuka. Mode `auto` paling tinggi `medium`
+  (`Config.Blur.autoHigh = true` untuk mengizinkan high). Kanvas komposit 75% (medium) / 50% (low).
+  Event `0r-hud:blurTier` tetap mengirim tier pilihan pemain (dipakai f_chat, ox_lib, Renewed-Banking).
+- Lua hanya mengirim bagian `Hud.data` yang berubah (client_info / compass / navigation_widget / vehicle_info / bars / hygiene).
+- React: `useData()` sekarang mencatat field yang dibaca komponen dan hanya render ulang kalau field itu berubah
+  (DataProvider memberi store tetap, bukan value baru tiap render).
+- Aset: miko.png (2,1 MB, cuma preview browser) dihapus, spoimp.jpeg 565 KB -> 4 KB, font .otf/.ttf -> .woff2.
+- Edit di `ui/dev` lalu `npm run build` (blur.js sumbernya `ui/dev/public/blur.js`).

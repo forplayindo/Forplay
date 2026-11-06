@@ -36,7 +36,7 @@ function render() {
     const mult = 1 + (d.bonus || 0) / 100;
     $('d-desc').textContent = d.desc;
     $('d-stops').textContent = `${d.stops} titik`;
-    $('d-pay').textContent = rupiah(D.worth.package * mult) + (d.bonus ? ` (+${d.bonus}%)` : '') + ' · besar 2x';
+    $('d-pay').textContent = rupiah(D.worth.package * mult) + ' x anggota' + (d.bonus ? ` (+${d.bonus}%)` : '');
     $('d-km').textContent = rupiah(D.worth.km * mult);
 
     // crew

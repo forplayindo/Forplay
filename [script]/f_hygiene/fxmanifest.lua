@@ -37,7 +37,7 @@ files {
     'html/index.html',
     'html/style.css',
     'html/script.js',
-    'html/sounds/flies.wav'
+    'html/sounds/nyamuk.wav'
 }
 
 dependencies {

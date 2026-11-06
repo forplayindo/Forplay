@@ -76,7 +76,7 @@ const InventoryGrid: React.FC<{ inventory: Inventory; side: 'left' | 'right' }> 
   }, [entry]);
 
   return (
-    <div className="inventory-panel" style={{ pointerEvents: isBusy ? 'none' : 'auto' }}>
+    <div className={`inventory-panel is-${side}`} style={{ pointerEvents: isBusy ? 'none' : 'auto' }}>
       {/* Keeps both panels aligned; the close button only sits above the right one. */}
       <div className="inventory-panel-topbar">{side === 'right' && <CloseButton />}</div>
 

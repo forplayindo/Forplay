@@ -1,11 +1,37 @@
 local isTimerInstance = false
 local isTimerRunning = false -- flag variable to control the Timer thread
+local uiShown = false
+local watchId = 0
+
+-- kartu disembunyikan selama pause menu (ESC / peta) terbuka; loop hanya jalan selama kartu tampil
+local function watchPause()
+    watchId = watchId + 1
+    local id = watchId
+    CreateThread(function()
+        local paused = false
+        while uiShown and id == watchId do
+            local active = IsPauseMenuActive()
+            if active ~= paused then
+                paused = active
+                SendNUIMessage({ type = "pause", paused = paused })
+            end
+            Wait(250)
+        end
+        if paused then SendNUIMessage({ type = "pause", paused = false }) end
+    end)
+end
 
 function setUiShow(bool)
     SendNUIMessage({
         type = "show",
         show = bool
     })
+    if bool and not uiShown then
+        uiShown = true
+        watchPause()
+    elseif not bool then
+        uiShown = false
+    end
 end
 
 function updateUiTime(timeLeft)

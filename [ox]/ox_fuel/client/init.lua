@@ -14,6 +14,7 @@ local tank  = require 'shared.tank'
 local effects = require 'client.effects'
 
 require 'client.stations'
+require 'client.chargers'
 
 ---Baterai kendaraan listrik: berkurang menurut RPM (seperti caticus KwUsage), bukan konsumsi native
 local function electricDrain(vehicle, level)

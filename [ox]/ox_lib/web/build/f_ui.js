@@ -36,9 +36,9 @@
 
   // ---------------- 2. blur ----------------
   var TIERS = {
-    high:   { fps: 30, ds: 6, passes: 1, spread: 0.8 },
-    medium: { fps: 24, ds: 8, passes: 1, spread: 0.6 },
-    low:    { fps: 20, ds: 8, passes: 1, spread: 0.5 },
+    high:   { fps: 30, ds: 6, passes: 1, spread: 0.8, cs: 1 },
+    medium: { fps: 24, ds: 8, passes: 1, spread: 0.6, cs: 0.75 },
+    low:    { fps: 20, ds: 8, passes: 1, spread: 0.5, cs: 0.5 },
   };
   var LOOK = { saturation: 1.3, brightness: 1.0 };
   var START_TIER = "off"; // mati sampai f_hud mengirim tier asli (pilih karakter tanpa blur, CPU lemah)
@@ -77,12 +77,16 @@
 
   // dipanggil saat elemen masuk/keluar DOM (bukan tiap perubahan teks)
   var discoverTimer = 0, lastDiscover = 0;
+  // radial tidak punya panel blur: buka/tutup/ganti submenu tidak perlu memicu pindai ulang
+  function isRadial(n, parent) {
+    return n.matches(SKIP) || !!n.querySelector(SKIP) || !!(parent.closest && parent.closest(SKIP));
+  }
   function onMutate(records) {
     var structural = false;
     for (var i = 0; i < records.length && !structural; i++) {
       var r = records[i], n, k;
-      for (k = 0; k < r.addedNodes.length; k++) { n = r.addedNodes[k]; if (n.nodeType === 1) { structural = true; break; } }
-      for (k = 0; !structural && k < r.removedNodes.length; k++) { n = r.removedNodes[k]; if (n.nodeType === 1) { structural = true; break; } }
+      for (k = 0; k < r.addedNodes.length; k++) { n = r.addedNodes[k]; if (n.nodeType === 1 && !isRadial(n, r.target)) { structural = true; break; } }
+      for (k = 0; !structural && k < r.removedNodes.length; k++) { n = r.removedNodes[k]; if (n.nodeType === 1 && !isRadial(n, r.target)) { structural = true; break; } }
     }
     if (!structural) return;
     syncLanes();
@@ -175,7 +179,7 @@
     function resize() {
       if (!T) return;
       W = Math.max(1, window.innerWidth); H = Math.max(1, window.innerHeight);
-      canvas.width = W; canvas.height = H;
+      canvas.width = Math.max(1, Math.round(W * T.cs)); canvas.height = Math.max(1, Math.round(H * T.cs)); // kanvas komposit lebih kecil (cs), koordinat tetap px layar
       lw = Math.max(1, Math.round(W / T.ds)); lh = Math.max(1, Math.round(H / T.ds));
       tx.forEach(function (t) { gl.deleteTexture(t); }); fb.forEach(function (f) { gl.deleteFramebuffer(f); });
       var a = makeTarget(), b = makeTarget(); fb = [a[0], b[0]]; tx = [a[1], b[1]];
@@ -228,7 +232,7 @@
 
     function clearCanvas() {
       gl.disable(gl.SCISSOR_TEST);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, canvas.width, canvas.height);
       gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
     }
     function eachScissor(fn) {
@@ -268,7 +272,7 @@
       }
 
       gl.disable(gl.SCISSOR_TEST);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, canvas.width, canvas.height);
       gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
       gl.useProgram(pComp); gl.uniform1i(u.compT, 0); gl.bindTexture(gl.TEXTURE_2D, tx[0]);
       gl.uniform2f(u.compRes, W, H); gl.uniform1f(u.sat, LOOK.saturation); gl.uniform1f(u.bri, LOOK.brightness);

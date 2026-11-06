@@ -1,59 +1,56 @@
-.content {
+/* banner pemain baru — gaya iOS (kit F-UI), warna kuning tetap.
+   Ukuran & posisi mengikuti panel info f_hud (ClientInfo, Opsi A 2026-11-06): lebar 224px, kanan 12px,
+   skala = tinggi layar / 1080 (0.85–2), dipasang di bawah tanggal (panel info mulai y=127, tinggi ±176). */
+.at-banner {
     position: absolute;
-    bottom: 0;
-    right: 15vw;
-    width: auto;
-    height: 84px;
-
-    background: rgba(239, 178, 86, 0.582);  /* Warna #efb156 dengan transparansi 70% */
-    border-radius: 5px 5px 0 0;
-    overflow: hidden;
-
+    top: calc(318px * var(--sc, 1));
+    right: calc(12px * var(--sc, 1));
+    width: 224px;
+    transform-origin: top right;
 
     display: flex;
-    justify-content: space-between;
-    flex-wrap: nowrap;
-    align-items: center;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 11px 11px;
+
+    background: rgba(239, 177, 86, .92);
+    color: var(--on-accent);
+    border-radius: 11px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .25);
+
+    opacity: 0;
+    transform: scale(var(--sc, 1)) translateY(6px);
+    transition: opacity .25s ease, transform .25s ease;
+    pointer-events: none;
 }
+.at-banner.show { opacity: 1; transform: scale(var(--sc, 1)); }
 
-.newPlayer {
-    font-family: 'Segoe UI';
-    font-style: normal;
-    font-weight: 600;
-    font-size: 18px;
-
-    margin-block-start: 0%;
-    margin-block-end: 0%;
-
-    color: #E9E9E9;
+.at-head { display: flex; align-items: center; gap: 8px; }
+.at-icon {
+    width: 26px; height: 26px; flex: none;
+    display: grid; place-items: center;
+    border-radius: 7px;
+    background: rgba(29, 20, 6, .14);
 }
-
-.description {
-    font-family: 'Segoe UI';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    /* line-height: 19px; */
-    
-    margin-block-start: 0.3rem;
-    margin-block-end: 0.3rem;
-
-    color: #E9E9E9;
+.at-icon svg {
+    width: 16px; height: 16px;
+    fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
 }
+/* judul boleh turun ke baris kedua kalau teksnya panjang (tidak pernah dipotong "...") */
+.at-title { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 800; line-height: 1.25; overflow-wrap: anywhere; }
+.at-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 1px; }
+.at-foot-lbl { font-size: 10.5px; font-weight: 700; color: rgba(29, 20, 6, .7); }
 
-.timer {
-    font-family: 'Segoe UI';
-    font-style: normal;
-    font-weight: 700;
-    font-size: 32px;
-    line-height: 43px;
-    margin: 11px;
-    /* identical to box height */
-
-
-    color: #FFFFFF;
+.at-timer {
+    flex: none;
+    display: flex; align-items: baseline; gap: 2px;
+    height: 26px; padding: 0 9px;
+    border-radius: 7px;
+    background: rgba(29, 20, 6, .82);
+    color: #f3b354;
+    line-height: 26px;
 }
+.at-num { font-size: 14px; font-weight: 800; }
+.at-unit { font-size: 10px; font-weight: 600; color: rgba(243, 179, 84, .75); }
 
-.main-text {
-    margin: 11px;
-}
+.at-desc { font-size: 11px; font-weight: 500; line-height: 1.4; color: rgba(29, 20, 6, .75); }

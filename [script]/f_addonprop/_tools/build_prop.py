@@ -5,12 +5,28 @@
 # Pivot = origin glb (0,0,0), sumbu glTF (x, y, z) -> GTA (x, -z, y).
 # Tekstur: <folder_build>/<nama_model>_<material>.dds (dari prep_blender.py), selain itu warna solid DXT1 8x8.
 # Material alphaMode MASK -> cutout.sps (render bucket 3). Empty (node tanpa mesh) dicetak + ditulis ke <nama_model>_titik.json.
+# Opsi tambahan (key=value, setelah lod/static):
+#   drop=node1,node2      node (beserta anaknya) tidak ikut dibuat, mis. pistol di station versi kosong
+#   emis=mat1:2,mat2:1    material jadi emissive.sps (menyala), angka = emissiveMultiplier
+#   collision boxes=<file.json>  daftar kotak [[minx,miny,minz],[maxx,maxy,maxz]] dalam koordinat GTA
+#   rotz=90               putar model di sumbu Z GTA (derajat), lalu
+#   move=x,y,z            geser (meter, GTA) -> pivot / arah sama dengan prop lain (mis. pistol lc_fuel)
 import sys, os, math, struct, json
 
 glb, out, MODEL, COL, LOD = sys.argv[1:6]
 LOD = int(LOD)
-STATIC = len(sys.argv) > 6 and sys.argv[6] == 'static'
-AXES = lambda p: (p[0], -p[2], p[1])
+STATIC = 'static' in sys.argv[6:]
+OPT = dict(a.split('=', 1) for a in sys.argv[6:] if '=' in a)
+DROP = set(OPT['drop'].split(',')) if OPT.get('drop') else set()
+EMIS = {k: float(v) for k, v in (x.split(':') for x in OPT['emis'].split(','))} if OPT.get('emis') else {}
+RZ = math.radians(float(OPT.get('rotz', 0)))
+MOVE = [float(c) for c in OPT['move'].split(',')] if OPT.get('move') else [0.0, 0.0, 0.0]
+
+def AXN(p):  # glTF -> GTA + rotz (untuk normal)
+    x, y, z = p[0], -p[2], p[1]
+    return (x * math.cos(RZ) - y * math.sin(RZ), x * math.sin(RZ) + y * math.cos(RZ), z)
+
+AXES = lambda p: tuple(c + m for c, m in zip(AXN(p), MOVE))  # posisi
 os.makedirs(out, exist_ok=True)
 
 # ---------- baca glb ----------
@@ -58,7 +74,7 @@ def add(mi, pos, nor, uv, idx):
     for flip in ((False, True) if mats[mi].get('doubleSided') else (False,)):
         base = len(g['v'])
         for p, n, t in zip(pos, nor, uv):
-            P = AXES(p); N = AXES(n)
+            P = AXES(p); N = AXN(n)
             ln = math.sqrt(sum(c * c for c in N)) or 1
             N = tuple((-c if flip else c) / ln for c in N)
             g['v'].append([P, N, tf(t)]); allp.append(P)
@@ -69,6 +85,7 @@ def add(mi, pos, nor, uv, idx):
 def rec(ni, parent):
     n = j['nodes'][ni]; m = matmul(parent, nodemat(n))
     name = n.get('name', '')
+    if name in DROP: return
     if 'mesh' in n:
         for p in j['meshes'][n['mesh']]['primitives']:
             at = p['attributes']
@@ -137,6 +154,12 @@ for mi in order:
              '    <Width value="%d" />\n    <Height value="%d" />\n    <MipLevels value="%d" />\n    <Format>%s</Format>\n    <FileName>%s.dds</FileName>\n   </Item>\n' % (tn, w, h, mips, fmt, tn))
 X.append('  </TextureDictionary>\n  <Shaders>\n')
 for mi in order:
+    if mats[mi]['name'] in EMIS:
+        X.append('   <Item>\n    <Name>emissive</Name>\n    <FileName>emissive.sps</FileName>\n    <RenderBucket value="0" />\n    <Parameters>\n')
+        X.append('     <Item name="DiffuseSampler" type="Texture">\n      <Name>%s</Name>\n     </Item>\n' % texname[mi])
+        X.append('     <Item name="matMaterialColorScale" type="Vector" x="1" y="0" z="0" w="1" />\n     <Item name="HardAlphaBlend" type="Vector" x="1" y="0" z="0" w="0" />\n     <Item name="useTessellation" type="Vector" x="0" y="0" z="0" w="0" />\n')
+        X.append('     <Item name="emissiveMultiplier" type="Vector" x="%s" y="0" z="0" w="0" />\n    </Parameters>\n   </Item>\n' % f(EMIS[mats[mi]['name']]))
+        continue
     cut = mats[mi].get('alphaMode') == 'MASK'
     X.append('   <Item>\n    <Name>default</Name>\n    <FileName>%s</FileName>\n    <RenderBucket value="%d" />\n    <Parameters>\n'
              % ('cutout.sps' if cut else 'default.sps', 3 if cut else 0))
@@ -164,6 +187,13 @@ if COL == 'box':
     colv = [(x, y, z) for z in (vmin[2], vmax[2]) for x, y in ((vmin[0], vmin[1]), (vmax[0], vmin[1]), (vmax[0], vmax[1]), (vmin[0], vmax[1]))]
     colt = [(0, 2, 1), (0, 3, 2), (4, 5, 6), (4, 6, 7), (0, 1, 5), (0, 5, 4),
             (3, 7, 6), (3, 6, 2), (0, 4, 7), (0, 7, 3), (1, 2, 6), (1, 6, 5)]
+elif COL.startswith('boxes='):
+    colv, colt = [], []
+    for vmin, vmax in json.load(open(COL[6:])):
+        base = len(colv)
+        colv += [(x, y, z) for z in (vmin[2], vmax[2]) for x, y in ((vmin[0], vmin[1]), (vmax[0], vmin[1]), (vmax[0], vmax[1]), (vmin[0], vmax[1]))]
+        colt += [(base + a, base + c, base + e) for a, c, e in ((0, 2, 1), (0, 3, 2), (4, 5, 6), (4, 6, 7), (0, 1, 5), (0, 5, 4),
+                 (3, 7, 6), (3, 6, 2), (0, 4, 7), (0, 7, 3), (1, 2, 6), (1, 6, 5))]
 if COL != 'none':
     assert colt, 'collision %s tapi tidak ada segitiga col_*' % COL
     cmin = [min(v[k] for v in colv) for k in range(3)]; cmax = [max(v[k] for v in colv) for k in range(3)]

@@ -14,6 +14,7 @@ client_scripts {
     'client/self.lua',
     'client/spectate.lua',
     'client/dev.lua',
+    'client/wtune.lua',
 }
 
 server_scripts {
@@ -29,11 +30,13 @@ server_scripts {
     'server/pets.lua',
     'server/bans.lua',
     'server/commands.lua',
+    'server/wtune.lua',
 }
 
 ui_page 'html/index.html'
 
 files {
+    'shared/weapons.lua',
     'html/ui/ios.css',
     'html/ui/fonts/*.woff2',
     'html/index.html',

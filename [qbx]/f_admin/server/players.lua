@@ -339,6 +339,8 @@ lib.callback.register('f_admin:self', function(src, key, state, extra)
     local s = SELF[key]
     if not s or not GetRole(src) or not Can(src, s.need) then return false end
     if key == 'tpm' and type(extra) == 'vector3' then backPos[src] = extra end
+    -- lepas borgol harus dari server (f_police menolak client yang melepas sendiri)
+    if key == 'cuff' and not state and GetResourceState('f_police') == 'started' then exports.f_police:ReleaseCuffs(src) end
     if s.log then
         if key == 'ped' then
             Log(src, s.log, ('mengganti model ped ke %s'):format(tostring(extra)))

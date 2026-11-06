@@ -26,10 +26,27 @@ local function send(tier)
     SendNuiMessage(('{"action":"ui:setBlurQuality","data":"%s"}'):format(tier))
 end
 
-local function currentTier()
+-- alasan blur ditahan: hidden (HUD tidak tampil / pause menu), faded (layar gelap) -> off; settings -> pause (frame terakhir dibiarkan)
+local suspended = {}
+
+--- Tier pilihan pemain / auto, tanpa melihat status HUD (dipakai juga oleh f_chat, ox_lib, Renewed-Banking)
+local function baseTier()
     if cfg.enabled == false then return 'off' end
     if mode ~= 'auto' then return mode end
     return autoTier
+end
+
+local function currentTier()
+    if not client.load or suspended.hidden or suspended.faded then return 'off' end
+    if suspended.settings then return 'pause' end
+    return baseTier()
+end
+
+---@param reason 'hidden' | 'settings' | 'faded'
+---@param state boolean
+function Blur.Suspend(reason, state)
+    suspended[reason] = state or nil
+    if client.uiLoad then send(currentTier()) end
 end
 
 --- Force re-sending the tier (e.g. after the UI was reloaded)
@@ -42,6 +59,7 @@ end
 local function tierFromFps(fps, cur)
     local t = cfg.autoFps or { high = 75, medium = 45, low = 30 }
     local raw = (fps >= t.high and 'high') or (fps >= t.medium and 'medium') or (fps >= t.low and 'low') or 'off'
+    if raw == 'high' and not cfg.autoHigh then raw = 'medium' end -- auto paling tinggi medium; high hanya lewat /hudblur high
     if ORDER[raw] > ORDER[cur] then
         local need = t[raw] + 8
         if fps < need then return cur end
@@ -57,9 +75,13 @@ CreateThread(function()
         local fps = (frames - lastFrames) * 1000 / math.max(1, now - lastTime)
         lastFrames, lastTime = frames, now
 
+        local faded = IsScreenFadedOut()
+        if (suspended.faded or false) ~= faded then suspended.faded = faded or nil end
         if not client.uiLoad then
             lastSent = nil -- UI not ready yet, send again once it is
-        elseif not IsPauseMenuActive() and not IsScreenFadedOut() then
+        elseif IsPauseMenuActive() or faded or not client.load then
+            send(currentTier()) -- off / pause, FPS di menu tidak dihitung
+        else
             if mode == 'auto' and cfg.enabled ~= false then
                 local target = tierFromFps(fps, autoTier)
                 if target ~= autoTier then
@@ -74,8 +96,8 @@ CreateThread(function()
             end
             send(currentTier())
         end
-        -- let other resources (nx_chat) follow the same blur tier
-        TriggerEvent('0r-hud:blurTier', currentTier())
+        -- let other resources (f_chat, ox_lib, Renewed-Banking) follow the same blur tier
+        TriggerEvent('0r-hud:blurTier', baseTier())
     end
 end)
 
@@ -90,7 +112,7 @@ if cfg.command then
         mode = m
         SetResourceKvp(KVP_KEY, m)
         send(currentTier())
-        TriggerEvent('0r-hud:blurTier', currentTier())
+        TriggerEvent('0r-hud:blurTier', baseTier())
         Utils.Notify(('HUD blur: %s'):format(m), 'success')
     end, false)
 end

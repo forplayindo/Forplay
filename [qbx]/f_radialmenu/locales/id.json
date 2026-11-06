@@ -9,6 +9,7 @@
     "vehicle_driving_fast": "Kendaraan ini melaju terlalu cepat.",
     "seat_occupied": "Kursi ini sudah terisi.",
     "race_harness_on": "Kamu memakai harness balap. Tidak bisa pindah kursi.",
+    "seatbelt_on": "Lepas sabuk pengaman dulu sebelum pindah kursi.",
     "obj_not_found": "Gagal membuat objek yang diminta.",
     "not_near_ambulance": "Kamu tidak berada di dekat ambulans.",
     "far_away": "Kamu terlalu jauh.",

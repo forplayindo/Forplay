@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><style>
+@font-face { font-family: 'Sentic'; font-weight: 700; src: url('sentic-text-bold.woff2') format('woff2'); }
+@font-face { font-family: 'Sentic'; font-weight: 300; src: url('sentic-text-light.woff2') format('woff2'); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #111; font-family: 'Sentic', 'Segoe UI', sans-serif; color: #fff; display: flex; gap: 18px; padding: 18px; }
+.col { display: flex; flex-direction: column; gap: 8px; }
+.title { font-size: 15px; font-weight: 700; color: #f3b354; }
+.sub { font-size: 11px; font-weight: 300; color: rgba(255,255,255,.7); width: 560px; }
+.shot { position: relative; width: 560px; height: 460px; border-radius: 6px; overflow: hidden; background-size: cover; }
+.anchor { position: absolute; left: 16px; bottom: 192px; width: 318px; display: flex; flex-direction: column; gap: 7px; }
+/* tanpa latar: teks putih + bayangan gelap (gaya angka bar f_hud) */
+.row { display: flex; align-items: center; gap: 9px; text-shadow: 0 1px 2px rgba(0,0,0,.95), 0 0 5px rgba(0,0,0,.7); }
+.ico { width: 24px; height: 24px; border-radius: 5px; background: #f3b354; display: grid; place-items: center; flex: none; box-shadow: 0 1px 4px rgba(0,0,0,.6); }
+.ico svg { width: 14px; height: 14px; fill: none; stroke: #1d1406; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.txt { line-height: 1.12; }
+.k { font-size: 8.5px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.8); }
+.n { font-size: 12.5px; font-weight: 700; }
+.wave { display: flex; align-items: center; gap: 2px; height: 14px; margin-left: 4px; filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.9)); }
+.wave i { display: block; width: 3px; border-radius: 2px; background: #f3b354; }
+.tx { font-size: 8.5px; font-weight: 700; color: #1d1406; background: #f3b354; border-radius: 3px; padding: 1px 4px; letter-spacing: .06em; text-shadow: none; box-shadow: 0 1px 3px rgba(0,0,0,.6); }
+</style></head><body>
+<script>
+const ICO = '<div class="ico"><svg viewBox="0 0 24 24"><path d="M6 8h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/><path d="M8 8 17 3"/><circle cx="15" cy="15" r="2.5"/><path d="M7 13h3M7 16h3"/></svg></div>';
+const row = (name, h) => `<div class="row">${ICO}<div class="txt"><div class="k">Radio 101.5 MHz</div><div class="n">${name}</div></div><div class="wave">${h.map(x => `<i style="height:${x}px"></i>`).join('')}</div><span class="tx">TX</span></div>`;
+const shots = [['bg.png', 'Siang terang'], ['bg_rain.png', 'Hujan / mendung'], ['bg_night.png', 'Malam']];
+document.body.innerHTML = shots.map(([bg, t]) => `<div class="col"><div class="title">A tanpa latar — ${t}</div><div class="sub">Teks putih + bayangan gelap, ikon & TX kuning.</div>
+<div class="shot" style="background-image:url('${bg}')"><div class="anchor">${row('Sora Ajah', [5, 11, 14, 8, 12])}${row('Budi Santoso', [9, 13, 6, 12, 7])}</div></div></div>`).join('');
+</script></body></html>

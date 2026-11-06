@@ -421,6 +421,17 @@ local function docked(veh)
     return #(GetEntityCoords(veh) - sharedConfig.dock) <= sharedConfig.dockRadius
 end
 
+-- titik naik di dek: sinar dari atas mencari lantai kapal, pinggang pemain diletakkan ±1 m di atasnya.
+-- Tanpa ini kaki bisa menembus lantai dek dan dorongan fisikanya membalikkan tug.
+local function deckPoint(veh, off)
+    local top = GetOffsetFromEntityInWorldCoords(veh, off.x, off.y, off.z + 3.0)
+    local bottom = GetOffsetFromEntityInWorldCoords(veh, off.x, off.y, off.z - 3.0)
+    local ray = StartExpensiveSynchronousShapeTestLosProbe(top.x, top.y, top.z, bottom.x, bottom.y, bottom.z, 2, cache.ped, 7)
+    local _, hit, at, _, ent = GetShapeTestResult(ray)
+    if hit == 1 and ent == veh then return vec3(at.x, at.y, at.z + 1.1) end
+    return GetOffsetFromEntityInWorldCoords(veh, off.x, off.y, off.z + 0.5)
+end
+
 local function moveTo(x, y, z, h)
     busy = true
     DoScreenFadeOut(400)
@@ -451,7 +462,7 @@ local function registerBoatTarget()
             end,
             onSelect = function(data)
                 local b = config.tug.board
-                local p = GetOffsetFromEntityInWorldCoords(data.entity, b.x, b.y, b.z)
+                local p = deckPoint(data.entity, b)
                 moveTo(p.x, p.y, p.z, GetEntityHeading(data.entity) + b.w)
             end,
         },
@@ -589,15 +600,32 @@ local function ropeTextures()
     return RopeAreTexturesLoaded()
 end
 
+-- tali diikat ke bola kecil tak terlihat yang menempel di tulang tangan kanan (ikat langsung ke ped = ujung
+-- tali diam di posisi awal, tidak ikut tangan). Mengembalikan rope + bola untuk dihapus nanti.
 local function handRope(obj)
     if not ropeTextures() then return end
-    local hand = GetPedBoneCoords(cache.ped, 57005, 0.0, 0.0, 0.0)
+    local ped = cache.ped
+    lib.requestModel(M.ropeAnchor, 2000)
+    local hand = GetPedBoneCoords(ped, 57005, 0.0, 0.0, 0.0)
+    local anchor = CreateObject(M.ropeAnchor, hand.x, hand.y, hand.z, false, false, false)
+    SetModelAsNoLongerNeeded(M.ropeAnchor)
+    SetEntityCollision(anchor, false, false)
+    SetEntityAlpha(anchor, 0, false)
+    AttachEntityToEntity(anchor, ped, GetPedBoneIndex(ped, 57005), 0.1, 0.02, -0.02, 0.0, 0.0, 0.0, true, true, false, false, 2, true)
+    Wait(0)
+    local a = GetEntityCoords(anchor)
     local np = GetEntityCoords(obj) + vec3(0.0, 0.0, 0.3)
-    local len = #(hand - np) + 1.0
+    local len = #(a - np) + 1.0
     -- (posisi, rotasi, panjang maks, tipe 4 = tali tipis, panjang awal, panjang min, laju ubah, ...)
-    local rope = AddRope(hand.x, hand.y, hand.z, 0.0, 0.0, 0.0, len + 20.0, 4, len, 0.5, 0.5, false, false, false, 1.0, false)
-    AttachEntitiesToRope(rope, cache.ped, obj, hand.x, hand.y, hand.z, np.x, np.y, np.z, len, false, false, nil, nil)
-    return rope
+    local rope = AddRope(a.x, a.y, a.z, 0.0, 0.0, 0.0, len + 20.0, 4, len, 0.5, 0.5, false, false, false, 1.0, false)
+    AttachEntitiesToRope(rope, anchor, obj, a.x, a.y, a.z, np.x, np.y, np.z, len, false, false, nil, nil)
+    return { rope = rope, anchor = anchor }
+end
+
+local function removeHandRope(h)
+    if not h then return end
+    DeleteRope(h.rope)
+    if DoesEntityExist(h.anchor) then DeleteEntity(h.anchor) end
 end
 
 -- jaring di laut ditarik mendekat ke buritan selama tarik-ulur; panjang tali ikut memendek (tidak pernah tegang)
@@ -612,9 +640,8 @@ local function reelIn(obj, rope, veh, untilFn)
             local found, water = GetWaterHeight(to.x, to.y, 5.0)
             local p = from + (vec3(to.x, to.y, found and water - 0.05 or from.z) - from) * t
             SetEntityCoordsNoOffset(obj, p.x, p.y, p.z, false, false, false)
-            if rope then
-                local hand = GetPedBoneCoords(cache.ped, 57005, 0.0, 0.0, 0.0)
-                RopeForceLength(rope, #(hand - p) + 1.0)
+            if rope and DoesEntityExist(rope.anchor) then
+                RopeForceLength(rope.rope, #(GetEntityCoords(rope.anchor) - p) + 1.0)
             end
             Wait(0)
         end
@@ -668,7 +695,7 @@ local function haulNet()
     if left > 0 then Wait(left) end
     StopAnimTask(cache.ped, A.pull.dict, A.pull.clip, 1.0)
     reeling = false
-    if rope then DeleteRope(rope) end
+    removeHandRope(rope)
 
     local done = lib.callback.await('f_nelayan:server:haul', false, hits)
     if done and done.ok and done.empty then
