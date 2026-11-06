@@ -20,6 +20,7 @@
   },
   "error": {
     "you_have_clocked_out": "Kamu sudah selesai bekerja",
+    "canceled": "Dibatalkan",
     "overweight_check": "Kamu tidak bisa membawa barang lagi"
   }
 }

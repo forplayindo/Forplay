@@ -16,7 +16,14 @@
     const count = () => Object.values(cart).reduce((a, b) => a + b, 0);
     const total = () => menu.items.reduce((s, m) => s + (cart[m.item] || 0) * m.price, 0);
 
+    // gambar ulang tanpa melompat ke atas (tombol +/− di bawah tetap di posisi)
     function render() {
+        const body = $('ph-body'), top = body.scrollTop;
+        draw();
+        body.scrollTop = top;
+    }
+
+    function draw() {
         $('ph-title').textContent = menu.label;
         $('ph-sub').textContent = menu.ems > 0 ? `${menu.ems} petugas EMS bertugas` : 'Tidak ada petugas EMS bertugas';
         const body = $('ph-body'), foot = $('ph-foot');
@@ -93,6 +100,7 @@
         if (d.action === 'pharmacyOpen') {
             menu = d.data; msg = null; cart = {};
             render();
+            $('ph-body').scrollTop = 0;
             $('pharmacy').classList.remove('hidden');
         } else if (d.action === 'pharmacyClose') {
             $('pharmacy').classList.add('hidden');

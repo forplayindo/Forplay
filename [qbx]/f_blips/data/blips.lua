@@ -1,6 +1,6 @@
 -- File ini ditulis otomatis oleh menu /blips. Perubahan berlaku setelah "ensure f_blips".
 Blips = {
-    { id = 1, label = "Balai Kota", category = "Layanan Publik", sprite = 487, color = 0, scale = 0.7, active = true, coords = vec3(-262.79, -964.18, 31.22) },
+    { id = 1, label = "Balai Kota", category = "Layanan Publik", sprite = 487, color = 2, scale = 1.1, active = true, coords = vec3(233.63, -416.49, 52.25) },
     { id = 2, label = "Bank", category = "Layanan Publik", sprite = 108, color = 2, scale = 0.8, active = true, coords = vec3(241.44, 227.19, 105.29) },
     { id = 3, label = "Bank", category = "Layanan Publik", sprite = 108, color = 2, scale = 0.8, active = true, coords = vec3(313.84, -280.58, 53.16) },
     { id = 4, label = "Bank", category = "Layanan Publik", sprite = 108, color = 2, scale = 0.8, active = true, coords = vec3(149.46, -1042.09, 28.37) },
@@ -11,9 +11,8 @@ Blips = {
     { id = 9, label = "Bank", category = "Layanan Publik", sprite = 108, color = 2, scale = 0.8, active = true, coords = vec3(-112.22, 6471.01, 30.63) },
     { id = 10, label = "Toilet", category = "Layanan Publik", sprite = 1, color = 3, scale = 0.7, active = true, coords = vec3(359.20, -603.57, 27.66) },
     { id = 11, label = "Toilet", category = "Layanan Publik", sprite = 1, color = 3, scale = 0.7, active = true, coords = vec3(352.10, -607.02, 27.79) },
-    { id = 12, label = "Cafe", category = "Pekerjaan", sprite = 214, color = 5, scale = 0.8, active = true, coords = vec3(-1755.54, -1091.05, 13.06) },
-    { id = 13, label = "Bengkel Forplay", category = "Pekerjaan", sprite = 446, color = 47, scale = 0.8, active = true, coords = vec3(-338.00, -1355.00, 30.40) },
-    --{ id = 14, label = "Bengkel Kustom", category = "Pekerjaan", sprite = 72, color = 3, scale = 0.8, active = true, coords = vec3(-333.25, -1342.50, 30.40) },
+    { id = 12, label = "Cafe", category = "Pekerjaan", sprite = 93, color = 8, scale = 1.0, active = true, coords = vec3(-1714.98, -803.82, 10.24) },
+    { id = 13, label = "Bengkel 4PLAY", category = "Pekerjaan", sprite = 446, color = 47, scale = 0.8, active = true, coords = vec3(-338.00, -1355.00, 30.40) },
     { id = 15, label = "Weazel News", category = "Pekerjaan", sprite = 459, color = 1, scale = 0.8, active = true, coords = vec3(-598.40, -929.85, 24.00) },
     { id = 16, label = "Vineyard", category = "Pekerjaan", sprite = 827, color = 83, scale = 0.8, active = true, coords = vec3(-1877.35, 2132.57, 127.93) },
     { id = 17, label = "Vineyard Processing", category = "Pekerjaan", sprite = 270, color = 83, scale = 0.8, active = true, coords = vec3(-1928.80, 2059.75, 141.00) },

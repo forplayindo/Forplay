@@ -23,6 +23,7 @@ let st = null;        // status pasien dari server
 let sel = null;       // area terpilih / 'BLEED'
 let timer = null;
 let tab = 'care';     // 'care' | 'bill'
+let shown;            // area yang terakhir digambar di #content (scroll dipertahankan selama sama)
 let bill = null;      // { pending: [...], unpaid: [...] } dari server
 let billSel = {};     // id layanan -> { on, price }
 let billMsg = null;   // { ok, text }
@@ -139,12 +140,16 @@ function render() {
     ].map(([k, v, c]) => `<div class="vital ${c}"><small>${k}</small><b>${v}</b></div>`).join('');
 
     const tb = document.querySelector('.tabs [data-tab="bill"]');
-    tb.innerHTML = '🧾 Tagihan' + (st.pendingBill ? `<span class="badge">${st.pendingBill}</span>` : '');
+    tb.innerHTML = 'Tagihan' + (st.pendingBill ? `<span class="badge">${st.pendingBill}</span>` : '');
 
     if (tab !== 'care') return;
+    // update server (tiap 2 detik saat tergeletak) tidak boleh melempar daftar ke atas
+    const c = $('content'), top = c.scrollTop;
     if (sel === 'BLEED') renderBleed();
     else if (sel) renderDetail(sel);
     else renderSummary();
+    c.scrollTop = sel === shown ? top : 0;
+    shown = sel;
     renderFooter();
 }
 
@@ -221,8 +226,9 @@ function renderBilling() {
         h += '<div class="note">Bisa ditagih paksa dari bank pasien lewat Kasir EMS atau MDT > Tagihan.</div>';
     }
 
-    const el = $('billing');
+    const el = $('billing'), top = el.scrollTop;
     el.innerHTML = h;
+    el.scrollTop = top; // pilih metode / hapus layanan tidak melompat ke atas
     el.querySelectorAll('[data-chk]').forEach(c => c.onchange = () => {
         billSel[c.dataset.chk].on = c.checked;
         c.closest('.bill-row').classList.toggle('off', !c.checked);

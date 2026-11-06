@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>4Play Logo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="l4p">
+  <div class="wrap">
+    <div class="glow">
+      <div class="row">
+        <div class="persp"><div class="badge"><span class="n">4</span><i class="shine"></i></div></div>
+        <div class="col">
+          <div class="play">PLAY</div>
+          <div class="tag"><i class="line"></i><span class="txt"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// ====== SETTING (ubah di sini) ======
+const CONFIG = {
+  mode: 'always',        // 'fade' = fade in/out tiap loop | 'always' = selalu tampil
+  accent: '#f3b354',   // warna aksen
+  tagline: 'ROLEPLAY',
+  opacity: 0.9,        // transparansi ala logo TV
+  duration: 12.8,      // detik per loop
+  // ukuran panel info HUD f_hud @1080p (ClientInfo: PANEL_W, right 12, LOGO_SAFE_TOP) — logo dibuat selebar panel itu
+  hudWidth: 192, hudRight: 13, hudTop: 116,
+  hudGap: 5           // jarak bawah logo ke panel info (px @1080p)
+};
+// ====================================
+(function(){
+  const el = document.getElementById('l4p');
+  const n = parseInt(CONFIG.accent.slice(1),16), c=[n>>16,(n>>8)&255,n&255];
+  const light = '#'+c.map(v=>Math.round(v+(255-v)*.55).toString(16).padStart(2,'0')).join('');
+  Object.entries({'--accent':CONFIG.accent,'--accent-light':light,'--accent-glow':`rgba(${c.join(',')},.55)`,'--opacity':CONFIG.opacity})
+    .forEach(([k,v])=>el.style.setProperty(k,v));
+  el.querySelector('.txt').textContent = CONFIG.tagline;
+  const wrap = el.querySelector('.wrap'), row = el.querySelector('.row');
+  ['r','c'].forEach(k=>{ const g=document.createElement('div'); g.className='ghost '+k; g.appendChild(row.cloneNode(true)); wrap.insertBefore(g, wrap.firstChild); });
+  // skala sama dengan info HUD f_hud (tinggi/1080, min 0.85, max 2): lebar logo = lebar panel,
+  // tepi kanan sejajar panel, dan tepat di atas panel (berjarak hudGap)
+  const persp = row.querySelector('.persp'), play = row.querySelector('.play'), txt = row.querySelector('.txt');
+  const fit = () => {
+    if (!el.offsetWidth) return; // masih tersembunyi, ukur ulang saat showLogo
+    const sc = Math.min(2, Math.max(0.85, window.innerHeight / 1080));
+    // logo digambar langsung di ukuran akhirnya (bukan transform: scale) supaya tajam; ukur dulu di ukuran desain (--size 1)
+    el.style.setProperty('--size', 1);
+    // tepi yang terlihat setelah skewX(-10deg): bagian atas geser ke kanan, bawah ke kiri (posisi layout relatif .wrap)
+    const t = Math.tan(10 * Math.PI / 180), cy = row.offsetHeight / 2;
+    const ls = parseFloat(getComputedStyle(txt).letterSpacing) || 0; // spasi kosong setelah huruf terakhir
+    // posisi relatif .wrap: jumlahkan offset sepanjang rantai offsetParent (.col pakai filter → bisa jadi offsetParent)
+    const pos = e => { let x = 0, y = 0; for (; e && e !== wrap && e !== el; e = e.offsetParent) { x += e.offsetLeft; y += e.offsetTop; } return { x, y }; };
+    const pp = pos(persp), pl = pos(play), pt = pos(txt);
+    const left = pp.x - (pp.y + persp.offsetHeight - cy) * t;
+    const right = Math.max(
+      pl.x + play.offsetWidth - 2 + (cy - pl.y) * t,
+      pt.x + txt.offsetWidth - ls + (cy - pt.y) * t);
+    const w = el.offsetWidth, h = row.offsetHeight; // ukuran desain, dibaca sebelum --size diganti
+    const s = CONFIG.hudWidth * sc / (right - left);
+    el.style.setProperty('--size', s);
+    el.style.setProperty('--right', (CONFIG.hudRight * sc - (w - right) * s) + 'px');
+    el.style.setProperty('--top', Math.max(4, (CONFIG.hudTop - CONFIG.hudGap) * sc - h * s) + 'px');
+  };
+  // font baru diunduh saat teksnya tampil; muat dari awal supaya ukuran tidak dihitung pakai font cadangan
+  const fontsReady = Promise.all([document.fonts.load('108px Anton'), document.fonts.load('700 22px "Chakra Petch"')]).catch(() => {});
+  fontsReady.then(fit);
+  window.addEventListener('resize', fit);
+
+  // timeline: animasi hanya di fase masuk / tengah / keluar, selebihnya logo diam (tanpa repaint)
+  let timers = [];
+  const phase = p => { el.classList.remove('p-in', 'p-mid', 'p-out'); if (p) el.classList.add(p); };
+  const at = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const loop = () => {
+    timers = [];
+    const D = CONFIG.duration * 1000, mid = D * 0.4375;
+    if (CONFIG.mode !== 'always') { phase('p-in'); at(1500, () => phase(null)); at(D - 1200, () => phase('p-out')); }
+    at(mid, () => phase('p-mid'));
+    at(mid + 1500, () => phase(null)); // ghost glitch dilepas lagi supaya tidak ikut dirender
+    at(D, loop);
+  };
+  const stop = () => { timers.forEach(clearTimeout); timers = []; phase(null); };
+
+  // client.lua: tampil setelah masuk kota, hilang saat logout
+  window.addEventListener('message', e => {
+    const a = e.data && e.data.action;
+    if ((a === 'showLogo' || a === 'show4play') && !el.classList.contains('on')) { el.classList.add('on'); fit(); fontsReady.then(() => document.fonts.ready).then(fit); loop(); }
+    if (a === 'hideLogo' || a === 'hide4play') { stop(); el.classList.remove('on'); }
+  });
+})();
+</script>
+</body>
+</html>

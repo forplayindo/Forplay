@@ -1,0 +1,31 @@
+/* f_mining — layout saja; gaya dasar dari ui/ios.css */
+.panel { width: min(400px, 94vw); }
+
+.body { display: flex; flex-direction: column; gap: 14px; padding: 0 20px 20px; }
+#view-caves, #view-wadah { display: flex; flex-direction: column; gap: 8px; }
+.head-row { display: flex; align-items: center; justify-content: space-between; }
+.head-row .b-plain { height: 22px; padding: 0 4px; }
+.head-row .ic { width: 15px; height: 15px; }
+
+.dots { display: flex; gap: 4px; margin-top: 4px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--fill-2); }
+.dots i.on { background: var(--accent); }
+.row .full { color: var(--red); font-weight: 600; font-size: 12px; }
+
+#ores .row.off { opacity: .4; }
+#ores .row.on { background: var(--accent-soft); }
+
+.amount-h { display: flex; justify-content: space-between; }
+.amount-h span { text-transform: none; }
+.stepper { display: flex; align-items: center; gap: 6px; flex: none; }
+.stepper input { width: 52px; height: 30px; padding: 0; text-align: center; font-size: 15px; font-weight: 600; -moz-appearance: textfield; }
+.stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.stepper .circle { width: 28px; height: 28px; font-size: 16px; }
+#w-out { white-space: normal; text-align: right; line-height: 1.45; }
+.fill-row { display: flex; gap: 8px; }
+.fill-row .cap { flex: 1; justify-content: center; }
+
+/* not ".actions": the kit styles ".actions button" as small gray list buttons */
+.menu-actions { display: flex; gap: 10px; }
+.menu-actions .b-lg { flex: 1; }
+.menu-actions .primary:disabled { opacity: 1; background: var(--fill); color: var(--label-2); }

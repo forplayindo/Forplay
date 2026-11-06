@@ -36,16 +36,22 @@
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+        <svg width="0" height="0" style="position:absolute">
+            <symbol id="fp-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+            <symbol id="fp-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"/></symbol>
+            <symbol id="fp-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3M7.5 14h9"/></symbol>
+            <symbol id="fp-bars" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 3v18M12 3v18M16 3v18"/></symbol>
+        </svg>
         <!-- ADMINISTRASI (tilang) -->
         <div id="admin" class="fp hidden">
             <div class="ad-panel">
                 <header>
-                    <div class="brand"><span class="logo">👮</span><div><h1>Administrasi</h1><small id="ad-sub"></small></div></div>
-                    <button class="icon-btn close" data-ad-close>✕</button>
+                    <div class="brand"><span class="logo"><svg class="ic"><use href="#fp-shield"/></svg></span><div><h1>Administrasi</h1><small id="ad-sub"></small></div></div>
+                    <button class="icon-btn close" data-ad-close><svg class="ic"><use href="#fp-x"/></svg></button>
                 </header>
                 <main id="ad-grid" class="ad-grid"></main>
                 <aside id="ad-sheet" class="sheet hidden">
-                    <div class="sheet-head"><h2 id="ad-sheet-title"></h2><button class="icon-btn" id="ad-sheet-close">✕</button></div>
+                    <div class="sheet-head"><h2 id="ad-sheet-title"></h2><button class="icon-btn" id="ad-sheet-close"><svg class="ic"><use href="#fp-x"/></svg></button></div>
                     <div id="ad-sheet-body" class="sheet-body"></div>
                     <div class="sheet-foot">
                         <div class="total hidden" id="ad-total-row"><span>Total</span><strong id="ad-total">Rp 0</strong></div>
@@ -59,8 +65,8 @@
         <div id="lab" class="fp hidden">
             <div class="ad-panel">
                 <header>
-                    <div class="brand"><span class="logo">🧪</span><div><h1>Lab Forensik</h1><small id="lab-sub"></small></div></div>
-                    <button class="icon-btn close" data-lab-close>✕</button>
+                    <div class="brand"><span class="logo"><svg class="ic"><use href="#fp-flask"/></svg></span><div><h1>Lab Forensik</h1><small id="lab-sub"></small></div></div>
+                    <button class="icon-btn close" data-lab-close><svg class="ic"><use href="#fp-x"/></svg></button>
                 </header>
                 <main id="lab-grid" class="ad-grid"></main>
                 <main id="lab-result" class="lab-result hidden"></main>
@@ -74,8 +80,8 @@
         <div id="prison" class="fp hidden">
             <div class="ad-panel">
                 <header>
-                    <div class="brand"><span class="logo">🏛️</span><div><h1>Administrasi Penjara</h1><small id="pr-sub"></small></div></div>
-                    <button class="icon-btn close" data-pr-close>✕</button>
+                    <div class="brand"><span class="logo"><svg class="ic"><use href="#fp-bars"/></svg></span><div><h1>Administrasi Penjara</h1><small id="pr-sub"></small></div></div>
+                    <button class="icon-btn close" data-pr-close><svg class="ic"><use href="#fp-x"/></svg></button>
                 </header>
                 <main id="pr-list" class="pr-list"></main>
                 <div class="lab-actions">

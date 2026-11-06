@@ -463,7 +463,7 @@ local function camRaycast(dist, ignore)
     local handle = StartExpensiveSynchronousShapeTestLosProbe(camCoords.x, camCoords.y, camCoords.z,
         dest.x, dest.y, dest.z, 17, ignore or cache.ped, 4)
     local _, hit, endCoords, normal = GetShapeTestResult(handle)
-    return hit == 1, endCoords, normal
+    return hit == true or hit == 1, endCoords, normal
 end
 
 local disabledControls = { 10, 11, 14, 15, 16, 17, 24, 25, 37, 44, 47, 140, 141, 142, 172, 173, 174, 175, 257, 263, 264 }

@@ -1,50 +1,33 @@
--- lastresort_loading
--- LastResort Development · https://intelnpc.com
-
 fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-name 'foreplay'
-author 'LastResort Development'
-description 'Configurable loading screen — live server stats, local MP4 background video, local MP3 music with a real spectrum visualizer, particles, stripes/dots/hex/grid pattern, i18n.'
-version '2.1.0'
-repository 'https://fivem-last-resort.tebex.io'
+name 'f_loadscreen'
+author 'Foreplay'
+description 'Loading screen Foreplay — video, musik + visualizer, status server live, peraturan/staf/berita, tips'
+version '1.0.0'
 
 loadscreen 'index.html'
 loadscreen_cursor 'yes'
-ui_page 'nui/callbacks.html'
 loadscreen_manual_shutdown 'yes'
+-- NUI callback hanya diteruskan ke resource yang punya ui_page
+ui_page 'nui/callbacks.html'
 
-client_script 'bridge/handover.lua'
-server_script 'bridge/server.lua'
+client_script 'client.lua'
+server_script 'server.lua'
 
 files {
     'index.html',
     'nui/callbacks.html',
     'config.js',
     'locales/*.json',
-    'assets/fonts/app-font.css',
     'assets/fonts/*.woff2',
-    'assets/lucide/lucide.css',
-    'assets/lucide/lucide.woff2',
     'assets/video/*.mp4',
     'assets/video/*.webm',
-    'assets/video/*.mkv',
-    'assets/video/*.m4v',
-    'assets/video/*.ogv',
+    'assets/audio/*.mp3',
+    'assets/audio/*.ogg',
     'assets/img/*.png',
     'assets/img/*.jpg',
+    'assets/img/*.webp',
     'assets/img/*.svg',
-    'assets/img/*.webp'
 }
-
-escrow_ignore {
-    'config.js',
-    'locales/*.json',
-    'assets/**/*',
-    'data/*',
-    '*.md',
-}
-
-dependency '/assetpacks'

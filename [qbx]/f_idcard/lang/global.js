@@ -1,5 +1,5 @@
 export const Global = {
-    lang_header: 'Foreplay',
+    lang_header: '4PLAY',
     lang_lastname: 'Nama Belakang',
     lang_firstname: 'Nama Depan',
     lang_dob: 'Tanggal Lahir',

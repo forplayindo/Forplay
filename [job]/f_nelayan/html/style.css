@@ -1,0 +1,57 @@
+/* f_nelayan — layout saja; gaya dasar dari ui/ios.css */
+.panel { width: min(420px, 94vw); }
+.body { display: flex; flex-direction: column; gap: 14px; padding: 0 20px 20px; }
+.head-row { display: flex; align-items: center; justify-content: space-between; }
+.head-row .b-plain { height: 22px; padding: 0 4px; }
+.head-row .ic { width: 15px; height: 15px; }
+#crew .row .d, #near .row .d { font-size: 12px; }
+#near:empty::after { content: "Tidak ada pemain lain di dekatmu."; display: block; padding: 14px; text-align: center; color: var(--label-2); font-size: 13px; }
+.menu-actions #leave { flex: 0 0 34%; }
+
+/* HUD progres: kanan tengah, kecil, tanpa blur / animasi berat */
+.hud {
+    position: fixed; right: 18px; top: 50%; transform: translateY(-50%); width: 230px;
+    display: flex; flex-direction: column; gap: 8px; padding: 12px 14px;
+    background: rgba(28, 28, 30, .85); border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
+    color: var(--label); font-size: 12px; pointer-events: none;
+}
+.hud-h { display: flex; align-items: center; gap: 10px; }
+.hud-h b { display: block; font-size: 13px; }
+.hud-h small { display: block; color: var(--label-2); font-size: 11px; }
+.hud-ic { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border-radius: 8px; background: var(--accent); color: var(--on-accent); }
+.hud-ic .ic { width: 16px; height: 16px; }
+.hud-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.hud-row span { color: var(--label-2); }
+.hud-row b { font-variant-numeric: tabular-nums; }
+#h-rows { display: flex; flex-direction: column; gap: 6px; }
+.hud-f { display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--sep); }
+.hud-f span { color: var(--label-2); }
+.hud-f b { color: var(--green); font-variant-numeric: tabular-nums; }
+.hud-tip { padding: 8px 10px; border-radius: 10px; background: rgba(243, 179, 84, .14); color: var(--label); font-size: 11.5px; line-height: 1.4; }
+.hud-tip::before { content: "Tips: "; font-weight: 700; color: var(--accent); }
+
+/* tarik-ulur: tengah bawah */
+.pull {
+    position: fixed; left: 50%; bottom: 16%; transform: translateX(-50%); width: 360px;
+    display: flex; flex-direction: column; gap: 10px; padding: 14px 16px;
+    background: rgba(28, 28, 30, .9); border-radius: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+    color: var(--label); font-size: 13px; pointer-events: none;
+}
+.pull-h { display: flex; justify-content: space-between; align-items: center; }
+.pull-h span { color: var(--label-2); font-variant-numeric: tabular-nums; }
+.pull-bar { position: relative; height: 18px; border-radius: 9px; background: var(--fill); overflow: hidden; }
+.pull-bar i { position: absolute; top: 0; bottom: 0; background: var(--green); opacity: .55; }
+.pull-bar b { position: absolute; top: -2px; bottom: -2px; width: 4px; margin-left: -2px; border-radius: 2px; background: #fff; }
+.pull-bar.hit i { opacity: 1; }
+.pull-bar.miss { box-shadow: inset 0 0 0 2px var(--red); }
+.pull-dots { display: flex; gap: 6px; justify-content: center; }
+.pull-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--fill); }
+.pull-dots i.ok { background: var(--green); }
+.pull-dots i.no { background: var(--red); }
+.pull small { text-align: center; color: var(--label-2); }
+.pull kbd { padding: 1px 6px; border-radius: 5px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; }
+
+.menu-actions { display: flex; gap: 10px; }
+/* not ".actions": the kit styles ".actions button" as small gray list buttons */
+.menu-actions .primary:disabled { opacity: 1; background: var(--fill); color: var(--label-2); }
+.menu-actions .b-lg { flex: 1; }

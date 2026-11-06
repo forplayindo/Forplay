@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>F-Panduan Mockup</title>
+<link rel="stylesheet" href="f-ui/ios.css">
+<style>
+/* latar tiruan layar game */
+html, body {
+    background:
+        radial-gradient(ellipse at 70% 20%, #6d8a5a55, transparent 60%),
+        linear-gradient(180deg, #8fb0c9 0%, #6f8f73 45%, #3f5537 70%, #2c3a26 100%);
+}
+
+/* ===================== PANEL ALUR KERJA (yang akan dibuat) ===================== */
+.flow { width: min(540px, 94vw); max-height: 90vh; z-index: 5; }
+.flow header { padding-bottom: 10px; }
+.flow .body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 0 20px 18px; }
+
+.steps { display: flex; flex-direction: column; gap: 8px; }
+.st { display: flex; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--cell); border: 1.5px solid transparent; }
+.st .no { width: 26px; height: 26px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--fill); font-size: 12px; font-weight: 700; color: var(--label-2); }
+.st h3 { font-size: 14px; line-height: 1.3; display: flex; align-items: center; gap: 8px; }
+.st p { font-size: 12.5px; line-height: 1.5; color: var(--label-2); margin-top: 3px; }
+.st p b { color: var(--label); font-weight: 600; }
+.st.now { border-color: var(--accent); }
+.st.now .no { background: var(--accent); color: var(--on-accent); }
+.st.done .no { background: var(--green); color: #04210d; }
+.st.done h3, .st.done p { opacity: .55; }
+.chip-now { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); }
+
+.rules { padding: 12px 14px; border-radius: 14px; background: var(--orange-soft); }
+.rules b { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--orange); }
+.rules b .ic { width: 15px; height: 15px; }
+.rules ul { margin-top: 6px; padding-left: 18px; font-size: 12.5px; line-height: 1.5; color: var(--label-2); }
+
+.flow-foot { display: flex; align-items: center; gap: 12px; padding: 12px 20px 18px; border-top: 1px solid var(--sep); }
+.flow-foot label { flex: 1; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--label-2); cursor: pointer; }
+.flow-foot input { width: 16px; height: 16px; accent-color: var(--accent); }
+.flow-foot .primary { width: auto; padding: 0 22px; }
+.hint { font-size: 11px; color: var(--label-3); text-align: center; }
+.kbd b { min-width: 18px; height: 18px; padding: 0 5px; display: inline-grid; place-items: center; border-radius: 5px; font-size: 10px; color: var(--label); background: var(--cell-2); }
+
+/* tab kecil saat panel ditutup */
+.g-tab {
+    position: fixed; left: 0; top: 34%; z-index: 5; display: flex; align-items: center; gap: 8px; cursor: pointer;
+    padding: 8px 12px 8px 10px; border-radius: 0 12px 12px 0; background: rgba(0, 0, 0, .78); font-size: 12px; color: var(--label-2);
+}
+.g-tab .ic { width: 15px; height: 15px; color: var(--accent); }
+
+/* ===================== tiruan elemen lain di layar ===================== */
+.hud {
+    position: fixed; right: 18px; top: 50%; transform: translateY(-50%); width: 230px;
+    display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; font-size: 12px;
+    background: rgba(28, 28, 30, .85); border-radius: 14px;
+}
+.hud .h b { display: block; font-size: 13px; } .hud .h small { display: block; color: var(--label-2); font-size: 11px; }
+.hud .r { display: flex; justify-content: space-between; } .hud .r span { color: var(--label-2); }
+.minimap { position: fixed; left: 18px; bottom: 18px; width: 300px; height: 170px; border-radius: 14px; background: #0006; display: grid; place-items: center; color: #fff6; font-size: 12px; }
+.notifs { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 30; width: 380px; display: flex; flex-direction: column; gap: 8px; }
+.nt { display: flex; gap: 10px; padding: 11px 13px; border-radius: 14px; background: rgba(28, 28, 30, .96); box-shadow: 0 6px 18px rgba(0, 0, 0, .35); }
+.nt b { display: block; font-size: 13px; } .nt p { font-size: 12px; color: var(--label-2); margin-top: 2px; }
+
+/* panel demo mockup (tidak ada di game) */
+.demo { position: fixed; top: 16px; right: 16px; z-index: 20; width: 300px; padding: 14px; border-radius: 16px; background: #000d; display: flex; flex-direction: column; gap: 9px; font-size: 12px; color: var(--label-2); }
+.demo b { color: var(--label); font-size: 13px; }
+.demo .row2 { display: flex; gap: 6px; flex-wrap: wrap; }
+.demo button { height: 30px; padding: 0 10px; border-radius: 9px; background: var(--fill); color: var(--label); font-size: 12px; }
+.demo button.on { background: var(--accent); color: var(--on-accent); font-weight: 600; }
+.demo ul { padding-left: 16px; display: flex; flex-direction: column; gap: 3px; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-tree" viewBox="0 0 24 24"><path d="M12 2 5 12h4l-3 5h12l-3-5h4zM12 17v5"/></symbol>
+  <symbol id="i-pick" viewBox="0 0 24 24"><path d="M14 4c3 0 6 2 7 5-3-1-6-1-8 0M14 4l-11 11 3 3 11-11M14 4c-1 2-1 4 0 6"/></symbol>
+  <symbol id="i-fish" viewBox="0 0 24 24"><path d="M3 12c3-5 9-6 14-3l4-3v12l-4-3c-5 3-11 2-14-3zM15 11h.01"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4h6a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4zM20 4h-6a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h7z"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2 20h20zM12 10v4M12 17h.01"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+</svg>
+
+<!-- PANEL ALUR KERJA -->
+<div id="flow" class="panel flow">
+    <header>
+        <div class="brand"><span class="logo"><svg class="ic"><use id="f-icon" href="#i-tree"/></svg></span><div><h1 id="f-title">Alur Kerja</h1><small id="f-sub">-</small></div></div>
+        <div class="head-actions"><button class="circle close" id="f-close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+    </header>
+    <section class="body">
+        <div class="steps" id="f-steps"></div>
+        <div class="rules" id="f-rules"></div>
+    </section>
+    <div class="flow-foot">
+        <label><input type="checkbox" id="f-mute">Jangan tampilkan otomatis lagi</label>
+        <button class="primary b-lg" id="f-ok">Mengerti</button>
+    </div>
+</div>
+
+<div id="g-tab" class="g-tab hidden"><svg class="ic"><use href="#i-book"/></svg>Alur Kerja <span class="kbd"><b>F7</b></span></div>
+
+<!-- tiruan HUD job & layar game -->
+<div class="hud">
+    <div class="h"><b id="h-title">Tebang &amp; muat kayu</b><small>Tips di HUD tetap ada</small></div>
+    <div class="r"><span>Bak truk</span><b>6/18 potong</b></div>
+    <div class="r"><span>Kayu belum dimuat</span><b>3/6 potong</b></div>
+</div>
+<div class="minimap">minimap</div>
+<div class="notifs" id="notifs"></div>
+
+<!-- panel demo -->
+<div class="demo">
+    <b>Mockup Alur Kerja</b>
+    <span>Job</span>
+    <div class="row2" id="d-jobs"></div>
+    <div class="row2">
+        <button id="d-open">Buka (F7)</button>
+        <button id="d-next">Tandai langkah berikutnya</button>
+        <button id="d-auto">Kerja ke-3 selesai</button>
+    </div>
+    <ul>
+        <li>Panel muncul <b>otomatis saat Mulai Kerja</b> di 3 kerja pertama tiap job.</li>
+        <li>Tutup dengan <b>Mengerti</b> / ✕. Buka lagi kapan saja dengan <b>F7</b> atau <b>/panduan</b>.</li>
+        <li>Saat dibuka di tengah kerja, langkah yang sedang dikerjakan ditandai <b>Sekarang</b>.</li>
+        <li>Tips di HUD kanan tetap seperti sekarang.</li>
+    </ul>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+const JOBS = {
+    kayu: {
+        name: 'Penebang Kayu', icon: 'i-tree', hud: 'Tebang & muat kayu',
+        steps: [
+            ['Pergi ke hutan dengan truk kerja',
+             'Ikuti petunjuk arah di peta menuju hutan, pakai truk yang sudah disiapkan. Jangan lupa <b>beli chainsaw</b> di Mandor untuk menebang. Satu chainsaw bisa dipakai untuk <b>50 pohon</b>.'],
+            ['Tebang pohon dan muat ke bak truk',
+             'Arahkan target ke pohon lalu pilih <b>Tebang pohon</b>. Kalau kerja sendiri, potong batangnya jadi 3 bagian lalu panggul satu per satu ke belakang truk. Kalau berdua, angkat batang besar bersama (satu di depan, satu di belakang).'],
+            ['Bawa kayu ke tempat pengolahan',
+             'Parkir truk di tempat yang sudah disediakan, dengan <b>bagian belakang truk menghadap mesin</b>. Tekan <b>[E] Olah Kayu</b>, lalu tunggu kayu masuk mesin satu per satu.'],
+            ['Ambil papan hasil olahan',
+             'Papan hasil olahan ada di tumpukan <b>di bawah mesin pengolahan</b>. Parkir truk di dekatnya, arahkan target ke tumpukan papan, lalu pilih <b>Pindahkan papan ke truk</b>.'],
+            ['Kembali ke gudang untuk menyimpan papan',
+             'Bawa truk ke Mandor di Paleto, arahkan target ke truk lalu pilih <b>Bongkar papan</b>. Papan masuk gudang dan bisa diambil kapan saja di <b>petugas gudang (Mandor)</b>, lalu dijual di Koperasi.'],
+        ],
+        rules: [
+            'Kalau kamu berhenti bekerja, papan yang belum dibongkar tetap otomatis masuk gudang.',
+            'Truk ditinggal lebih dari 300 meter selama 5 menit = pekerjaan dibatalkan.',
+        ],
+    },
+    nelayan: {
+        name: 'Nelayan', icon: 'i-fish', hud: 'Melaut',
+        steps: [
+            ['Naik ke kapal nelayan',
+             'Bicara dengan Syahbandar di dermaga untuk mulai bekerja, lalu arahkan target ke kapal dan pilih <b>Naik ke kapal</b>. Pastikan sudah <b>membeli jaring</b>. Satu jaring bisa dipakai <b>5 kali tebar</b>, setelah itu rusak.'],
+            ['Lihat lokasi menangkap ikan di peta',
+             'Lokasi menangkap ikan ditandai di peta. Bawa kapal ke sana, lalu <b>pelankan kapal</b> sebelum menebar jaring.'],
+            ['Tebar jaring di lokasi',
+             'Tebar jaring lalu tunggu ikan masuk, jangan menjauh dari jaring. Saat menarik jaring ada <b>permainan kecil</b>: tekan tepat waktu 3 kali. Kalau gagal, ikan lepas, tapi jaring tidak berkurang. Masukkan ikan ke peti di dek kapal.'],
+            ['Kembali ke dermaga dan turunkan peti',
+             'Arahkan target ke tumpukan peti ikan untuk <b>menurunkan peti</b> dari kapal. Gunakan target juga untuk <b>turun dari kapal</b> ke dermaga.'],
+            ['Muat peti ke mobil yang sudah disiapkan',
+             'Angkat peti ikan bagianmu dan masukkan ke <b>bak mobil Bison</b> di parkiran dermaga.'],
+            ['Antar ke Pasar Ikan',
+             'Ikuti petunjuk arah ke Pasar Ikan dan jual peti ikan. Uang langsung masuk <b>rekening bank</b>. Setelah itu kembalikan mobil ke parkiran dermaga.'],
+        ],
+        rules: [
+            'Mobil kerja hanya untuk mengantar ikan. Setelah ikan terjual, kembalikan dalam <b>5 menit</b>. Kalau tidak dikembalikan atau dibawa keluar jalur, kena <b>denda Rp 200.000</b>.',
+            'Kapal terlalu jauh dari jaring = jaring putus dan hanyut.',
+        ],
+    },
+    tambang: {
+        name: 'Penambang', icon: 'i-pick', hud: 'Menambang',
+        steps: [
+            ['Ganti seragam dan siapkan kapak',
+             'Ganti seragam di loker pos tambang (helm sudah termasuk). Kamu <b>tidak bisa menambang tanpa seragam</b>. Beli <b>Kapak Tambang</b> di pos, satu kapak bisa dipakai 200 kali pukul.'],
+            ['Masuk gua lewat lift',
+             'Naik lift dan pilih gua yang masih ada tempat. Satu gua <b>maksimal 6 penambang</b>.'],
+            ['Tambang batu di dinding gua',
+             'Arahkan target ke batu lalu pilih <b>Tambang</b>. Setiap 2 ayunan dapat 1 bijih (tembaga, perak, emas, atau berlian yang langka). Bijih masuk ke tasmu.'],
+            ['Setor bijih ke lori',
+             'Masukkan bijih ke <b>bak lori</b> di persimpangan gua. Lori akan mengantar bijih ke Gudang Tambang di lobby.'],
+            ['Lebur bijih di tungku',
+             'Ambil <b>wadah</b> di gudang (maksimal 50 bijih), bawa ke tungku yang kosong. Bijih dilebur otomatis jadi batangan dan masuk gudang. <b>Bijih mentah tidak bisa dijual.</b>'],
+            ['Ambil hasil dan jual',
+             'Ambil batangan di <b>Gudang Hasil</b> dekat pintu tambang, bawa dengan kendaraanmu ke <b>Koperasi Balai Kota</b> untuk dijual.'],
+        ],
+        rules: [
+            'Tidak menambang selama 10 menit = kamu dipindahkan kembali ke lobby.',
+        ],
+    },
+    sampah: {
+        name: 'Tukang Sampah', icon: 'i-trash', hud: 'Angkut sampah',
+        steps: [
+            ['Ambil pekerjaan di Job Centre',
+             'Di Balai Kota pilih <b>Tukang Sampah</b>, pilih tingkat kesulitan, ajak teman kalau mau (maksimal 4 orang), lalu tekan Mulai.'],
+            ['Ambil truk di depot',
+             'Truk sampah menunggu di <b>depot La Mesa</b>. Ikuti petunjuk arah ke titik sampah pertama.'],
+            ['Angkut kantong sampah',
+             'Kantong sampah ditandai <b>panah kuning</b>. Ambil kantongnya lalu lempar ke atas truk.'],
+            ['Kosongkan kontainer',
+             'Kontainer ditandai <b>panah hijau</b>. Kaitkan ke truk dengan <b>[E]</b>, angkat dan kosongkan dengan <b>[SHIFT]</b>, lalu lepas lagi dengan <b>[E]</b>.'],
+            ['Selesaikan semua titik lalu kembali',
+             'Sisa titik terlihat di HUD. Setelah semua selesai, kembali ke depot dan pilih <b>Selesai Kerja</b>. Bayaran dibagi rata ke semua anggota.'],
+        ],
+        rules: [
+            'Truk ditinggal lebih dari 300 meter selama 5 menit = pekerjaan dibatalkan.',
+        ],
+    },
+    kurir: {
+        name: 'Kurir Paket', icon: 'i-box', hud: 'Antar paket',
+        steps: [
+            ['Ambil pekerjaan di Job Centre',
+             'Di Balai Kota pilih <b>Kurir</b>, pilih rute, dan ajak 1 teman kalau mau kerja berdua.'],
+            ['Muat paket ke van',
+             'Pergi ke <b>depot GoPostal</b>, van akan muncul. Ambil paket dari tumpukan lalu masukkan ke belakang van.'],
+            ['Antar paket ke alamat',
+             'Ikuti petunjuk arah. Sesampainya di alamat, ambil paket dari van. <b>Paket besar harus diangkat berdua.</b>'],
+            ['Serahkan ke penerima',
+             'Serahkan paket ke penerima yang menunggu di depan alamat. Kadang penerima perlu <b>tanda tangan</b> dulu.'],
+            ['Kembali ke depot',
+             'Setelah semua paket terantar, kembali ke depot dan tekan <b>[E] Selesai rute</b>. Bayaran dibagi, lalu pilih <b>Lanjut Rute</b> atau <b>Selesai Kerja</b>.'],
+        ],
+        rules: [
+            'Van ditinggal lebih dari 300 meter selama 5 menit, atau van rusak/tenggelam = pekerjaan dibatalkan.',
+        ],
+    },
+};
+
+let job = 'kayu', now = -1, open = true;
+
+function render() {
+    const j = JOBS[job];
+    $('f-icon').setAttribute('href', '#' + j.icon);
+    $('f-title').textContent = 'Alur Kerja ' + j.name;
+    $('f-sub').textContent = 'Baca sebentar sebelum mulai bekerja';
+    $('h-title').textContent = j.hud;
+    $('f-steps').innerHTML = j.steps.map(([title, desc], i) => {
+        const cls = now < 0 ? '' : i < now ? 'done' : i === now ? 'now' : '';
+        const no = i < now ? '<svg class="ic" style="width:13px;height:13px;stroke-width:3"><use href="#i-check"/></svg>' : i + 1;
+        return `<div class="st ${cls}"><span class="no">${no}</span><div><h3>${title}${i === now ? '<span class="chip-now">Sekarang</span>' : ''}</h3><p>${desc}</p></div></div>`;
+    }).join('');
+    $('f-rules').innerHTML = `<b><svg class="ic"><use href="#i-warn"/></svg>Perhatikan</b><ul>${j.rules.map((r) => `<li>${r}</li>`).join('')}</ul>`;
+    $('flow').classList.toggle('hidden', !open);
+    $('g-tab').classList.toggle('hidden', open);
+    document.querySelectorAll('#d-jobs button').forEach((b) => b.classList.toggle('on', b.dataset.job === job));
+}
+
+function notify(title, text) {
+    const el = document.createElement('div');
+    el.className = 'nt';
+    el.innerHTML = `<span class="sq" style="--c:var(--accent)"><svg class="ic"><use href="#i-info"/></svg></span><div><b>${title}</b><p>${text}</p></div>`;
+    $('notifs').appendChild(el);
+    setTimeout(() => el.remove(), 6000);
+}
+
+Object.entries(JOBS).forEach(([key, j]) => {
+    const b = document.createElement('button');
+    b.textContent = j.name;
+    b.dataset.job = key;
+    b.onclick = () => { job = key; now = -1; open = true; render(); };
+    $('d-jobs').appendChild(b);
+});
+
+const close = () => {
+    open = false;
+    render();
+    if ($('f-mute').checked) notify('Alur kerja tidak muncul otomatis lagi', 'Buka kapan saja dengan F7 atau ketik /panduan.');
+};
+$('f-close').onclick = close;
+$('f-ok').onclick = close;
+$('g-tab').onclick = () => { open = true; render(); };
+$('d-open').onclick = () => { open = !open; render(); };
+$('d-next').onclick = () => { now = (now + 1) % JOBS[job].steps.length; open = true; render(); };
+$('d-auto').onclick = () => {
+    open = false;
+    render();
+    notify('Alur kerja disembunyikan', `Kamu sudah 3 kali bekerja sebagai ${JOBS[job].name}, panduan tidak muncul otomatis lagi. Buka kapan saja dengan F7 atau /panduan.`);
+};
+document.addEventListener('keydown', (e) => { if (e.key === 'F7') { e.preventDefault(); open = !open; render(); } });
+
+render();
+</script>
+</body>
+</html>

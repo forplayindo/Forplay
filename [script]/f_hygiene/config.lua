@@ -11,16 +11,24 @@ Config.Mandi = {
     FliesPercent = 85,                -- persen HUD saat lalat mulai mengelilingi player
     BathDuration = 10000,              -- 10 detik durasi animasi mandi
 
-    -- animasi lalat mengelilingi player (dari spesifikasi)
-    FliesAnim = { dict = 'cm@insect@clip', anim = 'insect_clip' },
-    FliesInterval = 20000, -- animasi tepuk lalat dimainkan sekali tiap 20 detik
+    -- animasi kibas-kibas bau/lalat (animasi bawaan GTA "Stinker", pengganti mosquitoes_singleanimation
+    -- yang escrow). Upper body saja, jadi tetap bisa jalan
+    FliesAnim = { dict = 'anim@mp_player_intupperstinker', anim = 'idle_a' },
+    FliesInterval = 20000, -- animasi kibas dimainkan sekali tiap 20 detik
 
-    -- efek visual lalat beneran (particle), dipasang bareng animasinya
+    -- efek visual lalat beneran (particle bawaan GTA), nempel di ped selama kotor
     FliesEffect = {
         dict = 'core',
         name = 'ent_amb_fly_swarm',
         offset = vector3(0.0, 0.0, 0.4),
         scale = 1.0,
+    },
+
+    -- lalat + dengung ikut terlihat/terdengar player lain di sekitar (lewat statebag dari server)
+    FliesSync = {
+        Distance = 15.0, -- radius lalat ditampilkan & dengungnya terdengar
+        Volume = 0.6,    -- volume dengung maksimal (0.0 - 1.0), makin jauh makin pelan
+        Tick = 500,      -- ms, interval cek player kotor di sekitar
     },
 
     -- animasi proses mandi (dipakai baik mandi di air maupun di shower)

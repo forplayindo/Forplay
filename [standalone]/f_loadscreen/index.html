@@ -1,978 +1,452 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Loading</title>
-    <link rel="stylesheet" href="assets/fonts/app-font.css">
-    <link rel="stylesheet" href="assets/lucide/lucide.css">
-    <script src="config.js"></script>
-    <style>
-        :root {
-            --lr-ease: cubic-bezier(.16, 1, .3, 1);
-            --lr-ease-in: cubic-bezier(.4, 0, 1, 1);
-            --lr-dur-fast: 120ms;
-            --lr-dur: 220ms;
-            --lr-dur-slow: 420ms;
-            --lr-radius-sm: 6px;
-            --lr-radius-md: 12px;
-            --lr-radius-lg: 18px;
-            --lr-radius-pill: 999px;
-            --lr-space-1: 4px;
-            --lr-space-2: 8px;
-            --lr-space-3: 12px;
-            --lr-space-4: 16px;
-            --lr-space-5: 20px;
-            --lr-space-6: 24px;
-            --lr-space-8: 32px;
-            --lr-shadow-1: 0 1px 2px rgba(0, 0, 0, .30), 0 2px 8px rgba(0, 0, 0, .24);
-            --lr-shadow-2: 0 8px 24px rgba(0, 0, 0, .38), 0 2px 6px rgba(0, 0, 0, .28);
-            --lr-accent: var(--accent);
-            --lr-focus-ring: 0 0 0 2px rgba(255, 255, 255, .9), 0 0 0 4px var(--lr-accent);
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4PLAY</title>
+<script src="config.js"></script>
+<style>
+@font-face { font-family: 'Inter'; font-weight: 400; font-display: swap; src: url('assets/fonts/inter-400.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 600; font-display: swap; src: url('assets/fonts/inter-600.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 700 800; font-display: swap; src: url('assets/fonts/inter-700.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-weight: 400 800; font-display: swap; src: url('assets/fonts/jetbrains-mono-700.woff2') format('woff2'); }
+@font-face { font-family: 'Saira Condensed'; font-weight: 500 900; font-display: swap; src: url('assets/fonts/saira-condensed-800.woff2') format('woff2'); }
 
-            --bg: #06080d;
-            --accent: #f3b354;
-            --accent-2: #a78bfa;
-            --accent-3: #f472b6;
-            --accent-soft: rgba(95, 224, 255, 0.16);
-            --accent-glow: rgba(95, 224, 255, 0.4);
-            --text: #f4f7fb;
-            --muted: #a8b0c2;
-            --faint: #6f7891;
-            --line: rgba(255, 255, 255, 0.08);
-            --line-strong: rgba(255, 255, 255, 0.16);
-            --ok: #34d399;
-            --shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
-        }
+:root {
+    --ease: cubic-bezier(.16, 1, .3, 1);
+    --ease-in: cubic-bezier(.4, 0, 1, 1);
+    --r-sm: 6px; --r-md: 12px; --r-lg: 18px; --r-pill: 999px;
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+    --bg: #06080d;
+    --accent: #f3b354;
+    --accent-2: #a78bfa;
+    --accent-3: #f472b6;
+    --accent-soft: rgba(95, 224, 255, .16);
+    --accent-glow: rgba(95, 224, 255, .4);
+    --text: #f4f7fb;
+    --muted: #a8b0c2;
+    --faint: #6f7891;
+    --line: rgba(255, 255, 255, .08);
+    --line-strong: rgba(255, 255, 255, .16);
+    --ok: #34d399;
+    --mono: "JetBrains Mono", monospace;
+    --cond: "Saira Condensed", sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+body {
+    font-family: "Inter", system-ui, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+    cursor: default;
+    position: relative;
+}
+.ic { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+button { font-family: inherit; }
+button:focus-visible, a:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(255,255,255,.9), 0 0 0 4px var(--accent); }
 
-        html, body { width: 100%; height: 100%; overflow: hidden; }
+/* ===== Lapisan latar ===== */
+#bg { position: absolute; inset: 0; overflow: hidden; background-color: var(--bg); }
+#bgSlides { position: absolute; inset: 0; overflow: hidden; }
+#bgSlides .sl { position: absolute; inset: 0; opacity: 0; background: 50% 50% / cover no-repeat; }
+#bgSlides .sl.kb { animation: kb 28s ease-in-out infinite alternate; }
+@keyframes kb { from { transform: scale(1.05); } to { transform: scale(1.16) translate(-1.6%, -1.2%); } }
+#bgVideo {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; pointer-events: none; display: none;
+}
+#bgVideo.playing { display: block; }
+#pattern { position: absolute; inset: 0; pointer-events: none; }
+#pattern.masked {
+    -webkit-mask-image: radial-gradient(ellipse 95% 80% at 50% 50%, #000 28%, transparent 92%);
+    mask-image: radial-gradient(ellipse 95% 80% at 50% 50%, #000 28%, transparent 92%);
+}
+#scrim, #grain { position: absolute; inset: 0; pointer-events: none; }
+#grain {
+    display: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+#particles { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
-        body {
-            font-family: "Inter", system-ui, sans-serif;
-            color: var(--text);
-            background: var(--bg);
-            -webkit-font-smoothing: antialiased;
-            user-select: none;
-            cursor: default;
-            position: relative;
-        }
+/* ===== Sudut ===== */
+.corners { position: absolute; inset: 14px; pointer-events: none; }
+.corners span {
+    position: absolute; width: 22px; height: 22px;
+    border: 0 solid var(--accent);
+    filter: drop-shadow(0 0 6px var(--accent-glow));
+}
+.corners .tl { top: 0; left: 0; }
+.corners .tr { top: 0; right: 0; }
+.corners .bl { bottom: 0; left: 0; }
+.corners .br { bottom: 0; right: 0; }
 
-        [class^="icon-"], [class*=" icon-"] { display: inline-block; line-height: 1; }
+/* ===== Panel kaca (blur ringan — sama dengan f_hud) ===== */
+.panel {
+    position: relative;
+    background: rgba(140, 160, 182, .16);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: var(--r-lg);
+}
 
-        button:focus-visible,
-        a:focus-visible,
-        [role="button"]:focus-visible,
-        input:focus-visible,
-        select:focus-visible,
-        textarea:focus-visible,
-        [tabindex]:focus-visible {
-            outline: none;
-            box-shadow: var(--lr-focus-ring);
-        }
+/* ===== Stage ===== */
+#stage {
+    position: relative; width: 100%; height: 100%;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: clamp(28px, 3.4vw, 56px);
+}
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes riseMid { from { opacity: 0; transform: translateY(calc(-50% + 14px)); } to { opacity: 1; transform: translateY(-50%); } }
+.a1, .a2, .a3, .a4 { opacity: 0; animation: rise .7s var(--ease) forwards; }
+.a1 { animation-delay: .15s; }
+.a2 { animation-delay: .28s; }
+.a3 { animation-delay: .4s; }
+.a4 { animation-delay: .52s; animation-duration: .75s; }
 
-        /* ===== Layers ===== */
-        #bg {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            background-color: var(--bg);
-        }
+/* ===== Atas ===== */
+.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+.wordmark { display: flex; flex-direction: column; gap: 12px; }
+.logo { display: none; align-self: flex-start; height: 84px; width: auto; max-width: min(46vw, 520px); object-fit: contain; margin-bottom: 2px; }
+.logo.on { display: block; }
+.logo.glow { filter: drop-shadow(0 0 18px var(--accent-glow)) drop-shadow(0 8px 24px rgba(0, 0, 0, .55)); }
+.pre {
+    display: flex; align-items: center; gap: 12px;
+    font: 700 11px var(--mono); letter-spacing: .32em; text-transform: uppercase;
+    color: var(--accent);
+}
+.pre::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 10px var(--accent-glow);
+    animation: pulse 1.6s ease-in-out infinite;
+}
+.wordmark h1 {
+    font: 800 clamp(44px, 5.6vw, 80px)/.88 var(--cond);
+    letter-spacing: .14em; text-transform: uppercase;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, .6);
+}
+.wordmark h1:empty { display: none; }
+.ln { display: flex; align-items: center; gap: 14px; }
+.ln::before {
+    content: ""; width: clamp(34px, 3.4vw, 58px); height: 2px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+.ln span { font-size: clamp(11px, 1.1vw, 14px); letter-spacing: .42em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 
-        #bgVideo {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            display: none;
-            background: transparent;
-        }
-        #bgVideo.playing { display: block; }
-        #bgVideo.hidden { display: none; }
+.chip { display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-radius: var(--r-md); font-size: 14px; }
+.chip .g { display: flex; align-items: center; gap: 8px; }
+.chip .ic { font-size: 17px; color: var(--muted); }
+.chip b { font-weight: 700; }
+.chip small { color: var(--faint); font-size: 14px; }
+.chip .dv { width: 1px; height: 16px; background: var(--line-strong); }
+.dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+.dot::after {
+    content: ""; position: absolute; inset: 0; border-radius: 50%;
+    border: 1px solid var(--ok); opacity: 0;
+    animation: ping 2.4s var(--ease) infinite;
+}
+.chip.off .dot { background: #f87171; box-shadow: 0 0 8px #f87171; }
+.chip.off .dot::after { display: none; }
+@keyframes ping { 0% { transform: scale(1); opacity: .5; } 70%, 100% { transform: scale(3.2); opacity: 0; } }
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(.82); opacity: .55; } }
 
-        #bgSlides {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-        }
-        #bgSlides .slide {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            background-position: 50% 50%;
-            background-repeat: no-repeat;
-            background-size: cover;
-            will-change: opacity, transform;
-        }
-        #bgSlides .slide.kb { animation: kenburns 28s ease-in-out infinite alternate; }
-        @keyframes kenburns {
-            from { transform: scale(1.05); }
-            to   { transform: scale(1.16) translate(-1.6%, -1.2%); }
-        }
+/* ===== Panel info kanan ===== */
+.info {
+    position: absolute; right: clamp(28px, 3.4vw, 56px); top: 50%;
+    transform: translateY(-50%);
+    width: clamp(330px, 27vw, 410px);
+    padding: 8px; overflow: hidden;
+}
+.info.a3 { animation-name: riseMid; }
+.tabs { display: flex; gap: 4px; padding: 5px; border-radius: var(--r-md); background: rgba(0, 0, 0, .3); border: 1px solid var(--line); }
+.tab {
+    flex: 1; border: 0; cursor: pointer; background: transparent; color: var(--muted);
+    font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    padding: 10px; border-radius: var(--r-sm);
+    transition: background .12s var(--ease), color .12s var(--ease);
+}
+.tab:hover { color: var(--text); }
+.tab.on { background: var(--accent-soft); color: var(--accent); box-shadow: inset 0 0 0 1px rgba(95, 224, 255, .3); }
+.tabbody { padding: 18px 16px 14px; }
+.pane { display: none; flex-direction: column; gap: 12px; }
+.pane.on { display: flex; }
 
-        #pattern {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-        }
-        #pattern.masked {
-            mask-image: radial-gradient(ellipse 95% 80% at 50% 50%, #000 28%, transparent 92%);
-            -webkit-mask-image: radial-gradient(ellipse 95% 80% at 50% 50%, #000 28%, transparent 92%);
-        }
+.rule { display: flex; gap: 14px; align-items: flex-start; font-size: 14.5px; line-height: 1.4; color: var(--muted); }
+.rule .n {
+    flex: none; width: 24px; height: 24px; border-radius: var(--r-sm);
+    display: grid; place-items: center;
+    font: 700 11px var(--mono); color: var(--accent);
+    background: var(--accent-soft); border: 1px solid rgba(95, 224, 255, .25);
+}
 
-        #scrim {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-        }
+.staff { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.sc {
+    position: relative; padding: 14px 13px; border-radius: var(--r-md); overflow: hidden;
+    background: rgba(255, 255, 255, .025); border: 1px solid var(--line);
+    transition: background .22s var(--ease), border-color .22s var(--ease), transform .22s var(--ease);
+}
+.sc::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .35;
+    background: linear-gradient(135deg, var(--tint, transparent), transparent 60%);
+}
+.sc:hover { background: rgba(255, 255, 255, .05); border-color: var(--line-strong); transform: translateY(-1px); }
+.sc-h { position: relative; display: flex; align-items: center; gap: 11px; }
+.sc-av {
+    flex: none; width: 34px; height: 34px; border-radius: var(--r-md);
+    display: grid; place-items: center;
+    font: 800 15px var(--cond); color: var(--text);
+    background: rgba(255, 255, 255, .06); border: 1px solid var(--line-strong);
+}
+.sc-n { font-size: 14px; font-weight: 700; line-height: 1.1; }
+.sc-r { font-size: 11px; color: var(--faint); letter-spacing: .04em; margin-top: 2px; }
+.sc-b {
+    position: relative; display: inline-block; margin-top: 10px; padding: 4px 9px;
+    font: 700 10px var(--mono); letter-spacing: .18em; text-transform: uppercase;
+    border-radius: var(--r-pill); background: rgba(255, 255, 255, .04); border: 1px solid var(--line); color: var(--muted);
+}
+.sc.t-owner { --tint: rgba(244, 114, 182, .22); --c1: #ffd0e6; --c2: #ffb3d8; --rgb: 244, 114, 182; }
+.sc.t-admin { --tint: rgba(167, 139, 250, .22); --c1: #d6c8ff; --c2: #c4b3ff; --rgb: 167, 139, 250; }
+.sc.t-dev   { --tint: rgba(94, 234, 212, .22);  --c1: #bff7ec; --c2: #97ecda; --rgb: 94, 234, 212; }
+.sc.t-mod   { --tint: rgba(95, 224, 255, .22);  --c1: #c2efff; --c2: #95ddf6; --rgb: 95, 224, 255; }
+.sc[class*="t-"] .sc-av { color: var(--c1); background: rgba(var(--rgb), .14); border-color: rgba(var(--rgb), .4); }
+.sc[class*="t-"] .sc-b  { color: var(--c2); background: rgba(var(--rgb), .1);  border-color: rgba(var(--rgb), .32); }
 
-        #particles {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            display: block;
-        }
+#news { gap: 10px; max-height: 36vh; overflow-y: auto; padding-right: 4px; }
+.nw { padding: 12px 13px; border-radius: var(--r-md); background: rgba(255, 255, 255, .025); border: 1px solid var(--line); }
+.nw-h { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.nw-tag {
+    font: 700 9.5px var(--mono); letter-spacing: .18em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: var(--r-pill);
+    color: var(--accent); background: var(--accent-soft); border: 1px solid rgba(95, 224, 255, .25);
+}
+.nw-d { margin-left: auto; font: 700 10px var(--mono); letter-spacing: .08em; color: var(--faint); }
+.nw-t { font-size: 14.5px; font-weight: 700; line-height: 1.25; }
+.nw ul { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
+.nw li { position: relative; padding-left: 14px; font-size: 13.5px; line-height: 1.45; color: var(--muted); }
+.nw li::before { content: ""; position: absolute; left: 3px; top: 8px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); opacity: .8; }
 
-        #grain {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            opacity: 0.035;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-        }
+/* ===== Bawah ===== */
+.bottom { display: flex; flex-direction: column; gap: clamp(16px, 2vh, 26px); }
+.headline { display: flex; flex-direction: column; gap: 12px; }
+.welcome {
+    font: 800 clamp(36px, 4.6vw, 66px)/.92 var(--cond);
+    letter-spacing: .04em; text-transform: uppercase;
+    text-shadow: 0 2px 26px rgba(0, 0, 0, .6);
+}
+.welcome b { color: var(--accent); text-shadow: 0 0 22px var(--accent-glow); }
+.tip { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 15px; }
+.tip .ic { font-size: 18px; color: var(--accent); }
+.tip .k { font: 700 11px var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
+#tipText { transition: opacity .4s var(--ease); }
 
-        /* ===== Corner brackets ===== */
-        .corners {
-            position: absolute;
-            inset: 14px;
-            pointer-events: none;
-        }
-        .corners span {
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            border-color: var(--accent);
-            border-style: solid;
-            border-width: 0;
-            filter: drop-shadow(0 0 6px var(--accent-glow));
-        }
-        .corners .tl { top: 0; left: 0; border-top-width: 2px; border-left-width: 2px; }
-        .corners .tr { top: 0; right: 0; border-top-width: 2px; border-right-width: 2px; }
-        .corners .bl { bottom: 0; left: 0; border-bottom-width: 2px; border-left-width: 2px; }
-        .corners .br { bottom: 0; right: 0; border-bottom-width: 2px; border-right-width: 2px; }
+.bar { display: flex; align-items: center; gap: clamp(18px, 2.4vw, 36px); padding: 20px 26px; }
+.vline { width: 1px; align-self: stretch; background: var(--line-strong); flex: none; }
 
-        /* ===== Glass panel — same soft frosted look as f_hud (glass.css) =====
-           Light blur only: a big radius + saturate is re-computed every frame
-           over the playing video and fights the game for the GPU. */
-        .panel {
-            position: relative;
-            background: rgba(140, 160, 182, 0.16);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: var(--lr-radius-lg);
-        }
-        @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-            .panel { background: rgba(140, 160, 182, 0.30); }
-        }
+.progress { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.pmeta { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.pmeta-l { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+#stageLabel { font: 700 10px var(--mono); letter-spacing: .22em; text-transform: uppercase; color: var(--faint); }
+#status { font-size: 14px; font-weight: 600; letter-spacing: .02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#status i { font-style: normal; color: var(--accent); animation: bk 1.1s steps(2) infinite; }
+@keyframes bk { 50% { opacity: .25; } }
+#pct {
+    font: 800 clamp(34px, 3.6vw, 52px)/1 var(--cond); letter-spacing: .02em;
+    color: var(--accent); text-shadow: 0 0 16px var(--accent-glow);
+    font-variant-numeric: tabular-nums;
+}
+#pct small { font-size: .5em; color: var(--faint); margin-left: 2px; text-shadow: none; }
+.track {
+    position: relative; height: 12px; border-radius: var(--r-pill); overflow: hidden;
+    background: rgba(255, 255, 255, .06); border: 1px solid var(--line);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .5), inset 0 -1px 0 rgba(255, 255, 255, .04);
+}
+.marks { position: absolute; inset: 0; display: flex; justify-content: space-between; padding: 0 25%; pointer-events: none; }
+.marks span { width: 1px; background: rgba(255, 255, 255, .18); }
+.fill {
+    position: absolute; inset: 0 auto 0 0; width: 0; overflow: hidden;
+    border-radius: var(--r-pill);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, .18), transparent 50%),
+        linear-gradient(90deg, var(--accent) 0%, #b6f0ff 60%, var(--accent-2) 100%);
+    box-shadow: 0 0 14px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, .4);
+}
+.fill::before {
+    content: ""; position: absolute; inset: 0 -18px; opacity: .7;
+    background-image: linear-gradient(45deg, rgba(255,255,255,.18) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.18) 50%, rgba(255,255,255,.18) 75%, transparent 75%);
+    background-size: 18px 18px;
+    animation: stripes 1.2s linear infinite;
+}
+.fill::after {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 100%; width: 30%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent);
+    animation: sheen 2.4s ease-in-out infinite;
+}
+@keyframes stripes { to { transform: translateX(18px); } }
+@keyframes sheen { 0% { transform: translateX(-467%); } 100% { transform: translateX(0); } }
 
-        /* ===== Stage ===== */
-        #stage {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: clamp(28px, 3.4vw, 56px);
-        }
+/* ===== Musik ===== */
+.music { position: relative; display: flex; align-items: center; gap: 14px; flex: none; }
+.cover {
+    position: relative; width: 54px; height: 54px; flex: none; overflow: hidden;
+    border-radius: var(--r-md); background: rgba(95, 224, 255, .12); border: 1px solid rgba(95, 224, 255, .32);
+}
+.cover canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.minfo { display: flex; flex-direction: column; min-width: 120px; max-width: 180px; }
+.minfo canvas { width: 100%; height: 16px; margin-top: 4px; opacity: .9; }
+.now { font: 700 10px var(--mono); letter-spacing: .22em; text-transform: uppercase; color: var(--faint); }
+#trk { font-size: 14.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.mctrl { display: flex; align-items: center; gap: 5px; }
+.mbtn {
+    width: 34px; height: 34px; display: grid; place-items: center; cursor: pointer;
+    border: 1px solid var(--line); border-radius: var(--r-md);
+    background: rgba(255, 255, 255, .04); color: var(--text);
+    transition: background .12s var(--ease), border-color .12s var(--ease);
+}
+.mbtn .ic { font-size: 17px; }
+.mbtn:hover { background: rgba(255, 255, 255, .1); border-color: var(--line-strong); }
+.mbtn.hl, .mbtn.on { background: var(--accent-soft); border-color: rgba(95, 224, 255, .45); color: var(--accent); box-shadow: 0 0 12px rgba(95, 224, 255, .25); }
+.mbtn.hl:hover, .mbtn.on:hover { background: rgba(95, 224, 255, .28); }
+.music.off .mctrl, .music.off .vol { opacity: .4; pointer-events: none; }
+.vol { display: flex; align-items: center; gap: 9px; margin-left: 2px; color: var(--faint); }
+.vol .ic { font-size: 16px; }
+.vbar { position: relative; width: 64px; height: 4px; border-radius: var(--r-pill); background: rgba(255, 255, 255, .1); cursor: pointer; }
+.vbar::before { content: ""; position: absolute; inset: -8px 0; }
+.vbar .lv { position: absolute; inset: 0 auto 0 0; width: 50%; border-radius: var(--r-pill); background: var(--accent); box-shadow: 0 0 6px var(--accent-glow); }
+.vbar .kn { position: absolute; top: 50%; left: 50%; width: 11px; height: 11px; border-radius: 50%; background: #fff; transform: translate(-50%, -50%); box-shadow: 0 0 5px var(--accent-glow); }
 
-        @keyframes riseIn {
-            from { opacity: 0; transform: translateY(14px); }
-            to   { opacity: 1; transform: none; }
-        }
+.plist {
+    position: absolute; left: 0; bottom: calc(100% + 18px); z-index: 6;
+    width: 300px; max-width: 78vw; padding: 8px;
+    display: none; flex-direction: column;
+    background: rgba(9, 12, 19, .97);
+}
+.plist.on { display: flex; }
+.plist-h { display: flex; align-items: center; gap: 8px; padding: 6px 8px 10px; font: 700 10px var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--faint); }
+.plist-h .ic { font-size: 14px; color: var(--accent); }
+.plist-h .n { margin-left: auto; }
+.plist-b { display: flex; flex-direction: column; gap: 2px; max-height: 210px; overflow-y: auto; }
+.pt {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px; cursor: pointer; text-align: left;
+    border: 0; border-radius: var(--r-sm); background: transparent; color: var(--muted); font-size: 13.5px;
+    transition: background .12s var(--ease), color .12s var(--ease);
+}
+.pt:hover { background: rgba(255, 255, 255, .06); color: var(--text); }
+.pt .i { flex: none; width: 18px; font: 700 10px var(--mono); color: var(--faint); }
+.pt .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt.on { background: var(--accent-soft); color: var(--accent); }
+.pt.on .i { color: var(--accent); }
 
-        @keyframes riseInCentered {
-            from { opacity: 0; transform: translateY(calc(-50% + 14px)); }
-            to   { opacity: 1; transform: translateY(-50%); }
-        }
+.socials { display: flex; gap: 9px; flex: none; }
+.s {
+    width: 42px; height: 42px; display: grid; place-items: center; cursor: pointer;
+    border-radius: var(--r-md); background: rgba(255, 255, 255, .04); border: 1px solid var(--line); color: var(--muted);
+    transition: color .12s var(--ease), background .12s var(--ease), border-color .12s var(--ease), transform .12s var(--ease);
+}
+.s .ic { font-size: 19px; }
+.s:hover { color: var(--accent); background: var(--accent-soft); border-color: rgba(95, 224, 255, .4); transform: translateY(-1px); }
+.s.copied { color: var(--ok); background: rgba(52, 211, 153, .14); border-color: rgba(52, 211, 153, .45); }
 
-        .a1 { opacity: 0; animation: riseIn 0.7s 0.15s var(--lr-ease) forwards; }
-        .a2 { opacity: 0; animation: riseIn 0.7s 0.28s var(--lr-ease) forwards; }
-        .a3 { opacity: 0; animation: riseIn 0.7s 0.4s  var(--lr-ease) forwards; }
-        .a4 { opacity: 0; animation: riseIn 0.75s 0.52s var(--lr-ease) forwards; }
+.foot {
+    position: absolute; left: 0; right: 0; bottom: 9px; text-align: center; pointer-events: none;
+    font: 700 10px var(--mono); letter-spacing: .24em; text-transform: uppercase; color: var(--faint);
+}
 
-        /* ===== Top bar ===== */
-        .top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: var(--lr-space-6);
-        }
+.plist-b::-webkit-scrollbar, .gate-body::-webkit-scrollbar, #news::-webkit-scrollbar { width: 6px; }
+.plist-b::-webkit-scrollbar-thumb, .gate-body::-webkit-scrollbar-thumb, #news::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .16); border-radius: var(--r-pill); }
 
-        .wordmark { display: flex; flex-direction: column; gap: var(--lr-space-3); }
-        .logo {
-            display: none;
-            align-self: flex-start;
-            height: 84px;
-            width: auto;
-            max-width: min(46vw, 520px);
-            object-fit: contain;
-            margin-bottom: 2px;
-        }
-        .logo.on { display: block; }
-        .logo.glow { filter: drop-shadow(0 0 18px var(--accent-glow)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.55)); }
-        .wordmark .pre {
-            display: flex; align-items: center; gap: var(--lr-space-3);
-            font-family: "JetBrains Mono", monospace;
-            font-size: 11px;
-            letter-spacing: 0.32em;
-            text-transform: uppercase;
-            color: var(--accent);
-        }
-        .wordmark .pre::before {
-            content: "";
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: var(--accent);
-            box-shadow: 0 0 10px var(--accent-glow);
-            animation: pulse 1.6s ease-in-out infinite;
-        }
-        .wordmark h1 {
-            font-family: "Saira Condensed", sans-serif;
-            font-weight: 800;
-            font-size: clamp(44px, 5.6vw, 80px);
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            line-height: 0.88;
-            color: var(--text);
-            text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
-        }
-        .wordmark .ln { display: flex; align-items: center; gap: 14px; }
-        .wordmark .ln::before {
-            content: "";
-            width: clamp(34px, 3.4vw, 58px);
-            height: 2px;
-            border-radius: 2px;
-            background: linear-gradient(90deg, var(--accent), transparent);
-            box-shadow: 0 0 12px var(--accent-glow);
-        }
-        .wordmark .ln span {
-            font-size: clamp(11px, 1.1vw, 14px);
-            letter-spacing: 0.42em;
-            text-transform: uppercase;
-            color: var(--muted);
-            font-weight: 600;
-        }
+/* ===== Gerbang peraturan ===== */
+#gate {
+    position: absolute; inset: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: center;
+    padding: clamp(20px, 4vh, 60px);
+    background: rgba(4, 6, 10, .72);
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity .42s var(--ease), visibility 0s .42s;
+}
+#gate.on { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity .42s var(--ease); }
+.gate-card { width: min(720px, 100%); max-height: 100%; display: flex; flex-direction: column; gap: 16px; padding: clamp(20px, 2.4vw, 30px); }
+#gate.on .gate-card { animation: rise .5s var(--ease) both; }
+.gate-head { display: flex; align-items: flex-start; gap: 14px; }
+.gate-head > .ic { font-size: 26px; margin-top: 2px; color: var(--accent); filter: drop-shadow(0 0 10px var(--accent-glow)); }
+.gate-tt { flex: 1; min-width: 0; }
+.gate-t { font: 800 clamp(24px, 2.4vw, 34px)/1 var(--cond); letter-spacing: .06em; text-transform: uppercase; }
+.gate-s { margin-top: 7px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.gate-v { flex: none; font: 700 10px var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--faint); padding: 5px 10px; border: 1px solid var(--line); border-radius: var(--r-pill); }
+.gate-body {
+    flex: 1; min-height: 0; max-height: 42vh; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 12px; padding: 16px;
+    border-radius: var(--r-md); background: rgba(0, 0, 0, .28); border: 1px solid var(--line);
+}
+.gate-foot { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.gate-hint { flex: 1; min-width: 170px; display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--faint); }
+.gate-hint .ic { font-size: 15px; }
+.gate-hint.ready { color: var(--ok); }
+.gate-btns { display: flex; gap: 8px; }
+.gbtn {
+    cursor: pointer; padding: 13px 22px; border-radius: var(--r-md);
+    font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    border: 1px solid var(--line-strong); background: rgba(255, 255, 255, .05); color: var(--text);
+    transition: background .12s var(--ease), opacity .12s var(--ease);
+}
+.gbtn:hover { background: rgba(255, 255, 255, .1); }
+.gbtn.acc { background: var(--accent-soft); border-color: rgba(95, 224, 255, .45); color: var(--accent); box-shadow: 0 0 16px rgba(95, 224, 255, .18); }
+.gbtn.acc:hover { background: rgba(95, 224, 255, .26); }
+.gbtn:disabled { opacity: .4; cursor: default; }
+.gbtn:disabled:hover { background: rgba(255, 255, 255, .05); }
+.gbtn.acc:disabled:hover { background: var(--accent-soft); }
 
-        .chip {
-            display: flex; align-items: center; gap: 14px;
-            padding: var(--lr-space-3) 18px;
-            border-radius: var(--lr-radius-md);
-            font-size: 14px;
-            letter-spacing: 0.01em;
-        }
-        .chip .grp { display: flex; align-items: center; gap: var(--lr-space-2); color: var(--text); }
-        .chip i { font-size: 17px; color: var(--muted); }
-        .chip b { font-weight: 700; font-size: 14px; }
-        .chip small { color: var(--faint); font-weight: 400; }
-        .chip .div { width: 1px; height: var(--lr-space-4); background: var(--line-strong); }
-
-        .dot {
-            position: relative;
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: var(--ok);
-            box-shadow: 0 0 8px var(--ok);
-        }
-        .dot::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            border: 1px solid var(--ok);
-            opacity: 0;
-            animation: ping 2.4s var(--lr-ease) infinite;
-        }
-        @keyframes ping {
-            0%        { transform: scale(1);   opacity: 0.5; }
-            70%, 100% { transform: scale(3.2); opacity: 0; }
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1);    opacity: 1; }
-            50%      { transform: scale(0.82); opacity: 0.55; }
-        }
-
-        /* ===== Side info panel ===== */
-        .info {
-            position: absolute;
-            right: clamp(28px, 3.4vw, 56px);
-            top: 50%;
-            transform: translateY(-50%);
-            width: clamp(330px, 27vw, 410px);
-            padding: var(--lr-space-2);
-            overflow: hidden;
-        }
-        /* riseIn ends on `transform: none`, which would drop the centering the
-           panel is positioned with — it keeps its own version of the keyframe. */
-        .info.a3 { animation-name: riseInCentered; }
-        .tabs {
-            display: flex; gap: var(--lr-space-1);
-            padding: 5px;
-            border-radius: var(--lr-radius-md);
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--line);
-        }
-        .tab {
-            flex: 1; border: 0; cursor: pointer;
-            background: transparent;
-            color: var(--muted);
-            font-family: inherit;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            padding: 10px;
-            border-radius: var(--lr-radius-sm);
-            transition: background var(--lr-dur-fast) var(--lr-ease), color var(--lr-dur-fast) var(--lr-ease);
-        }
-        .tab:hover { color: var(--text); }
-        .tab.on {
-            background: var(--accent-soft);
-            color: var(--accent);
-            box-shadow: inset 0 0 0 1px rgba(95, 224, 255, 0.3);
-        }
-        .tabbody { padding: 18px var(--lr-space-4) 14px; }
-        .pane { display: none; flex-direction: column; gap: var(--lr-space-3); }
-        .pane.on { display: flex; }
-
-        .rule {
-            display: flex; gap: 14px;
-            font-size: 14.5px; line-height: 1.4;
-            color: var(--muted);
-            align-items: flex-start;
-        }
-        .rule .n {
-            flex: none;
-            width: var(--lr-space-6); height: var(--lr-space-6);
-            border-radius: var(--lr-radius-sm);
-            display: grid; place-items: center;
-            font-family: "JetBrains Mono", monospace;
-            font-weight: 700;
-            font-size: 11px;
-            color: var(--accent);
-            background: var(--accent-soft);
-            border: 1px solid rgba(95, 224, 255, 0.25);
-        }
-
-        .staff-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 9px;
-        }
-        .staff-card {
-            position: relative;
-            padding: 14px 13px;
-            border-radius: var(--lr-radius-md);
-            background: rgba(255, 255, 255, 0.025);
-            border: 1px solid var(--line);
-            transition: background var(--lr-dur) var(--lr-ease), border-color var(--lr-dur) var(--lr-ease), transform var(--lr-dur) var(--lr-ease);
-            overflow: hidden;
-        }
-        .staff-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, var(--tint, transparent), transparent 60%);
-            opacity: 0.35;
-            pointer-events: none;
-        }
-        .staff-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--line-strong);
-            transform: translateY(-1px);
-        }
-        .staff-head { display: flex; align-items: center; gap: 11px; position: relative; }
-        .staff-av {
-            width: 34px; height: 34px;
-            border-radius: var(--lr-radius-md);
-            flex: none;
-            display: grid; place-items: center;
-            font-family: "Saira Condensed", sans-serif;
-            font-weight: 800; font-size: 15px;
-            color: var(--text);
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--line-strong);
-        }
-        .staff-nm { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.1; }
-        .staff-ro { font-size: 11px; color: var(--faint); letter-spacing: 0.04em; margin-top: 2px; }
-        .staff-bdg {
-            position: relative;
-            display: inline-block;
-            margin-top: 10px;
-            font-family: "JetBrains Mono", monospace;
-            font-size: 10px; font-weight: 700;
-            letter-spacing: 0.18em; text-transform: uppercase;
-            padding: var(--lr-space-1) 9px;
-            border-radius: var(--lr-radius-pill);
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--line);
-            color: var(--muted);
-        }
-
-        .staff-card.t-owner { --tint: rgba(244, 114, 182, 0.22); }
-        .staff-card.t-owner .staff-av  { color: #ffd0e6; background: rgba(244, 114, 182, 0.14); border-color: rgba(244, 114, 182, 0.4); }
-        .staff-card.t-owner .staff-bdg { color: #ffb3d8; background: rgba(244, 114, 182, 0.1); border-color: rgba(244, 114, 182, 0.32); }
-
-        .staff-card.t-admin { --tint: rgba(167, 139, 250, 0.22); }
-        .staff-card.t-admin .staff-av  { color: #d6c8ff; background: rgba(167, 139, 250, 0.14); border-color: rgba(167, 139, 250, 0.4); }
-        .staff-card.t-admin .staff-bdg { color: #c4b3ff; background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.32); }
-
-        .staff-card.t-dev { --tint: rgba(94, 234, 212, 0.22); }
-        .staff-card.t-dev .staff-av  { color: #bff7ec; background: rgba(94, 234, 212, 0.14); border-color: rgba(94, 234, 212, 0.4); }
-        .staff-card.t-dev .staff-bdg { color: #97ecda; background: rgba(94, 234, 212, 0.1); border-color: rgba(94, 234, 212, 0.32); }
-
-        .staff-card.t-mod { --tint: rgba(95, 224, 255, 0.22); }
-        .staff-card.t-mod .staff-av  { color: #c2efff; background: rgba(95, 224, 255, 0.14); border-color: rgba(95, 224, 255, 0.4); }
-        .staff-card.t-mod .staff-bdg { color: #95ddf6; background: rgba(95, 224, 255, 0.1); border-color: rgba(95, 224, 255, 0.32); }
-
-        /* ===== Bottom ===== */
-        .bottom { display: flex; flex-direction: column; gap: clamp(16px, 2vh, 26px); }
-        .headline { display: flex; flex-direction: column; gap: var(--lr-space-3); }
-
-        .welcome {
-            font-family: "Saira Condensed", sans-serif;
-            font-weight: 800;
-            font-size: clamp(36px, 4.6vw, 66px);
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            line-height: 0.92;
-            color: var(--text);
-            text-shadow: 0 2px 26px rgba(0, 0, 0, 0.6);
-        }
-        .welcome b {
-            font-weight: 800;
-            color: var(--accent);
-            text-shadow: 0 0 22px var(--accent-glow);
-        }
-
-        .tip { display: flex; align-items: center; gap: var(--lr-space-3); color: var(--muted); font-size: 15px; }
-        .tip i { font-size: 18px; color: var(--accent); }
-        .tip .k {
-            font-family: "JetBrains Mono", monospace;
-            font-weight: 700;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            font-size: 11px;
-            color: var(--accent);
-        }
-        #tipText { transition: opacity var(--lr-dur-slow) var(--lr-ease); }
-
-        .bar { padding: var(--lr-space-5) 26px; display: flex; align-items: center; gap: clamp(18px, 2.4vw, 36px); }
-
-        .bar .progress { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-
-        .pmeta { display: flex; justify-content: space-between; align-items: baseline; gap: var(--lr-space-4); }
-        .pmeta-left { display: flex; flex-direction: column; gap: var(--lr-space-1); min-width: 0; flex: 1; }
-
-        #stageLabel {
-            font-family: "JetBrains Mono", monospace;
-            font-size: 10px;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: var(--faint);
-            font-weight: 700;
-        }
-        #status {
-            font-size: 14px; font-weight: 600;
-            color: var(--text);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            letter-spacing: 0.02em;
-        }
-        #status .bk { color: var(--accent); animation: bk 1.1s steps(2) infinite; }
-        @keyframes bk { 50% { opacity: 0.25; } }
-
-        #pct {
-            font-family: "Saira Condensed", sans-serif;
-            font-weight: 800;
-            font-size: clamp(34px, 3.6vw, 52px);
-            letter-spacing: 0.02em;
-            color: var(--accent);
-            text-shadow: 0 0 16px var(--accent-glow);
-            font-variant-numeric: tabular-nums;
-            line-height: 1;
-        }
-        #pct small { font-size: 0.5em; color: var(--faint); font-weight: 700; margin-left: 2px; text-shadow: none; }
-
-        .track {
-            position: relative;
-            height: var(--lr-space-3);
-            border-radius: var(--lr-radius-pill);
-            background: rgba(255, 255, 255, 0.06);
-            overflow: hidden;
-            border: 1px solid var(--line);
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5), inset 0 -1px 0 rgba(255, 255, 255, 0.04);
-        }
-        .track-marks {
-            position: absolute; inset: 0;
-            display: flex; justify-content: space-between;
-            padding: 0 25%;
-            pointer-events: none;
-        }
-        .track-marks span { width: 1px; background: rgba(255, 255, 255, 0.18); align-self: stretch; }
-        .fill {
-            position: absolute; inset: 0 auto 0 0;
-            width: 0%;
-            border-radius: var(--lr-radius-pill);
-            background:
-                linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 50%),
-                linear-gradient(90deg, var(--accent) 0%, #b6f0ff 60%, var(--accent-2) 100%);
-            box-shadow: 0 0 14px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-            transition: width var(--lr-dur) var(--lr-ease);
-            overflow: hidden;
-        }
-        .fill::before {
-            content: "";
-            position: absolute; inset: 0 -18px 0 -18px;
-            background-image: linear-gradient(45deg,
-                rgba(255, 255, 255, 0.18) 25%, transparent 25%,
-                transparent 50%, rgba(255, 255, 255, 0.18) 50%,
-                rgba(255, 255, 255, 0.18) 75%, transparent 75%);
-            background-size: 18px 18px;
-            animation: stripes 1.2s linear infinite;
-            opacity: 0.7;
-            will-change: transform;
-        }
-        .fill::after {
-            content: "";
-            position: absolute; top: 0; bottom: 0;
-            width: 30%; left: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
-            animation: sheen 2.4s ease-in-out infinite;
-            will-change: transform;
-        }
-        @keyframes stripes { to { transform: translateX(18px); } }
-        @keyframes sheen   { 0% { transform: translateX(-467%); } 100% { transform: translateX(0); } }
-
-        .vline { width: 1px; align-self: stretch; background: var(--line-strong); flex: none; }
-
-        /* ===== Music ===== */
-        .music { position: relative; display: flex; align-items: center; gap: 14px; flex: none; }
-        .cover {
-            position: relative;
-            width: 54px; height: 54px;
-            flex: none;
-            border-radius: var(--lr-radius-md);
-            overflow: hidden;
-            background: rgba(95, 224, 255, 0.12);
-            border: 1px solid rgba(95, 224, 255, 0.32);
-        }
-        /* The cover art is the spectrum: a canvas the analyser drives directly.
-           It keeps drawing on a synthetic signal when the audio cannot be
-           tapped, so the panel never sits there dead while music is audibly
-           playing. */
-        .cover canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-
-        .minfo { display: flex; flex-direction: column; min-width: 120px; max-width: 180px; }
-        .minfo canvas { width: 100%; height: 16px; display: block; margin-top: 4px; opacity: 0.9; }
-        .minfo .now {
-            font-family: "JetBrains Mono", monospace;
-            font-size: 10px;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: var(--faint);
-            font-weight: 700;
-        }
-        .minfo .trk {
-            font-size: 14.5px;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-top: 2px;
-        }
-        .mctrl { display: flex; align-items: center; gap: 5px; }
-        .mbtn {
-            width: 34px; height: 34px;
-            border: 1px solid var(--line);
-            border-radius: var(--lr-radius-md);
-            cursor: pointer;
-            display: grid; place-items: center;
-            background: rgba(255, 255, 255, 0.04);
-            color: var(--text);
-            transition: background var(--lr-dur-fast) var(--lr-ease), border-color var(--lr-dur-fast) var(--lr-ease);
-        }
-        .mbtn i { font-size: 17px; }
-        .mbtn:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--line-strong); }
-        .mbtn.play, .mbtn.on {
-            background: var(--accent-soft);
-            border-color: rgba(95, 224, 255, 0.45);
-            color: var(--accent);
-            box-shadow: 0 0 12px rgba(95, 224, 255, 0.25);
-        }
-        .mbtn.play:hover, .mbtn.on:hover { background: rgba(95, 224, 255, 0.28); }
-        .music.off .mctrl, .music.off .vol { opacity: 0.4; pointer-events: none; }
-
-        .vol { display: flex; align-items: center; gap: 9px; margin-left: 2px; color: var(--faint); }
-        .vol i { font-size: 16px; }
-        .vbar {
-            position: relative;
-            width: 64px; height: var(--lr-space-1);
-            border-radius: var(--lr-radius-pill);
-            background: rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-        }
-        .vbar .lv {
-            position: absolute; inset: 0 auto 0 0;
-            width: 50%;
-            border-radius: var(--lr-radius-pill);
-            background: var(--accent);
-            box-shadow: 0 0 6px var(--accent-glow);
-        }
-        .vbar .kn {
-            position: absolute; top: 50%; left: 50%;
-            width: 11px; height: 11px;
-            border-radius: 50%;
-            background: #fff;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 5px var(--accent-glow);
-        }
-
-        .socials { display: flex; gap: 9px; flex: none; }
-        .s {
-            width: 42px; height: 42px;
-            border-radius: var(--lr-radius-md);
-            display: grid; place-items: center;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--line);
-            color: var(--muted);
-            transition: color var(--lr-dur-fast) var(--lr-ease), background var(--lr-dur-fast) var(--lr-ease), border-color var(--lr-dur-fast) var(--lr-ease), transform var(--lr-dur-fast) var(--lr-ease);
-            text-decoration: none;
-        }
-        .s i { font-size: 19px; }
-        .s:hover {
-            color: var(--accent);
-            background: var(--accent-soft);
-            border-color: rgba(95, 224, 255, 0.4);
-            transform: translateY(-1px);
-        }
-        .s.copied {
-            color: var(--ok);
-            background: rgba(52, 211, 153, 0.14);
-            border-color: rgba(52, 211, 153, 0.45);
-        }
-
-        .foot {
-            position: absolute;
-            left: 0; right: 0; bottom: 9px;
-            text-align: center;
-            font-family: "JetBrains Mono", monospace;
-            font-size: 10px;
-            letter-spacing: 0.24em;
-            text-transform: uppercase;
-            color: var(--faint);
-            pointer-events: none;
-        }
-
-        #dock {
-            position: absolute;
-            right: 14px; top: 14px;
-            display: none;
-            gap: var(--lr-space-2); align-items: center;
-            padding: 6px 10px;
-            border-radius: var(--lr-radius-md);
-            background: rgba(6, 8, 13, 0.6);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid var(--line-strong);
-            box-shadow: var(--lr-shadow-2);
-            font-family: "JetBrains Mono", monospace;
-            font-size: 10px;
-            letter-spacing: 0.16em;
-            color: var(--faint);
-            text-transform: uppercase;
-        }
-        #dock.on { display: flex; }
-        #dock button {
-            cursor: pointer;
-            border: 1px solid var(--line-strong);
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text);
-            font-family: inherit;
-            font-size: 10px;
-            letter-spacing: 0.1em;
-            padding: 6px 11px;
-            border-radius: var(--lr-radius-sm);
-            transition: background var(--lr-dur-fast) var(--lr-ease);
-            text-transform: uppercase;
-        }
-        #dock button:hover { background: rgba(255, 255, 255, 0.12); }
-
-        /* ===== Scrollable regions ===== */
-        .plist-b::-webkit-scrollbar,
-        .gate-body::-webkit-scrollbar,
-        #news::-webkit-scrollbar { width: 6px; }
-        .plist-b::-webkit-scrollbar-track,
-        .gate-body::-webkit-scrollbar-track,
-        #news::-webkit-scrollbar-track { background: transparent; }
-        .plist-b::-webkit-scrollbar-thumb,
-        .gate-body::-webkit-scrollbar-thumb,
-        #news::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.16);
-            border-radius: var(--lr-radius-pill);
-        }
-
-        /* ===== Playlist ===== */
-        .plist {
-            position: absolute;
-            left: 0;
-            bottom: calc(100% + 18px);
-            width: 300px;
-            max-width: 78vw;
-            flex-direction: column;
-            padding: var(--lr-space-2);
-            display: none;
-            z-index: 6;
-            /* Near-solid rather than the shared glass: it floats over the
-               welcome line, which is the brightest text on the screen. */
-            background: rgba(9, 12, 19, 0.97);
-        }
-        .plist.on { display: flex; }
-        .plist-h {
-            display: flex; align-items: center; gap: var(--lr-space-2);
-            padding: 6px var(--lr-space-2) 10px;
-            font-family: "JetBrains Mono", monospace;
-            font-size: 10px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: var(--faint);
-        }
-        .plist-h i { font-size: 14px; color: var(--accent); }
-        .plist-h .n { margin-left: auto; }
-        .plist-b {
-            display: flex; flex-direction: column; gap: 2px;
-            max-height: 210px;
-            overflow-y: auto;
-        }
-        .ptrack {
-            display: flex; align-items: center; gap: 10px;
-            padding: 9px 10px;
-            border: 0;
-            border-radius: var(--lr-radius-sm);
-            background: transparent;
-            color: var(--muted);
-            font-family: inherit;
-            font-size: 13.5px;
-            text-align: left;
-            cursor: pointer;
-            transition: background var(--lr-dur-fast) var(--lr-ease), color var(--lr-dur-fast) var(--lr-ease);
-        }
-        .ptrack:hover { background: rgba(255, 255, 255, 0.06); color: var(--text); }
-        .ptrack .i {
-            flex: none;
-            width: 18px;
-            font-family: "JetBrains Mono", monospace;
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--faint);
-        }
-        .ptrack .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .ptrack.on { background: var(--accent-soft); color: var(--accent); }
-        .ptrack.on .i { color: var(--accent); }
-
-        /* ===== News ===== */
-        /* Capped so a long patch note scrolls inside the panel instead of
-           growing it into the progress bar. */
-        #news { gap: 10px; max-height: 36vh; overflow-y: auto; padding-right: var(--lr-space-1); }
-        .news {
-            padding: 12px 13px;
-            border-radius: var(--lr-radius-md);
-            background: rgba(255, 255, 255, 0.025);
-            border: 1px solid var(--line);
-        }
-        .news-h { display: flex; align-items: center; gap: var(--lr-space-2); margin-bottom: 7px; }
-        .news-tag {
-            font-family: "JetBrains Mono", monospace;
-            font-size: 9.5px; font-weight: 700;
-            letter-spacing: 0.18em; text-transform: uppercase;
-            padding: 3px 8px;
-            border-radius: var(--lr-radius-pill);
-            color: var(--accent);
-            background: var(--accent-soft);
-            border: 1px solid rgba(95, 224, 255, 0.25);
-        }
-        .news-date {
-            margin-left: auto;
-            font-family: "JetBrains Mono", monospace;
-            font-size: 10px;
-            letter-spacing: 0.08em;
-            color: var(--faint);
-        }
-        .news-t { font-size: 14.5px; font-weight: 700; line-height: 1.25; color: var(--text); }
-        .news-b { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
-        .news-b li {
-            position: relative;
-            padding-left: 14px;
-            font-size: 13.5px;
-            line-height: 1.45;
-            color: var(--muted);
-        }
-        .news-b li::before {
-            content: "";
-            position: absolute;
-            left: 3px; top: 8px;
-            width: 4px; height: 4px;
-            border-radius: 50%;
-            background: var(--accent);
-            opacity: 0.8;
-        }
-
-        /* ===== Rules gate ===== */
-        #gate {
-            position: absolute;
-            inset: 0;
-            z-index: 20;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: clamp(20px, 4vh, 60px);
-            background: rgba(4, 6, 10, 0.72);
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: opacity var(--lr-dur-slow) var(--lr-ease);
-        }
-        #gate.on { opacity: 1; visibility: visible; pointer-events: auto; }
-        .gate-card {
-            width: min(720px, 100%);
-            max-height: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: var(--lr-space-4);
-            padding: clamp(20px, 2.4vw, 30px);
-        }
-        #gate.on .gate-card { animation: riseIn 0.5s var(--lr-ease) both; }
-        .gate-head { display: flex; align-items: flex-start; gap: 14px; }
-        .gate-head > i {
-            font-size: 26px;
-            margin-top: 2px;
-            color: var(--accent);
-            filter: drop-shadow(0 0 10px var(--accent-glow));
-        }
-        .gate-tt { flex: 1; min-width: 0; }
-        .gate-t {
-            font-family: "Saira Condensed", sans-serif;
-            font-weight: 800;
-            font-size: clamp(24px, 2.4vw, 34px);
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            line-height: 1;
-            color: var(--text);
-        }
-        .gate-s { margin-top: 7px; font-size: 14px; line-height: 1.45; color: var(--muted); }
-        .gate-v {
-            flex: none;
-            font-family: "JetBrains Mono", monospace;
-            font-size: 10px;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: var(--faint);
-            padding: 5px 10px;
-            border: 1px solid var(--line);
-            border-radius: var(--lr-radius-pill);
-        }
-        .gate-body {
-            flex: 1;
-            min-height: 0;
-            max-height: 42vh;
-            overflow-y: auto;
-            display: flex; flex-direction: column; gap: var(--lr-space-3);
-            padding: var(--lr-space-4);
-            border-radius: var(--lr-radius-md);
-            background: rgba(0, 0, 0, 0.28);
-            border: 1px solid var(--line);
-        }
-        .gate-foot { display: flex; align-items: center; gap: var(--lr-space-4); flex-wrap: wrap; }
-        .gate-hint {
-            flex: 1;
-            min-width: 170px;
-            display: flex; align-items: center; gap: var(--lr-space-2);
-            font-size: 12.5px;
-            color: var(--faint);
-        }
-        .gate-hint i { font-size: 15px; }
-        .gate-hint.ready { color: var(--ok); }
-        .gate-btns { display: flex; gap: var(--lr-space-2); }
-        .gbtn {
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            padding: 13px 22px;
-            border-radius: var(--lr-radius-md);
-            border: 1px solid var(--line-strong);
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text);
-            transition: background var(--lr-dur-fast) var(--lr-ease), border-color var(--lr-dur-fast) var(--lr-ease), opacity var(--lr-dur-fast) var(--lr-ease);
-        }
-        .gbtn:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--line-strong); }
-        .gbtn.accept {
-            background: var(--accent-soft);
-            border-color: rgba(95, 224, 255, 0.45);
-            color: var(--accent);
-            box-shadow: 0 0 16px rgba(95, 224, 255, 0.18);
-        }
-        .gbtn.accept:hover { background: rgba(95, 224, 255, 0.26); }
-        .gbtn:disabled { opacity: 0.4; cursor: default; }
-        .gbtn:disabled:hover { background: rgba(255, 255, 255, 0.05); }
-        .gbtn.accept:disabled:hover { background: var(--accent-soft); }
-
-        @media (max-width: 960px) {
-            .info { position: static; transform: none; width: 100%; margin: 14px 0; }
-            .bar { flex-wrap: wrap; justify-content: center; }
-            .vline { display: none; }
-            .music, .socials { flex: 1 1 100%; justify-content: center; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 1ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 1ms !important;
-                scroll-behavior: auto !important;
-            }
-        }
-    </style>
+@media (max-width: 960px) {
+    .info { position: static; transform: none; width: 100%; margin: 14px 0; }
+    .info.a3 { animation-name: rise; }
+    .bar { flex-wrap: wrap; justify-content: center; }
+    .vline { display: none; }
+    .music, .socials { flex: 1 1 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+}
+</style>
 </head>
 <body>
 
+<!-- Ikon (garis gaya Lucide, ISC) — inline supaya tidak perlu font ikon 370 KB -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.86a10 10 0 0 1 14 0"/><path d="M8.5 16.43a5 5 0 0 1 7 0"/></symbol>
+    <symbol id="i-lightbulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
+    <symbol id="i-skip-back" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" x2="5" y1="19" y2="5"/></symbol>
+    <symbol id="i-skip-forward" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
+    <symbol id="i-list-music" viewBox="0 0 24 24"><path d="M21 15V6"/><path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M12 12H3"/><path d="M16 6H3"/><path d="M12 18H3"/></symbol>
+    <symbol id="i-volume-2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></symbol>
+    <symbol id="i-volume-x" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></symbol>
+    <symbol id="i-scroll-text" viewBox="0 0 24 24"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></symbol>
+    <symbol id="i-message-circle" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+    <symbol id="i-shopping-bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+    <symbol id="i-youtube" viewBox="0 0 24 24"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></symbol>
+    <symbol id="i-instagram" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></symbol>
+    <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+</svg>
+
 <div id="bg">
     <div id="bgSlides"></div>
-    <video id="bgVideo" autoplay muted loop playsinline></video>
+    <video id="bgVideo" muted playsinline preload="auto"></video>
     <div id="pattern"></div>
 </div>
-
 <div id="scrim"></div>
 <canvas id="particles"></canvas>
 <div id="grain"></div>
-
-<div class="corners" id="corners">
-    <span class="tl"></span><span class="tr"></span>
-    <span class="bl"></span><span class="br"></span>
-</div>
+<div class="corners" id="corners"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
 
 <div id="stage">
-
     <div class="top">
         <div class="wordmark a1">
             <img class="logo" id="logo" alt="">
@@ -980,10 +454,16 @@
             <h1 id="title"></h1>
             <div class="ln"><span id="subtitle"></span></div>
         </div>
-        <div class="chip panel a1" id="statusChip"></div>
+        <div class="chip panel a1" id="chip">
+            <span class="g"><span class="dot"></span><b id="onlineLbl"></b></span>
+            <span class="dv"></span>
+            <span class="g"><svg class="ic"><use href="#i-users"/></svg><b id="plCur">0</b><small id="plMax">/0</small></span>
+            <span class="dv"></span>
+            <span class="g"><svg class="ic"><use href="#i-wifi"/></svg><b id="ping">0</b><small id="msLbl">ms</small></span>
+        </div>
     </div>
 
-    <div class="info panel a3" id="infoPanel">
+    <div class="info panel a3" id="info">
         <div class="tabs" id="tabs"></div>
         <div class="tabbody" id="tabbody"></div>
     </div>
@@ -992,7 +472,7 @@
         <div class="headline a2">
             <div class="welcome"><span id="welcomeText"></span> <b id="player"></b></div>
             <div class="tip" id="tipRow">
-                <i class="icon-lightbulb" aria-hidden="true"></i>
+                <svg class="ic"><use href="#i-lightbulb"/></svg>
                 <span class="k" id="tipLabel"></span>
                 <span id="tipText"></span>
             </div>
@@ -1000,56 +480,42 @@
 
         <div class="bar panel a4">
             <div class="music" id="music">
-                <div class="cover">
-                    <canvas id="vizBars"></canvas>
-                </div>
+                <div class="cover"><canvas id="vizBars"></canvas></div>
                 <div class="minfo">
                     <span class="now" id="nowPlaying"></span>
-                    <span class="trk" id="trk"></span>
+                    <span id="trk"></span>
                     <canvas id="vizWave"></canvas>
                 </div>
                 <div class="mctrl">
-                    <button class="mbtn" id="prev"><i class="icon-skip-back" aria-hidden="true"></i></button>
-                    <button class="mbtn play" id="play"><i class="icon-play" id="playIc" aria-hidden="true"></i></button>
-                    <button class="mbtn" id="next"><i class="icon-skip-forward" aria-hidden="true"></i></button>
-                    <button class="mbtn" id="listBtn"><i class="icon-list-music" aria-hidden="true"></i></button>
+                    <button class="mbtn" id="prev"><svg class="ic"><use href="#i-skip-back"/></svg></button>
+                    <button class="mbtn hl" id="play"><svg class="ic"><use id="playUse" href="#i-play"/></svg></button>
+                    <button class="mbtn" id="next"><svg class="ic"><use href="#i-skip-forward"/></svg></button>
+                    <button class="mbtn" id="listBtn"><svg class="ic"><use href="#i-list-music"/></svg></button>
                 </div>
                 <div class="vol">
-                    <i class="icon-volume-2" aria-hidden="true"></i>
-                    <div class="vbar" id="vbar">
-                        <div class="lv" id="lv"></div>
-                        <div class="kn" id="kn"></div>
-                    </div>
+                    <svg class="ic"><use id="volUse" href="#i-volume-2"/></svg>
+                    <div class="vbar" id="vbar"><div class="lv" id="lv"></div><div class="kn" id="kn"></div></div>
                 </div>
-
                 <div class="plist panel" id="plist">
-                    <div class="plist-h">
-                        <i class="icon-list-music" aria-hidden="true"></i>
-                        <span id="plistTitle"></span>
-                        <span class="n" id="plistCount"></span>
-                    </div>
+                    <div class="plist-h"><svg class="ic"><use href="#i-list-music"/></svg><span id="plistTitle"></span><span class="n" id="plistCount"></span></div>
                     <div class="plist-b" id="plistBody"></div>
                 </div>
             </div>
-
             <div class="vline" id="vline1"></div>
-
             <div class="progress">
                 <div class="pmeta">
-                    <div class="pmeta-left">
+                    <div class="pmeta-l">
                         <div id="stageLabel"></div>
                         <div id="status"></div>
                     </div>
-                    <div id="pct">0<small>%</small></div>
+                    <div id="pct"></div>
                 </div>
                 <div class="track">
                     <div class="fill" id="fill"></div>
-                    <div class="track-marks"><span></span><span></span><span></span></div>
+                    <div class="marks"><span></span><span></span><span></span></div>
                 </div>
             </div>
-
             <div class="vline" id="vline2"></div>
-
             <div class="socials" id="socials"></div>
         </div>
     </div>
@@ -1060,11 +526,8 @@
 <div id="gate">
     <div class="gate-card panel">
         <div class="gate-head">
-            <i class="icon-scroll-text" aria-hidden="true"></i>
-            <div class="gate-tt">
-                <div class="gate-t" id="gateTitle"></div>
-                <div class="gate-s" id="gateIntro"></div>
-            </div>
+            <svg class="ic"><use href="#i-scroll-text"/></svg>
+            <div class="gate-tt"><div class="gate-t" id="gateTitle"></div><div class="gate-s" id="gateIntro"></div></div>
             <span class="gate-v" id="gateVersion"></span>
         </div>
         <div class="gate-body" id="gateBody"></div>
@@ -1072,1794 +535,1120 @@
             <span class="gate-hint" id="gateHint"></span>
             <div class="gate-btns">
                 <button class="gbtn" id="gateDecline"></button>
-                <button class="gbtn accept" id="gateAccept" disabled></button>
+                <button class="gbtn acc" id="gateAccept" disabled></button>
             </div>
         </div>
     </div>
-</div>
-
-<div id="dock">
-    <span>Preview</span>
-    <button id="replay">Replay</button>
 </div>
 
 <audio id="audio" preload="auto"></audio>
 
 <script>
 (() => {
-    const CFG = window.LR_CONFIG || {};
-    let booted = false;
+'use strict';
 
-    /// The resource this page belongs to, read off its own URL.
-    const RESOURCE = (() => {
-        const h = (location.hostname || '').replace(/^cfx-nui-/, '');
-        if (h && h.indexOf('.') < 0 && h !== 'game' && h !== 'loadingScreen') return h;
-        try {
-            if (typeof window.GetParentResourceName === 'function') {
-                const n = window.GetParentResourceName();
-                if (n && n !== 'loadingScreen' && n !== 'game') return n;
-            }
-        } catch {}
-        return 'lastresort_loading';
-    })();
+const C = window.FLS_CONFIG || {};
+const $ = id => document.getElementById(id);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const num = (v, d) => (v == null || isNaN(Number(v)) ? d : Number(v));
 
-    /* ============================================================
-     * Connect handover
-     * What bridge/server.lua attached to the connection before this
-     * page existed: the player's name, the counts, the server name,
-     * the newest news and tips. It is here on the very first frame,
-     * while the client script that pushes the live numbers is still
-     * waiting for the resources to finish downloading — so the first
-     * paint is real data rather than a placeholder waiting to be
-     * corrected. Everything in it is replaced by the client script's
-     * push the moment that arrives.
-     * ============================================================ */
-    const HANDOVER = (() => {
-        let h = null;
-        try { h = window.nuiHandoverData || null; } catch {}
-        return (h && typeof h === 'object') ? h : {};
-    })();
+// nama resource dari URL halaman (https://cfx-nui-<resource>/)
+const RES = (() => {
+    const h = (location.hostname || '').replace(/^cfx-nui-/, '');
+    return h && h.indexOf('.') < 0 && h !== 'localhost' ? h : 'f_loadscreen';
+})();
 
-    // Seeded into the same variables the client script's messages write, so
-    // there is exactly one path from data to screen and nothing renders twice.
-    function seedFromHandover() {
-        const players = Number(HANDOVER.players);
-        const max = Number(HANDOVER.maxPlayers);
-        if (Number.isFinite(players) || Number.isFinite(max)) {
-            lastStats = { players: players, maxPlayers: max };
-        }
-        if (typeof HANDOVER.name === 'string' && HANDOVER.name.trim()) {
-            pendingName = HANDOVER.name.trim();
-        }
-        if (Array.isArray(HANDOVER.news) && HANDOVER.news.length) serverNews = HANDOVER.news;
-        if (Array.isArray(HANDOVER.tips) && HANDOVER.tips.length) serverTips = HANDOVER.tips;
-        if (typeof HANDOVER.serverName === 'string') liveServerName = HANDOVER.serverName.trim();
+// data dari server.lua (deferrals.handover) — ada sejak frame pertama
+const HO = (() => {
+    try { const h = window.nuiHandoverData; return h && typeof h === 'object' ? h : {}; } catch (e) { return {}; }
+})();
+
+const state = {
+    booted: false,
+    name: typeof HO.name === 'string' ? HO.name.trim() : null,
+    stats: (HO.players != null || HO.maxPlayers != null) ? { players: HO.players, maxPlayers: HO.maxPlayers } : null,
+    serverName: typeof HO.serverName === 'string' ? HO.serverName.trim() : '',
+    news: Array.isArray(HO.news) && HO.news.length ? HO.news : null,
+    tips: Array.isArray(HO.tips) && HO.tips.length ? HO.tips : null
+};
+
+/* ================= Locale ================= */
+let L = {};
+function t(key, fb) {
+    const v = key.split('.').reduce((o, k) => (o && o[k] != null ? o[k] : undefined), L);
+    return v == null ? (fb != null ? fb : key) : v;
+}
+const fmt = (s, map) => String(s).replace(/\{(\w+)\}/g, (_, k) => (map[k] != null ? map[k] : ''));
+async function loadLocale(name) {
+    try {
+        const r = await fetch(`locales/${name}.json`);
+        if (!r.ok) throw 0;
+        return await r.json();
+    } catch (e) {
+        return name !== C.fallbackLocale && C.fallbackLocale ? loadLocale(C.fallbackLocale) : {};
     }
+}
 
-    /* ============================================================
-     * Channel back to the client script
-     * A loading screen is only ever talked to one way, so the page
-     * opens the way back itself and keeps knocking until
-     * bridge/handover.lua answers. Nothing answers in a plain
-     * browser preview, and nothing here depends on an answer.
-     * ============================================================ */
-    const NUI = (() => {
-        let alive = false;
-        // The URL is asked FIRST. `GetParentResourceName()` answers with the
-        // frame's name inside a loading screen — `loadingScreen` — not the
-        // resource's, and every callback posted to that host is thrown away
-        // in silence. The document sits at `https://cfx-nui-<resource>/`, so
-        // its own hostname is the answer.
-        const host = RESOURCE;
-        function post(name, data) {
-            return fetch(`https://${host}/${name}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json; charset=UTF-8' },
-                body: JSON.stringify(data || {})
-            }).then(r => {
-                if (!r.ok) throw new Error(String(r.status));
-                alive = true;
-                return r;
-            });
-        }
-        return { post, isAlive: () => alive };
-    })();
+/* ================= Kanal balik ke client.lua ================= */
+function post(name, data) {
+    return fetch(`https://${RES}/${name}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+        body: JSON.stringify(data || {})
+    }).then(r => { if (!r.ok) throw new Error(r.status); return r; });
+}
+function hello() {
+    let tries = 0;
+    const knock = () => post('flsHello').catch(() => { if (++tries < 40) setTimeout(knock, 750); });
+    knock();
+}
 
-    // The client script may still be starting when the page is already up, so
-    // the greeting is repeated until it lands. Everything the bridge knows —
-    // name, stored volume, server content, a pending rules gate — is replayed
-    // onto the page in the answer.
-    function openChannel() {
-        let tries = 0;
-        const knock = () => {
-            NUI.post('lrlHello').catch(() => {
-                if (++tries < 40) setTimeout(knock, 750);
-            });
+/* ================= Helper DOM ================= */
+function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+}
+const ICON_ALIAS = { discord: 'message-circle', tiktok: 'music', website: 'globe', store: 'shopping-bag' };
+function icon(name) {
+    let n = String(name || '').replace(/^icon-/, '');
+    n = ICON_ALIAS[n] || n;
+    if (!document.getElementById('i-' + n)) n = 'link';
+    const ns = 'http://www.w3.org/2000/svg';
+    const s = document.createElementNS(ns, 'svg');
+    s.setAttribute('class', 'ic');
+    const u = document.createElementNS(ns, 'use');
+    u.setAttribute('href', '#i-' + n);
+    s.appendChild(u);
+    return s;
+}
+
+/* ================= Tema & latar ================= */
+function applyTheme() {
+    const T = C.theme || {};
+    const map = {
+        '--bg': T.bg, '--accent': T.accent, '--accent-2': T.accent2, '--accent-3': T.accent3,
+        '--accent-soft': T.accentSoft, '--accent-glow': T.accentGlow, '--text': T.text,
+        '--muted': T.muted, '--faint': T.faint, '--line': T.line, '--line-strong': T.lineStrong, '--ok': T.ok
+    };
+    const r = document.documentElement.style;
+    for (const k in map) if (map[k]) r.setProperty(k, map[k]);
+}
+
+function applyBackground() {
+    const B = C.background || {};
+    const bg = $('bg');
+    bg.style.backgroundColor = B.baseColor || '#06080d';
+    if (Array.isArray(B.gradients) && B.gradients.length) bg.style.backgroundImage = B.gradients.join(',');
+}
+
+function applyPattern() {
+    const P = C.pattern || {};
+    const e = $('pattern');
+    if (!P.enabled || P.type === 'none') { e.remove(); return; }
+    const c = P.color || 'rgba(255,255,255,.55)';
+    e.style.opacity = num(P.opacity, 0.07);
+    if (P.type === 'dots') {
+        const s = num(P.dotSize, 1), sp = num(P.dotSpacing, 22);
+        e.style.backgroundImage = `radial-gradient(${c} ${s}px, transparent ${s + 0.5}px)`;
+        e.style.backgroundSize = `${sp}px ${sp}px`;
+    } else if (P.type === 'grid') {
+        const sp = num(P.gridSpacing, 28), th = num(P.gridThickness, 1);
+        e.style.backgroundImage = `linear-gradient(${c} ${th}px, transparent ${th}px), linear-gradient(90deg, ${c} ${th}px, transparent ${th}px)`;
+        e.style.backgroundSize = `${sp}px ${sp}px`;
+    } else if (P.type === 'hex') {
+        const st = encodeURIComponent(P.hexAccent || c);
+        const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='56' height='48'><g fill='none' stroke='${st}' stroke-width='0.7' stroke-linejoin='round'><path d='M14,-8 L28,0 L28,16 L14,24 L0,16 L0,0 Z'/><path d='M42,-8 L56,0 L56,16 L42,24 L28,16 L28,0 Z'/><path d='M28,16 L42,24 L42,40 L28,48 L14,40 L14,24 Z'/></g></svg>`;
+        e.style.backgroundImage = `url("data:image/svg+xml;utf8,${svg}")`;
+        e.style.backgroundSize = '56px 48px';
+    } else {
+        const a = num(P.stripeAngle, 35), sp = num(P.stripeSpacing, 6), th = num(P.stripeThickness, 1);
+        e.style.backgroundImage = `repeating-linear-gradient(${a}deg, transparent 0, transparent ${sp - th}px, ${c} ${sp - th}px, ${c} ${sp}px)`;
+    }
+    if (P.maskEdges) e.classList.add('masked');
+}
+
+function applyScrim() {
+    const S = C.scrim || {};
+    const e = $('scrim');
+    if (!S.enabled) { e.remove(); return; }
+    const d = 'rgba(6,8,13,';
+    e.style.background = [
+        `linear-gradient(180deg, ${d}${num(S.topDark, .55)}) 0%, ${d}${num(S.midDark, .18)}) 30%, ${d}${num(S.midDark, .18)}) 60%, ${d}${num(S.bottomDark, .78)}) 100%)`,
+        `radial-gradient(120% 80% at 50% 50%, transparent 50%, ${d}${num(S.vignette, .55)}) 100%)`,
+        `linear-gradient(0deg, ${S.tintTop || 'transparent'}, ${S.tintBottom || 'transparent'})`
+    ].join(',');
+}
+
+function applyGrain() {
+    const G = C.grain || {};
+    const e = $('grain');
+    if (!G.enabled) { e.remove(); return; }
+    e.style.display = 'block';
+    e.style.opacity = num(G.opacity, 0.035);
+}
+
+function applyCorners() {
+    const K = C.corners || {};
+    const e = $('corners');
+    if (!K.enabled) { e.remove(); return; }
+    e.style.inset = num(K.inset, 14) + 'px';
+    const size = num(K.size, 22) + 'px', th = num(K.thickness, 2) + 'px';
+    for (const s of e.children) {
+        const c = s.className;
+        s.style.width = s.style.height = size;
+        if (K.color) s.style.borderColor = K.color;
+        s.style.borderTopWidth = c[0] === 't' ? th : 0;
+        s.style.borderBottomWidth = c[0] === 'b' ? th : 0;
+        s.style.borderLeftWidth = c[1] === 'l' ? th : 0;
+        s.style.borderRightWidth = c[1] === 'r' ? th : 0;
+    }
+}
+
+/* ================= Merek, sambutan, logo ================= */
+const liveTitle = () => { const B = C.brand || {}; return B.title == null || String(B.title).trim() === ''; };
+
+function applyBrand() {
+    const B = C.brand || {};
+    const pick = (v, key, fb) => (v != null ? v : t(key, fb));
+    const logo = C.logo || {};
+    const hideTitle = logo.enabled && logo.placement === 'replace' && $('logo').classList.contains('on');
+    $('preTitle').textContent = pick(B.preTitle, 'preTitle', '');
+    $('title').textContent = hideTitle ? '' : (liveTitle() ? (state.serverName || t('title', 'Server')) : B.title);
+    $('subtitle').textContent = pick(B.subtitle, 'subtitle', '');
+    $('footer').textContent = pick(B.footer, 'footer', '');
+    $('tipLabel').textContent = t('tipLabel', 'Tip');
+    $('nowPlaying').textContent = t('nowPlaying', 'Now Playing');
+    renderName();
+}
+
+function renderName() {
+    const n = (state.name != null ? state.name : (C.playerName || '')).trim();
+    $('welcomeText').textContent = n ? t('welcome', 'Welcome back,') : t('welcomeAnon', 'Welcome');
+    $('player').textContent = n;
+}
+
+function applyLogo() {
+    const G = C.logo || {};
+    if (!G.enabled || !G.src) return;
+    const img = $('logo');
+    img.style.height = num(G.height, 84) + 'px';
+    if (G.glow !== false) img.classList.add('glow');
+    img.onload = () => { img.classList.add('on'); applyBrand(); };
+    img.src = G.src;
+}
+
+/* ================= Chip status ================= */
+function applyChip() {
+    const S = C.status || {};
+    const chip = $('chip');
+    if (!S.show) { chip.style.visibility = 'hidden'; return; }
+    chip.classList.toggle('off', !S.online);
+    $('onlineLbl').textContent = S.online ? t('online', 'Online') : t('offline', 'Offline');
+    $('msLbl').textContent = t('msUnit', 'ms');
+    updateChip({ players: S.playersCurrent, maxPlayers: S.playersMax, ping: S.ping });
+    if (state.stats) updateChip(state.stats);
+}
+function updateChip(d) {
+    if (!d) return;
+    const p = Number(d.players), m = Number(d.maxPlayers), g = Number(d.ping);
+    if (d.players != null && isFinite(p)) $('plCur').textContent = p;
+    if (d.maxPlayers != null && isFinite(m)) $('plMax').textContent = t('playersSlash', '/') + m;
+    if (d.ping != null && isFinite(g)) $('ping').textContent = g;
+}
+
+/* ================= Panel info (peraturan / berita / staf) ================= */
+let activeTab = null;
+
+function rulesList() {
+    return (Array.isArray(C.rules) && C.rules.length) ? C.rules : (Array.isArray(L.rules) ? L.rules : []);
+}
+
+function newsList() {
+    const src = (state.news && state.news.length) ? state.news : ((C.news || {}).items || []);
+    return src.filter(n => n && (n.title || n.body)).slice(0, num((C.news || {}).maxItems, 8));
+}
+
+function applyInfo() {
+    const T = C.tabs || {};
+    const panes = [];
+    if (T.rules !== false && rulesList().length) panes.push(['rules', t('rulesTab', 'Rules'), rulesPane]);
+    if (T.news !== false && newsList().length) panes.push(['news', t('newsTab', 'News'), newsPane]);
+    if (T.staff !== false && (C.staff || []).length) panes.push(['staff', t('staffTab', 'Staff'), staffPane]);
+    const info = $('info');
+    if (!panes.length) { info.style.display = 'none'; return; }
+    info.style.display = '';
+    const ids = panes.map(p => p[0]);
+    const sel = ids.includes(activeTab) ? activeTab : (ids.includes(T.defaultTab) ? T.defaultTab : ids[0]);
+    const tabs = $('tabs'), body = $('tabbody');
+    tabs.textContent = ''; body.textContent = '';
+    for (const [id, label, build] of panes) {
+        const b = el('button', 'tab' + (id === sel ? ' on' : ''), label);
+        const pane = build();
+        pane.id = id;
+        pane.className = 'pane' + (id === sel ? ' on' : '');
+        b.onclick = () => {
+            activeTab = id;
+            for (const x of tabs.children) x.classList.toggle('on', x === b);
+            for (const x of body.children) x.classList.toggle('on', x === pane);
         };
-        knock();
+        tabs.appendChild(b);
+        body.appendChild(pane);
     }
+}
 
-    /* ============================================================
-     * Locale
-     * ============================================================ */
-    let L = {};
-    function lookup(obj, path) {
-        return path.split('.').reduce((o, k) => (o && o[k] != null ? o[k] : undefined), obj);
-    }
-    function t(key, fallback) {
-        const v = lookup(L, key);
-        return v == null ? (fallback != null ? fallback : key) : v;
-    }
-    async function loadLocale(name) {
-        try {
-            const r = await fetch(`locales/${name}.json`, { cache: 'no-store' });
-            if (!r.ok) throw 0;
-            return await r.json();
-        } catch {
-            if (name !== CFG.fallbackLocale) return loadLocale(CFG.fallbackLocale);
-            return {};
+function rulesPane() {
+    const p = el('div');
+    rulesList().forEach((r, i) => {
+        const row = el('div', 'rule');
+        row.appendChild(el('span', 'n', String(i + 1).padStart(2, '0')));
+        row.appendChild(el('span', null, r));
+        p.appendChild(row);
+    });
+    return p;
+}
+
+function newsPane() {
+    const p = el('div');
+    for (const n of newsList()) {
+        const card = el('div', 'nw');
+        if (n.tag || n.date) {
+            const h = el('div', 'nw-h');
+            if (n.tag) h.appendChild(el('span', 'nw-tag', n.tag));
+            if (n.date) h.appendChild(el('span', 'nw-d', n.date));
+            card.appendChild(h);
         }
+        if (n.title) card.appendChild(el('div', 'nw-t', n.title));
+        const lines = Array.isArray(n.body) ? n.body : String(n.body || '').split(/\r?\n/);
+        const items = lines.map(s => String(s).trim()).filter(Boolean);
+        if (items.length) {
+            const ul = el('ul');
+            for (const s of items) ul.appendChild(el('li', null, s));
+            card.appendChild(ul);
+        }
+        p.appendChild(card);
     }
+    return p;
+}
 
-    /* ============================================================
-     * Theme → CSS vars
-     * ============================================================ */
-    function applyTheme() {
-        const r = document.documentElement.style;
-        const T = CFG.theme || {};
-        const map = {
-            '--bg': T.bg, '--accent': T.accent, '--accent-2': T.accent2, '--accent-3': T.accent3,
-            '--accent-soft': T.accentSoft, '--accent-glow': T.accentGlow,
-            '--text': T.text, '--muted': T.muted, '--faint': T.faint,
-            '--line': T.line, '--line-strong': T.lineStrong, '--ok': T.ok
+function staffPane() {
+    const p = el('div');
+    const grid = el('div', 'staff');
+    const D = C.staffDefaults || {};
+    for (const s of C.staff || []) {
+        const def = D[s.tone] || {};
+        const card = el('div', 'sc' + (s.tone ? ' t-' + s.tone : ''));
+        const head = el('div', 'sc-h');
+        head.appendChild(el('div', 'sc-av', s.avatar || String(s.name || '?').charAt(0).toUpperCase()));
+        const nm = el('div');
+        nm.appendChild(el('div', 'sc-n', s.name || ''));
+        nm.appendChild(el('div', 'sc-r', s.role != null ? s.role : (def.roleKey ? t(def.roleKey, '') : '')));
+        head.appendChild(nm);
+        card.appendChild(head);
+        const badge = s.badge != null ? s.badge : (def.badgeKey ? t(def.badgeKey, '') : '');
+        if (badge) card.appendChild(el('span', 'sc-b', badge));
+        grid.appendChild(card);
+    }
+    p.appendChild(grid);
+    return p;
+}
+
+/* ================= Sosial ================= */
+function openUrl(url, btn) {
+    try {
+        if (typeof window.invokeNative === 'function') { window.invokeNative('openUrl', url); return; }
+    } catch (e) {}
+    // browser biasa / tanpa invokeNative: salin link
+    const ta = el('textarea');
+    ta.value = url;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    ta.remove();
+    btn.classList.add('copied');
+    setTimeout(() => btn.classList.remove('copied'), 1400);
+}
+
+function applySocials() {
+    const box = $('socials');
+    const list = (C.socials || []).filter(s => s && s.url);
+    if (!list.length) { box.remove(); $('vline2').remove(); return; }
+    for (const s of list) {
+        const b = el('button', 's');
+        b.title = s.url;
+        b.appendChild(icon(s.icon));
+        b.onclick = () => openUrl(s.url, b);
+        box.appendChild(b);
+    }
+}
+
+/* ================= Latar: gambar / slideshow ================= */
+function applyImage() {
+    const I = C.image || {};
+    const list = (I.sources || []).filter(Boolean);
+    if (!I.enabled || !list.length) return;
+    const box = $('bgSlides');
+    const fade = num(I.fadeMs, 1200);
+    box.style.opacity = num(I.opacity, 1);
+    if (I.blurPx) box.style.filter = `blur(${I.blurPx}px)`;
+    const make = () => {
+        const d = el('div', 'sl' + (I.kenBurns !== false ? ' kb' : ''));
+        d.style.backgroundSize = I.objectFit === 'contain' ? 'contain' : 'cover';
+        d.style.transition = `opacity ${fade}ms ease`;
+        box.appendChild(d);
+        return d;
+    };
+    const layers = [make(), make()];
+    let idx = 0, front = 0;
+    const show = i => {
+        const src = list[i % list.length];
+        const img = new Image();
+        img.onload = () => {
+            const next = layers[front ^ 1];
+            next.style.backgroundImage = `url("${src}")`;
+            next.style.opacity = '1';
+            layers[front].style.opacity = '0';
+            front ^= 1;
         };
-        for (const k in map) if (map[k]) r.setProperty(k, map[k]);
-    }
+        img.src = src;
+    };
+    show(0);
+    if (list.length > 1) setInterval(() => show(++idx), Math.max(fade + 500, num(I.intervalMs, 9000)));
+}
 
-    /* ============================================================
-     * Background gradient + pattern + scrim + grain + corners
-     * ============================================================ */
-    function applyBackground() {
-        const bg = document.getElementById('bg');
-        const B = CFG.background || {};
-        bg.style.backgroundColor = B.baseColor || '#06080d';
-        if (Array.isArray(B.gradients) && B.gradients.length) {
-            bg.style.backgroundImage = B.gradients.join(', ');
-        }
-    }
+/* ================= Latar: video ================= */
+const video = $('bgVideo');
+let videoDead = false;
+const videoDeadHooks = [];
 
-    function applyPattern() {
-        const el = document.getElementById('pattern');
-        const P = CFG.pattern || {};
-        if (!P.enabled || P.type === 'none') { el.style.display = 'none'; return; }
-        el.style.opacity = P.opacity != null ? P.opacity : 0.07;
-        const c = P.color || 'rgba(255,255,255,0.55)';
-
-        if (P.type === 'stripes') {
-            const a = P.stripeAngle != null ? P.stripeAngle : 35;
-            const sp = P.stripeSpacing != null ? P.stripeSpacing : 6;
-            const th = P.stripeThickness != null ? P.stripeThickness : 1;
-            el.style.backgroundImage =
-                `repeating-linear-gradient(${a}deg, transparent 0, transparent ${sp - th}px, ${c} ${sp - th}px, ${c} ${sp}px)`;
-        } else if (P.type === 'dots') {
-            const s = P.dotSize != null ? P.dotSize : 1;
-            const sp = P.dotSpacing != null ? P.dotSpacing : 22;
-            el.style.backgroundImage = `radial-gradient(${c} ${s}px, transparent ${s + 0.5}px)`;
-            el.style.backgroundSize = `${sp}px ${sp}px`;
-        } else if (P.type === 'grid') {
-            const sp = P.gridSpacing != null ? P.gridSpacing : 28;
-            const th = P.gridThickness != null ? P.gridThickness : 1;
-            el.style.backgroundImage =
-                `linear-gradient(${c} ${th}px, transparent ${th}px), linear-gradient(90deg, ${c} ${th}px, transparent ${th}px)`;
-            el.style.backgroundSize = `${sp}px ${sp}px`;
-        } else if (P.type === 'hex') {
-            const stroke = encodeURIComponent(P.hexAccent || c);
-            const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='56' height='48' viewBox='0 0 56 48'><g fill='none' stroke='${stroke}' stroke-width='0.7' stroke-linejoin='round'><path d='M14,-8 L28,0 L28,16 L14,24 L0,16 L0,0 Z'/><path d='M42,-8 L56,0 L56,16 L42,24 L28,16 L28,0 Z'/><path d='M28,16 L42,24 L42,40 L28,48 L14,40 L14,24 Z'/></g></svg>`;
-            el.style.backgroundImage = `url("data:image/svg+xml;utf8,${svg.replace(/"/g, '%22')}")`;
-            el.style.backgroundSize = '56px 48px';
-        }
-        if (P.maskEdges) el.classList.add('masked');
-    }
-
-    function applyScrim() {
-        const el = document.getElementById('scrim');
-        const S = CFG.scrim || {};
-        if (!S.enabled) { el.style.display = 'none'; return; }
-        const layers = [
-            `linear-gradient(180deg, rgba(6,8,13,${S.topDark}) 0%, rgba(6,8,13,${S.midDark}) 30%, rgba(6,8,13,${S.midDark}) 60%, rgba(6,8,13,${S.bottomDark}) 100%)`,
-            `radial-gradient(120% 80% at 50% 50%, transparent 50%, rgba(6,8,13,${S.vignette}) 100%)`,
-            `linear-gradient(0deg, ${S.tintTop || 'transparent'}, ${S.tintBottom || 'transparent'})`
-        ];
-        el.style.background = layers.join(', ');
-    }
-
-    function applyGrain() {
-        const el = document.getElementById('grain');
-        const G = CFG.grain || {};
-        if (!G.enabled) { el.style.display = 'none'; return; }
-        el.style.opacity = G.opacity != null ? G.opacity : 0.035;
-    }
-
-    function applyCorners() {
-        const el = document.getElementById('corners');
-        const C = CFG.corners || {};
-        if (!C.enabled) { el.style.display = 'none'; return; }
-        el.style.inset = (C.inset != null ? C.inset : 14) + 'px';
-        const size = (C.size != null ? C.size : 22) + 'px';
-        const t = (C.thickness != null ? C.thickness : 2) + 'px';
-        for (const s of el.querySelectorAll('span')) {
-            s.style.width = size; s.style.height = size;
-            if (C.color) s.style.borderColor = C.color;
-            s.style.borderTopWidth = s.classList.contains('tl') || s.classList.contains('tr') ? t : '0';
-            s.style.borderBottomWidth = s.classList.contains('bl') || s.classList.contains('br') ? t : '0';
-            s.style.borderLeftWidth = s.classList.contains('tl') || s.classList.contains('bl') ? t : '0';
-            s.style.borderRightWidth = s.classList.contains('tr') || s.classList.contains('br') ? t : '0';
-        }
-    }
-
-    /* ============================================================
-     * Brand strings, status chip, info panel, socials
-     * ============================================================ */
-    function applyBrand() {
-        const B = CFG.brand || {};
-        document.getElementById('preTitle').textContent = B.preTitle != null ? B.preTitle : t('preTitle', 'Loading');
-        document.getElementById('title').textContent    = wantsLiveTitle()
-            ? (liveServerName || (B.title != null ? B.title : t('title', 'Server')))
-            : B.title;
-        document.getElementById('subtitle').textContent = B.subtitle != null ? B.subtitle : t('subtitle', '');
-        document.getElementById('footer').textContent   = B.footer   != null ? B.footer   : t('footer', '');
-        document.getElementById('tipLabel').textContent = t('tipLabel', 'Tip');
-        document.getElementById('nowPlaying').textContent = t('nowPlaying', 'Now Playing');
-
-        const welcomeEl = document.getElementById('welcomeText');
-        const playerEl  = document.getElementById('player');
-        function renderWelcome(name) {
-            if (name && name.trim()) {
-                welcomeEl.textContent = t('welcome', 'Welcome back,');
-                playerEl.textContent = name.trim();
-            } else {
-                welcomeEl.textContent = t('welcomeAnon', 'Welcome');
-                playerEl.textContent = '';
-            }
-        }
-        renderWelcome(pendingName != null ? pendingName : (CFG.playerName || ''));
-        window.__lrrSetName = renderWelcome;
-    }
-
-    // The bridge starts pushing names and stats the moment the page exists,
-    // which is before the locale fetch resolves and the panels are built —
-    // both are held here and replayed by the render step that owns them.
-    let chipRefs = null, lastStats = null, pendingName = null;
-    // sv_projectName, as the server itself reports it. Only ever drawn where
-    // config.js left the title empty — a configured brand is never overwritten.
-    let liveServerName = '';
-    function wantsLiveTitle() {
-        const B = CFG.brand || {};
-        return B.title == null || String(B.title).trim() === '';
-    }
-    // Lucide is a glyph font: the icon is a class, so an unknown name renders
-    // nothing instead of a broken box, and anything but [a-z0-9-] is dropped
-    // before it can reach a class attribute.
-    function makeIcon(name) {
-        const i = document.createElement('i');
-        i.className = 'icon-' + String(name || '').replace(/^icon-/, '').replace(/[^a-zA-Z0-9-]/g, '');
-        i.setAttribute('aria-hidden', 'true');
-        return i;
-    }
-    function chipGroup(icon) {
-        const grp = document.createElement('span');
-        grp.className = 'grp';
-        grp.appendChild(makeIcon(icon));
-        return grp;
-    }
-    function applyStatusChip() {
-        const chip = document.getElementById('statusChip');
-        const S = CFG.status || {};
-        if (!S.show) { chip.style.display = 'none'; return; }
-        chip.textContent = '';
-        const grpOnline = document.createElement('span');
-        grpOnline.className = 'grp';
-        if (S.online) {
-            const dot = document.createElement('span'); dot.className = 'dot';
-            grpOnline.appendChild(dot);
-        }
-        const onlineLabel = document.createElement('b');
-        onlineLabel.textContent = S.online ? t('online', 'Online') : t('offline', 'Offline');
-        grpOnline.appendChild(onlineLabel);
-        chip.appendChild(grpOnline);
-
-        const d1 = document.createElement('span'); d1.className = 'div'; chip.appendChild(d1);
-
-        const grpPlayers = chipGroup('users');
-        const playersVal = document.createElement('b');
-        playersVal.textContent = S.playersCurrent;
-        const playersMax = document.createElement('small');
-        playersMax.textContent = t('playersSlash', '/') + S.playersMax;
-        grpPlayers.appendChild(playersVal);
-        grpPlayers.appendChild(playersMax);
-        chip.appendChild(grpPlayers);
-
-        const d2 = document.createElement('span'); d2.className = 'div'; chip.appendChild(d2);
-
-        const grpPing = chipGroup('wifi');
-        const pingVal = document.createElement('b');
-        pingVal.textContent = S.ping;
-        const pingUnit = document.createElement('small');
-        pingUnit.textContent = t('msUnit', 'ms');
-        grpPing.appendChild(pingVal);
-        grpPing.appendChild(pingUnit);
-        chip.appendChild(grpPing);
-
-        chipRefs = { players: playersVal, max: playersMax, ping: pingVal };
-        if (lastStats) updateStatusChip(lastStats);
-    }
-    function updateStatusChip(d) {
-        if (!chipRefs || !d) return;
-        const players = Number(d.players);
-        const max = Number(d.maxPlayers);
-        const ping = Number(d.ping);
-        if (Number.isFinite(players)) chipRefs.players.textContent = players;
-        if (Number.isFinite(max)) chipRefs.max.textContent = t('playersSlash', '/') + max;
-        if (Number.isFinite(ping)) chipRefs.ping.textContent = ping;
-    }
-
-    // Rebuilt whenever the server sends news, so the tab the player is reading
-    // is remembered instead of snapping back to the default underneath them.
-    let activeTab = null;
-
-    function applyInfoPanel() {
-        const T = CFG.tabs || {};
-        const panel = document.getElementById('infoPanel');
-        const tabs = document.getElementById('tabs');
-        const body = document.getElementById('tabbody');
-        const wantRules = T.rules !== false;
-        const wantStaff = T.staff !== false;
-        // The News tab only exists once there is something in it — a server
-        // that publishes nothing shows the panel exactly as it always did.
-        const wantNews = T.news !== false && newsItems().length > 0;
-        if (!wantRules && !wantStaff && !wantNews) { panel.style.display = 'none'; return; }
-        panel.style.display = '';
-
-        // A defaultTab naming a disabled — or misspelled — tab would leave the
-        // panel with nothing selected, so it only counts when it is really there.
-        const available = [];
-        if (wantRules) available.push('rules');
-        if (wantNews) available.push('news');
-        if (wantStaff) available.push('staff');
-        const def = available.indexOf(T.defaultTab) !== -1 ? T.defaultTab : available[0];
-        const sel = available.indexOf(activeTab) !== -1 ? activeTab : def;
-        tabs.innerHTML = '';
-        body.innerHTML = '';
-
-        if (wantRules) {
-            tabs.appendChild(makeTab('rules', t('rulesTab', 'Rules'), sel === 'rules'));
-            body.appendChild(makeRulesPane(sel === 'rules'));
-        }
-        if (wantNews) {
-            tabs.appendChild(makeTab('news', t('newsTab', 'News'), sel === 'news'));
-            body.appendChild(makeNewsPane(sel === 'news'));
-        }
-        if (wantStaff) {
-            tabs.appendChild(makeTab('staff', t('staffTab', 'Staff'), sel === 'staff'));
-            body.appendChild(makeStaffPane(sel === 'staff'));
-        }
-        tabs.querySelectorAll('.tab').forEach(b => {
-            b.onclick = () => {
-                tabs.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
-                body.querySelectorAll('.pane').forEach(x => x.classList.remove('on'));
-                b.classList.add('on');
-                activeTab = b.dataset.pane;
-                document.getElementById(b.dataset.pane).classList.add('on');
-            };
-        });
-    }
-    function makeTab(id, label, on) {
-        const b = document.createElement('button');
-        b.className = 'tab' + (on ? ' on' : '');
-        b.dataset.pane = id;
-        b.textContent = label;
-        return b;
-    }
-    function makeRulesPane(on) {
-        const div = document.createElement('div');
-        div.className = 'pane' + (on ? ' on' : '');
-        div.id = 'rules';
-        const list = Array.isArray(CFG.rules) ? CFG.rules : (L.rules || []);
-        list.forEach((text, i) => {
-            const row = document.createElement('div');
-            row.className = 'rule';
-            row.innerHTML = `<span class="n">${String(i + 1).padStart(2, '0')}</span>${text}`;
-            div.appendChild(row);
-        });
-        return div;
-    }
-    /* ============================================================
-     * Server news / patch notes
-     * The list the server pushes wins over the one in config.js, so
-     * the owner publishes a patch note without touching the resource
-     * and the config array is what a fresh install falls back to.
-     * ============================================================ */
-    let serverNews = null, serverTips = null;
-
-    function normalizeNews(list) {
-        const out = [];
-        (Array.isArray(list) ? list : []).forEach(raw => {
-            if (typeof raw === 'string') {
-                const s = raw.trim();
-                if (s) out.push({ title: '', date: '', tag: '', body: [s] });
-                return;
-            }
-            if (!raw || typeof raw !== 'object') return;
-            const src = raw.body != null ? raw.body : raw.text;
-            const lines = (Array.isArray(src) ? src : (typeof src === 'string' ? src.split('\n') : []))
-                .map(x => String(x == null ? '' : x).trim())
-                .filter(Boolean);
-            const title = raw.title != null ? String(raw.title).trim() : '';
-            if (!title && !lines.length) return;
-            out.push({
-                title: title,
-                date: raw.date != null ? String(raw.date).trim() : '',
-                tag: raw.tag != null ? String(raw.tag).trim() : '',
-                body: lines
-            });
-        });
-        return out;
-    }
-
-    function newsItems() {
-        const N = CFG.news || {};
-        const items = normalizeNews((serverNews && serverNews.length) ? serverNews : (N.items || []));
-        const max = Number(N.maxItems);
-        return (Number.isFinite(max) && max > 0) ? items.slice(0, max) : items;
-    }
-
-    function makeNewsPane(on) {
-        const div = document.createElement('div');
-        div.className = 'pane' + (on ? ' on' : '');
-        div.id = 'news';
-        newsItems().forEach(item => {
-            const card = document.createElement('article');
-            card.className = 'news';
-            if (item.tag || item.date) {
-                const head = document.createElement('div');
-                head.className = 'news-h';
-                if (item.tag) {
-                    const tag = document.createElement('span');
-                    tag.className = 'news-tag';
-                    tag.textContent = item.tag;
-                    head.appendChild(tag);
-                }
-                if (item.date) {
-                    const date = document.createElement('span');
-                    date.className = 'news-date';
-                    date.textContent = item.date;
-                    head.appendChild(date);
-                }
-                card.appendChild(head);
-            }
-            if (item.title) {
-                const h = document.createElement('div');
-                h.className = 'news-t';
-                h.textContent = item.title;
-                card.appendChild(h);
-            }
-            if (item.body.length) {
-                const ul = document.createElement('ul');
-                ul.className = 'news-b';
-                item.body.forEach(line => {
-                    const li = document.createElement('li');
-                    li.textContent = line;
-                    ul.appendChild(li);
-                });
-                card.appendChild(ul);
-            }
-            div.appendChild(card);
-        });
-        return div;
-    }
-
-    function makeStaffPane(on) {
-        const div = document.createElement('div');
-        div.className = 'pane' + (on ? ' on' : '');
-        div.id = 'staff';
-        const grid = document.createElement('div');
-        grid.className = 'staff-grid';
-        const defaults = CFG.staffDefaults || {};
-        (CFG.staff || []).forEach(s => {
-            const card = document.createElement('div');
-            card.className = 'staff-card t-' + (s.tone || 'mod');
-            const role = s.role != null ? s.role : t(lookup(defaults, s.tone + '.roleKey') || '', '');
-            const badge = s.badge != null ? s.badge : t(lookup(defaults, s.tone + '.badgeKey') || '', '');
-            card.innerHTML = `
-                <div class="staff-head">
-                    <div class="staff-av">${s.avatar || (s.name || '?').charAt(0)}</div>
-                    <div>
-                        <div class="staff-nm">${s.name || ''}</div>
-                        <div class="staff-ro">${role || ''}</div>
-                    </div>
-                </div>
-                <span class="staff-bdg">${badge || ''}</span>`;
-            grid.appendChild(card);
-        });
-        div.appendChild(grid);
-        return div;
-    }
-
-    // A loading screen has no tab to open into, so `target="_blank"` does
-    // nothing here: the URL goes to the game's own browser instead, and lands
-    // on the clipboard when that is unavailable (plain browser preview).
-    function openExternal(url) {
-        if (!url) return 'none';
-        try {
-            if (typeof window.invokeNative === 'function') {
-                window.invokeNative('openUrl', url);
-                return 'native';
-            }
-        } catch {}
-        try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(url);
-                return 'copied';
-            }
-        } catch {}
-        try {
-            const ta = document.createElement('textarea');
-            ta.value = url;
-            ta.setAttribute('readonly', '');
-            ta.style.position = 'fixed';
-            ta.style.opacity = '0';
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            return 'copied';
-        } catch {}
-        return 'none';
-    }
-
-    function applySocials() {
-        const wrap = document.getElementById('socials');
-        wrap.innerHTML = '';
-        (CFG.socials || []).forEach(s => {
-            const a = document.createElement('a');
-            a.className = 's';
-            a.href = s.url || '#';
-            a.rel = 'noopener';
-            a.title = s.url || '';
-            a.appendChild(makeIcon(s.icon));
-            a.addEventListener('click', e => {
-                e.preventDefault();
-                if (openExternal(s.url) !== 'copied') return;
-                a.classList.add('copied');
-                setTimeout(() => a.classList.remove('copied'), 1200);
-            });
-            wrap.appendChild(a);
-        });
-        if (!wrap.children.length) wrap.style.display = 'none';
-    }
-
-    /* ============================================================
-     * Server logo — only shown once the file has really decoded, so
-     * a wrong path costs the logo and nothing else.
-     * ============================================================ */
-    function applyLogo() {
-        const G = CFG.logo || {};
-        const img = document.getElementById('logo');
-        if (!G.enabled || !G.src) return;
-        const title = document.getElementById('title');
-        img.style.height = (G.height != null ? G.height : 84) + 'px';
-        if (G.glow !== false) img.classList.add('glow');
-        img.alt = title.textContent || '';
-        img.addEventListener('load', () => {
-            img.classList.add('on');
-            if (G.placement === 'replace') title.style.display = 'none';
-        });
-        img.addEventListener('error', () => {
-            img.classList.remove('on');
-            title.style.display = '';
-        });
-        img.src = G.src;
-    }
-
-    /* ============================================================
-     * Background image / slideshow — one source is a static
-     * background, several cross-fade. Drawn under the video layer,
-     * so it also covers a video that never decodes.
-     * ============================================================ */
-    function applyImage() {
-        const wrap = document.getElementById('bgSlides');
-        const I = CFG.image || {};
-        const list = Array.isArray(I.sources) ? I.sources.filter(s => typeof s === 'string' && s) : [];
-        if (!I.enabled || !list.length) { wrap.style.display = 'none'; return; }
-        const opacity = I.opacity != null ? I.opacity : 1;
-        const fade = I.fadeMs != null ? I.fadeMs : 1200;
-        if (I.blurPx) wrap.style.filter = `blur(${I.blurPx}px)`;
-        const slides = list.map((src, i) => {
-            const d = document.createElement('div');
-            d.className = 'slide' + (I.kenBurns !== false ? ' kb' : '');
-            d.style.backgroundImage = `url("${String(src).replace(/["\\]/g, '')}")`;
-            d.style.backgroundSize = I.objectFit === 'contain' ? 'contain' : 'cover';
-            d.style.transition = `opacity ${fade}ms ease`;
-            d.style.animationDelay = `-${i * 4}s`;
-            if (i === 0) d.style.opacity = opacity;
-            wrap.appendChild(d);
-            return d;
-        });
-        if (slides.length < 2) return;
-        let cur = 0;
-        setInterval(() => {
-            const next = (cur + 1) % slides.length;
-            slides[cur].style.opacity = 0;
-            slides[next].style.opacity = opacity;
-            cur = next;
-        }, Math.max(1200, I.intervalMs != null ? I.intervalMs : 9000));
-    }
-
-    /* ============================================================
-     * Background video — local webm/mp4 with fallback chain.
-     * If nothing decodes, the element stays hidden and the gradient
-     * background is what the player sees.
-     * ============================================================ */
-    const DEAD_CONTAINER = /\.(avi|wmv|flv|mpg|mpeg|m2ts|mov)(\?.*)?$/i;
-    // Matroska is the container WebM is a profile of, and CEF demuxes it with
-    // the same code — an .mkv holding VP8 / VP9 / H.264 plays. One holding
-    // HEVC or AC-3 does not, so the .webm and .mp4 of the same name are queued
-    // behind it rather than in place of it: the file is tried first and the
-    // chain still has somewhere to go if its codec is the one CEF lacks.
-    const MAYBE_CONTAINER = /\.(mkv|ogv)(\?.*)?$/i;
-
-    // Containers CEF can never demux are swapped for the .webm and .mp4 of the
-    // same name instead of being requested and failing.
-    function videoSources(list) {
-        const out = [];
-        const add = src => { if (out.indexOf(src) < 0) out.push(src); };
-        list.forEach(src => {
-            if (typeof src !== 'string' || !src) return;
-            if (DEAD_CONTAINER.test(src)) {
-                const base = src.replace(DEAD_CONTAINER, '');
-                add(base + '.webm');
-                add(base + '.mp4');
-                return;
-            }
-            add(src);
-            if (MAYBE_CONTAINER.test(src)) {
-                const base = src.replace(MAYBE_CONTAINER, '');
-                add(base + '.webm');
-                add(base + '.mp4');
-            }
-        });
-        return out;
-    }
-
-    function applyVideo() {
-        const v = document.getElementById('bgVideo');
-        const V = CFG.video || {};
-        const sources = (V.enabled && Array.isArray(V.sources)) ? videoSources(V.sources) : [];
-        if (!sources.length) {
-            v.classList.add('hidden');
+function startVideo() {
+    const V = C.video || {};
+    const list = (V.sources || []).filter(Boolean);
+    if (!V.enabled || !list.length) { videoDead = true; return; }
+    video.style.objectFit = V.objectFit === 'contain' ? 'contain' : 'cover';
+    video.style.opacity = num(V.opacity, 1);
+    if (V.blurPx) video.style.filter = `blur(${V.blurPx}px)`;
+    video.loop = V.loop !== false;
+    video.muted = true;
+    let i = 0;
+    const next = () => {
+        if (i >= list.length) {
+            video.removeAttribute('src');
+            video.classList.remove('playing');
+            videoDead = true;
+            videoDeadHooks.forEach(f => f());
             return;
         }
-        startLocalVideo(v, V, sources);
+        video.src = list[i++];
+        const p = video.play();
+        if (p && p.catch) p.catch(() => {});
+    };
+    video.addEventListener('error', next);
+    video.addEventListener('playing', () => video.classList.add('playing'));
+    next();
+}
+
+/* ================= Musik ================= */
+const M = C.music || {};
+const audio = $('audio');
+let media = null;            // elemen yang suaranya dianggap musik
+let playing = false;
+let userVol = clamp(num(M.volume, 50), 0, 100);
+let volTouched = false;
+let volSaveTimer = null;
+
+function setPlayingUI() {
+    $('playUse').setAttribute('href', playing ? '#i-pause' : '#i-play');
+    $('volUse').setAttribute('href', userVol <= 0 ? '#i-volume-x' : '#i-volume-2');
+    if (playing) Viz.wake();
+}
+
+function applyVolume(v) {
+    if (media) media.volume = clamp(v / 100, 0, 1);
+}
+
+function setVolume(v, persist) {
+    userVol = clamp(Math.round(num(v, userVol)), 0, 100);
+    applyVolume(userVol);
+    $('lv').style.width = userVol + '%';
+    $('kn').style.left = userVol + '%';
+    setPlayingUI();
+    if (persist && M.rememberVolume !== false) {
+        clearTimeout(volSaveTimer);
+        volSaveTimer = setTimeout(() => post('flsVolume', { volume: userVol }).catch(() => {}), 350);
     }
+}
 
-    function startLocalVideo(v, V, sources) {
-        v.classList.remove('hidden');
-        v.loop = V.loop !== false;
-        v.muted = V.muted !== false;
-        v.autoplay = V.autoplay !== false;
-        v.playsInline = true;
-        v.style.objectFit = V.objectFit || 'cover';
-        v.style.opacity = V.opacity != null ? V.opacity : 1;
-        if (V.blurPx) v.style.filter = `blur(${V.blurPx}px)`;
+function wireVolume() {
+    const bar = $('vbar');
+    let drag = false;
+    const set = e => {
+        const r = bar.getBoundingClientRect();
+        volTouched = true;
+        setVolume(clamp((e.clientX - r.left) / r.width, 0, 1) * 100, true);
+    };
+    bar.addEventListener('mousedown', e => { drag = true; set(e); });
+    window.addEventListener('mousemove', e => { if (drag) set(e); });
+    window.addEventListener('mouseup', () => { drag = false; });
+    bar.addEventListener('wheel', e => { volTouched = true; setVolume(userVol + (e.deltaY < 0 ? 5 : -5), true); });
+}
 
-        const STALL_MS = 6000;
-        let i = 0, probe = null, current = '', decoded = false, exhausted = false;
+// suara ditolak sebelum ada interaksi: coba lagi di klik / tombol pertama
+let gestureArmed = false;
+function armGesture(fn) {
+    if (gestureArmed) return;
+    gestureArmed = true;
+    const go = () => {
+        document.removeEventListener('pointerdown', go, true);
+        document.removeEventListener('keydown', go, true);
+        gestureArmed = false;
+        fn();
+    };
+    document.addEventListener('pointerdown', go, true);
+    document.addEventListener('keydown', go, true);
+}
 
-        function arm() {
-            clearTimeout(probe);
-            // A source that never errors but never decodes must not stall the
-            // chain. Bytes arriving re-arm it, so a large or slow stream that is
-            // genuinely still loading is never cut off for taking its time.
-            probe = setTimeout(() => {
-                console.warn('[lastresort_loading] video timed out: ' + current);
-                tryNext();
-            }, STALL_MS);
-        }
-        function tryNext() {
-            clearTimeout(probe);
-            decoded = false;
-            v.classList.remove('playing');
-            if (i >= sources.length) {
-                // A late error from a source already given up on lands here too,
-                // and the list is only ever declared dead once.
-                if (exhausted) return;
-                exhausted = true;
-                v.classList.add('hidden');
-                console.warn('[lastresort_loading] no background video decoded — falling back to the image or gradient layer.');
-                return;
-            }
-            current = sources[i++];
-            v.src = current;
-            v.load();
-            arm();
-            const p = v.play();
-            if (p && typeof p.catch === 'function') p.catch(() => {});
-        }
-        v.addEventListener('error', () => {
-            const err = v.error;
-            console.warn('[lastresort_loading] video source failed: ' + current
-                + (err ? ' (code ' + err.code + ')' : ''));
-            tryNext();
-        });
-        v.addEventListener('progress', () => { if (!decoded) arm(); });
-        v.addEventListener('loadeddata', () => {
-            decoded = true;
-            clearTimeout(probe);
-            v.classList.add('playing');
-            // console.info('[lastresort_loading] background video: ' + current);
-        });
-        tryNext();
-    }
+function musicOff(label) {
+    $('music').classList.add('off');
+    $('trk').textContent = label || t('noTrack', 'No track');
+    playing = false;
+    setPlayingUI();
+}
 
-    /* ============================================================
-     * Music — one playlist of files this resource ships, played by
-     * the page's own <audio>.
-     * ============================================================ */
-    let audioEl, tracks, ti = 0, musicPlaying = false, userVolume = 50, shuffleOrder = null;
-    let deadTracks = 0;
-    let rememberVolume = true, volumeTouched = false, volumeSaveTimer = null;
+function initMusic() {
+    const box = $('music');
+    if (!M.enabled || M.showUI === false) { box.style.display = 'none'; $('vline1').remove(); }
+    if (!M.enabled) return;
+    $('plistTitle').textContent = t('playlist', 'Playlist');
+    wireVolume();
+    if (M.useVideoAudio) initVideoSound(); else initTracks();
+    setVolume(userVol, false);
+}
 
-    // The volume the player set last is theirs, not the config's. It is kept in
-    // the page's own storage and mirrored into client KVP by the bridge, so it
-    // survives a cleared browser cache as well as a rejoin.
-    const VOLUME_KEY = 'lastresort_loading:volume';
-
-    function readStoredVolume() {
-        try {
-            const raw = localStorage.getItem(VOLUME_KEY);
-            if (raw == null) return null;
-            const v = Number(raw);
-            return Number.isFinite(v) ? Math.max(0, Math.min(100, Math.round(v))) : null;
-        } catch { return null; }
-    }
-    function storeVolume(v) {
-        try { localStorage.setItem(VOLUME_KEY, String(v)); } catch {}
-        clearTimeout(volumeSaveTimer);
-        volumeSaveTimer = setTimeout(() => { NUI.post('lrlVolume', { volume: v }).catch(() => {}); }, 350);
-    }
-    function setVolume(v, persist) {
-        if (!Number.isFinite(v)) return;
-        userVolume = Math.max(0, Math.min(100, Math.round(v)));
-        applyVolume(userVolume);
-        const lv = document.getElementById('lv');
-        const kn = document.getElementById('kn');
-        if (lv) lv.style.width = userVolume + '%';
-        if (kn) kn.style.left = userVolume + '%';
-        if (persist && rememberVolume) storeVolume(userVolume);
-    }
-    function applyVolume(v) {
-        if (audioEl) audioEl.volume = Math.max(0, Math.min(1, v / 100));
-    }
-
-    function normalizeTracks(list) {
-        const out = [];
-        for (const raw of (Array.isArray(list) ? list : [])) {
-            if (!raw) continue;
-            const src = typeof raw === 'string' ? raw : raw.src;
-            if (!src) continue;
-            out.push({
-                title: (typeof raw === 'object' && raw.title) ? raw.title : '',
-                src: String(src)
-            });
-        }
-        return out;
-    }
-
-    function applyMusic() {
-        const M = CFG.music || {};
-        const wrap = document.getElementById('music');
-        const vline1 = document.getElementById('vline1');
-        if (!M.showUI || !M.enabled) {
-            wrap.style.display = 'none';
-            if (!M.showUI) vline1.style.display = 'none';
-            if (!M.enabled) return;
-        }
-        const useVideo = !!M.useVideoAudio;
-        audioEl = document.getElementById(useVideo ? 'bgVideo' : 'audio');
-        tracks = useVideo ? [] : normalizeTracks(M.tracks);
-        rememberVolume = M.rememberVolume !== false;
-        const vol = Number(M.volume != null ? M.volume : 50);
-        const stored = rememberVolume ? readStoredVolume() : null;
-        setVolume(stored != null ? stored : (isFinite(vol) ? vol : 50), false);
-
-        // Nothing to draw into on a hidden panel — the music still plays.
-        if (M.showUI) Visualizer.start();
-
-        if (useVideo) { wireVideoSound(M); return; }
-
-        const trk = document.getElementById('trk');
-        if (!tracks.length) {
-            trk.textContent = t('noTrack', 'No tracks');
-            document.getElementById('listBtn').style.display = 'none';
-            disableMusicControls();
-            return;
-        }
-        if (M.shuffle) shuffleOrder = makeShuffle(tracks.length);
-        wireMusicControls();
-        loadTrack(0);
-        if (M.autoplay) tryPlay();
-        if (M.showPlaylist === false) {
-            document.getElementById('listBtn').style.display = 'none';
-        } else {
-            buildPlaylist();
-        }
-    }
-
-    /* ============================================================
-     * Visualizer
-     * The <audio> is routed through an AnalyserNode and the cover art
-     * IS the spectrum. Where the browser will not hand the page a
-     * running audio context the same bars are driven by a synthetic
-     * signal instead — the panel reads as alive either way, which is
-     * the whole point of having it on a loading screen.
-     * ============================================================ */
-    const Visualizer = (() => {
-        let barsCv, waveCv, barsCtx, waveCtx;
-        let audioCtx = null, analyser = null, srcNode = null;
-        let freq = null, wave = null;
-        let levels = [], phases = [];
-        let raf = null, started = false, attachTried = false;
-
-        function cfg() {
-            const V = (CFG.music || {}).visualizer || {};
-            return {
-                enabled: V.enabled !== false,
-                bars: Math.max(4, Math.min(48, Number(V.bars) || 14)),
-                wave: V.wave !== false,
-                analyse: V.analyse !== false,
-                smoothing: V.smoothing != null ? Number(V.smoothing) : 0.72,
-                sensitivity: V.sensitivity != null ? Number(V.sensitivity) : 1.0
-            };
-        }
-        const V = () => cfg();
-
-        function sizeCanvas(cv) {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const w = cv.clientWidth || 1, h = cv.clientHeight || 1;
-            cv.width = Math.max(1, Math.round(w * dpr));
-            cv.height = Math.max(1, Math.round(h * dpr));
-            const ctx = cv.getContext('2d');
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            return ctx;
-        }
-
-        // The element is only ever re-routed through the graph once the context
-        // is known to be running. A suspended context that already owns the
-        // element would mean silent music, which is far worse than flat bars.
-        function attach() {
-            const c = V();
-            if (!c.analyse || analyser || attachTried || !audioEl) return;
-            const AC = window.AudioContext || window.webkitAudioContext;
-            if (!AC) { attachTried = true; return; }
-            let ctx;
-            try { ctx = new AC(); } catch { attachTried = true; return; }
-            const finish = () => {
-                if (ctx.state !== 'running') { try { ctx.close(); } catch {} return; }
-                try {
-                    srcNode = ctx.createMediaElementSource(audioEl);
-                    analyser = ctx.createAnalyser();
-                    analyser.fftSize = 256;
-                    analyser.smoothingTimeConstant = Math.max(0, Math.min(0.95, c.smoothing));
-                    srcNode.connect(analyser);
-                    analyser.connect(ctx.destination);
-                    freq = new Uint8Array(analyser.frequencyBinCount);
-                    wave = new Uint8Array(analyser.fftSize);
-                    audioCtx = ctx;
-                    attachTried = true;
-                } catch (e) {
-                    analyser = null;
-                    try { ctx.close(); } catch {}
-                    attachTried = true;
-                }
-            };
-            if (ctx.state === 'suspended') {
-                const p = ctx.resume();
-                if (p && p.then) p.then(finish).catch(() => { try { ctx.close(); } catch {} });
-                else finish();
-            } else {
-                finish();
-            }
-        }
-
-        function synthetic(i, n, now) {
-            // Three detuned oscillators per bar plus a slow envelope: no two
-            // bars ever line up, so it never reads as a looping animation.
-            const p = phases[i];
-            const s = Math.sin(now * 0.0042 + p) * 0.5
-                    + Math.sin(now * 0.0113 + p * 2.3) * 0.32
-                    + Math.sin(now * 0.0007 + p * 0.7) * 0.18;
-            const tilt = 1 - (i / n) * 0.45;          // highs sit lower, like real music
-            return Math.max(0.06, Math.min(1, (0.52 + s * 0.48) * tilt));
-        }
-
-        function readBars(n, now) {
-            const out = new Array(n);
-            if (analyser && musicPlaying) {
-                analyser.getByteFrequencyData(freq);
-                // Logarithmic buckets: an even split puts everything audible
-                // into the first two bars and leaves the rest permanently flat.
-                const bins = freq.length;
-                let sum = 0;
-                for (let i = 0; i < n; i++) {
-                    const lo = Math.floor(Math.pow(i / n, 1.7) * bins);
-                    const hi = Math.max(lo + 1, Math.floor(Math.pow((i + 1) / n, 1.7) * bins));
-                    let acc = 0;
-                    for (let b = lo; b < hi && b < bins; b++) acc += freq[b];
-                    const v = (acc / (hi - lo)) / 255;
-                    out[i] = Math.max(0, Math.min(1, v * V().sensitivity * (1 + i / n)));
-                    sum += out[i];
-                }
-                // A track that decodes to digital silence would leave the panel
-                // looking broken; fall through to the synthetic signal instead.
-                if (sum > 0.02) return out;
-            }
-            if (!musicPlaying) { for (let i = 0; i < n; i++) out[i] = 0.05; return out; }
-            for (let i = 0; i < n; i++) out[i] = synthetic(i, n, now);
-            return out;
-        }
-
-        function accent() {
-            return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#5fe0ff';
-        }
-
-        function draw(now) {
-            raf = requestAnimationFrame(draw);
-            const c = V();
-            const n = c.bars;
-            const target = readBars(n, now);
-            for (let i = 0; i < n; i++) {
-                const prev = levels[i] || 0;
-                // Fast attack, slow release — the shape a VU meter has.
-                const k = target[i] > prev ? 0.55 : 0.12;
-                levels[i] = prev + (target[i] - prev) * k;
-            }
-
-            if (barsCtx) {
-                const w = barsCv.clientWidth, h = barsCv.clientHeight;
-                barsCtx.clearRect(0, 0, w, h);
-                const pad = 5;
-                const inner = w - pad * 2;
-                const gap = Math.max(1, inner / n * 0.32);
-                const bw = (inner - gap * (n - 1)) / n;
-                const col = accent();
-                barsCtx.fillStyle = col;
-                barsCtx.shadowColor = col;
-                barsCtx.shadowBlur = 6;
-                for (let i = 0; i < n; i++) {
-                    const bh = Math.max(1.5, levels[i] * (h - pad * 2));
-                    const x = pad + i * (bw + gap);
-                    barsCtx.globalAlpha = 0.35 + levels[i] * 0.65;
-                    barsCtx.fillRect(x, h - pad - bh, bw, bh);
-                }
-                barsCtx.globalAlpha = 1;
-                barsCtx.shadowBlur = 0;
-            }
-
-            if (waveCtx) {
-                const w = waveCv.clientWidth, h = waveCv.clientHeight;
-                waveCtx.clearRect(0, 0, w, h);
-                waveCtx.beginPath();
-                const mid = h / 2;
-                const useReal = analyser && musicPlaying;
-                if (useReal) analyser.getByteTimeDomainData(wave);
-                const steps = Math.max(24, Math.min(160, Math.round(w / 2)));
-                for (let i = 0; i <= steps; i++) {
-                    const p = i / steps;
-                    let v;
-                    if (useReal) {
-                        v = (wave[Math.floor(p * (wave.length - 1))] - 128) / 128;
-                    } else if (musicPlaying) {
-                        const amp = levels[Math.floor(p * (n - 1))] || 0;
-                        v = Math.sin(p * 18 + now * 0.006) * amp * 0.9;
-                    } else {
-                        v = 0;
-                    }
-                    const y = mid - v * (mid - 1) * V().sensitivity;
-                    if (i === 0) waveCtx.moveTo(0, y); else waveCtx.lineTo(p * w, y);
-                }
-                waveCtx.strokeStyle = accent();
-                waveCtx.globalAlpha = musicPlaying ? 0.75 : 0.28;
-                waveCtx.lineWidth = 1.4;
-                waveCtx.stroke();
-                waveCtx.globalAlpha = 1;
-            }
-        }
-
-        function start() {
-            const c = cfg();
-            barsCv = document.getElementById('vizBars');
-            waveCv = document.getElementById('vizWave');
-            if (!c.enabled) {
-                if (barsCv) barsCv.style.display = 'none';
-                if (waveCv) waveCv.style.display = 'none';
-                return;
-            }
-            if (started) return;
-            started = true;
-            if (!c.wave && waveCv) { waveCv.style.display = 'none'; waveCv = null; }
-            for (let i = 0; i < 48; i++) { levels[i] = 0.05; phases[i] = i * 1.7 + Math.random() * 6.28; }
-            const resize = () => {
-                if (barsCv) barsCtx = sizeCanvas(barsCv);
-                if (waveCv) waveCtx = sizeCanvas(waveCv);
-            };
-            resize();
-            window.addEventListener('resize', resize);
-            // A browser that would not give us a running audio context before
-            // the player touched anything will give us one after they did.
-            const retry = () => {
-                document.removeEventListener('pointerdown', retry, true);
-                document.removeEventListener('keydown', retry, true);
-                if (!analyser) { attachTried = false; attach(); }
-            };
-            document.addEventListener('pointerdown', retry, true);
-            document.addEventListener('keydown', retry, true);
-            raf = requestAnimationFrame(draw);
-        }
-
-        return {
-            start,
-            attach,
-            stop() { cancelAnimationFrame(raf); raf = null; }
-        };
-    })();
-
-    /* ============================================================
-     * Playlist — the whole queue, not just the track that happens
-     * to be playing. Clicking a row jumps straight to it.
-     * ============================================================ */
-    function trackTitle(i) {
-        const t0 = tracks[actualIndex(i)];
-        if (!t0) return '';
-        if (t0.title) return t0.title;
-        return decodeURIComponent(String(t0.src || '').split('/').pop().replace(/\.[a-z0-9]+$/i, ''));
-    }
-    function buildPlaylist() {
-        const body = document.getElementById('plistBody');
-        body.innerHTML = '';
-        for (let i = 0; i < tracks.length; i++) {
-            const row = document.createElement('button');
-            row.className = 'ptrack';
-            row.dataset.i = i;
-            const n = document.createElement('span');
-            n.className = 'i';
-            n.textContent = String(i + 1).padStart(2, '0');
-            const label = document.createElement('span');
-            label.className = 't';
-            label.textContent = trackTitle(i);
-            row.appendChild(n);
-            row.appendChild(label);
-            row.onclick = () => {
-                loadTrack(i);
-                playCurrent();
-                togglePlaylist(false);
-            };
-            body.appendChild(row);
-        }
-        document.getElementById('plistTitle').textContent = t('playlist', 'Playlist');
-        markPlaylist();
-    }
-    function markPlaylist() {
-        const body = document.getElementById('plistBody');
-        if (!body || !tracks) return;
-        body.querySelectorAll('.ptrack').forEach(el => {
-            el.classList.toggle('on', Number(el.dataset.i) === ti);
-        });
-        const count = document.getElementById('plistCount');
-        if (count && tracks.length) {
-            count.textContent = t('trackCount', '{n} / {total}')
-                .replace('{n}', String(ti + 1).padStart(2, '0'))
-                .replace('{total}', String(tracks.length).padStart(2, '0'));
-        }
-    }
-    function togglePlaylist(force) {
-        const el = document.getElementById('plist');
-        const btn = document.getElementById('listBtn');
-        if (!el || !btn) return;
-        const on = force != null ? force : !el.classList.contains('on');
-        el.classList.toggle('on', on);
-        btn.classList.toggle('on', on);
-    }
-    function playCurrent() {
-        if (!audioEl) return;
-        Visualizer.attach();
-        const p = audioEl.play();
-        if (p && p.then) p.then(() => { musicPlaying = true; refreshPlayBtn(); }).catch(() => {});
-    }
-    function makeShuffle(n) {
-        const a = Array.from({ length: n }, (_, i) => i);
-        for (let i = a.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [a[i], a[j]] = [a[j], a[i]];
-        }
-        return a;
-    }
-    function actualIndex(i) { return shuffleOrder ? shuffleOrder[i % shuffleOrder.length] : (i % tracks.length); }
-
-    function loadTrack(i) {
-        if (!tracks.length) return;
-        ti = (i + tracks.length) % tracks.length;
-        const t0 = tracks[actualIndex(ti)];
-        const wantPlaying = musicPlaying;
-        audioEl.src = t0.src;
-        if (wantPlaying) { const p = audioEl.play(); if (p && p.catch) p.catch(() => {}); }
-        document.getElementById('trk').textContent = trackTitle(ti) || t('loadingTrack', '…');
-        markPlaylist();
-    }
-    // The step next/prev and an ended track all take, so `loop: false` is
-    // honoured in exactly one place.
-    function advance(step) {
-        step = step || 1;
-        if (step > 0 && ti === tracks.length - 1 && CFG.music && CFG.music.loop === false) {
-            musicPlaying = false;
-            refreshPlayBtn();
-            return;
-        }
-        loadTrack(ti + step);
-    }
-    function tryPlay() {
-        Visualizer.attach();
-        const p = audioEl.play();
-        if (p && p.catch) {
-            p.then(() => { musicPlaying = true; refreshPlayBtn(); }).catch(() => {
-                // Autoplay blocked — fall back to first interaction.
-                const unlock = () => {
-                    document.removeEventListener('pointerdown', unlock, true);
-                    document.removeEventListener('keydown', unlock, true);
-                    Visualizer.attach();
-                    playCurrent();
-                };
-                document.addEventListener('pointerdown', unlock, true);
-                document.addEventListener('keydown', unlock, true);
-            });
-        } else {
-            musicPlaying = true;
-            refreshPlayBtn();
-        }
-    }
-    function refreshPlayBtn() {
-        document.getElementById('playIc').className = musicPlaying ? 'icon-pause' : 'icon-play';
-        document.getElementById('music').classList.toggle('playing', musicPlaying);
-    }
-    function disableMusicControls() {
-        ['prev', 'play', 'next', 'listBtn'].forEach(id => { const e = document.getElementById(id); if (e) e.disabled = true; });
-        document.getElementById('music').classList.add('off');
-    }
-    function wireMusicControls() {
-        document.getElementById('play').onclick = () => {
-            if (!tracks.length) return;
-            if (audioEl.paused) {
-                playCurrent();
-            } else {
-                audioEl.pause();
-                musicPlaying = false;
-                refreshPlayBtn();
-            }
-        };
-        document.getElementById('next').onclick = () => advance(1);
-        document.getElementById('prev').onclick = () => loadTrack(ti - 1);
-        document.getElementById('listBtn').onclick = () => togglePlaylist();
-        document.addEventListener('pointerdown', e => {
-            const el = document.getElementById('plist');
-            const btn = document.getElementById('listBtn');
-            if (!el || !el.classList.contains('on')) return;
-            if (el.contains(e.target) || btn.contains(e.target)) return;
-            togglePlaylist(false);
-        });
-        audioEl.addEventListener('ended', () => advance(1));
-        audioEl.addEventListener('play', () => {
-            musicPlaying = true; refreshPlayBtn(); Visualizer.attach();
-            deadTracks = 0;
-        });
-        audioEl.addEventListener('pause', () => {
-            musicPlaying = false; refreshPlayBtn();
-        });
-        // A source that 404s or is in a container the game's browser cannot
-        // decode used to leave the panel stuck on a track that never starts.
-        // Skipping alone is not enough: a one-entry playlist had nothing to
-        // skip to, and a list where every entry fails would cycle forever.
-        audioEl.addEventListener('error', () => {
-            console.warn('[lastresort_loading] track could not be played:', audioEl.src);
-            deadTracks += 1;
-            if (deadTracks >= tracks.length) {
-                musicPlaying = false;
-                refreshPlayBtn();
-                document.getElementById('trk').textContent = t('noTrack', 'No tracks');
-                return;
-            }
-            advance(1);
-        });
-
-        wireVolumeBar();
-    }
-
-    /* ============================================================
-     * Video sound — the background video's soundtrack is the music.
-     * The video keeps looping muted no matter what; the play button
-     * only flips its sound on and off.
-     * ============================================================ */
-    function wireVideoSound(M) {
-        ['prev', 'next', 'listBtn'].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = 'none'; });
-        document.getElementById('trk').textContent = M.videoTitle || '';
-
-        const sync = () => {
-            musicPlaying = !audioEl.muted && !audioEl.paused;
-            refreshPlayBtn();
-        };
-        const mute = () => {
-            audioEl.muted = true;
-            const p = audioEl.play();
-            if (p && p.catch) p.catch(() => {});
+function initVideoSound() {
+    ['prev', 'next', 'listBtn'].forEach(id => $(id).remove());
+    $('plist').remove();
+    media = video;
+    $('trk').textContent = M.videoTitle || '';
+    if (videoDead) { musicOff(); return; }
+    videoDeadHooks.push(() => musicOff());
+    const sync = () => { playing = !video.muted && !video.paused; setPlayingUI(); };
+    const mute = () => {
+        video.muted = true;
+        const p = video.play(); if (p && p.catch) p.catch(() => {});
+        sync();
+    };
+    // browser yang menolak suara tanpa gesture mem-pause video, bukan reject —
+    // jadi jatuh ke mode bisu (latar tetap jalan) lalu coba lagi saat diklik
+    const unmute = () => {
+        Viz.attach(video);
+        video.muted = false;
+        const p = video.play();
+        if (p && p.catch) p.catch(() => { mute(); armGesture(unmute); });
+        setTimeout(() => {
+            if (!video.muted && video.paused) { mute(); armGesture(unmute); }
             sync();
-        };
-        let gestureArmed = false;
-        const armGesture = () => {
-            if (gestureArmed) return;
-            gestureArmed = true;
-            const unlock = () => {
-                document.removeEventListener('pointerdown', unlock, true);
-                document.removeEventListener('keydown', unlock, true);
-                gestureArmed = false;
-                if (audioEl.muted && M.autoplay) unmute();
-            };
-            document.addEventListener('pointerdown', unlock, true);
-            document.addEventListener('keydown', unlock, true);
-        };
-        // A browser that refuses sound without a gesture pauses the video
-        // instead of rejecting — so fall back to muted playback, never a frozen
-        // background, and retry on the first click / key press.
-        const unmute = () => {
-            Visualizer.attach();
-            audioEl.muted = false;
-            const p = audioEl.play();
-            if (p && p.catch) p.catch(() => { mute(); armGesture(); });
-            setTimeout(() => {
-                if (!audioEl.muted && audioEl.paused) { mute(); armGesture(); }
-                sync();
-            }, 300);
-            sync();
-        };
+        }, 300);
+        sync();
+    };
+    $('play').onclick = () => (video.muted ? unmute() : mute());
+    video.addEventListener('volumechange', sync);
+    video.addEventListener('play', sync);
+    video.addEventListener('pause', sync);
+    if (M.autoplay !== false) unmute(); else sync();
+}
 
-        document.getElementById('play').onclick = () => {
-            if (audioEl.muted) unmute(); else mute();
-        };
-        audioEl.addEventListener('volumechange', sync);
-        audioEl.addEventListener('play', sync);
-        audioEl.addEventListener('pause', sync);
-        wireVolumeBar();
+let tracks = [], order = [], cur = 0;
 
-        if (M.autoplay) unmute(); else sync();
-    }
+function initTracks() {
+    tracks = (M.tracks || []).map(x => (typeof x === 'string' ? { src: x } : x)).filter(x => x && x.src);
+    if (!tracks.length) { musicOff(); $('plist').remove(); return; }
+    media = audio;
+    order = tracks.map((_, i) => i);
+    if (M.shuffle) for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+    if (tracks.length < 2) { $('prev').remove(); $('next').remove(); }
+    if (M.showPlaylist === false || tracks.length < 2) { $('listBtn').remove(); $('plist').remove(); }
+    else buildPlaylist();
 
-    function wireVolumeBar() {
-        const vbar = document.getElementById('vbar');
-        const setVol = e => {
-            const r = vbar.getBoundingClientRect();
-            let p = (e.clientX - r.left) / r.width;
-            p = Math.max(0, Math.min(1, p));
-            volumeTouched = true;
-            setVolume(p * 100, true);
-        };
-        let drag = false;
-        vbar.addEventListener('mousedown', e => { drag = true; setVol(e); });
-        window.addEventListener('mousemove', e => { if (drag) setVol(e); });
-        window.addEventListener('mouseup', () => drag = false);
-    }
+    audio.addEventListener('play', () => { playing = true; setPlayingUI(); });
+    audio.addEventListener('pause', () => { playing = false; setPlayingUI(); });
+    audio.addEventListener('ended', () => {
+        if (cur + 1 >= order.length && M.loop === false) return;
+        step(1);
+    });
+    audio.addEventListener('error', () => { if (tracks.length > 1) setTimeout(() => step(1), 600); });
 
-    /* ============================================================
-     * Tips rotator
-     * A tip list from the server replaces the config / locale one
-     * the moment it arrives, so the owner can rotate tips live
-     * without the page ever having heard of them.
-     * ============================================================ */
-    let tipTimer = null, tipKey = null;
-
-    function tipSources() {
-        if (serverTips && serverTips.length) return serverTips;
-        const T = CFG.tips || {};
-        if (T.override && T.override.length) return T.override;
-        return L.tips || [];
-    }
-
-    function applyTips() {
-        const T = CFG.tips || {};
-        const row = document.getElementById('tipRow');
-        if (!T.enabled) { row.style.display = 'none'; return; }
-        const list = tipSources().map(x => String(x == null ? '' : x).trim()).filter(Boolean);
-        const key = list.join('\n');
-        if (key === tipKey) return;
-        tipKey = key;
-        clearInterval(tipTimer);
-        tipTimer = null;
-        if (!list.length) { row.style.display = 'none'; return; }
-        row.style.display = '';
-        const el = document.getElementById('tipText');
-        const interval = T.intervalMs || 5000;
-        const fade = T.fadeMs || 400;
-        el.style.transition = `opacity ${fade}ms`;
-        el.style.opacity = 1;
-        let i = 0;
-        el.textContent = list[0];
-        if (list.length < 2) return;
-        tipTimer = setInterval(() => {
-            el.style.opacity = 0;
-            setTimeout(() => {
-                i = (i + 1) % list.length;
-                el.textContent = list[i];
-                el.style.opacity = 1;
-            }, fade);
-        }, interval);
-    }
-
-    /* ============================================================
-     * Rules acceptance gate
-     * Shown only when bridge/server.lua says this identifier still
-     * owes an acceptance for the current rules version, and the
-     * screen is held open by the client bridge until it is answered.
-     * ============================================================ */
-    let gateShown = false, gateAnswered = false, pendingGate = null;
-
-    function gateRules() {
-        const list = Array.isArray(CFG.rules) ? CFG.rules : (L.rules || []);
-        return list.map(x => String(x == null ? '' : x).trim()).filter(Boolean);
-    }
-
-    function showGate(version) {
-        if (gateShown || gateAnswered) return;
-        if (!booted) { pendingGate = version == null ? '' : version; return; }
-        const G = CFG.rulesGate || {};
-        const el = document.getElementById('gate');
-        const body = document.getElementById('gateBody');
-        const accept = document.getElementById('gateAccept');
-        const decline = document.getElementById('gateDecline');
-        const hint = document.getElementById('gateHint');
-        gateShown = true;
-
-        document.getElementById('gateTitle').textContent = t('gateTitle', 'Server rules');
-        document.getElementById('gateIntro').textContent =
-            t('gateIntro', 'Read the rules through and accept them to finish joining.');
-        const versionEl = document.getElementById('gateVersion');
-        const vs = String(version == null ? '' : version).trim();
-        if (vs) {
-            versionEl.textContent = t('gateVersion', 'Version {v}').replace('{v}', vs);
-        } else {
-            versionEl.style.display = 'none';
-        }
-
-        body.innerHTML = '';
-        gateRules().forEach((text, i) => {
-            const row = document.createElement('div');
-            row.className = 'rule';
-            const n = document.createElement('span');
-            n.className = 'n';
-            n.textContent = String(i + 1).padStart(2, '0');
-            row.appendChild(n);
-            row.appendChild(document.createTextNode(text));
-            body.appendChild(row);
-        });
-
-        accept.textContent = t('gateAccept', 'I accept');
-        decline.textContent = t('gateDecline', 'Decline');
-        if (G.showDecline === false) decline.style.display = 'none';
-
-        const dim = Number(G.dim);
-        if (Number.isFinite(dim)) {
-            el.style.background = `rgba(4, 6, 10, ${Math.max(0, Math.min(1, dim))})`;
-        }
-
-        const requireScroll = G.requireScroll !== false;
-        let unlocked = !requireScroll;
-        function paintHint() {
-            hint.textContent = '';
-            hint.appendChild(makeIcon(unlocked ? 'check' : 'arrow-down'));
-            hint.appendChild(document.createTextNode(unlocked
-                ? t('gateReadyHint', 'Rules read — you can accept now.')
-                : t('gateScrollHint', 'Scroll to the end of the rules to continue.')));
-            hint.classList.toggle('ready', unlocked);
-            accept.disabled = !unlocked;
-        }
-        paintHint();
-        if (requireScroll) {
-            body.addEventListener('scroll', () => {
-                if (unlocked) return;
-                if (body.scrollTop + body.clientHeight >= body.scrollHeight - 8) {
-                    unlocked = true;
-                    paintHint();
-                }
-            });
-            // A rules list short enough to fit has already been read in full.
-            requestAnimationFrame(() => {
-                if (!unlocked && body.scrollHeight <= body.clientHeight + 8) {
-                    unlocked = true;
-                    paintHint();
-                }
-            });
-        }
-
-        // A post that never lands hands the buttons back rather than leaving
-        // the player on a dead panel.
-        function retryable(btn, label) {
-            return () => {
-                btn.disabled = false;
-                btn.textContent = label;
-                if (btn === accept) decline.disabled = false;
-            };
-        }
-        accept.onclick = () => {
-            if (accept.disabled) return;
-            const label = accept.textContent;
-            accept.disabled = true;
-            decline.disabled = true;
-            accept.textContent = t('gateSaving', 'Saving…');
-            NUI.post('lrlRulesAccept', { version: vs }).catch(retryable(accept, label));
-        };
-        decline.onclick = () => {
-            const label = decline.textContent;
-            decline.disabled = true;
-            NUI.post('lrlRulesDecline', { locale: CFG.locale || 'en' }).catch(retryable(decline, label));
-        };
-
-        el.classList.add('on');
-    }
-
-    function hideGate() {
-        gateAnswered = true;
-        pendingGate = null;
-        const el = document.getElementById('gate');
-        if (el) el.classList.remove('on');
-    }
-
-    /* ============================================================
-     * Progress (real + simulated)
-     * ============================================================ */
-    let displayed = 0, target = 0, rafId = null, simTimer = null, realProgress = false;
-    let handoverAt = 0, handoverFrom = 0, statusHoldUntil = 0, lastFrameAt = 0;
-    function getStages() {
-        return (L.stages && L.stages.length) ? L.stages : ['Loading'];
-    }
-    // The bar redraws on every animation frame while the map streams, so the
-    // rows it touches are built once and then written through text nodes: no
-    // parsing, no element churn, and nothing is written when the value has not
-    // actually changed.
-    let ui = null, lastWidth = '', lastPct = -1, lastStage = '', lastStatus = '';
-    function progressUI() {
-        if (ui) return ui;
-        const pct = document.getElementById('pct');
-        const status = document.getElementById('status');
-        const pctValue = document.createTextNode('0');
-        const pctUnit = document.createElement('small');
-        pctUnit.textContent = '%';
-        pct.textContent = '';
-        pct.appendChild(pctValue);
-        pct.appendChild(pctUnit);
-        const statusValue = document.createTextNode('');
-        const caret = document.createElement('span');
-        caret.className = 'bk';
-        caret.textContent = '…';
-        status.textContent = '';
-        status.appendChild(statusValue);
-        status.appendChild(caret);
-        ui = {
-            fill: document.getElementById('fill'),
-            stage: document.getElementById('stageLabel'),
-            pct: pctValue,
-            status: statusValue
-        };
-        return ui;
-    }
-    // A game log line owns the status row for holdMs, otherwise the next
-    // animation frame would overwrite it with the stage name before it can be
-    // read. The stage name simply resumes when the hold expires.
-    function setStatus(text, holdMs) {
-        if (!holdMs && performance.now() < statusHoldUntil) return;
-        const s = String(text);
-        if (s !== lastStatus) {
-            progressUI().status.nodeValue = s;
-            lastStatus = s;
-        }
-        if (holdMs) statusHoldUntil = performance.now() + holdMs;
-    }
-    function renderProgress(frac) {
-        const u = progressUI();
-        const f = Math.max(0, Math.min(1, frac));
-        const width = (f * 100).toFixed(2) + '%';
-        if (width !== lastWidth) { u.fill.style.width = width; lastWidth = width; }
-        const intPct = Math.round(f * 100);
-        if (intPct !== lastPct) { u.pct.nodeValue = intPct; lastPct = intPct; }
-        const stages = getStages();
-        const idx = Math.min(stages.length - 1, Math.floor(f * stages.length));
-        const stageNum = String(idx + 1).padStart(2, '0');
-        const total = String(stages.length).padStart(2, '0');
-        const label = f >= 1 ? t('ready', 'Ready') : t('stageOf', 'Stage {n} / {total}')
-            .replace('{n}', stageNum).replace('{total}', total);
-        if (label !== lastStage) { u.stage.textContent = label; lastStage = label; }
-        if (f >= 1) statusHoldUntil = 0;
-        setStatus(f >= 1 ? t('ready', 'Ready') : stages[idx]);
-    }
-    // Eased with the real frame delta rather than a fixed per-frame share, so a
-    // client rendering at 30 fps reaches the target in the same wall-clock time
-    // as one at 144.
-    function tick(now) {
-        const dt = lastFrameAt ? Math.min(100, now - lastFrameAt) : 16.67;
-        lastFrameAt = now;
-        const diff = target - displayed;
-        if (Math.abs(diff) < 0.0005) {
-            displayed = target;
-            renderProgress(displayed);
-            rafId = null;
-            lastFrameAt = 0;
-            return;
-        }
-        displayed += diff * (1 - Math.pow(0.92, dt / 16.67));
-        renderProgress(displayed);
-        rafId = requestAnimationFrame(tick);
-    }
-    function setTarget(v) {
-        target = Math.max(target, Math.max(0, Math.min(1, v)));
-        if (rafId === null) { lastFrameAt = 0; rafId = requestAnimationFrame(tick); }
-    }
-    // The simulation only fills the bar until the game reports for real. On the
-    // first loadProgress the travel that is left is remapped onto the real
-    // fraction, so control passes over without the bar ever jumping backwards.
-    function takeOverProgress(fraction) {
-        realProgress = true;
-        clearInterval(simTimer);
-        handoverAt = target;
-        handoverFrom = Math.max(0, Math.min(1, Number(fraction) || 0));
-    }
-    function realToBar(fraction) {
-        const f = Math.max(0, Math.min(1, Number(fraction) || 0));
-        if (handoverAt >= 1 || handoverFrom >= 1) return 1;
-        return handoverAt + (Math.max(f, handoverFrom) - handoverFrom) * (1 - handoverAt) / (1 - handoverFrom);
-    }
-    function startSimulation() {
-        const P = CFG.progress || {};
-        cancelAnimationFrame(rafId); rafId = null; lastFrameAt = 0;
-        displayed = 0; target = 0;
-        handoverAt = 0; handoverFrom = 0;
-        renderProgress(0);
-        clearInterval(simTimer);
-        if (!P.simulate) return;
-        simTimer = setInterval(() => {
-            if (target >= 0.999) { clearInterval(simTimer); return; }
-            const step = (P.stepMin || 0.02) + Math.random() * ((P.stepMax || 0.07) - (P.stepMin || 0.02));
-            setTarget(Math.min(1, target + step));
-        }, P.intervalMs || 380);
-    }
-    window.addEventListener('message', e => {
-        const d = e.data || {};
-        if (d.eventName === 'loadProgress') {
-            if (!realProgress) takeOverProgress(d.loadFraction);
-            setTarget(realToBar(d.loadFraction));
-        } else if (d.eventName === 'onLogLine' && d.message) {
-            const P = CFG.progress || {};
-            setStatus(d.message, P.logHoldMs != null ? P.logHoldMs : 2500);
-        } else if (d.eventName === 'serverStats') {
-            lastStats = d;
-            updateStatusChip(d);
-            const sn = typeof d.serverName === 'string' ? d.serverName.trim() : '';
-            if (sn && sn !== liveServerName) {
-                liveServerName = sn;
-                if (booted && wantsLiveTitle()) guard(applyBrand);
-            }
-        } else if (d.eventName === 'setPlayerName') {
-            pendingName = d.name || '';
-            if (typeof window.__lrrSetName === 'function') window.__lrrSetName(pendingName);
-        } else if (d.eventName === 'serverContent') {
-            if (Array.isArray(d.news)) serverNews = d.news;
-            if (Array.isArray(d.tips)) serverTips = d.tips;
-            if (booted) { guard(applyInfoPanel); guard(applyTips); }
-        } else if (d.eventName === 'rulesGate') {
-            guard(() => showGate(d.version));
-        } else if (d.eventName === 'rulesAccepted' || d.eventName === 'rulesGateOff') {
-            guard(hideGate);
-        } else if (d.eventName === 'storedVolume') {
-            if (rememberVolume && !volumeTouched) guard(() => setVolume(Number(d.volume), false));
-        } else if (d.eventName === 'fadeOut') {
-            fadeOut(Number(d.durationMs) > 0 ? Number(d.durationMs) : 600);
-        }
+    $('play').onclick = () => (audio.paused ? tryPlay() : audio.pause());
+    if ($('prev')) $('prev').onclick = () => step(-1);
+    if ($('next')) $('next').onclick = () => step(1);
+    if ($('listBtn')) $('listBtn').onclick = () => togglePlaylist();
+    document.addEventListener('pointerdown', e => {
+        const pl = $('plist');
+        if (pl && pl.classList.contains('on') && !pl.contains(e.target) && !$('listBtn').contains(e.target)) togglePlaylist(false);
     });
 
-    /* ============================================================
-     * Fade out — sent by bridge/handover.lua right before the screen
-     * is shut down (loadscreen_manual_shutdown). The page dims and the
-     * music ramps to silence, so the NUI is already gone visually by
-     * the time it is destroyed.
-     * ============================================================ */
-    let fading = false;
-    function fadeOut(ms) {
-        if (fading) return;
-        fading = true;
-        clearInterval(simTimer);
-        document.body.style.transition = `opacity ${ms}ms var(--lr-ease-in)`;
-        document.body.style.opacity = '0';
-        const video = document.getElementById('bgVideo');
-        const from = userVolume;
-        const t0 = performance.now();
-        const ramp = () => {
-            const k = Math.min(1, (performance.now() - t0) / ms);
-            applyVolume(Math.max(0, from * (1 - k)));
-            if (k < 1) { requestAnimationFrame(ramp); return; }
-            if (audioEl) audioEl.pause();
-            try { video.pause(); } catch {}
-        };
-        requestAnimationFrame(ramp);
+    load(0);
+    if (M.autoplay !== false) tryPlay();
+}
+
+function titleOf(i) {
+    const tr = tracks[i];
+    return tr.title || decodeURIComponent(String(tr.src).split('/').pop().replace(/\.[^.]+$/, ''));
+}
+
+function load(pos) {
+    cur = (pos + order.length) % order.length;
+    audio.src = tracks[order[cur]].src;
+    $('trk').textContent = titleOf(order[cur]);
+    markPlaylist();
+}
+
+function step(d) {
+    const was = !audio.paused || d !== 0;
+    load(cur + d);
+    if (was) tryPlay();
+}
+
+function tryPlay() {
+    Viz.attach(audio);
+    const p = audio.play();
+    if (p && p.catch) p.catch(() => armGesture(tryPlay));
+}
+
+function buildPlaylist() {
+    const body = $('plistBody');
+    body.textContent = '';
+    order.forEach((ti, pos) => {
+        const b = el('button', 'pt');
+        b.appendChild(el('span', 'i', String(pos + 1).padStart(2, '0')));
+        b.appendChild(el('span', 't', titleOf(ti)));
+        b.onclick = () => { load(pos); tryPlay(); };
+        body.appendChild(b);
+    });
+    markPlaylist();
+}
+
+function markPlaylist() {
+    const body = $('plistBody');
+    if (!body) return;
+    [...body.children].forEach((b, i) => b.classList.toggle('on', i === cur));
+    $('plistCount').textContent = `${cur + 1} / ${order.length}`;
+}
+
+function togglePlaylist(force) {
+    const pl = $('plist');
+    const on = force != null ? force : !pl.classList.contains('on');
+    pl.classList.toggle('on', on);
+    $('listBtn').classList.toggle('on', on);
+}
+
+/* ================= Visualizer (sampul = spektrum) =================
+ * Dibatasi fps, berhenti total saat musik diam dan bar sudah turun. */
+const Viz = (() => {
+    const VC = M.visualizer || {};
+    const on = M.enabled && VC.enabled !== false;
+    const n = clamp(num(VC.bars, 14), 4, 48);
+    const sens = num(VC.sensitivity, 1);
+    const frameMs = 1000 / clamp(num(VC.fps, 30), 10, 60);
+    let barsCv, waveCv, bctx, wctx, color = '#5fe0ff';
+    let analyser = null, pendingCtx = null, freq = null, wave = null, tried = new WeakSet(), lastElm = null;
+    const lv = new Array(n).fill(0.05), ph = [];
+    let raf = 0, last = 0;
+
+    function size(cv) {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        cv.width = Math.max(1, Math.round(cv.clientWidth * dpr));
+        cv.height = Math.max(1, Math.round(cv.clientHeight * dpr));
+        const c = cv.getContext('2d');
+        c.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return c;
     }
 
-    /* ============================================================
-     * Particles canvas (rising dots)
-     * ============================================================ */
-    function startParticles() {
-        const P = CFG.particles || {};
-        const canvas = document.getElementById('particles');
-        if (!P.enabled) { canvas.style.display = 'none'; return; }
-        const ctx = canvas.getContext('2d');
-        const palette = P.palette || [
-            { r: 220, g: 232, b: 248, weight: 0.65 },
-            { r: 150, g: 220, b: 255, weight: 0.25 },
-            { r: 200, g: 180, b: 255, weight: 0.10 }
-        ];
-        const totalWeight = palette.reduce((s, c) => s + (c.weight || 0), 0) || 1;
+    // hanya sumber same-origin: createMediaElementSource pada URL lintas
+    // origin tanpa CORS membuat suaranya jadi senyap
+    function attach(elm) {
+        if (!on || VC.analyse === false || analyser || pendingCtx || tried.has(elm)) return;
+        tried.add(elm);
+        lastElm = elm;
+        const src = elm.currentSrc || elm.src || '';
+        if (src && src.indexOf(location.origin) !== 0) return;
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        let ctx;
+        try { ctx = new AC(); } catch (e) { return; }
+        const finish = () => {
+            pendingCtx = null;
+            if (ctx.state !== 'running') { try { ctx.close(); } catch (e) {} tried.delete(elm); return; }
+            try {
+                const node = ctx.createMediaElementSource(elm);
+                analyser = ctx.createAnalyser();
+                analyser.fftSize = 256;
+                analyser.smoothingTimeConstant = clamp(num(VC.smoothing, 0.72), 0, 0.95);
+                node.connect(analyser);
+                analyser.connect(ctx.destination);
+                freq = new Uint8Array(analyser.frequencyBinCount);
+                wave = new Uint8Array(analyser.fftSize);
+            } catch (e) { analyser = null; try { ctx.close(); } catch (e2) {} }
+        };
+        if (ctx.state === 'suspended') {
+            pendingCtx = ctx;
+            ctx.resume().then(finish, () => { pendingCtx = null; tried.delete(elm); });
+        } else finish();
+    }
 
-        // Every dot is the same picture at a different size and opacity, so each
-        // palette colour is drawn once into an offscreen canvas and blitted from
-        // there. Building the gradient per dot per frame is what used to cost
-        // thousands of allocations a second while the map streams in.
-        const sizeMax = P.sizeMax || 1.5;
-        const haloMul = P.haloMultiplier || 3.5;
-        const haloOpacity = P.haloOpacity != null ? P.haloOpacity : 0.45;
-        const SUPERSAMPLE = 4;
-        const spriteRadius = Math.max(1, Math.ceil(sizeMax * haloMul * SUPERSAMPLE));
-        const sprites = palette.map(c => {
-            const s = document.createElement('canvas');
-            s.width = s.height = spriteRadius * 2;
-            const sctx = s.getContext('2d');
-            const mid = spriteRadius;
-            const grad = sctx.createRadialGradient(mid, mid, 0, mid, mid, spriteRadius);
-            grad.addColorStop(0, `rgba(${c.r},${c.g},${c.b},${haloOpacity})`);
-            grad.addColorStop(1, `rgba(${c.r},${c.g},${c.b},0)`);
-            sctx.fillStyle = grad;
-            sctx.fillRect(0, 0, s.width, s.height);
-            sctx.fillStyle = `rgb(${c.r},${c.g},${c.b})`;
-            sctx.beginPath();
-            sctx.arc(mid, mid, spriteRadius / haloMul, 0, Math.PI * 2);
-            sctx.fill();
-            return s;
-        });
-        function pickSprite() {
-            const r = Math.random() * totalWeight;
-            let acc = 0;
-            for (let i = 0; i < palette.length; i++) {
-                acc += (palette[i].weight || 0);
-                if (r <= acc) return sprites[i];
+    function targets(now) {
+        const out = new Array(n);
+        if (!playing) { out.fill(0.05); return out; }
+        if (analyser) {
+            analyser.getByteFrequencyData(freq);
+            const bins = freq.length;
+            let sum = 0;
+            for (let i = 0; i < n; i++) {
+                const lo = Math.floor(Math.pow(i / n, 1.7) * bins);
+                const hi = Math.max(lo + 1, Math.floor(Math.pow((i + 1) / n, 1.7) * bins));
+                let acc = 0;
+                for (let b = lo; b < hi && b < bins; b++) acc += freq[b];
+                out[i] = clamp((acc / (hi - lo)) / 255 * sens * (1 + i / n), 0, 1);
+                sum += out[i];
             }
-            return sprites[0];
+            if (sum > 0.02) return out;
         }
+        for (let i = 0; i < n; i++) {
+            const p = ph[i];
+            const s = Math.sin(now * 0.0042 + p) * 0.5 + Math.sin(now * 0.0113 + p * 2.3) * 0.32 + Math.sin(now * 0.0007 + p * 0.7) * 0.18;
+            out[i] = clamp((0.52 + s * 0.48) * (1 - (i / n) * 0.45), 0.06, 1);
+        }
+        return out;
+    }
 
-        let w = 0, h = 0, dpr = 1, parts = [];
-
-        function resize() {
-            dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-            w = canvas.clientWidth || window.innerWidth;
-            h = canvas.clientHeight || window.innerHeight;
-            canvas.width = Math.round(w * dpr);
-            canvas.height = Math.round(h * dpr);
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            const target = Math.round((w * h) / (P.density || 32000));
-            const count = Math.max(P.minCount || 30, Math.min(P.maxCount || 60, target));
-            parts = [];
-            for (let i = 0; i < count; i++) parts.push(spawn(true));
+    function draw(now) {
+        raf = requestAnimationFrame(draw);
+        if (now - last < frameMs) return;
+        last = now;
+        const tg = targets(now);
+        let moving = playing;
+        for (let i = 0; i < n; i++) {
+            const k = tg[i] > lv[i] ? 0.55 : 0.18;
+            lv[i] += (tg[i] - lv[i]) * k;
+            if (Math.abs(tg[i] - lv[i]) > 0.004) moving = true;
         }
-        function spawn(initial) {
-            return {
-                x: Math.random() * w,
-                y: initial ? Math.random() * h : h + Math.random() * 30,
-                r: (P.sizeMin || 0.5) + Math.random() * ((P.sizeMax || 1.5) - (P.sizeMin || 0.5)),
-                vy: (P.speedMin || 0.12) + Math.random() * ((P.speedMax || 0.47) - (P.speedMin || 0.12)),
-                drift: (Math.random() - 0.5) * 0.12,
-                phase: Math.random() * Math.PI * 2,
-                wob: 0.2 + Math.random() * 0.4,
-                life: 0,
-                ttl: 800 + Math.random() * 1200,
-                sprite: pickSprite(),
-                alpha: (P.alphaMin || 0.18) + Math.random() * ((P.alphaMax || 0.6) - (P.alphaMin || 0.18))
-            };
-        }
-        let last = performance.now();
-        function step(now) {
-            const dt = Math.min(2.5, (now - last) / 16.67);
-            last = now;
-            ctx.clearRect(0, 0, w, h);
-            for (let i = 0; i < parts.length; i++) {
-                const p = parts[i];
-                p.life += dt;
-                p.phase += 0.008 * dt;
-                p.y -= p.vy * dt;
-                p.x += (Math.sin(p.phase) * p.wob * 0.25 + p.drift) * dt;
-                const tin = Math.min(1, p.life / 60);
-                const tout = Math.min(1, (p.ttl - p.life) / 100);
-                const yfade = Math.min(1, p.y / (h * 0.18));
-                const a = p.alpha * tin * Math.max(0, tout) * yfade;
-                if (a > 0.002) {
-                    const halo = p.r * haloMul;
-                    ctx.globalAlpha = a;
-                    ctx.drawImage(p.sprite, p.x - halo, p.y - halo, halo * 2, halo * 2);
-                }
-                if (p.y < -10 || p.life > p.ttl) parts[i] = spawn(false);
+        if (bctx) {
+            const w = barsCv.clientWidth, h = barsCv.clientHeight, pad = 5;
+            const inner = w - pad * 2, gap = Math.max(1, inner / n * 0.32), bw = (inner - gap * (n - 1)) / n;
+            bctx.clearRect(0, 0, w, h);
+            bctx.fillStyle = color;
+            for (let i = 0; i < n; i++) {
+                const bh = Math.max(1.5, lv[i] * (h - pad * 2));
+                bctx.globalAlpha = 0.35 + lv[i] * 0.65;
+                bctx.fillRect(pad + i * (bw + gap), h - pad - bh, bw, bh);
             }
-            ctx.globalAlpha = 1;
-            requestAnimationFrame(step);
+            bctx.globalAlpha = 1;
         }
+        if (wctx) {
+            const w = waveCv.clientWidth, h = waveCv.clientHeight, mid = h / 2;
+            wctx.clearRect(0, 0, w, h);
+            wctx.beginPath();
+            const real = analyser && playing;
+            if (real) analyser.getByteTimeDomainData(wave);
+            const steps = clamp(Math.round(w / 3), 24, 80);
+            for (let i = 0; i <= steps; i++) {
+                const p = i / steps;
+                let v = 0;
+                if (real) v = (wave[Math.floor(p * (wave.length - 1))] - 128) / 128;
+                else if (playing) v = Math.sin(p * 18 + now * 0.006) * (lv[Math.floor(p * (n - 1))] || 0) * 0.9;
+                const y = mid - clamp(v * sens, -1, 1) * (mid - 1);
+                if (i === 0) wctx.moveTo(0, y); else wctx.lineTo(p * w, y);
+            }
+            wctx.strokeStyle = color;
+            wctx.globalAlpha = playing ? 0.75 : 0.28;
+            wctx.lineWidth = 1.4;
+            wctx.stroke();
+            wctx.globalAlpha = 1;
+        }
+        if (!moving) { cancelAnimationFrame(raf); raf = 0; }
+    }
+
+    function start() {
+        barsCv = $('vizBars'); waveCv = $('vizWave');
+        if (!on) { barsCv.remove(); waveCv.remove(); return; }
+        if (VC.wave === false) { waveCv.remove(); waveCv = null; }
+        color = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || color;
+        for (let i = 0; i < n; i++) ph[i] = i * 1.7 + Math.random() * 6.28;
+        const resize = () => { bctx = size(barsCv); if (waveCv) wctx = size(waveCv); wake(); };
+        resize();
         window.addEventListener('resize', resize);
-        requestAnimationFrame(() => { resize(); requestAnimationFrame(step); });
-    }
-
-    /* ============================================================
-     * Dev dock (replay)
-     * ============================================================ */
-    function applyDevDock() {
-        const d = document.getElementById('dock');
-        if (!CFG.devDock) return;
-        d.classList.add('on');
-        document.getElementById('replay').onclick = () => {
-            document.querySelectorAll('.a1,.a2,.a3,.a4').forEach(el => {
-                el.style.animation = 'none'; void el.offsetHeight; el.style.animation = '';
-            });
-            realProgress = false;
-            startSimulation();
+        // AudioContext yang ditolak sebelum ada interaksi biasanya diizinkan sesudahnya
+        const retry = () => {
+            if (analyser) return;
+            if (pendingCtx) { pendingCtx.resume().catch(() => {}); return; }
+            if (lastElm) { tried.delete(lastElm); attach(lastElm); }
         };
+        document.addEventListener('pointerdown', retry, true);
+        document.addEventListener('keydown', retry, true);
     }
 
-    /* ============================================================
-     * Boot
-     * Every step is isolated: one bad config key may cost its own
-     * feature, never the whole loading screen.
-     * ============================================================ */
-    function guard(fn) {
-        try { fn(); } catch (e) { console.error('[lastresort_loading]', fn.name || 'step', e); }
-    }
+    function wake() { if (on && bctx && !raf) { last = 0; raf = requestAnimationFrame(draw); } }
 
-    (async function boot() {
-        guard(seedFromHandover);
-        guard(openChannel);
-        guard(applyTheme);
-        guard(applyBackground);
-        guard(applyPattern);
-        guard(applyScrim);
-        guard(applyGrain);
-        guard(applyCorners);
-        // The welcome line and the status chip are painted BEFORE the locale
-        // fetch resolves, on the built-in English fallbacks. The bridge starts
-        // pushing the player name and the live player count within the first
-        // frames, and a chip that does not exist yet has nowhere to put them —
-        // that is what used to make the numbers show up late, or not at all.
-        guard(applyBrand);
-        guard(applyStatusChip);
-        L = await loadLocale(CFG.locale || 'en');
-        guard(applyBrand);
-        guard(applyLogo);
-        guard(applyStatusChip);
-        guard(applyInfoPanel);
-        guard(applySocials);
-        guard(applyImage);
-        guard(applyVideo);
-        guard(applyMusic);
-        guard(applyTips);
-        guard(applyDevDock);
-        guard(startParticles);
-        booted = true;
-        if (pendingGate !== null) guard(() => showGate(pendingGate));
-        if (!realProgress) guard(startSimulation);
-    })();
+    return { start, attach, wake, stop() { cancelAnimationFrame(raf); raf = 0; } };
+})();
+
+/* ================= Tips ================= */
+let tipTimer = null, tipSig = '';
+
+function tipList() {
+    if (state.tips && state.tips.length) return state.tips;
+    const T = C.tips || {};
+    if (Array.isArray(T.override) && T.override.length) return T.override;
+    return Array.isArray(L.tips) ? L.tips : [];
+}
+
+function applyTips() {
+    const T = C.tips || {};
+    const row = $('tipRow');
+    const list = tipList();
+    if (T.enabled === false || !list.length) { row.style.display = 'none'; clearInterval(tipTimer); return; }
+    row.style.display = '';
+    const sig = list.join('\n');
+    if (sig === tipSig) return;
+    tipSig = sig;
+    clearInterval(tipTimer);
+    const txt = $('tipText');
+    const fade = num(T.fadeMs, 400);
+    txt.style.transitionDuration = fade + 'ms';
+    let i = 0;
+    txt.textContent = list[0];
+    if (list.length < 2) return;
+    tipTimer = setInterval(() => {
+        txt.style.opacity = '0';
+        setTimeout(() => { i = (i + 1) % list.length; txt.textContent = list[i]; txt.style.opacity = '1'; }, fade);
+    }, Math.max(fade * 2 + 200, num(T.intervalMs, 5000)));
+}
+
+/* ================= Progress =================
+ * Disimulasikan sampai FiveM mengirim loadProgress pertama; sisa jarak lalu
+ * dipetakan ke progress asli supaya bar tidak pernah mundur. */
+const P = C.progress || {};
+let shown = 0, target = 0, raf = 0, lastT = 0;
+let realMode = false, hoAt = 0, hoFrom = 0, simTimer = null, holdUntil = 0;
+let fillEl, pctNode, statusNode, wLast = '', pLast = -1, sLast = '', stLast = '';
+
+function progressInit() {
+    fillEl = $('fill');
+    const pct = $('pct');
+    pctNode = document.createTextNode('0');
+    pct.appendChild(pctNode);
+    pct.appendChild(el('small', null, '%'));
+    const st = $('status');
+    statusNode = document.createTextNode('');
+    st.appendChild(statusNode);
+    st.appendChild(el('i', null, '…'));
+}
+
+function stages() { return Array.isArray(L.stages) && L.stages.length ? L.stages : ['Loading']; }
+
+function setStatus(text, hold) {
+    if (!hold && performance.now() < holdUntil) return;
+    const s = String(text);
+    if (s !== stLast) { statusNode.nodeValue = s; stLast = s; }
+    if (hold) holdUntil = performance.now() + hold;
+}
+
+function render(f) {
+    f = clamp(f, 0, 1);
+    const w = (f * 100).toFixed(1) + '%';
+    if (w !== wLast) { fillEl.style.width = w; wLast = w; }
+    const p = Math.round(f * 100);
+    if (p !== pLast) { pctNode.nodeValue = p; pLast = p; }
+    const st = stages();
+    const idx = Math.min(st.length - 1, Math.floor(f * st.length));
+    const label = f >= 1 ? t('ready', 'Ready') : fmt(t('stageOf', 'Stage {n} / {total}'), {
+        n: String(idx + 1).padStart(2, '0'), total: String(st.length).padStart(2, '0')
+    });
+    if (label !== sLast) { $('stageLabel').textContent = label; sLast = label; }
+    if (f >= 1) holdUntil = 0;
+    setStatus(f >= 1 ? t('ready', 'Ready') : st[idx]);
+}
+
+function tick(now) {
+    const dt = lastT ? Math.min(100, now - lastT) : 16.67;
+    lastT = now;
+    const diff = target - shown;
+    if (Math.abs(diff) < 0.0005) { shown = target; render(shown); raf = 0; lastT = 0; return; }
+    shown += diff * (1 - Math.pow(0.92, dt / 16.67));
+    render(shown);
+    raf = requestAnimationFrame(tick);
+}
+
+function setTarget(v) {
+    target = Math.max(target, clamp(v, 0, 1));
+    if (!raf) { lastT = 0; raf = requestAnimationFrame(tick); }
+}
+
+function realToBar(f) {
+    f = clamp(Number(f) || 0, 0, 1);
+    if (hoAt >= 1 || hoFrom >= 1) return 1;
+    return hoAt + (Math.max(f, hoFrom) - hoFrom) * (1 - hoAt) / (1 - hoFrom);
+}
+
+function startProgress() {
+    render(0);
+    if (P.simulate === false || realMode) return;
+    const a = num(P.stepMin, 0.02), b = num(P.stepMax, 0.07);
+    simTimer = setInterval(() => {
+        // simulasi berhenti di 90% — sisanya menunggu progress asli
+        if (target >= 0.9) { clearInterval(simTimer); return; }
+        setTarget(Math.min(0.9, target + a + Math.random() * (b - a)));
+    }, num(P.intervalMs, 380));
+}
+
+/* ================= Gerbang peraturan ================= */
+let gateVer = null, gateBusy = false, pendingGate = null;
+
+function showGate(version) {
+    const G = C.rulesGate || {};
+    gateVer = version;
+    gateBusy = false;
+    const gate = $('gate');
+    gate.style.background = `rgba(4,6,10,${num(G.dim, 0.72)})`;
+    $('gateTitle').textContent = t('gateTitle', 'Server rules');
+    $('gateIntro').textContent = t('gateIntro', '');
+    $('gateVersion').textContent = fmt(t('gateVersion', 'Version {v}'), { v: version });
+    const body = $('gateBody');
+    body.textContent = '';
+    rulesList().forEach((r, i) => {
+        const row = el('div', 'rule');
+        row.appendChild(el('span', 'n', String(i + 1).padStart(2, '0')));
+        row.appendChild(el('span', null, r));
+        body.appendChild(row);
+    });
+    const acc = $('gateAccept'), dec = $('gateDecline'), hint = $('gateHint');
+    acc.textContent = t('gateAccept', 'Accept');
+    dec.textContent = t('gateDecline', 'Decline');
+    dec.style.display = G.showDecline === false ? 'none' : '';
+    dec.disabled = false;
+
+    const setHint = ready => {
+        hint.textContent = '';
+        hint.classList.toggle('ready', ready);
+        hint.appendChild(icon(ready ? 'check-circle' : 'arrow-down'));
+        hint.appendChild(el('span', null, ready ? t('gateReadyHint', '') : t('gateScrollHint', '')));
+        acc.disabled = !ready;
+    };
+    const check = () => {
+        if (gateBusy) return;
+        const end = body.scrollTop + body.clientHeight >= body.scrollHeight - 4;
+        if (end || G.requireScroll === false) { setHint(true); body.onscroll = null; }
+    };
+    setHint(G.requireScroll === false);
+    body.scrollTop = 0;
+    body.onscroll = check;
+    gate.classList.add('on');
+    requestAnimationFrame(check);
+
+    acc.onclick = () => {
+        if (gateBusy) return;
+        gateBusy = true;
+        acc.disabled = dec.disabled = true;
+        acc.textContent = t('gateSaving', 'Saving…');
+        post('flsGateAccept', { version: gateVer }).catch(() => {
+            gateBusy = false; acc.disabled = dec.disabled = false; acc.textContent = t('gateAccept', 'Accept');
+        });
+    };
+    dec.onclick = () => {
+        if (gateBusy) return;
+        gateBusy = true;
+        acc.disabled = dec.disabled = true;
+        post('flsGateDecline', { message: t('gateDeclined', 'You must accept the rules.') }).catch(() => {
+            gateBusy = false; acc.disabled = dec.disabled = false;
+        });
+    };
+}
+
+function hideGate() { $('gate').classList.remove('on'); gateVer = null; }
+
+/* ================= Partikel naik =================
+ * Halo dirender sekali ke sprite lalu di-blit; fps dibatasi; DPR 1. */
+let partStop = null;
+
+function startParticles() {
+    const Q = C.particles || {};
+    const cv = $('particles');
+    if (!Q.enabled) { cv.remove(); return; }
+    const ctx = cv.getContext('2d');
+    const halo = num(Q.haloMultiplier, 3.5);
+    const frameMs = 1000 / clamp(num(Q.fps, 30), 10, 60);
+    const pal = (Q.palette && Q.palette.length) ? Q.palette : [{ r: 220, g: 232, b: 248, weight: 1 }];
+    const wsum = pal.reduce((s, c) => s + num(c.weight, 1), 0);
+
+    const sprites = pal.map(c => {
+        const S = 64, s = document.createElement('canvas');
+        s.width = s.height = S;
+        const g = s.getContext('2d');
+        const rgb = `${c.r},${c.g},${c.b}`;
+        const grd = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+        const core = 1 / halo;
+        grd.addColorStop(0, `rgba(${rgb},1)`);
+        grd.addColorStop(core * 0.9, `rgba(${rgb},1)`);
+        grd.addColorStop(Math.min(0.99, core * 1.15), `rgba(${rgb},${num(Q.haloOpacity, 0.45)})`);
+        grd.addColorStop(1, `rgba(${rgb},0)`);
+        g.fillStyle = grd;
+        g.fillRect(0, 0, S, S);
+        return s;
+    });
+    const pick = () => {
+        let r = Math.random() * wsum;
+        for (let i = 0; i < pal.length; i++) { r -= num(pal[i].weight, 1); if (r <= 0) return i; }
+        return 0;
+    };
+    const rnd = (a, b) => a + Math.random() * (b - a);
+
+    let W = 0, H = 0, list = [];
+    const spawn = (p, anywhere) => {
+        p.r = rnd(num(Q.sizeMin, 0.5), num(Q.sizeMax, 1.5));
+        p.R = p.r * halo;
+        p.x = Math.random() * W;
+        p.y = anywhere ? Math.random() * H : H + p.R;
+        p.v = rnd(num(Q.speedMin, 0.12), num(Q.speedMax, 0.47));
+        p.a = rnd(num(Q.alphaMin, 0.18), num(Q.alphaMax, 0.6));
+        p.ph = Math.random() * 6.28;
+        p.sp = sprites[pick()];
+        return p;
+    };
+    const resize = () => {
+        W = cv.width = window.innerWidth;
+        H = cv.height = window.innerHeight;
+        const count = clamp(Math.round(W * H / num(Q.density, 32000)), num(Q.minCount, 15), num(Q.maxCount, 25));
+        while (list.length < count) list.push(spawn({}, true));
+        list.length = count;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    let raf = 0, last = 0;
+    const loop = now => {
+        raf = requestAnimationFrame(loop);
+        const dt = now - last;
+        if (dt < frameMs) return;
+        last = now;
+        const k = Math.min(100, dt) / 16.67;
+        ctx.clearRect(0, 0, W, H);
+        for (const p of list) {
+            p.y -= p.v * k;
+            p.ph += 0.01 * k;
+            p.x += Math.sin(p.ph) * 0.15 * k;
+            if (p.y < -p.R) spawn(p, false);
+            ctx.globalAlpha = p.a * (0.75 + Math.sin(p.ph * 2) * 0.25);
+            ctx.drawImage(p.sp, p.x - p.R, p.y - p.R, p.R * 2, p.R * 2);
+        }
+    };
+    raf = requestAnimationFrame(loop);
+    partStop = () => cancelAnimationFrame(raf);
+}
+
+/* ================= Fade out (dikirim client.lua sebelum shutdown) ================= */
+let fading = false;
+function fadeOut(ms) {
+    if (fading) return;
+    fading = true;
+    clearInterval(simTimer);
+    clearInterval(tipTimer);
+    document.body.style.transition = `opacity ${ms}ms cubic-bezier(.4,0,1,1)`;
+    document.body.style.opacity = '0';
+    const from = userVol, t0 = performance.now();
+    const ramp = () => {
+        const k = Math.min(1, (performance.now() - t0) / ms);
+        applyVolume(from * (1 - k));
+        if (k < 1) { requestAnimationFrame(ramp); return; }
+        try { audio.pause(); video.pause(); } catch (e) {}
+        Viz.stop();
+        if (partStop) partStop();
+    };
+    requestAnimationFrame(ramp);
+}
+
+/* ================= Pesan dari engine / client.lua ================= */
+window.addEventListener('message', e => {
+    const d = e.data || {};
+    switch (d.eventName) {
+        case 'loadProgress':
+            if (!realMode) { realMode = true; clearInterval(simTimer); hoAt = target; hoFrom = clamp(Number(d.loadFraction) || 0, 0, 1); }
+            if (state.booted) setTarget(realToBar(d.loadFraction));
+            break;
+        case 'onLogLine':
+            if (d.message && state.booted) setStatus(d.message, num(P.logHoldMs, 2500));
+            break;
+        case 'serverStats':
+            state.stats = d;
+            if (state.booted) updateChip(d);
+            if (typeof d.serverName === 'string' && d.serverName.trim() && d.serverName.trim() !== state.serverName) {
+                state.serverName = d.serverName.trim();
+                if (state.booted && liveTitle()) applyBrand();
+            }
+            break;
+        case 'setPlayerName':
+            state.name = String(d.name || '');
+            if (state.booted) renderName();
+            break;
+        case 'serverContent':
+            if (Array.isArray(d.news)) state.news = d.news;
+            if (Array.isArray(d.tips)) state.tips = d.tips;
+            if (state.booted) { applyInfo(); applyTips(); }
+            break;
+        case 'rulesGate':
+            pendingGate = d.version;
+            if (state.booted) showGate(d.version);
+            break;
+        case 'rulesAccepted':
+        case 'rulesGateOff':
+            pendingGate = null;
+            if (state.booted) hideGate();
+            break;
+        case 'storedVolume':
+            if (M.rememberVolume !== false && !volTouched) setVolume(Number(d.volume), false);
+            break;
+        case 'fadeOut':
+            fadeOut(Number(d.durationMs) > 0 ? Number(d.durationMs) : 600);
+            break;
+    }
+});
+
+/* ================= Boot ================= */
+function guard(fn) { try { fn(); } catch (e) { console.error('[f_loadscreen]', e); } }
+
+async function boot() {
+    // efek visual dulu — tidak menunggu locale
+    guard(applyTheme);
+    guard(applyBackground);
+    guard(applyPattern);
+    guard(applyScrim);
+    guard(applyGrain);
+    guard(applyCorners);
+    guard(applyImage);
+    guard(startVideo);
+    guard(startParticles);
+
+    L = await loadLocale(C.locale || 'en');
+    document.documentElement.lang = C.locale || 'en';
+
+    guard(applyLogo);
+    guard(applyBrand);
+    guard(applyChip);
+    guard(applyInfo);
+    guard(applySocials);
+    guard(applyTips);
+    guard(progressInit);
+    guard(Viz.start);
+    guard(initMusic);
+    state.booted = true;
+    guard(startProgress);
+    if (realMode) setTarget(realToBar(hoFrom));
+    if (pendingGate != null) guard(() => showGate(pendingGate));
+    hello();
+}
+
+boot();
 })();
 </script>
 </body>

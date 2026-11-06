@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CMapTypes>
+ <extensions />
+ <archetypes>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="300" />
+   <flags value="32" />
+   <specialAttribute value="0" />
+   <bbMin x="-3.042656" y="-3.389635" z="-0" />
+   <bbMax x="4.197344" y="3.700212" z="9.953938" />
+   <bsCentre x="0.577344" y="0.155289" z="4.976969" />
+   <bsRadius value="7.10219" />
+   <hdTextureDist value="150" />
+   <name>f_kelapa_pohon</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary>f_kelapa_pohon</physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>f_kelapa_pohon</assetName>
+   <extensions />
+  </Item>
+ </archetypes>
+ <name>f_kelapa_pohon</name>
+ <dependencies />
+ <compositeEntityTypes itemType="CCompositeEntityType" />
+</CMapTypes>

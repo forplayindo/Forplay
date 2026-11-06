@@ -238,6 +238,7 @@ function AddAccountMoney(account, amount)
     end
     cachedAccounts[account].amount += amount
     updateBalance(account)
+    TriggerEvent('f_dashboard:account', account, amount, 'add', GetInvokingResource()) -- f_dashboard: arus uang
     if not taxSkip then TriggerEvent('f_tax:income', account, amount) end -- f_tax: hitung pendapatan
     return true
 end
@@ -306,6 +307,7 @@ function RemoveAccountMoney(account, amount)
 
     cachedAccounts[account].amount -= amount
     updateBalance(account)
+    TriggerEvent('f_dashboard:account', account, amount, 'remove', GetInvokingResource()) -- f_dashboard: arus uang
     return true
 end
 exports('removeAccountMoney', RemoveAccountMoney)

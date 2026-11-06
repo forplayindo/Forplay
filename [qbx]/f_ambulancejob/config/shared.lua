@@ -1,19 +1,19 @@
 return {
     checkInCost = 200000, -- Biaya kasur RS + dokter AI (sedikit di atas dirawat EMS supaya pemain tetap cari EMS)
-    minForCheckIn = 2, -- Minimum number of people with the ambulance job to prevent the check-in system from being used
+    minForCheckIn = 1, -- Minimum number of people with the ambulance job to prevent the check-in system from being used
 
     locations = { -- Various interaction points
         duty = {
-            vec3(311.18, -599.25, 43.29),
-            vec3(-254.88, 6324.5, 32.58),
+            vec3(-2784.89, -78.76, 17.61),
+            
         },
         vehicle = {
-            vec4(294.578, -574.761, 43.179, 35.79),
-            vec4(-234.28, 6329.16, 32.15, 222.5),
+            vec4(-2784.75, -49.17, 17.61, 323.09),
+           
         },
         helicopter = {
-            vec4(351.58, -587.45, 74.16, 160.5),
-            vec4(-475.43, 5988.353, 31.716, 31.34),
+            vec4(-2802.07, -63.88, 56.89, 188.38),
+            
         },
         armory = {
             {
@@ -31,7 +31,7 @@ return {
                     { name = 'weapon_fireextinguisher', price = 0 },
                 },
                 locations = {
-                    vec3(309.93, -602.94, 43.29)
+                    vec3(-2800.67, -76.71, 17.61)
                 }
             }
         },
@@ -50,17 +50,19 @@ return {
         ---@type table<string, {coords: vector3, checkIn?: vector3|vector3[], beds: Bed[]}>
         hospitals = {
             pillbox = {
-                label = 'Foreplay Hospital',
-                coords = vec3(350, -580, 43),
-                checkIn = vec3(308.19, -595.35, 43.29),
+                label = '4PLAY Hospital',
+                coords = vec3(-2786.37, -69.65, 17.61),
+                checkIn = vec3(-2786.37, -69.65, 17.61),
                 beds = {
-                    {coords = vec4(356.68, -581.23, 16.76, 272.16), model = 1631638868},
-                    {coords = vec4(356.68, -581.23, 16.76, 272.16), model = 1631638868},
-                    {coords = vec4(356.68, -581.23, 16.76, 272.16), model = 2117668672},
+                    {coords = vec4(-2769.61, -86.14, 18.17, 4.54), model = `v_med_bed2`},
+                    {coords = vec4(-2766.13, -85.86, 18.17, 4.54), model = `v_med_bed2`},
+                    {coords = vec4(-2762.62, -85.58, 18.17, 4.54), model = `v_med_bed2`},
+                    {coords = vec4(-2759.14, -85.3, 18.17, 4.54), model = `v_med_bed2`},
+                    {coords = vec4(-2755.66, -85.03, 18.17, 4.54), model = `v_med_bed2`},
                     
                 },
             },
-            
+
             jail = {
                 label = 'Bolingbroke Infirmary',
                 coords = vec3(1761, 2600, 46),
@@ -74,7 +76,7 @@ return {
         },
 
         stations = {
-            {label = 'Forplay Hospital', coords = vec4(304.27, -600.33, 43.28, 272.249)},
+            {label = '4PLAY Hospital', coords = vec4(-2783.23, -66.29, 17.61, 322.73)},
         }
     },
 }

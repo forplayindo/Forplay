@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CVehicleModelInfoVariation>
+  <variationData>
+    <Item>
+      <modelName>master</modelName>
+      <colors>
+        <Item>
+          <indices content="char_array">
+          112
+          12
+          112
+          6
+          0
+          0
+          </indices>
+          <liveries>
+            <Item value="true" />
+            <Item value="true" />
+            <Item value="true" />
+            <Item value="true" />
+            <Item value="true" />
+          </liveries>
+        </Item>
+        <Item>
+          <indices content="char_array">
+          112
+          1
+          112
+          3
+          0
+          0
+          </indices>
+          <liveries>
+            <Item value="true" />
+            <Item value="true" />
+            <Item value="true" />
+            <Item value="true" />
+            <Item value="true" />
+          </liveries>
+        </Item>
+        <Item>
+          <indices content="char_array">
+          101
+          2
+          10
+          14
+          0
+          0
+          </indices>
+          <liveries>
+            <Item value="false" />
+            <Item value="false" />
+            <Item value="true" />
+            <Item value="false" />
+            <Item value="false" />
+          </liveries>
+        </Item>
+        <Item>
+          <indices content="char_array">
+          121
+          21
+          121
+          31
+          0
+          0
+          </indices>
+          <liveries>
+            <Item value="true" />
+            <Item value="true" />
+            <Item value="false" />
+            <Item value="true" />
+            <Item value="true" />
+          </liveries>
+        </Item>
+        <Item>
+          <indices content="char_array">
+          131
+          131
+          131
+          18
+          0
+          0
+          </indices>
+          <liveries>
+            <Item value="true" />
+            <Item value="true" />
+            <Item value="false" />
+            <Item value="true" />
+            <Item value="true" />
+          </liveries>
+        </Item>
+      </colors>
+      <kits />
+      <windowsWithExposedEdges />
+      <plateProbabilities>
+        <Probabilities>
+          <Item>
+            <Name>standard white</Name>
+            <Value value="100" />
+          </Item>
+        </Probabilities>
+      </plateProbabilities>
+      <lightSettings value="0" />
+      <sirenSettings value="0" />
+    </Item>
+    <Item>
+      <modelName>master2</modelName>
+      <colors>
+        <Item>
+          <indices content="char_array">
+          132
+          58
+          112
+          122
+          22
+          0
+          </indices>
+          <liveries />
+        </Item>
+        <Item>
+          <indices content="char_array">
+          132
+          132
+          132
+          122
+          22
+          0
+          </indices>
+          <liveries />
+        </Item>
+        <Item>
+          <indices content="char_array">
+          132
+          15
+          111
+          132
+          16
+          0
+          </indices>
+          <liveries />
+        </Item>
+        <Item>
+          <indices content="char_array">
+          124
+          124
+          0
+          22
+          22
+          0
+          </indices>
+          <liveries />
+        </Item>
+        <Item>
+          <indices content="char_array">
+          112
+          32
+          132
+          22
+          22
+          0
+          </indices>
+          <liveries />
+        </Item>
+        <Item>
+          <indices content="char_array">
+          49
+          49
+          0
+          50
+          16
+          0
+          </indices>
+          <liveries />
+        </Item>
+        <Item>
+          <indices content="char_array">
+          77
+          77
+          0
+          77
+          15
+          0
+          </indices>
+          <liveries />
+        </Item>
+        <Item>
+          <indices content="char_array">
+          132
+          77
+          0
+          77
+          12
+          0
+          </indices>
+          <liveries />
+        </Item>
+        <Item>
+          <indices content="char_array">
+          78
+          78
+          0
+          7
+          12
+          0
+          </indices>
+          <liveries />
+        </Item>
+        <Item>
+          <indices content="char_array">
+          15
+          126
+          16
+          122
+          15
+          0
+          </indices>
+          <liveries />
+        </Item>
+      </colors>
+      <kits />
+      <windowsWithExposedEdges />
+      <plateProbabilities>
+        <Probabilities>
+          <Item>
+            <Name>standard white</Name>
+            <Value value="100" />
+          </Item>
+        </Probabilities>
+      </plateProbabilities>
+      <lightSettings value="0" />
+      <sirenSettings value="9" />
+    </Item>
+  </variationData>
+</CVehicleModelInfoVariation>

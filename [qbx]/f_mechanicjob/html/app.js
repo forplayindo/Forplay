@@ -1,3 +1,10 @@
+// Gambar item dari ox_inventory (dipakai panel, toko & kasir). Kalau PNG belum ada, tampil teks cadangan (emoji).
+window.itemImg = (item, fallback = '', cls = 'iimg') => {
+    const fb = String(fallback ?? '').replace(/[&<>"'\\]/g, '');
+    return `<img class="${cls}" src="nui://ox_inventory/web/images/${encodeURIComponent(item)}.png" alt=""`
+        + ` onerror="this.replaceWith(Object.assign(document.createElement('span'), { className: 'iimg-fb', textContent: '${fb}' }))">`;
+};
+
 // Panel "Periksa Kendaraan": gambar kendaraan + titik penunjuk, cairan, daftar kerusakan, tab Tagihan.
 // Semua keputusan di server; halaman ini hanya menampilkan & mengirim pilihan mekanik.
 (() => {
@@ -49,7 +56,7 @@
     const tyresWorst = () => Math.max(...tyreList().map(t => tyreLvl(t.key)));
     const have = item => S.stock[item] || 0;
     const itemLabel = item => C.itemLabels[item] || item;
-    const icon = item => C.itemIcons[item] || '•';
+    const icon = item => itemImg(item, C.itemIcons[item] || '•');
 
     function toast(text) {
         let t = document.querySelector('.toast');
@@ -178,7 +185,7 @@
     }
 
     function matHtml(item, qty) {
-        return `<div class="mat ${have(item) < qty ? 'none' : ''}">${icon(item)} ${esc(itemLabel(item))} ×${qty} · stok ${have(item)}</div>`;
+        return `<div class="mat ${have(item) < qty ? 'none' : ''}">${icon(item)}${esc(itemLabel(item))} ×${qty} · stok ${have(item)}</div>`;
     }
 
     function partRow(k) {
@@ -224,7 +231,7 @@
         const bt = $('btn-tyres'), ba = $('btn-all');
         const fixT = tyreList().filter(t => tyreNeeds(t.key)).length;
         bt.disabled = !fixT || have(C.tyre.item) < fixT;
-        $('tyres-sub').textContent = !fixT ? 'Semua ban layak' : `${icon(C.tyre.item)} ${itemLabel(C.tyre.item)} ×${fixT} · stok ${have(C.tyre.item)}`;
+        $('tyres-sub').innerHTML = !fixT ? 'Semua ban layak' : `${icon(C.tyre.item)}${esc(itemLabel(C.tyre.item))} ×${fixT} · stok ${have(C.tyre.item)}`;
         bt.onclick = () => post('action', { action: 'tyres' });
 
         const cost = {};
@@ -242,7 +249,7 @@
         let sub = !keys.length ? (lockedN ? `🔒 ${lockedN} bagian ${where}` : 'Tidak ada yang diperbaiki')
             : keys.map(k => `${icon(k)}${cost[k]}`).join(' ') + (enough ? '' : ' · bahan kurang');
         if (keys.length && lockedN) sub += ` · 🔒 ${lockedN} ${where}`;
-        $('all-sub').textContent = sub;
+        $('all-sub').innerHTML = sub;
         ba.onclick = () => post('action', { action: 'all' });
     }
 

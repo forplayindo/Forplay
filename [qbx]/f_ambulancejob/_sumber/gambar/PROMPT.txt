@@ -1,0 +1,34 @@
+PROMPT GAMBAR ITEM EMS (untuk Gemini)
+=====================================
+Simpan hasil di folder ini dengan nama file = nama item, contoh: painkillers.jpg
+Boleh juga satu lembar berisi banyak item (seperti lembar mekanik); taruh di subfolder lembar/.
+Nanti diproses jadi PNG 256x256 transparan ke ox_inventory.
+
+PENTING untuk Gemini: JANGAN minta "transparent background" (Gemini menggambar kotak-kotak palsu).
+Pakai background abu-abu polos seperti di GAYA DASAR.
+
+Cara pakai: tempel GAYA DASAR, lalu ganti [ITEM] dengan deskripsi item.
+Kalau generate di satu chat, tambahkan: "Keep exactly the same style, camera angle and lighting as the previous image."
+
+GAYA DASAR
+----------
+Photorealistic product photo of [ITEM]. Centered, three-quarter view from slightly above (about 35 degrees), the whole object fully visible with empty space around it, soft studio lighting, sharp focus, highly detailed. No text, no letters, no brand logo, no hands, no table, no other objects. Isolated on a plain solid light gray background, square 1:1.
+
+DESKRIPSI [ITEM]
+----------------
+-- Obat & alat medis (apotek, Cek Pasien, operasi)
+painkillers      a white plastic pill bottle with a blank white label and a few white round tablets spilled next to it
+calm_pills       a blister pack of light blue oval capsules with plain silver foil, no print
+hemostatic       a rolled white hemostatic gauze bandage coming out of an opened sterile pouch, blank pouch
+splint           a padded orange and blue aluminum medical splint, partly rolled
+suture           a sterile suture kit: a curved surgical needle with black thread and a needle holder in an open plastic tray
+firstaid         a white plastic first aid box with a green plus symbol on the lid and a carry handle, closed
+crutch           a single adjustable aluminum underarm crutch with gray rubber padding and rubber tip
+anesthetic       a small clear glass vial of anesthetic liquid with an aluminum cap next to a sealed plastic syringe, blank label
+blood_bag        a full medical blood bag filled with dark red blood, with a coiled tube, blank label
+blood_bag_empty  an empty transparent medical blood bag with a coiled clear tube, blank label
+
+-- Opsional
+surgery          (stok gudang "Alat Operasi", bukan item inventory) a sterile surgical instrument set on a steel tray: scalpel, forceps, scissors and clamps
+tas_emergency    (sekarang pinjam gambar medikit) a red EMS trauma backpack with reflective strips and many pockets
+tas_operasi      (sekarang pinjam gambar advancedkit) an open dark blue hard shell surgeon instrument case with neatly arranged surgical tools

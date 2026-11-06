@@ -161,32 +161,19 @@ CreateThread(function()
     end
 end)
 
--- efek lalat saat HUD mandi mencapai 100%
+-- animasi kibas lalat saat HUD mandi >= FliesPercent (lalat + dengungnya di thread sync di bawah)
 local fliesActive = false
 
 RegisterNetEvent('hygiene:client:RefreshHud', function()
     if HygieneState.mandi >= Config.Mandi.FliesPercent and not fliesActive then
         fliesActive = true
         CreateThread(function()
-            local ped = PlayerPedId()
             local dict, anim = Config.Mandi.FliesAnim.dict, Config.Mandi.FliesAnim.anim
             RequestAnimDict(dict)
             local timeout = GetGameTimer() + 2000
             while not HasAnimDictLoaded(dict) and GetGameTimer() < timeout do Wait(0) end
 
-            local fx = Config.Mandi.FliesEffect
-            RequestNamedPtfxAsset(fx.dict)
-            local fxTimeout = GetGameTimer() + 2000
-            while not HasNamedPtfxAssetLoaded(fx.dict) and GetGameTimer() < fxTimeout do Wait(0) end
-
-            local fxHandle = nil
-            if HasNamedPtfxAssetLoaded(fx.dict) then
-                UseParticleFxAssetNextCall(fx.dict)
-                fxHandle = StartParticleFxLoopedOnEntity(fx.name, ped, fx.offset.x, fx.offset.y, fx.offset.z, 0.0, 0.0, 0.0, fx.scale, false, false, false)
-            end
-
-            -- particle lalat tetap nempel terus selama fliesActive (di atas), tapi gerakan
-            -- menepuk lalatnya cuma sekali tiap Config.Mandi.FliesInterval biar tidak terlalu sering, dan gantian
+            -- gerakan kibas cuma sekali tiap Config.Mandi.FliesInterval biar tidak terlalu sering, dan gantian
             -- sama animasi reaksi lain (batuk/muntah) lewat HygieneTryPlayReaction
             while fliesActive do
                 HygieneTryPlayReaction(3500, function()
@@ -200,11 +187,75 @@ RegisterNetEvent('hygiene:client:RefreshHud', function()
 
             RemoveAnimDict(dict)
             ClearPedSecondaryTask(PlayerPedId())
-            if fxHandle then
-                StopParticleFxLooped(fxHandle, false)
-            end
         end)
     elseif HygieneState.mandi < Config.Mandi.FliesPercent and fliesActive then
         fliesActive = false
+    end
+end)
+
+-- lalat (particle) + dengung buat SEMUA player kotor di sekitar, termasuk diri sendiri. Sumbernya
+-- statebag hygieneFlies yang di-set server, jadi player lain ikut lihat & dengar.
+-- Dengung: satu audio loop di NUI, volume ikut jarak player kotor terdekat
+local fliesFx = {} -- [serverId] = { ped = ped, handle = handle }
+
+local function StopFliesFx(sid)
+    local cur = fliesFx[sid]
+    if cur then
+        StopParticleFxLooped(cur.handle, false)
+        fliesFx[sid] = nil
+    end
+end
+
+local function StartFliesFx(ped)
+    local fx = Config.Mandi.FliesEffect
+    if not HasNamedPtfxAssetLoaded(fx.dict) then
+        RequestNamedPtfxAsset(fx.dict)
+        local timeout = GetGameTimer() + 2000
+        while not HasNamedPtfxAssetLoaded(fx.dict) and GetGameTimer() < timeout do Wait(0) end
+        if not HasNamedPtfxAssetLoaded(fx.dict) then return nil end
+    end
+    UseParticleFxAssetNextCall(fx.dict)
+    return StartParticleFxLoopedOnEntity(fx.name, ped, fx.offset.x, fx.offset.y, fx.offset.z, 0.0, 0.0, 0.0, fx.scale, false, false, false)
+end
+
+CreateThread(function()
+    local S = Config.Mandi.FliesSync
+    local lastVolume = 0
+    while true do
+        local myCoords = GetEntityCoords(cache.ped)
+        local seen, nearest = {}, nil
+
+        for _, id in ipairs(GetActivePlayers()) do
+            local sid = GetPlayerServerId(id)
+            if Player(sid).state.hygieneFlies then
+                local ped = GetPlayerPed(id)
+                local dist = #(myCoords - GetEntityCoords(ped))
+                if dist <= S.Distance then
+                    seen[sid] = true
+                    if not nearest or dist < nearest then nearest = dist end
+                    local cur = fliesFx[sid]
+                    if not cur or cur.ped ~= ped or not DoesParticleFxLoopedExist(cur.handle) then
+                        StopFliesFx(sid)
+                        local handle = StartFliesFx(ped)
+                        if handle then fliesFx[sid] = { ped = ped, handle = handle } end
+                    end
+                end
+            end
+        end
+
+        for sid in pairs(fliesFx) do
+            if not seen[sid] then StopFliesFx(sid) end
+        end
+
+        local volume = 0
+        if nearest then
+            volume = math.floor(S.Volume * (1.0 - nearest / S.Distance) * 100 + 0.5) / 100
+        end
+        if volume ~= lastVolume then
+            lastVolume = volume
+            SendNUIMessage({ action = 'flies', volume = volume })
+        end
+
+        Wait(S.Tick)
     end
 end)

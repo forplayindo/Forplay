@@ -250,11 +250,6 @@ RegisterNUICallback('ui:onChangeCinematicMode', function(show, resultCallback)
     end
 end)
 
--- Minimap GTA VI punya posisi tetap (Config.Minimap); edit_mini_map tidak dipakai
-RegisterNUICallback('ui:OpenEditMiniMap', function(_, resultCallback)
-    resultCallback(false)
-end)
-
 RegisterNUICallback('nui:onChangeMiniMapPlacer', function(data, resultCallback)
     resultCallback(true)
     Hud.data.mini_map.map_placer = data

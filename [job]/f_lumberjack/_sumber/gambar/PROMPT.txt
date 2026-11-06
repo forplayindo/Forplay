@@ -1,0 +1,21 @@
+PROMPT GAMBAR ITEM PENEBANG KAYU (untuk Gemini)
+================================================
+Simpan hasil di folder ini dengan nama file = nama item, contoh: papan_kayu.jpg
+(format jpg/png/webp bebas). Nanti diproses jadi PNG 256x256 transparan ke ox_inventory:
+  python proses.py --dir "../../../[job]/f_lumberjack/_sumber/gambar"   (jalankan dari [qbx]/f_cafe/_sumber/gambar)
+
+PENTING untuk Gemini: JANGAN minta "transparent background". Gemini akan menggambar pola
+kotak-kotak palsu yang ikut tercetak di gambar dan susah dihapus. Pakai background abu-abu polos
+seperti di GAYA DASAR di bawah.
+
+Cara pakai: tempel GAYA DASAR, lalu ganti [ITEM] dengan deskripsi item.
+Kalau generate di satu chat, tambahkan: "Keep exactly the same style, camera angle and lighting as the previous image."
+
+GAYA DASAR
+----------
+Photorealistic product photo of [ITEM]. Centered, three-quarter view from slightly above (about 35 degrees), the whole object fully visible with empty space around it, soft studio lighting, sharp focus, highly detailed. No text, no letters, no brand logo, no hands, no table, no other objects. Isolated on a plain solid light gray background, square 1:1.
+
+DESKRIPSI [ITEM]
+----------------
+papan_kayu    a neat stack of five freshly sawn pine wood planks, light natural wood color with visible grain and clean cut ends, tied together with two thin steel straps
+chainsaw      a professional orange and black gasoline chainsaw with a long steel guide bar and chain, lying on its side, clean and new

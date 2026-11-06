@@ -33,6 +33,8 @@ server_scripts {
 }
 
 files {
+	'html/ui/ios.css',
+	'html/ui/fonts/*.woff2',
 	'locales/*.json',
 	'config/client.lua',
 	'config/shared.lua',

@@ -8,13 +8,15 @@ import { t } from '@/i18n';
 import { useRyde } from '../store';
 import { getDefaultPickup, newId } from '../data';
 import type { Place } from '../data';
-import { rydeZoneName, useRydeLocations } from '../rydeApi';
+import { estimateFare, rydeZoneName, useRydeLocations, useRydePricing } from '../rydeApi';
+import { money } from '../data';
 import { LiveDot, useSelfLocation } from '@/apps/maps/LiveDot';
 import { DropoffPin, MapView, Pin } from '../ui';
 
 export function Home() {
     const g = useRyde();
     const locations = useRydeLocations();
+    const pricing = useRydePricing();
     const defaultPickup = getDefaultPickup();
     const me = useSelfLocation({ x: defaultPickup.x, y: defaultPickup.y, h: 0 });
     const pickup: Place = me ? { ...defaultPickup, x: me.x, y: me.y } : defaultPickup;
@@ -184,7 +186,9 @@ export function Home() {
             {dropoff && (
                 <AlertDialog
                     title={t('ryde.requestARide', 'Request a ride?')}
-                    message={t('ryde.requestRideMessage', 'A nearby driver will be asked to take you to {name}, then offer a fare you can accept.', { name: dropoff.name })}
+                    message={t('ryde.requestRideFixedMessage', 'Ride to {name}, about {km} km. Fare {fare}, paid from your bank balance when the trip ends (metered if you get off early). The first driver to accept will pick you up.', {
+                        name: dropoff.name, km: estimateFare(pricing, pickup, dropoff).km.toFixed(1), fare: money(estimateFare(pricing, pickup, dropoff).fare),
+                    })}
                     confirmLabel={t('ryde.requestRide', 'Request ride')}
                     onCancel={() => setDropoff(null)}
                     onConfirm={confirm}

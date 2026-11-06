@@ -105,23 +105,27 @@ end
 ---Creates a zone that lets players store and retrieve job vehicles
 ---@param vehicles AuthorizedVehicles
 ---@param coords vector4
-local function createGarage(vehicles, coords)
+local function createGarage(vehicles, coords, size)
     lib.zones.box({
-        coords = coords.xyz,
-        size = vec3(5, 5, 2),
+        -- coords dari /vec4 = lantai (z - 1), jadi tengah kotak dinaikkan supaya badan pemain masuk
+        coords = coords.xyz + vec3(0.0, 0.0, 1.0),
+        size = size,
         rotation = coords.w,
         debug = config.debugPoly,
-        onEnter = function()
-            if QBX.PlayerData.job.type == 'ems' and QBX.PlayerData.job.onduty then
-                lib.showTextUI(locale('text.veh_button'))
-            end
-        end,
         onExit = function()
             local _, text = lib.isTextUIOpen()
             if text == locale('text.veh_button') then lib.hideTextUI() end
         end,
         inside = function()
-            if QBX.PlayerData.job.type == 'ems' and QBX.PlayerData.job.onduty and IsControlJustPressed(0, 38) then
+            local allowed = QBX.PlayerData.job.type == 'ems' and QBX.PlayerData.job.onduty
+            -- tampil / sembunyi di dalam zona juga, supaya ikut berubah kalau duty diganti saat berdiri di sini
+            local isOpen, text = lib.isTextUIOpen()
+            if allowed and not isOpen then
+                lib.showTextUI(locale('text.veh_button'))
+            elseif not allowed and text == locale('text.veh_button') then
+                lib.hideTextUI()
+            end
+            if allowed and IsControlJustPressed(0, 38) then
                 if cache.vehicle then
                     DeleteEntity(cache.vehicle)
             else
@@ -135,11 +139,11 @@ end
 ---Creates air and land garages to spawn vehicles at for EMS personnel
 CreateThread(function()
     for _, coords in pairs(sharedConfig.locations.vehicle) do
-        createGarage(config.authorizedVehicles, coords)
+        createGarage(config.authorizedVehicles, coords, vec3(5, 5, 4))
     end
 
     for _, coords in pairs(sharedConfig.locations.helicopter) do
-        createGarage(config.authorizedHelicopters, coords)
+        createGarage(config.authorizedHelicopters, coords, vec3(8, 8, 4))
     end
 end)
 
@@ -256,21 +260,21 @@ else
     CreateThread(function()
         for i = 1, #sharedConfig.locations.duty do
             lib.zones.box({
-                coords = sharedConfig.locations.duty[i],
-                size = vec3(1, 1, 2),
+                -- coords dari /vec3 = lantai (z - 1), jadi tengah kotak dinaikkan supaya badan pemain masuk
+                coords = sharedConfig.locations.duty[i] + vec3(0.0, 0.0, 1.0),
+                size = vec3(2, 2, 3),
                 rotation = -20,
                 debug = config.debugPoly,
-                onEnter = function()
-                    if QBX.PlayerData.job.type ~= 'ems' then return end
-                    local label = QBX.PlayerData.job.onduty and locale('text.onduty_button') or locale('text.offduty_button')
-                    lib.showTextUI(label)
-                end,
                 onExit = function()
                     local _, text = lib.isTextUIOpen()
                     if text == locale('text.onduty_button') or text == locale('text.offduty_button') then lib.hideTextUI() end
                 end,
                 inside = function()
                     if QBX.PlayerData.job.type ~= 'ems' then return end
+                    -- label ikut status duty: on duty -> tawarkan selesai, off duty -> tawarkan mulai
+                    local label = QBX.PlayerData.job.onduty and locale('text.offduty_button') or locale('text.onduty_button')
+                    local isOpen, text = lib.isTextUIOpen()
+                    if not isOpen or text ~= label then lib.showTextUI(label) end
                     OnKeyPress(toggleDuty)
                 end,
             })
@@ -302,23 +306,29 @@ else
         for i = 1, #sharedConfig.locations.armory do
             for ii = 1, #sharedConfig.locations.armory[i].locations do
                 lib.zones.box({
-                    coords = sharedConfig.locations.armory[i].locations[ii],
-                    size = vec3(1, 1, 2),
+                    -- coords dari /vec3 = lantai (z - 1), jadi tengah kotak dinaikkan supaya badan pemain masuk
+                    coords = sharedConfig.locations.armory[i].locations[ii] + vec3(0.0, 0.0, 1.0),
+                    size = vec3(2, 2, 3),
                     rotation = -20,
                     debug = config.debugPoly,
-                    onEnter = function()
-                        if QBX.PlayerData.job.type ~= 'ems' or not QBX.PlayerData.job.onduty then return end
-                        lib.showTextUI(locale('text.armory_button'))
-                        end,
                     onExit = function()
                         local _, text = lib.isTextUIOpen()
                         if text == locale('text.armory_button') then lib.hideTextUI() end
                     end,
                     inside = function()
-                        if QBX.PlayerData.job.type ~= 'ems' then return end
-                        OnKeyPress(function()
-                            openArmory(i, ii)
-                        end)
+                        local allowed = QBX.PlayerData.job.type == 'ems' and QBX.PlayerData.job.onduty
+                        -- tampil / sembunyi di dalam zona juga, supaya ikut berubah kalau duty diganti saat berdiri di sini
+                        local isOpen, text = lib.isTextUIOpen()
+                        if allowed and not isOpen and not LocalPlayer.state.invOpen then
+                            lib.showTextUI(locale('text.armory_button'))
+                        elseif not allowed and text == locale('text.armory_button') then
+                            lib.hideTextUI()
+                        end
+                        if allowed then
+                            OnKeyPress(function()
+                                openArmory(i, ii)
+                            end)
+                        end
                     end,
                 })
             end

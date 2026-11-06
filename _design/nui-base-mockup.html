@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>F-UI Base Mockup</title>
+<!-- Mockup saja: di FiveM nanti Inter dibundel lokal (woff2), bukan dari Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   BAGIAN 1 — BASE KIT (ini yang nanti dipindah jadi base.css bersama)
+   ===================================================================== */
+:root {
+    --alpha: .85;                                   /* tingkat transparansi panel */
+    --bg: rgba(20, 23, 26, var(--alpha));           /* panel utama (netral, sama ox_inventory) */
+    --inset: rgba(0, 0, 0, .28);                    /* input / area cekung */
+    --surface: rgba(255, 255, 255, .045);           /* kartu, item */
+    --surface-2: rgba(255, 255, 255, .08);          /* hover */
+    --surface-3: rgba(255, 255, 255, .13);          /* aktif */
+    --line: rgba(255, 255, 255, .08);
+    --line-2: rgba(255, 255, 255, .15);
+
+    --text: #eef2f8;
+    --muted: #96a2b6;
+    --dim: #627085;
+
+    --accent: #f3b354;                              /* emas, sama $accent ox_inventory */
+    --accent-rgb: 243, 179, 84;
+    --accent-soft: rgba(var(--accent-rgb), .14);
+    --on-accent: #1d1406;
+
+    --ok: #4ade80;   --ok-soft: rgba(74, 222, 128, .14);
+    --warn: #fbbf24; --warn-soft: rgba(251, 191, 36, .14);
+    --bad: #f87171;  --bad-soft: rgba(248, 113, 113, .14);
+    --gold: #e7c36a;
+
+    --r-sm: 8px;
+    --r: 12px;
+    --r-lg: 18px;
+    --font: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+:root[data-accent="teal"]   { --accent: #2dd4bf; --accent-rgb: 45, 212, 191; }
+:root[data-accent="blue"]   { --accent: #5b9dff; --accent-rgb: 91, 157, 255; --on-accent: #08101f; }
+:root[data-accent="violet"] { --accent: #a78bfa; --accent-rgb: 167, 139, 250; }
+:root[data-accent="rose"]   { --accent: #fb7185; --accent-rgb: 251, 113, 133; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); color: var(--text); font-size: 13px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { border: 0; background: none; cursor: pointer; }
+.hidden { display: none !important; }
+.ic { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.spacer { flex: 1; }
+.row { display: flex; align-items: center; gap: 8px; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.divider { height: 1px; background: var(--line); margin: 6px 0; }
+.scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
+.scroll::-webkit-scrollbar { width: 6px; }
+.scroll::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 3px; }
+
+/* ---------- Tipografi ---------- */
+.t-display { font-size: 26px; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+.t-h1 { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+.t-h2 { font-size: 16px; font-weight: 700; }
+.t-h3 { font-size: 14px; font-weight: 600; }
+.t-body { font-size: 13px; }
+.t-small { font-size: 12px; color: var(--muted); }
+.t-label { font-size: 11px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; }
+.t-num, .money { font-variant-numeric: tabular-nums; }
+.money { font-weight: 800; }
+.c-accent { color: var(--accent); } .c-ok { color: var(--ok); } .c-warn { color: var(--warn); } .c-bad { color: var(--bad); } .c-muted { color: var(--muted); }
+
+/* ---------- Panel ---------- */
+.panel {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+.panel-head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+.panel-head.compact { padding: 12px 14px; }
+.panel-body { padding: 18px; }
+.panel-foot { display: flex; align-items: center; gap: 8px; justify-content: flex-end; padding: 14px 18px; border-top: 1px solid var(--line); }
+.logo { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); flex: none; }
+.logo .ic { width: 20px; height: 20px; }
+.title { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+.sub { font-size: 12px; color: var(--muted); }
+
+/* ---------- Tombol ---------- */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    height: 36px; padding: 0 14px; border-radius: 10px;
+    font-size: 13px; font-weight: 600; white-space: nowrap;
+    transition: background .12s, color .12s, box-shadow .12s, transform .08s;
+}
+.btn:active { transform: translateY(1px); }
+.btn:hover { box-shadow: inset 0 0 0 100px rgba(255, 255, 255, .08); }
+.btn-primary { background: var(--accent); color: var(--on-accent); }
+.btn-primary:hover { box-shadow: inset 0 0 0 100px rgba(255, 255, 255, .14); }
+.btn-soft { background: var(--accent-soft); color: var(--accent); }
+.btn-ghost { background: var(--surface-2); color: var(--text); }
+.btn-outline { box-shadow: inset 0 0 0 1px var(--line-2); color: var(--text); }
+.btn-outline:hover { box-shadow: inset 0 0 0 1px var(--line-2), inset 0 0 0 100px rgba(255, 255, 255, .06); }
+.btn-text { color: var(--muted); padding: 0 8px; }
+.btn-text:hover { color: var(--text); box-shadow: none; }
+.btn-danger { background: var(--bad-soft); color: var(--bad); }
+.btn-danger:hover { background: var(--bad); color: #1f0a0a; box-shadow: none; }
+.btn-success { background: var(--ok-soft); color: var(--ok); }
+.btn-success:hover { background: var(--ok); color: #062012; box-shadow: none; }
+.btn-sm { height: 28px; padding: 0 10px; font-size: 12px; border-radius: var(--r-sm); gap: 6px; }
+.btn-sm .ic { width: 14px; height: 14px; }
+.btn-lg { height: 44px; padding: 0 20px; font-size: 14px; border-radius: var(--r); }
+.btn-block { width: 100%; }
+.btn-icon { width: 36px; padding: 0; position: relative; }
+.btn-icon.btn-sm { width: 28px; }
+.btn-icon.close:hover { background: var(--bad-soft); color: var(--bad); box-shadow: none; }
+.btn[disabled] { opacity: .4; pointer-events: none; }
+.spin { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: rot .7s linear infinite; }
+@keyframes rot { to { transform: rotate(360deg); } }
+.dotbadge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: var(--on-accent); font-size: 10px; font-weight: 800; display: grid; place-items: center; }
+.kbd { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 6px; background: var(--surface-2); box-shadow: inset 0 -2px 0 var(--line-2); font-size: 11px; font-weight: 700; color: var(--text); }
+
+/* ---------- Input & Form ---------- */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > label { font-size: 12px; font-weight: 600; color: var(--muted); }
+.hint { font-size: 11px; color: var(--dim); }
+.hint.err { color: var(--bad); }
+.input {
+    width: 100%; height: 38px; padding: 0 12px; border-radius: var(--r);
+    background: var(--inset); border: 1px solid var(--line); outline: 0;
+    transition: border-color .12s, box-shadow .12s;
+}
+.input::placeholder { color: var(--dim); }
+.input:focus { border-color: rgba(var(--accent-rgb), .6); box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .15); }
+.input.invalid { border-color: rgba(248, 113, 113, .6); }
+textarea.input { height: auto; min-height: 76px; padding: 10px 12px; resize: none; }
+select.input {
+    appearance: none; padding-right: 34px; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2396a2b6' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; background-size: 16px;
+}
+select.input option { background: #121722; }
+.ig { position: relative; display: flex; align-items: center; }
+.ig > .ic { position: absolute; left: 12px; color: var(--dim); pointer-events: none; }
+.ig > .ic ~ .input { padding-left: 36px; }
+.ig > .pre { position: absolute; left: 12px; font-size: 12px; font-weight: 700; color: var(--dim); pointer-events: none; }
+.ig > .pre ~ .input { padding-left: 38px; }
+.ig > .suf { position: absolute; right: 12px; font-size: 12px; font-weight: 600; color: var(--dim); }
+
+.stepper { display: inline-flex; align-items: center; height: 38px; border-radius: var(--r); background: var(--inset); border: 1px solid var(--line); }
+.stepper button { width: 34px; height: 100%; display: grid; place-items: center; color: var(--muted); }
+.stepper button:hover { color: var(--text); }
+.stepper input { width: 40px; text-align: center; background: none; border: 0; outline: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stepper.sm { height: 28px; border-radius: var(--r-sm); }
+.stepper.sm button { width: 26px; }
+.stepper.sm input { width: 28px; font-size: 12px; }
+
+.switch { position: relative; width: 36px; height: 20px; border-radius: 999px; background: var(--surface-3); transition: background .15s; flex: none; }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.switch.on { background: var(--accent); }
+.switch.on::after { transform: translateX(16px); }
+
+.check { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.check input { display: none; }
+.check .box { width: 18px; height: 18px; border-radius: 6px; border: 1px solid var(--line-2); background: var(--inset); display: grid; place-items: center; color: transparent; flex: none; transition: background .12s, border-color .12s; }
+.check .box .ic { width: 12px; height: 12px; stroke-width: 3; }
+.check input:checked + .box { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.check .box.round { border-radius: 50%; }
+.check input:checked + .box.round { box-shadow: inset 0 0 0 4px #0d1119; }
+
+.range { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 4px; outline: 0; cursor: pointer;
+    background: linear-gradient(var(--accent), var(--accent)) 0 / var(--p, 50%) 100% no-repeat, var(--surface-3); }
+.range::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 3px solid var(--accent); }
+.range::-moz-range-thumb { width: 10px; height: 10px; border-radius: 50%; background: #fff; border: 3px solid var(--accent); }
+
+.seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: var(--r); background: var(--inset); border: 1px solid var(--line); }
+.seg button { height: 28px; padding: 0 14px; border-radius: 9px; font-size: 12px; font-weight: 600; color: var(--muted); transition: background .12s, color .12s; }
+.seg button.active { background: var(--surface-3); color: var(--text); }
+
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); }
+.tabs button { position: relative; display: flex; align-items: center; gap: 6px; padding: 10px 12px; font-weight: 600; color: var(--muted); transition: color .12s; }
+.tabs button:hover { color: var(--text); }
+.tabs button.active { color: var(--text); }
+.tabs button.active::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; border-radius: 2px; background: var(--accent); }
+.tabs .count { font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+.tabs button.active .count { background: var(--accent-soft); color: var(--accent); }
+
+/* ---------- Status & info ---------- */
+.badge { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.badge.accent { background: var(--accent-soft); color: var(--accent); }
+.badge.ok { background: var(--ok-soft); color: var(--ok); }
+.badge.warn { background: var(--warn-soft); color: var(--warn); }
+.badge.bad { background: var(--bad-soft); color: var(--bad); }
+.badge.gold { background: rgba(231, 195, 106, .14); color: var(--gold); }
+
+.progress { height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.progress > i { display: block; height: 100%; width: var(--v, 50%); background: var(--accent); border-radius: inherit; transition: width .2s; }
+.progress.ok > i { background: var(--ok); } .progress.warn > i { background: var(--warn); } .progress.bad > i { background: var(--bad); }
+
+.callout { display: flex; gap: 10px; padding: 10px 12px; border-radius: var(--r); background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 500; }
+.callout.warn { background: var(--warn-soft); color: var(--warn); }
+.callout .ic { margin-top: 1px; }
+
+.avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-3); font-weight: 700; font-size: 12px; flex: none; }
+
+.stat { padding: 14px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); }
+.stat .v { font-size: 20px; font-weight: 800; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.stat .d { font-size: 12px; font-weight: 600; margin-top: 2px; }
+
+.item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border-radius: var(--r); background: var(--surface); border: 1px solid transparent; text-align: left; transition: background .12s, border-color .12s; }
+.item:hover { background: var(--surface-2); }
+.item.active { background: var(--accent-soft); border-color: rgba(var(--accent-rgb), .35); }
+.item .ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--surface-2); flex: none; }
+.item.active .ico { background: var(--accent); color: var(--on-accent); }
+.item .meta { flex: 1; min-width: 0; }
+.item .name { font-weight: 600; }
+.item .desc { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item .trail { color: var(--dim); }
+
+.card { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); transition: background .12s, border-color .12s; }
+.card:hover { background: var(--surface-2); border-color: var(--line-2); }
+.card.off { opacity: .55; }
+.card .thumb { position: relative; height: 80px; border-radius: 9px; display: grid; place-items: center; color: var(--accent); background: linear-gradient(135deg, rgba(var(--accent-rgb), .22), rgba(255, 255, 255, .03)); }
+.card .thumb .ic { width: 30px; height: 30px; stroke-width: 1.6; }
+.card .thumb .badge { position: absolute; top: 8px; left: 8px; }
+.card h4 { font-size: 14px; font-weight: 700; }
+.card p { font-size: 12px; color: var(--muted); }
+.card .foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
+.price { font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+.table { width: 100%; border-collapse: collapse; }
+.table th { padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--line); }
+.table td { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.table tr:last-child td { border-bottom: 0; }
+.table tbody tr:hover td { background: var(--surface); }
+.table .r { text-align: right; }
+
+.empty { display: grid; place-items: center; gap: 6px; padding: 26px 12px; text-align: center; border: 1px dashed var(--line-2); border-radius: var(--r); color: var(--muted); }
+.empty .ic { width: 26px; height: 26px; color: var(--dim); stroke-width: 1.6; }
+
+/* ---------- Notifikasi ---------- */
+.toast { position: relative; display: flex; gap: 10px; align-items: flex-start; width: 300px; padding: 12px 14px 12px 16px; border-radius: var(--r); overflow: hidden;
+    background: var(--bg); border: 1px solid var(--line); box-shadow: 0 8px 24px rgba(0, 0, 0, .3); animation: tin .18s ease-out; }
+.toast::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--c); }
+.toast { --c: var(--accent); --cs: var(--accent-soft); }
+.toast.ok { --c: var(--ok); --cs: var(--ok-soft); }
+.toast.warn { --c: var(--warn); --cs: var(--warn-soft); }
+.toast.bad { --c: var(--bad); --cs: var(--bad-soft); }
+.toast .ti { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--cs); color: var(--c); flex: none; }
+.toast .tt { font-weight: 700; }
+.toast .tm { font-size: 12px; color: var(--muted); }
+@keyframes tin { from { opacity: 0; transform: translateY(8px); } }
+
+/* ---------- Prompt interaksi & progress bar ---------- */
+.prompt { display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 16px 0 9px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); font-weight: 600; box-shadow: 0 8px 24px rgba(0, 0, 0, .3); }
+.prompt .kbd { min-width: 26px; height: 26px; background: var(--accent); color: var(--on-accent); box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .25); }
+.progbar { width: 320px; padding: 12px 14px; border-radius: var(--r); }
+.progbar .row { justify-content: space-between; margin-bottom: 8px; font-weight: 600; }
+
+/* =====================================================================
+   BAGIAN 2 — HANYA UNTUK HALAMAN MOCKUP (tidak ikut ke base.css)
+   ===================================================================== */
+body { background: #06080c; }
+.toolbar { position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; padding: 12px 24px; background: rgba(6, 8, 12, .94); border-bottom: 1px solid var(--line); }
+.toolbar .brand { display: flex; align-items: center; gap: 10px; margin-right: auto; }
+.toolbar .ctrl { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.toolbar .range { width: 120px; }
+.swatches { display: flex; gap: 6px; }
+.swatches button { width: 20px; height: 20px; border-radius: 50%; background: var(--sw); box-shadow: 0 0 0 2px #06080c, 0 0 0 3px transparent; transition: box-shadow .12s; }
+.swatches button.active { box-shadow: 0 0 0 2px #06080c, 0 0 0 4px var(--sw); }
+
+.doc { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+.intro { max-width: 720px; margin-bottom: 8px; }
+.intro p { color: var(--muted); margin-top: 8px; font-size: 14px; }
+.sec { margin-top: 44px; }
+.sec-h { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.sec-h .n { font-size: 12px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+.sec-h p { color: var(--muted); font-size: 13px; }
+
+/* latar "game" supaya transparansi kelihatan */
+.game {
+    --sky: linear-gradient(180deg, #25304d 0%, #5d4e72 42%, #c9805a 72%, #2b2530 100%);
+    --glow: rgba(255, 176, 104, .55);
+    position: relative; border-radius: 20px; overflow: hidden; padding: 28px;
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 300' preserveAspectRatio='none'%3E%3Cg fill='%23171b28' opacity='.6'%3E%3Crect x='0' y='120' width='60' height='180'/%3E%3Crect x='50' y='90' width='80' height='210'/%3E%3Crect x='140' y='140' width='50' height='160'/%3E%3Crect x='200' y='60' width='70' height='240'/%3E%3Crect x='280' y='110' width='90' height='190'/%3E%3Crect x='380' y='40' width='60' height='260'/%3E%3Crect x='450' y='100' width='80' height='200'/%3E%3Crect x='540' y='70' width='50' height='230'/%3E%3Crect x='600' y='130' width='90' height='170'/%3E%3Crect x='700' y='30' width='70' height='270'/%3E%3Crect x='780' y='90' width='60' height='210'/%3E%3Crect x='850' y='60' width='100' height='240'/%3E%3Crect x='960' y='120' width='70' height='180'/%3E%3Crect x='1040' y='50' width='80' height='250'/%3E%3Crect x='1130' y='100' width='70' height='200'/%3E%3C/g%3E%3Cg fill='%230b0e16'%3E%3Crect x='0' y='190' width='90' height='110'/%3E%3Crect x='80' y='160' width='60' height='140'/%3E%3Crect x='150' y='210' width='110' height='90'/%3E%3Crect x='250' y='150' width='70' height='150'/%3E%3Crect x='330' y='200' width='90' height='100'/%3E%3Crect x='420' y='170' width='50' height='130'/%3E%3Crect x='480' y='220' width='120' height='80'/%3E%3Crect x='610' y='140' width='60' height='160'/%3E%3Crect x='680' y='190' width='90' height='110'/%3E%3Crect x='780' y='160' width='70' height='140'/%3E%3Crect x='860' y='210' width='100' height='90'/%3E%3Crect x='970' y='170' width='60' height='130'/%3E%3Crect x='1040' y='200' width='80' height='100'/%3E%3Crect x='1110' y='150' width='90' height='150'/%3E%3Crect x='0' y='270' width='1200' height='30'/%3E%3C/g%3E%3C/svg%3E") bottom / 100% 46% no-repeat,
+        radial-gradient(55% 40% at 72% 62%, var(--glow), transparent 70%),
+        var(--sky);
+}
+body[data-scene="siang"] .game { --sky: linear-gradient(180deg, #4f9df2 0%, #a6d1ff 52%, #eef4f7 74%, #8f9aa3 100%); --glow: rgba(255, 255, 255, .7); }
+body[data-scene="malam"] .game { --sky: linear-gradient(180deg, #04060d 0%, #0c1330 55%, #1a2342 76%, #06070c 100%); --glow: rgba(90, 120, 255, .25); }
+/* varian warna panel (coba-coba, scope ke .game saja) */
+body[data-theme="cokelat"] .game {
+    --bg: rgba(46, 32, 15, var(--alpha));           /* #c8872c digelapkan */
+    --inset: rgba(0, 0, 0, .3);
+}
+body[data-theme="emas"] .game {
+    --bg: rgba(200, 135, 44, var(--alpha));         /* #c8872c penuh, teks dibalik gelap */
+    --inset: rgba(255, 244, 222, .28);
+    --surface: rgba(0, 0, 0, .07);
+    --surface-2: rgba(0, 0, 0, .12);
+    --surface-3: rgba(0, 0, 0, .18);
+    --line: rgba(0, 0, 0, .14);
+    --line-2: rgba(0, 0, 0, .24);
+    --text: #1d1406;
+    --muted: rgba(29, 20, 6, .72);
+    --dim: rgba(29, 20, 6, .52);
+    --accent: #2a1a06;
+    --accent-rgb: 42, 26, 6;
+    --accent-soft: rgba(42, 26, 6, .14);
+    --on-accent: #ffd99a;
+    --ok: #14532d;   --ok-soft: rgba(20, 83, 45, .16);
+    --warn: #713f12; --warn-soft: rgba(113, 63, 18, .16);
+    --bad: #8f1d1d;  --bad-soft: rgba(143, 29, 29, .14);
+    --gold: #3b2506;
+}
+body[data-theme="putih"] .game {
+    --bg: rgba(255, 255, 255, var(--alpha));        /* gaya iOS terang */
+    --inset: rgba(118, 118, 128, .12);
+    --surface: rgba(118, 118, 128, .08);
+    --surface-2: rgba(118, 118, 128, .14);
+    --surface-3: rgba(118, 118, 128, .2);
+    --line: rgba(60, 60, 67, .14);
+    --line-2: rgba(60, 60, 67, .24);
+    --text: #1c1c1e;
+    --muted: rgba(60, 60, 67, .7);
+    --dim: rgba(60, 60, 67, .48);
+    --accent: #b8761f;                              /* emas digelapkan supaya terbaca di putih */
+    --accent-rgb: 184, 118, 31;
+    --accent-soft: rgba(184, 118, 31, .13);
+    --on-accent: #ffffff;
+    --ok: #248a3d;   --ok-soft: rgba(52, 199, 89, .16);
+    --warn: #b25000; --warn-soft: rgba(255, 149, 0, .16);
+    --bad: #d70015;  --bad-soft: rgba(255, 59, 48, .12);
+    --gold: #9a6510;
+    --r: 14px;
+    --r-lg: 22px;
+}
+body[data-theme="putih"] .game .panel { box-shadow: 0 8px 24px rgba(0, 0, 0, .12); }
+body[data-theme="putih"] .game .switch.on { background: #34c759; }
+body[data-theme="putih"] .game .switch::after { box-shadow: 0 2px 4px rgba(0, 0, 0, .2); }
+body[data-theme="putih"] .game .check input:checked + .box.round { box-shadow: inset 0 0 0 4px #fff; }
+body[data-theme="putih"] .game .kbd { background: #fff; box-shadow: inset 0 0 0 1px var(--line-2), inset 0 -2px 0 var(--line-2); }
+body[data-theme="putih"] .game .card .thumb { background: linear-gradient(135deg, rgba(var(--accent-rgb), .16), rgba(118, 118, 128, .06)); }
+body[data-theme="putih"] .game .sheet { background: rgba(118, 118, 128, .06); }
+body[data-theme="putih"] .game .btn-danger:hover { color: #fff; }
+body[data-theme="putih"] .game .btn-success:hover { background: #34c759; color: #fff; }
+body[data-theme="putih"] .game select.input option { background: #fff; }
+body[data-theme="putih"] .game .dim { background: rgba(0, 0, 0, .2); }
+.game.wide { aspect-ratio: 16 / 9; padding: 0; min-height: 560px; }
+.game.wide > .center { position: absolute; inset: 0; display: grid; place-items: center; }
+
+.kit { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 18px; align-items: start; }
+.kit .panel-body { display: flex; flex-direction: column; gap: 14px; }
+.kit .wrap { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+.sw { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); font-size: 11px; }
+.sw i { display: block; height: 38px; background: var(--c); }
+.sw span { display: block; padding: 6px 8px; color: var(--muted); }
+.sw b { display: block; color: var(--text); font-weight: 600; }
+
+/* Layout A — panel utama */
+.app { width: min(1040px, 94%); height: min(600px, 90%); display: flex; flex-direction: column; overflow: hidden; }
+.app-body { flex: 1; display: flex; min-height: 0; }
+.side { width: 200px; flex: none; display: flex; flex-direction: column; gap: 2px; padding: 14px 10px; border-right: 1px solid var(--line); }
+.side .t-label { padding: 0 12px 8px; }
+.nav { display: flex; align-items: center; gap: 10px; width: 100%; height: 38px; padding: 0 12px; border-radius: 10px; color: var(--muted); font-weight: 600; transition: background .12s, color .12s; }
+.nav:hover { background: var(--surface); color: var(--text); }
+.nav.active { background: var(--accent-soft); color: var(--accent); }
+.nav .badge { margin-left: auto; height: 20px; }
+.me { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--r); background: var(--surface); }
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 4px 18px 0; }
+.main .grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; align-content: start; padding: 14px 0 18px; }
+.sheet { width: 290px; flex: none; display: flex; flex-direction: column; border-left: 1px solid var(--line); background: rgba(0, 0, 0, .12); }
+.sheet-list { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 14px; }
+.line-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--r); background: var(--surface); }
+.line-item .meta { flex: 1; min-width: 0; }
+.sheet-foot { padding: 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.sheet-foot .row { justify-content: space-between; }
+
+/* Layout B — menu samping */
+.menu { position: absolute; right: 3%; top: 50%; transform: translateY(-50%); width: 310px; display: flex; flex-direction: column; overflow: hidden; }
+.menu-list { display: flex; flex-direction: column; gap: 6px; padding: 10px; max-height: 340px; }
+.menu-foot { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 10px 14px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+.menu-foot .kbd { min-width: 20px; height: 20px; font-size: 10px; }
+.menu-foot span.t { margin-right: 6px; }
+.at-bottom { position: absolute; left: 50%; transform: translateX(-50%); }
+.helpbox { position: absolute; left: 3%; top: 8%; width: 250px; padding: 12px 14px; border-radius: var(--r); }
+
+/* Layout C — dialog */
+.dim { position: absolute; inset: 0; background: rgba(0, 0, 0, .35); }
+.dialog { position: relative; width: 400px; overflow: hidden; }
+.dialog .panel-body { display: flex; flex-direction: column; gap: 14px; }
+.dialog-ico { width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+.dialog-ico .ic { width: 22px; height: 22px; }
+.info-row { display: flex; justify-content: space-between; padding: 10px 12px; border-radius: var(--r); background: var(--surface); font-size: 12px; }
+.toasts { position: absolute; right: 3%; bottom: 6%; display: flex; flex-direction: column; gap: 8px; }
+
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.rule { padding: 14px; border-radius: var(--r); background: rgba(255, 255, 255, .03); border: 1px solid var(--line); }
+.rule b { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.rule p { color: var(--muted); font-size: 12px; }
+.rule code { font-family: Consolas, monospace; font-size: 11px; color: var(--text); background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body data-scene="senja">
+
+<!-- Ikon (inline sprite, tanpa library) -->
+<svg width="0" height="0" style="position:absolute">
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-id" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="12" r="2.5"/><path d="M14 10h4M14 14h3"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24"><path d="M3 13l2-5a2 2 0 0 1 1.9-1.4h10.2A2 2 0 0 1 19 8l2 5v4H3z"/><path d="M5 17v2M19 17v2"/><circle cx="7.5" cy="13.5" r="1"/><circle cx="16.5" cy="13.5" r="1"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M16 13.5h2"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 1 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3 13h5l2 3h4l2-3h5"/><path d="M5 5h14l2 8v6H3v-6z"/></symbol>
+</svg>
+
+<header class="toolbar">
+    <div class="brand">
+        <div class="logo" style="width:32px;height:32px;border-radius:9px"><svg class="ic"><use href="#i-bolt"/></svg></div>
+        <div><div class="t-h3">F-UI · Base Design</div><div class="t-small">Mockup v1 — dasar NUI semua script</div></div>
+    </div>
+    <label class="ctrl">Transparansi
+        <input id="alpha" class="range" type="range" min=".4" max=".96" step=".01" value=".85">
+        <span id="alphaOut" class="t-num" style="width:32px;color:var(--text)">85%</span>
+    </label>
+    <div class="ctrl">Aksen
+        <div class="swatches" id="swatches">
+            <button class="active" data-a="" style="--sw:#f3b354" title="Emas (ox_inventory)"></button>
+            <button data-a="blue" style="--sw:#5b9dff" title="Biru (f_cityhall)"></button>
+            <button data-a="teal" style="--sw:#2dd4bf" title="Teal"></button>
+            <button data-a="violet" style="--sw:#a78bfa" title="Ungu"></button>
+            <button data-a="rose" style="--sw:#fb7185" title="Rose"></button>
+        </div>
+    </div>
+    <div class="ctrl">Warna panel
+        <div class="seg" id="theme">
+            <button class="active" data-t="">Hitam</button>
+            <button data-t="cokelat">Cokelat</button>
+            <button data-t="emas">Emas c8872c</button>
+            <button data-t="putih">Putih (iOS)</button>
+        </div>
+    </div>
+    <div class="ctrl">Latar game
+        <div class="seg" id="scene">
+            <button data-s="siang">Siang</button>
+            <button class="active" data-s="senja">Senja</button>
+            <button data-s="malam">Malam</button>
+        </div>
+    </div>
+</header>
+
+<main class="doc">
+    <div class="intro">
+        <div class="t-label c-accent">Base NUI</div>
+        <h1 class="t-display" style="margin-top:6px">Satu gaya untuk semua menu</h1>
+        <p>Gelap transparan, tipis, tanpa blur CSS. Geser <b>Transparansi</b> dan ganti <b>Latar game</b> di atas untuk cek keterbacaan di siang hari yang terang dan malam yang gelap.</p>
+    </div>
+
+    <!-- 01 TOKEN -->
+    <section class="sec">
+        <div class="sec-h"><span class="n">01</span><h2 class="t-h1">Warna & Tipografi</h2><p>Token dasar, semua komponen ambil dari sini</p></div>
+        <div class="game">
+            <div class="kit">
+                <div class="panel">
+                    <div class="panel-head"><div class="title">Warna</div></div>
+                    <div class="panel-body">
+                        <div class="t-label">Permukaan</div>
+                        <div class="sw-grid">
+                            <div class="sw"><i style="--c:var(--bg)"></i><span><b>bg</b>panel</span></div>
+                            <div class="sw"><i style="--c:var(--inset)"></i><span><b>inset</b>input</span></div>
+                            <div class="sw"><i style="--c:var(--surface)"></i><span><b>surface</b>kartu</span></div>
+                            <div class="sw"><i style="--c:var(--surface-3)"></i><span><b>surface-3</b>aktif</span></div>
+                        </div>
+                        <div class="t-label">Teks & status</div>
+                        <div class="sw-grid">
+                            <div class="sw"><i style="--c:var(--text)"></i><span><b>text</b>#eef2f8</span></div>
+                            <div class="sw"><i style="--c:var(--muted)"></i><span><b>muted</b>#96a2b6</span></div>
+                            <div class="sw"><i style="--c:var(--accent)"></i><span><b>accent</b>pilihan</span></div>
+                            <div class="sw"><i style="--c:var(--ok)"></i><span><b>ok</b>berhasil</span></div>
+                            <div class="sw"><i style="--c:var(--warn)"></i><span><b>warn</b>peringatan</span></div>
+                            <div class="sw"><i style="--c:var(--bad)"></i><span><b>bad</b>gagal</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head"><div class="title">Tipografi · Inter</div></div>
+                    <div class="panel-body">
+                        <div><div class="t-label">Display 26 / 800</div><div class="t-display">Rp 2.450.000</div></div>
+                        <div><div class="t-label">H1 20 / 700</div><div class="t-h1">Balai Kota</div></div>
+                        <div><div class="t-label">H2 16 / 700</div><div class="t-h2">Judul panel & dialog</div></div>
+                        <div><div class="t-label">H3 14 / 600</div><div class="t-h3">Nama item, judul kartu</div></div>
+                        <div><div class="t-label">Body 13 / 400</div><div class="t-body">Teks utama. Semua angka uang pakai tabular-nums supaya rapi sejajar.</div></div>
+                        <div><div class="t-label">Small 12 · muted</div><div class="t-small">Keterangan, deskripsi, info tambahan.</div></div>
+                        <div class="row"><span class="t-label">Label 11 / 700 · uppercase</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 02 KOMPONEN -->
+    <section class="sec">
+        <div class="sec-h"><span class="n">02</span><h2 class="t-h1">Komponen</h2><p>Tombol, form, status, daftar</p></div>
+        <div class="game">
+            <div class="kit">
+                <div class="panel">
+                    <div class="panel-head"><div class="title">Tombol</div></div>
+                    <div class="panel-body">
+                        <div class="wrap">
+                            <button class="btn btn-primary">Utama</button>
+                            <button class="btn btn-soft">Soft</button>
+                            <button class="btn btn-ghost">Ghost</button>
+                            <button class="btn btn-outline">Outline</button>
+                            <button class="btn btn-text">Teks</button>
+                        </div>
+                        <div class="wrap">
+                            <button class="btn btn-success"><svg class="ic"><use href="#i-check"/></svg>Setujui</button>
+                            <button class="btn btn-danger"><svg class="ic"><use href="#i-trash"/></svg>Hapus</button>
+                            <button class="btn btn-primary" disabled>Nonaktif</button>
+                            <button class="btn btn-primary"><span class="spin"></span>Memproses</button>
+                        </div>
+                        <div class="wrap">
+                            <button class="btn btn-primary btn-sm"><svg class="ic"><use href="#i-plus"/></svg>Kecil</button>
+                            <button class="btn btn-primary">Sedang</button>
+                            <button class="btn btn-primary btn-lg">Besar</button>
+                        </div>
+                        <div class="wrap">
+                            <button class="btn btn-ghost btn-icon"><svg class="ic"><use href="#i-search"/></svg></button>
+                            <button class="btn btn-ghost btn-icon"><svg class="ic"><use href="#i-bell"/></svg><span class="dotbadge">3</span></button>
+                            <button class="btn btn-ghost btn-icon close"><svg class="ic"><use href="#i-x"/></svg></button>
+                            <span class="t-small" style="margin-left:6px">Tombol keyboard:</span>
+                            <span class="kbd">E</span><span class="kbd">Esc</span><span class="kbd">Enter</span>
+                        </div>
+                        <button class="btn btn-primary btn-lg btn-block">Bayar Rp 130.000</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head"><div class="title">Form</div></div>
+                    <div class="panel-body">
+                        <div class="field">
+                            <label>Nama lengkap</label>
+                            <div class="ig"><svg class="ic"><use href="#i-user"/></svg><input class="input" placeholder="Contoh: Budi Santoso"></div>
+                        </div>
+                        <div class="field">
+                            <label>Jumlah</label>
+                            <div class="ig"><span class="pre">Rp</span><input class="input t-num" value="250.000"></div>
+                            <span class="hint">Maks Rp 5.000.000 per transaksi</span>
+                        </div>
+                        <div class="field">
+                            <label>Plat nomor</label>
+                            <input class="input invalid" value="F 12">
+                            <span class="hint err">Format plat harus seperti F 1111 R</span>
+                        </div>
+                        <div class="row" style="gap:12px">
+                            <div class="field" style="flex:1">
+                                <label>Jenis SIM</label>
+                                <select class="input"><option>SIM A — Mobil</option><option>SIM C — Motor</option><option>SIM B — Truk</option></select>
+                            </div>
+                            <div class="field">
+                                <label>Jumlah</label>
+                                <div class="stepper"><button data-d="-1"><svg class="ic"><use href="#i-minus"/></svg></button><input value="1"><button data-d="1"><svg class="ic"><use href="#i-plus"/></svg></button></div>
+                            </div>
+                        </div>
+                        <div class="field"><label>Catatan</label><textarea class="input" placeholder="Tulis alasan…"></textarea></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head"><div class="title">Kontrol</div></div>
+                    <div class="panel-body">
+                        <div class="tabs"><button class="active">Semua <span class="count">12</span></button><button>Identitas <span class="count">4</span></button><button>Lisensi</button></div>
+                        <div class="seg"><button class="active">Harian</button><button>Mingguan</button><button>Bulanan</button></div>
+                        <div class="row" style="justify-content:space-between"><div><div class="t-h3">Notifikasi suara</div><div class="t-small">Bunyi saat ada tagihan masuk</div></div><button class="switch on"></button></div>
+                        <div class="row" style="justify-content:space-between"><div><div class="t-h3">Mode anonim</div><div class="t-small">Sembunyikan nama di pengumuman</div></div><button class="switch"></button></div>
+                        <label class="check"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span>Saya setuju dengan syarat</label>
+                        <div class="row" style="gap:18px">
+                            <label class="check"><input type="radio" name="r1" checked><span class="box round"></span>Tunai</label>
+                            <label class="check"><input type="radio" name="r1"><span class="box round"></span>Bank</label>
+                        </div>
+                        <div class="field"><label>Volume</label><input class="range" type="range" value="60"></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head"><div class="title">Status & Info</div></div>
+                    <div class="panel-body">
+                        <div class="wrap">
+                            <span class="badge"><span class="dot"></span>Netral</span>
+                            <span class="badge accent">Baru</span>
+                            <span class="badge ok"><span class="dot"></span>Aktif</span>
+                            <span class="badge warn">Menunggu</span>
+                            <span class="badge bad">Ditolak</span>
+                            <span class="badge gold">VIP</span>
+                        </div>
+                        <div class="row" style="gap:10px">
+                            <div class="stat" style="flex:1"><div class="t-label">Saldo bank</div><div class="v">Rp 2.450.000</div><div class="d c-ok">+ Rp 150.000 hari ini</div></div>
+                            <div class="stat" style="flex:1"><div class="t-label">Tagihan</div><div class="v c-warn">3</div><div class="d c-muted">Rp 420.000 belum dibayar</div></div>
+                        </div>
+                        <div><div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="t-small">Bensin</span><span class="t-small t-num">82%</span></div><div class="progress ok"><i style="--v:82%"></i></div></div>
+                        <div><div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="t-small">Kondisi mesin</span><span class="t-small t-num">34%</span></div><div class="progress bad"><i style="--v:34%"></i></div></div>
+                        <div class="callout"><svg class="ic"><use href="#i-info"/></svg>Pengajuan disetujui di dekat petugas Balai Kota.</div>
+                        <div class="callout warn"><svg class="ic"><use href="#i-alert"/></svg>SIM kamu habis masa berlaku dalam 2 hari.</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head"><div class="title">Daftar</div><div class="spacer"></div><button class="btn btn-soft btn-sm" id="toastBtn"><svg class="ic"><use href="#i-bell"/></svg>Tes notifikasi</button></div>
+                    <div class="panel-body" style="gap:8px">
+                        <button class="item active"><span class="ico"><svg class="ic"><use href="#i-id"/></svg></span><span class="meta"><div class="name">Kartu Tanda Penduduk</div><div class="desc">NIK F4829174 · berlaku seumur hidup</div></span><svg class="ic trail"><use href="#i-chev"/></svg></button>
+                        <button class="item"><span class="ico"><svg class="ic"><use href="#i-car"/></svg></span><span class="meta"><div class="name">STNK Sultan RS</div><div class="desc">F 1234 R · pajak lunas</div></span><span class="badge ok">Lunas</span></button>
+                        <button class="item"><span class="ico"><svg class="ic"><use href="#i-wallet"/></svg></span><span class="meta"><div class="name">Pajak penghasilan</div><div class="desc">Jatuh tempo 30 Okt</div></span><span class="money c-warn">Rp 85.000</span></button>
+                        <div class="empty"><svg class="ic"><use href="#i-inbox"/></svg><div class="t-h3" style="color:var(--text)">Belum ada riwayat</div><div class="t-small">Transaksi akan muncul di sini</div></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head"><div class="title">Tabel</div></div>
+                    <div style="padding:6px 6px 10px">
+                        <table class="table">
+                            <thead><tr><th>Layanan</th><th>Status</th><th class="r">Harga</th></tr></thead>
+                            <tbody>
+                                <tr><td>KTP</td><td><span class="badge ok">Selesai</span></td><td class="r money">Rp 25.000</td></tr>
+                                <tr><td>SIM A</td><td><span class="badge warn">Proses</span></td><td class="r money">Rp 150.000</td></tr>
+                                <tr><td>STNK</td><td><span class="badge bad">Ditolak</span></td><td class="r money">Rp 75.000</td></tr>
+                                <tr><td>Balik nama</td><td><span class="badge">Draf</span></td><td class="r money">Rp 50.000</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="toasts" id="toastDemo" style="right:28px;bottom:28px"></div>
+        </div>
+    </section>
+
+    <!-- 03 LAYOUT A -->
+    <section class="sec">
+        <div class="sec-h"><span class="n">03</span><h2 class="t-h1">Layout A · Panel utama</h2><p>Untuk menu besar: Balai Kota, toko, kasir, MDT, garasi editor</p></div>
+        <div class="game wide">
+            <div class="center">
+                <div class="panel app">
+                    <div class="panel-head">
+                        <div class="logo"><svg class="ic"><use href="#i-home"/></svg></div>
+                        <div><div class="title">Balai Kota</div><div class="sub">Layanan publik · buka 24 jam</div></div>
+                        <div class="spacer"></div>
+                        <div class="ig" style="width:230px"><svg class="ic"><use href="#i-search"/></svg><input class="input" placeholder="Cari layanan…"></div>
+                        <button class="btn btn-ghost btn-icon"><svg class="ic"><use href="#i-bell"/></svg><span class="dotbadge">2</span></button>
+                        <button class="btn btn-ghost btn-icon close"><svg class="ic"><use href="#i-x"/></svg></button>
+                    </div>
+                    <div class="app-body">
+                        <nav class="side" data-group>
+                            <div class="t-label">Menu</div>
+                            <button class="nav active"><svg class="ic"><use href="#i-id"/></svg>Dokumen<span class="badge accent">6</span></button>
+                            <button class="nav"><svg class="ic"><use href="#i-car"/></svg>Kendaraan</button>
+                            <button class="nav"><svg class="ic"><use href="#i-wallet"/></svg>Pajak<span class="badge warn">1</span></button>
+                            <button class="nav"><svg class="ic"><use href="#i-file"/></svg>Riwayat</button>
+                            <div class="spacer"></div>
+                            <div class="me"><div class="avatar">BS</div><div style="min-width:0"><div class="t-h3">Budi Santoso</div><div class="t-small t-num">F4829174</div></div></div>
+                        </nav>
+                        <section class="main">
+                            <div class="tabs"><button class="active">Semua <span class="count">6</span></button><button>Identitas</button><button>Lisensi</button></div>
+                            <div class="grid scroll">
+                                <div class="card"><div class="thumb"><svg class="ic"><use href="#i-id"/></svg></div><h4>KTP</h4><p>Kartu identitas resmi warga.</p><div class="foot"><span class="price">Rp 25.000</span><button class="btn btn-soft btn-sm"><svg class="ic"><use href="#i-check"/></svg>Ditambah</button></div></div>
+                                <div class="card"><div class="thumb"><svg class="ic"><use href="#i-car"/></svg></div><h4>SIM A</h4><p>Izin mengemudi mobil.</p><div class="foot"><span class="price">Rp 150.000</span><button class="btn btn-primary btn-sm"><svg class="ic"><use href="#i-plus"/></svg>Tambah</button></div></div>
+                                <div class="card"><div class="thumb"><span class="badge gold">Populer</span><svg class="ic"><use href="#i-car"/></svg></div><h4>SIM C</h4><p>Izin mengemudi motor.</p><div class="foot"><span class="price">Rp 100.000</span><button class="btn btn-soft btn-sm"><svg class="ic"><use href="#i-check"/></svg>Ditambah</button></div></div>
+                                <div class="card"><div class="thumb"><svg class="ic"><use href="#i-file"/></svg></div><h4>STNK</h4><p>Surat tanda nomor kendaraan.</p><div class="foot"><span class="price">Rp 75.000</span><button class="btn btn-primary btn-sm"><svg class="ic"><use href="#i-plus"/></svg>Tambah</button></div></div>
+                                <div class="card"><div class="thumb"><svg class="ic"><use href="#i-user"/></svg></div><h4>Surat Kerja</h4><p>Keterangan kerja resmi.</p><div class="foot"><span class="price">Rp 30.000</span><button class="btn btn-primary btn-sm"><svg class="ic"><use href="#i-plus"/></svg>Tambah</button></div></div>
+                                <div class="card off"><div class="thumb"><svg class="ic"><use href="#i-shield"/></svg></div><h4>Lisensi Senjata</h4><p>Butuh persetujuan polisi.</p><div class="foot"><span class="price">Rp 500.000</span><button class="btn btn-ghost btn-sm" disabled>Terkunci</button></div></div>
+                            </div>
+                        </section>
+                        <aside class="sheet">
+                            <div class="panel-head compact"><div class="t-h2">Keranjang</div><span class="badge accent">2</span><div class="spacer"></div><button class="btn btn-text btn-sm">Kosongkan</button></div>
+                            <div class="sheet-list scroll">
+                                <div class="line-item"><div class="meta"><div class="t-h3">KTP</div><div class="t-small money c-accent">Rp 25.000</div></div><div class="stepper sm"><button data-d="-1"><svg class="ic"><use href="#i-minus"/></svg></button><input value="1"><button data-d="1"><svg class="ic"><use href="#i-plus"/></svg></button></div><button class="btn btn-ghost btn-icon btn-sm close"><svg class="ic"><use href="#i-trash"/></svg></button></div>
+                                <div class="line-item"><div class="meta"><div class="t-h3">SIM C</div><div class="t-small money c-accent">Rp 100.000</div></div><div class="stepper sm"><button data-d="-1"><svg class="ic"><use href="#i-minus"/></svg></button><input value="1"><button data-d="1"><svg class="ic"><use href="#i-plus"/></svg></button></div><button class="btn btn-ghost btn-icon btn-sm close"><svg class="ic"><use href="#i-trash"/></svg></button></div>
+                            </div>
+                            <div class="sheet-foot">
+                                <div class="row t-small"><span>Subtotal</span><span class="t-num">Rp 125.000</span></div>
+                                <div class="row t-small"><span>Biaya admin</span><span class="t-num">Rp 5.000</span></div>
+                                <div class="row" style="margin:4px 0 8px"><span class="t-h3">Total</span><span class="money" style="font-size:18px">Rp 130.000</span></div>
+                                <button class="btn btn-primary btn-lg btn-block">Ajukan & Bayar</button>
+                                <div class="hint" style="text-align:center">Disetujui petugas terdekat</div>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 04 LAYOUT B -->
+    <section class="sec">
+        <div class="sec-h"><span class="n">04</span><h2 class="t-h1">Layout B · Menu samping & HUD interaksi</h2><p>Pengganti context menu: garasi, interaksi target, pilihan cepat</p></div>
+        <div class="game wide">
+            <div class="panel helpbox">
+                <div class="t-label c-accent" style="margin-bottom:6px">Tugas aktif</div>
+                <div class="t-h3">Antar pesanan ke Vinewood</div>
+                <div class="t-small" style="margin-top:2px">2 dari 3 pesanan · sisa 04:12</div>
+                <div class="progress" style="margin-top:10px"><i style="--v:66%"></i></div>
+            </div>
+
+            <div class="panel menu">
+                <div class="panel-head compact">
+                    <div class="logo" style="width:34px;height:34px"><svg class="ic"><use href="#i-key"/></svg></div>
+                    <div><div class="t-h2">Garasi Pillbox</div><div class="sub">3 kendaraan</div></div>
+                    <div class="spacer"></div>
+                    <button class="btn btn-ghost btn-icon btn-sm close"><svg class="ic"><use href="#i-x"/></svg></button>
+                </div>
+                <div class="menu-list scroll" data-group>
+                    <button class="item active"><span class="ico"><svg class="ic"><use href="#i-car"/></svg></span><span class="meta"><div class="name">Sultan RS</div><div class="desc">F 1234 R · Bensin 82%</div></span><span class="badge ok">Ada</span></button>
+                    <button class="item"><span class="ico"><svg class="ic"><use href="#i-car"/></svg></span><span class="meta"><div class="name">Asbo</div><div class="desc">F 5521 R · Diderek</div></span><span class="badge warn">Depot</span></button>
+                    <button class="item"><span class="ico"><svg class="ic"><use href="#i-car"/></svg></span><span class="meta"><div class="name">Bati 801</div><div class="desc">F 7710 R · Bensin 40%</div></span><span class="badge ok">Ada</span></button>
+                    <div class="divider"></div>
+                    <button class="item"><span class="ico"><svg class="ic"><use href="#i-plus"/></svg></span><span class="meta"><div class="name">Simpan kendaraan</div><div class="desc">Kendaraan terdekat</div></span><svg class="ic trail"><use href="#i-chev"/></svg></button>
+                </div>
+                <div class="menu-foot"><span class="kbd">↑</span><span class="kbd">↓</span><span class="t">Pilih</span><span class="kbd">Enter</span><span class="t">Ambil</span><span class="kbd">Esc</span><span class="t">Tutup</span></div>
+            </div>
+
+            <div class="prompt at-bottom" style="bottom:24%"><span class="kbd">E</span>Buka Garasi</div>
+            <div class="panel progbar at-bottom" style="bottom:8%">
+                <div class="row"><span>Memperbaiki mesin…</span><span class="t-num c-muted">62%</span></div>
+                <div class="progress"><i style="--v:62%"></i></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 05 LAYOUT C -->
+    <section class="sec">
+        <div class="sec-h"><span class="n">05</span><h2 class="t-h1">Layout C · Dialog & notifikasi</h2><p>Konfirmasi, input jumlah, pesan singkat</p></div>
+        <div class="game wide">
+            <div class="dim"></div>
+            <div class="center">
+                <div class="panel dialog">
+                    <div class="panel-body">
+                        <div class="row" style="gap:12px;align-items:flex-start">
+                            <div class="dialog-ico"><svg class="ic"><use href="#i-send"/></svg></div>
+                            <div style="flex:1"><div class="t-h2">Transfer ke rekening</div><div class="sub">Pastikan nomor rekening benar. Transaksi tidak bisa dibatalkan.</div></div>
+                            <button class="btn btn-ghost btn-icon btn-sm close"><svg class="ic"><use href="#i-x"/></svg></button>
+                        </div>
+                        <div class="field"><label>Nomor rekening</label><input class="input t-num" value="F7731045"></div>
+                        <div class="field"><label>Jumlah</label><div class="ig"><span class="pre">Rp</span><input class="input t-num" value="500.000"></div></div>
+                        <div class="info-row"><span class="c-muted">Saldo setelah transfer</span><span class="money">Rp 1.950.000</span></div>
+                    </div>
+                    <div class="panel-foot">
+                        <button class="btn btn-ghost">Batal</button>
+                        <button class="btn btn-primary"><svg class="ic"><use href="#i-send"/></svg>Kirim</button>
+                    </div>
+                </div>
+            </div>
+            <div class="toasts">
+                <div class="toast ok"><div class="ti"><svg class="ic"><use href="#i-check"/></svg></div><div><div class="tt">Pembayaran berhasil</div><div class="tm">Rp 130.000 dipotong dari bank</div></div></div>
+                <div class="toast warn"><div class="ti"><svg class="ic"><use href="#i-alert"/></svg></div><div><div class="tt">Bensin hampir habis</div><div class="tm">Sisa 8% — cari SPBU terdekat</div></div></div>
+                <div class="toast bad"><div class="ti"><svg class="ic"><use href="#i-x"/></svg></div><div><div class="tt">Saldo tidak cukup</div><div class="tm">Butuh Rp 50.000 lagi</div></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 06 ATURAN -->
+    <section class="sec">
+        <div class="sec-h"><span class="n">06</span><h2 class="t-h1">Aturan supaya tetap ringan</h2><p>Berlaku untuk semua NUI yang pakai base ini</p></div>
+        <div class="rules">
+            <div class="rule"><b><svg class="ic c-accent"><use href="#i-bolt"/></svg>Tanpa blur CSS</b><p><code>backdrop-filter</code> tidak memburamkan dunia game di NUI, cuma makan GPU. Transparansi pakai <code>rgba</code>. Kalau mau blur, pakai screenblur dari Lua seperti ox_lib patch.</p></div>
+            <div class="rule"><b><svg class="ic c-accent"><use href="#i-bolt"/></svg>Font lokal</b><p>Inter woff2 (≈100 KB) disimpan di resource base, bukan Google Fonts, supaya tidak tergantung internet & tidak ada delay.</p></div>
+            <div class="rule"><b><svg class="ic c-accent"><use href="#i-bolt"/></svg>Animasi seperlunya</b><p>Cuma <code>opacity</code>/<code>transform</code>, ≤ 200 ms. Tidak ada animasi berulang saat menu diam (kecuali spinner loading).</p></div>
+            <div class="rule"><b><svg class="ic c-accent"><use href="#i-bolt"/></svg>Tutup = hilang</b><p>Saat menu ditutup pakai <code>display:none</code>, <code>body</code> transparan, tidak ada interval JS yang jalan.</p></div>
+            <div class="rule"><b><svg class="ic c-accent"><use href="#i-bolt"/></svg>Vanilla JS</b><p>Menu biasa tanpa React/Vue. Ikon pakai SVG sprite inline, tanpa icon font / library.</p></div>
+            <div class="rule"><b><svg class="ic c-accent"><use href="#i-bolt"/></svg>Satu sumber gaya</b><p>Token & komponen di satu <code>base.css</code>; tiap script cukup tambah CSS layout sendiri. Ganti aksen/transparansi sekali, semua ikut.</p></div>
+        </div>
+    </section>
+</main>
+
+<script>
+const root = document.documentElement;
+const setP = el => el.style.setProperty('--p', ((el.value - el.min) / (el.max - el.min) * 100) + '%');
+document.querySelectorAll('.range').forEach(r => { setP(r); r.addEventListener('input', () => setP(r)); });
+
+const alpha = document.getElementById('alpha');
+alpha.addEventListener('input', () => {
+    root.style.setProperty('--alpha', alpha.value);
+    document.getElementById('alphaOut').textContent = Math.round(alpha.value * 100) + '%';
+});
+
+// grup pilihan tunggal: tabs, segmented, sidebar, daftar menu
+const single = (group, sel) => group.addEventListener('click', e => {
+    const b = e.target.closest(sel);
+    if (!b || !group.contains(b)) return;
+    group.querySelectorAll(sel).forEach(x => x.classList.toggle('active', x === b));
+});
+document.querySelectorAll('.tabs, .seg, .swatches').forEach(g => single(g, 'button'));
+document.querySelectorAll('[data-group]').forEach(g => single(g, '.nav, .item'));
+document.querySelectorAll('.panel-body').forEach(g => { if (g.querySelector(':scope > .item')) single(g, '.item'); });
+
+document.getElementById('swatches').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.a) root.dataset.accent = b.dataset.a; else delete root.dataset.accent;
+});
+document.getElementById('theme').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.t) document.body.dataset.theme = b.dataset.t; else delete document.body.dataset.theme;
+});
+document.getElementById('scene').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (b) document.body.dataset.scene = b.dataset.s;
+});
+
+document.querySelectorAll('.switch').forEach(s => s.addEventListener('click', () => s.classList.toggle('on')));
+document.querySelectorAll('.stepper').forEach(st => st.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const inp = st.querySelector('input');
+    inp.value = Math.max(0, (parseInt(inp.value) || 0) + Number(b.dataset.d));
+}));
+
+const demo = [
+    ['ok', 'i-check', 'Berhasil disimpan', 'Data kendaraan diperbarui'],
+    ['', 'i-info', 'Tagihan baru', 'Rp 45.000 dari Kafe Foreplay'],
+    ['warn', 'i-alert', 'Peringatan', 'Kamu keluar dari zona aman'],
+    ['bad', 'i-x', 'Gagal', 'Inventaris penuh'],
+];
+let di = 0;
+document.getElementById('toastBtn').addEventListener('click', () => {
+    const box = document.getElementById('toastDemo');
+    const [k, ic, t, m] = demo[di++ % demo.length];
+    const el = document.createElement('div');
+    el.className = 'toast ' + k;
+    el.innerHTML = `<div class="ti"><svg class="ic"><use href="#${ic}"/></svg></div><div><div class="tt">${t}</div><div class="tm">${m}</div></div>`;
+    box.appendChild(el);
+    while (box.children.length > 4) box.firstChild.remove();
+    setTimeout(() => el.remove(), 3500);
+});
+</script>
+</body>
+</html>

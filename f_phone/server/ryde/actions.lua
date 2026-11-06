@@ -40,10 +40,6 @@ local EV = 'f_phone:client:ryde:'
 ---request/cancel loop worthless, short enough that re-picking a destination is not a wait.
 local REQUEST_COOLDOWN = 5000
 
----@type integer Offers one request may hold. A real driver can only bid once (driverActive gates
----them), so this only bounds the synthetic /rydeoffer cards.
-local MAX_OFFERS = 8
-
 local util = require 'server.util'
 local ok, fail = util.ok, util.fail
 
@@ -178,6 +174,23 @@ local function distanceKm(a, b)
     return math.sqrt((a.x - b.x) ^ 2 + (a.y - b.y) ^ 2) / 1000
 end
 
+---Estimated road distance in km (straight line * RoadFactor), rounded to 0.1 km.
+---@param a table
+---@param b table
+---@return number
+local function roadKm(a, b)
+    return math.floor(distanceKm(a, b) * (config.RoadFactor or 1.0) * 10 + 0.5) / 10
+end
+
+---Fixed fare for a road distance: BaseFare + km * PerKm, rounded to Rp 1.000 and clamped.
+---@param km number
+---@return integer
+local function calcFare(km)
+    local fare = (config.BaseFare or 0) + km * (config.PerKm or 0)
+    fare = math.floor(fare / 1000 + 0.5) * 1000
+    return math.floor(math.max(config.MinFare or 0, math.min(config.MaxFare or fare, fare)))
+end
+
 ---Trims a pending request down to a driver's board card, omitting the rider's citizenid and
 ---payment choice.
 ---@param r table request record
@@ -186,7 +199,7 @@ local function publicRequest(r)
     return {
         id = r.id, riderName = r.riderName,
         pickup = r.pickup, dropoff = r.dropoff,
-        distance = r.distance, createdAt = r.createdAt,
+        distance = r.distance, fare = r.fare, createdAt = r.createdAt,
     }
 end
 
@@ -223,6 +236,28 @@ local function cancelTrip(trip, by)
     if by ~= 'driver' then
         pushTo(trip.driverCid, 'tripUpdate', { id = trip.id, status = 'cancelled', role = 'driver', by = by })
     end
+end
+
+---Holds an engaged trip for DisconnectGrace seconds after one side crashes; one timer per drop,
+---no polling. Back in time (onPlayerLoaded clears `offline`) = trip continues; otherwise it is
+---cancelled free of charge.
+---@param trip table
+---@param cid string citizenid of the player who dropped
+local function holdTrip(trip, cid)
+    local role  = (trip.riderCid == cid) and 'rider' or 'driver'
+    local other = (role == 'rider') and trip.driverCid or trip.riderCid
+    local grace = config.DisconnectGrace or 300
+    local token = {}
+    trip.offline = { cid = cid, role = role, token = token }
+    notifyRyde(other, ('%s terputus. Menunggu maksimal %d menit.'):format(role == 'rider' and 'Penumpang' or 'Supir', math.ceil(grace / 60)))
+
+    SetTimeout(grace * 1000, function()
+        if trips[trip.id] ~= trip or not trip.offline or trip.offline.token ~= token then return end
+        if srcOf(cid) then trip.offline = nil; return end  -- back, but the load event was missed
+        cancelTrip(trip, 'disconnect')
+        if role == 'driver' then online[trip.driverUsername] = nil end
+        notifyRyde(other, ('%s tidak kembali. Perjalanan dibatalkan tanpa biaya.'):format(role == 'rider' and 'Penumpang' or 'Supir'))
+    end)
 end
 
 ---Drops a single offered trip and frees its driver, leaving the rider's open request untouched;
@@ -311,10 +346,14 @@ function actions.requestRide(src, payload)
         riderCid      = rdr.cid,
         pickup        = { label = (type(pickup.label) == 'string' and pickup.label or 'Lokasi saat ini'):sub(1, 96), x = px + 0.0, y = py + 0.0 },
         dropoff       = { label = (type(dropoff.label) == 'string' and dropoff.label or 'Destination'):sub(1, 96), x = dx + 0.0, y = dy + 0.0 },
-        payment       = (p.payment == 'cash') and 'cash' or 'card',
+        payment       = 'card',
         createdAt     = os.time() * 1000,
     }
-    req.distance = distanceKm(req.pickup, req.dropoff)
+    req.distance = roadKm(req.pickup, req.dropoff)
+    req.fare     = calcFare(req.distance)
+    if money.get(src, 'bank') < req.fare then
+        return fail('ryde.notEnoughBank', ('Saldo bank tidak cukup. Tarif perjalanan ini Rp %d.'):format(req.fare))
+    end
 
     requests[req.id]      = req
     riderActive[rdr.cid]  = req.id
@@ -322,46 +361,10 @@ function actions.requestRide(src, payload)
     broadcastWaiting()
     for username, d in pairs(online) do
         if not driverActive[username] then
-            notifyRyde(d.cid, ('Pesanan baru dari %s di dekat %s'):format(rdr.name, req.pickup.label))
+            notifyRyde(d.cid, ('Pesanan baru dari %s di dekat %s (Rp %d)'):format(rdr.name, req.pickup.label, req.fare))
         end
     end
-    return ok({ requestId = req.id })
-end
-
----Rider responds to a driver's offer: accept locks the trip in, pulls the request off the board,
----bounces other bids and pushes the engaged trip to both parties; decline drops just this offer.
----@param src integer player server id
----@param payload table { tripId: string, accept?: boolean }
----@return table result
-function actions.respond(src, payload)
-    local cid = player.getIdentifier(src)
-    local p = type(payload) == 'table' and payload or {}
-    local trip = p.tripId and trips[p.tripId] or nil
-    if not (trip and trip.riderCid == cid and trip.status == 'offered') then
-        return fail('ryde.noPendingOffer', 'No pending offer.')
-    end
-
-    if p.accept then
-        if trip.requestId and requests[trip.requestId] then
-            requests[trip.requestId] = nil
-            broadcastToDrivers('requestRemoved', { id = trip.requestId })
-            broadcastWaiting()
-        end
-        clearOffersFor(trip.requestId, trip.id, 'declined')
-
-        trip.status = 'enroute_pickup'
-        riderActive[trip.riderUsername] = trip.id
-        local driverView = publicTrip(trip, 'driver')
-        driverView.waypoint = trip.pickup
-        pushTo(trip.driverCid, 'tripUpdate', driverView)
-        pushTo(trip.riderCid,  'tripUpdate', publicTrip(trip, 'rider'))
-        notifyRyde(trip.driverCid, ('%s menerima tarifmu. Menuju titik jemput.'):format(trip.riderName or 'Penumpangmu'))
-        return ok({ tripId = trip.id })
-    end
-
-    dropOffer(trip)
-    pushTo(trip.driverCid, 'tripUpdate', { id = trip.id, status = 'declined', role = 'driver' })
-    return ok({ declined = true })
+    return ok({ requestId = req.id, fare = req.fare, distance = req.distance })
 end
 
 ---Goes on/off duty. Going online registers/refreshes the driver's vehicle card and hands back
@@ -418,10 +421,11 @@ function actions.requestsBoard(src)
     return ok({ requests = pending })
 end
 
----Driver bids on a pending request by quoting a fare, creating an 'offered' trip; the fare is
----coerced to a finite integer and clamped, and the gates are re-checked after the DB awaits.
+---Driver takes a pending request at its fixed fare, first come first served: the gates are
+---re-checked after the DB awaits, then the request is pulled off the board in the same
+---non-yielding block that creates the trip, so two drivers can never both win it.
 ---@param src integer player server id
----@param payload table { requestId: string, fare: number }
+---@param payload table { requestId: string }
 ---@return table result { tripId } on success
 function actions.accept(src, payload)
     local acc = account(src)
@@ -434,18 +438,15 @@ function actions.accept(src, payload)
     if not req then return fail('ryde.rideNoLongerAvailable', 'That ride is no longer available.') end
     if req.riderCid == acc._cid then return fail('ryde.cannotAcceptOwnRequest', 'You cannot accept your own request.') end
 
-    local fare = finite(p.fare)
-    fare = fare and math.floor(fare) or 0
-    if fare < (config.MinFare or 1) then return fail('ryde.fareRequired', 'Enter a fare.') end
-    if fare > (config.MaxFare or 100000) then return fail('ryde.fareTooHigh', 'That fare is too high.') end
-
-    local drv = online[acc.username]
     local driverNumber = settings.ensurePhoneNumber(acc._cid)
     local riderNumber  = settings.ensurePhoneNumber(req.riderCid)
-    if not online[acc.username] then return fail('ryde.goOnlineAcceptRides', 'Go online to accept rides.') end
+    -- Re-check after the awaits; from here to the end nothing yields, so the first driver wins.
+    local drv = online[acc.username]
+    if not drv then return fail('ryde.goOnlineAcceptRides', 'Go online to accept rides.') end
     if driverActive[acc.username] then return fail('ryde.alreadyHaveActiveTrip', 'You already have an active trip.') end
-    if not requests[req.id] then return fail('ryde.rideNoLongerAvailable', 'That ride is no longer available.') end
+    if requests[req.id] ~= req then return fail('ryde.rideTakenByOther', 'Pesanan ini sudah diambil supir lain.') end
 
+    requests[req.id] = nil
     local trip = {
         id = store.newId(), requestId = req.id,
         riderUsername = req.riderUsername, riderName = req.riderName, riderCid = req.riderCid,
@@ -454,21 +455,28 @@ function actions.accept(src, payload)
         riderNumber  = riderNumber,
         vehicle = drv.vehicle, plate = drv.plate, color = drv.color, driverRating = drv.rating,
         pickup = req.pickup, dropoff = req.dropoff, distance = req.distance,
-        payment = req.payment, fare = fare, status = 'offered',
+        payment = req.payment, fare = req.fare, status = 'enroute_pickup',
     }
-    trips[trip.id]             = trip
-    driverActive[acc.username] = trip.id
-    pushTo(trip.riderCid, 'offer', publicTrip(trip, 'rider'))
+    trips[trip.id]                  = trip
+    driverActive[acc.username]      = trip.id
+    riderActive[trip.riderUsername] = trip.id
+    broadcastToDrivers('requestRemoved', { id = req.id })
+    broadcastWaiting()
+
+    pushTo(trip.riderCid, 'matched', publicTrip(trip, 'rider'))
+    local driverView = publicTrip(trip, 'driver')
+    driverView.waypoint = trip.pickup
+    pushTo(trip.driverCid, 'tripUpdate', driverView)
+
     local riderSrc = srcOf(trip.riderCid)
     if riderSrc then
         TriggerClientEvent('f_phone:client:notify', riderSrc, {
             app = 'ryde', appId = 'ryde', quietInApp = true, time = 'now', title = 'Ryde',
-            bodyKey = 'ryde.driverOfferedFare', body = ('%s menawarkan tarif Rp %d'):format(trip.driverName, fare),
-            bodyVars = { name = trip.driverName, amount = fare },
+            body = ('%s menuju lokasimu (%s, %s)'):format(trip.driverName, trip.vehicle, trip.plate),
         })
     end
-    print(('^3[f_phone:ryde]^0 %s offered Rp %d on request %s (trip %s)'):format(acc.name, fare, req.id, trip.id))
-    return ok({ tripId = trip.id })
+    print(('^3[f_phone:ryde]^0 %s took request %s at Rp %d (trip %s)'):format(acc.name, req.id, trip.fare, trip.id))
+    return ok({ tripId = trip.id, fare = trip.fare })
 end
 
 ---Driver advances an accepted trip to 'arriving' or 'in_progress'; only the trip's own driver,
@@ -483,6 +491,7 @@ function actions.tripStatus(src, payload)
     local trip = p.tripId and trips[p.tripId] or nil
     if not (trip and trip.driverUsername == acc.username) then return fail('ryde.noActiveTrip', 'No active trip.') end
     if trip.status == 'offered' then return fail('ryde.noActiveTrip', 'No active trip.') end
+    if trip.offline then return fail('ryde.partyDisconnected', 'Penumpang sedang terputus. Tunggu dia kembali.') end
 
     local nextStatus = p.status
     if nextStatus ~= 'arriving' and nextStatus ~= 'in_progress' then return fail('ryde.invalidStatus', 'Invalid status.') end
@@ -517,7 +526,8 @@ function actions.sameVehicle(src, payload)
 end
 
 ---Driver completes an 'in_progress' trip within 250m of the drop-off: charges the rider bank ->
----bank, pays the driver's cut, persists the ride and bumps stats; unpaid rides record paid = false.
+---bank, pays the driver the fare minus TaxRate (tax -> TaxAccount + f_tax "Pajak Warga"),
+---persists the ride and bumps stats; unpaid rides record paid = false.
 ---@param src integer player server id
 ---@param payload table { tripId: string }
 ---@return table result { rideId, fare, paid }
@@ -528,8 +538,15 @@ function actions.complete(src, payload)
     local trip = p.tripId and trips[p.tripId] or nil
     if not (trip and trip.driverUsername == acc.username) then return fail('ryde.noActiveTrip', 'No active trip.') end
     if trip.status ~= 'in_progress' then return fail('ryde.pickUpRiderBeforeCompleting', 'Pick up your rider before completing the trip.') end
-    if not withinOf(srcOf(trip.driverCid), trip.dropoff.x, trip.dropoff.y, 250.0) then
-        return fail('ryde.driveDropOffCompleteTrip', 'Drive to the drop-off to complete the trip.')
+    -- Never charge a rider who is offline; the trip is held until they return or the grace ends.
+    if trip.offline then return fail('ryde.partyDisconnected', 'Penumpang sedang terputus. Tunggu dia kembali.') end
+
+    -- At the drop-off: full fare. Anywhere else: metered from pickup to here, capped at full fare.
+    local early = not withinOf(src, trip.dropoff.x, trip.dropoff.y, config.ArriveRadius or 250.0)
+    if early then
+        local c = GetEntityCoords(GetPlayerPed(src))
+        trip.fullFare = trip.fare
+        trip.fare     = math.min(trip.fare, calcFare(roadKm(trip.pickup, { x = c.x, y = c.y })))
     end
 
     trips[trip.id] = nil
@@ -538,13 +555,22 @@ function actions.complete(src, payload)
 
     local riderSrc  = srcOf(trip.riderCid)
     local driverSrc = srcOf(trip.driverCid)
-    local driverEarn = lib.math.round(trip.fare * (config.DriverCut or 1.0))
+    local tax        = math.floor(trip.fare * (config.TaxRate or 0) + 0.5)
+    local driverEarn = trip.fare - tax
 
     local paid = false
     if riderSrc and money.get(riderSrc, 'bank') >= trip.fare then
         money.remove(riderSrc, 'bank', trip.fare, 'Ryde fare')
         if driverSrc then money.add(driverSrc, 'bank', driverEarn, 'Pendapatan Ryde') end
         paid = true
+        if tax > 0 then
+            local okT, added = pcall(function() return exports['Renewed-Banking']:addAccountMoney(config.TaxAccount or 'government', tax) end)
+            if okT and added then
+                pcall(function() exports.f_tax:AddCitizenTax(tax) end)
+            else
+                print(('^1[f_phone:ryde]^0 pajak Ryde Rp %d (trip %s) gagal masuk ke rekening %s'):format(tax, trip.id, config.TaxAccount or 'government'))
+            end
+        end
     end
 
     if paid then
@@ -569,7 +595,11 @@ function actions.complete(src, payload)
         id = trip.id, status = 'completed', role = 'driver',
         fare = trip.fare, earn = paid and driverEarn or 0, paid = paid,
     })
-    notifyRyde(trip.riderCid, ('Perjalanan selesai. Tarif Rp %d. Ketuk untuk menilai pengemudimu.'):format(math.floor(trip.fare)))
+    if early then
+        notifyRyde(trip.riderCid, ('Perjalanan selesai sebelum tujuan. Tarif sesuai argo Rp %d. Ketuk untuk menilai pengemudimu.'):format(math.floor(trip.fare)))
+    else
+        notifyRyde(trip.riderCid, ('Perjalanan selesai. Tarif Rp %d. Ketuk untuk menilai pengemudimu.'):format(math.floor(trip.fare)))
+    end
     return ok({ rideId = trip.id, fare = trip.fare, paid = paid })
 end
 
@@ -590,7 +620,15 @@ function actions.cancel(src)
             return ok({})
         end
         local trip = trips[riderId]
-        if trip then cancelTrip(trip, 'rider'); return ok({}) end
+        if trip then
+            -- Once riding, the rider ends the trip by asking the driver to finish (metered fare);
+            -- only a vanished driver lets them walk away free.
+            if trip.status == 'in_progress' and not (trip.offline and trip.offline.role == 'driver') then
+                return fail('ryde.cannotCancelInTrip', 'Perjalanan sudah dimulai. Minta supir menekan Selesai untuk turun.')
+            end
+            cancelTrip(trip, 'rider')
+            return ok({})
+        end
     end
 
     local acc   = account(src)
@@ -691,7 +729,7 @@ local function riderActivePayload(cid)
         return {
             id = req.id, status = (#offers > 0) and 'offered' or 'finding',
             pickup = req.pickup, dropoff = req.dropoff, distance = req.distance,
-            payment = req.payment, createdAt = req.createdAt, riderName = req.riderName,
+            payment = req.payment, fare = req.fare, createdAt = req.createdAt, riderName = req.riderName,
             offers = offers,
         }
     end
@@ -898,52 +936,15 @@ end
 function actions.config()
     return ok({
         locations    = config.Locations or {},
-        driverCut    = config.DriverCut or 1.0,
+        driverCut    = 1.0 - (config.TaxRate or 0),
+        baseFare     = config.BaseFare or 0,
+        perKm        = config.PerKm or 0,
+        roadFactor   = config.RoadFactor or 1.0,
+        minFare      = config.MinFare or 0,
+        maxFare      = config.MaxFare or 0,
         leaderPrior  = config.LeaderboardPriorRating or 4.5,
         leaderWeight = config.LeaderboardWeight or 10,
     })
-end
-
--- DEV/TEST synthetic driver cards for /rydeoffer.
----@type table[] Fake driver cards devOffer picks from at random.
-local DEV_DRIVERS = {
-    { name = 'Test Driver', car = 'Bravado Buffalo',     color = '#10b981', plate = 'DEV 001' },
-    { name = 'Avery R.',    car = 'Annis Elegy RH8',     color = '#3b82f6', plate = 'DEV 002' },
-    { name = 'Sam Q.',      car = 'Dewbauchee Rapid GT', color = '#f59e0b', plate = 'DEV 003' },
-    { name = 'Jordan P.',   car = 'Vapid Peyote',        color = '#ef4444', plate = 'DEV 004' },
-}
-
----DEV/TEST: drops a synthetic fare offer onto the caller's own open ride request. Returns a
----short status string for the chat ack.
----@param src integer player server id
----@return string message
-function actions.devOffer(src)
-    local cid = player.getIdentifier(src)
-    if not cid then return 'No character.' end
-    local reqId = riderActive[cid]
-    local req   = reqId and requests[reqId] or nil
-    if not req then return 'Request a ride first, then run /rydeoffer to add a test offer.' end
-
-    local offers = 0
-    for _, t in pairs(trips) do
-        if t.requestId == req.id and t.status == 'offered' then offers = offers + 1 end
-    end
-    if offers >= MAX_OFFERS then return 'That request already has the maximum test offers.' end
-
-    local d    = DEV_DRIVERS[math.random(#DEV_DRIVERS)]
-    local fare = math.random(config.MinFare or 5, math.max((config.MinFare or 5) + 1, 45))
-    local trip = {
-        id = store.newId(), requestId = req.id,
-        riderUsername = req.riderUsername, riderName = req.riderName, riderCid = req.riderCid,
-        driverUsername = 'dev:' .. cid, driverName = d.name, driverCid = 'dev',
-        driverNumber = '5550000',
-        vehicle = d.car, plate = d.plate, color = d.color, driverRating = 4.8,
-        pickup = req.pickup, dropoff = req.dropoff, distance = req.distance,
-        payment = req.payment, fare = fare, status = 'offered',
-    }
-    trips[trip.id] = trip
-    pushTo(trip.riderCid, 'offer', publicTrip(trip, 'rider'))
-    return ('Sent a test offer: %s for Rp %d.'):format(d.name, fare)
 end
 
 ---Handles a player leaving: clears the per-src caches, drops them from the duty board, bins
@@ -955,7 +956,8 @@ function actions.onPlayerDropped(src)
     tripViewers[src] = nil
     if not cid then return end
     for username, d in pairs(online) do
-        if d.cid == cid then online[username] = nil; break end
+        -- A driver on a held trip stays registered so they are back on duty if they return.
+        if d.cid == cid and not driverActive[username] then online[username] = nil; break end
     end
     for id, r in pairs(requests) do
         if r.riderCid == cid then
@@ -973,9 +975,29 @@ function actions.onPlayerDropped(src)
                 if t.driverCid == cid then
                     pushTo(t.riderCid, 'offerRemoved', { id = id, requestId = t.requestId })
                 end
-            else
+            elseif t.offline then
+                -- Both sides gone: nothing left to hold.
                 cancelTrip(t, 'disconnect')
+            else
+                holdTrip(t, cid)
             end
+        end
+    end
+end
+
+---Hands a held trip back to a player who reconnected within the grace window and tells the
+---other side the trip continues.
+---@param src number player server id
+function actions.onPlayerLoaded(src)
+    local cid = player.getIdentifier(src)
+    if not cid then return end
+    srcCid[src] = cid
+    for _, t in pairs(trips) do
+        if t.offline and t.offline.cid == cid then
+            t.offline = nil
+            local other = (t.riderCid == cid) and t.driverCid or t.riderCid
+            local who   = (t.riderCid == cid) and 'Penumpang' or 'Supir'
+            notifyRyde(other, ('%s sudah kembali. Perjalanan dilanjutkan.'):format(who))
         end
     end
 end

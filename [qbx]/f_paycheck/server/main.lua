@@ -1,4 +1,5 @@
 local config = require 'config'
+local banking = require 'shared.banking'
 local META = 'paycheck'
 local busy = {} -- [src] = true selama pencairan berjalan (anti spam / double klaim)
 
@@ -17,10 +18,17 @@ local function pending(player)
     return math.max(0, math.floor(tonumber(player.PlayerData.metadata[META]) or 0))
 end
 
-local function nearDesk(src)
+---Cek player benar-benar di ATM / NPC bank. Posisi ATM dikirim client (objek map,
+---server tidak tahu letaknya), jadi minimal dicek jaraknya ke player.
+local function nearSpot(src, where)
+    if type(where) ~= 'table' then return false end
     local pos = GetEntityCoords(GetPlayerPed(src))
-    for i = 1, #config.locations do
-        if #(pos - config.locations[i].coords.xyz) <= config.useDistance then return true end
+    if where.kind == 'bank' then
+        for i = 1, #banking.banks do
+            if #(pos - banking.banks[i]) <= config.bankDistance then return true end
+        end
+    elseif where.kind == 'atm' and type(where.pos) == 'vector3' then
+        return #(pos - where.pos) <= config.atmDistance
     end
     return false
 end
@@ -53,25 +61,25 @@ exports('Add', function(src, amount)
     TriggerClientEvent('ox_lib:notify', src, {
         id = 'f_paycheck', title = n.title, icon = n.icon, iconColor = n.iconColor,
         position = n.position, duration = n.duration, style = n.style,
-        description = ('Gaji %s masuk · Total %s  \nAmbil di %s'):format(rupiah(amount), rupiah(total), config.locations[1].label),
+        description = ('Gaji %s masuk · Total %s  \nAmbil di ATM atau Bank'):format(rupiah(amount), rupiah(total)),
     })
     return true
 end)
 
-lib.callback.register('f_paycheck:get', function(src)
+lib.callback.register('f_paycheck:get', function(src, where)
     local player = exports.qbx_core:GetPlayer(src)
-    if not player or not nearDesk(src) then return end
+    if not player or not nearSpot(src, where) then return end
     local gross = pending(player)
     local tax, net = breakdown(gross)
     return { gross = gross, rate = config.taxRate, tax = tax, net = net }
 end)
 
-lib.callback.register('f_paycheck:withdraw', function(src, method)
+lib.callback.register('f_paycheck:withdraw', function(src, method, where)
     if busy[src] then return { ok = false, msg = 'Sedang diproses.' } end
     if method ~= 'cash' and method ~= 'bank' then return { ok = false, msg = 'Metode tidak valid.' } end
     local player = exports.qbx_core:GetPlayer(src)
     if not player then return { ok = false } end
-    if not nearDesk(src) then return { ok = false, msg = 'Kamu terlalu jauh dari petugas.' } end
+    if not nearSpot(src, where) then return { ok = false, msg = 'Kamu terlalu jauh dari ATM / bank.' } end
 
     local gross = pending(player)
     if gross <= 0 then return { ok = false, msg = 'Tidak ada paycheck untuk dicairkan.' } end
@@ -89,7 +97,7 @@ lib.callback.register('f_paycheck:withdraw', function(src, method)
         mail(src, player, 'Pencairan Paycheck Gagal', {
             ('Pencairan paycheck %s via %s gagal diproses.'):format(rupiah(net), methodLabel),
             '',
-            'Paycheck kamu tetap tersimpan, silakan coba lagi di Kantor Gaji.',
+            'Paycheck kamu tetap tersimpan, silakan coba lagi di ATM atau Bank.',
         })
         return { ok = false, msg = 'Pencairan gagal, paycheck tetap tersimpan.' }
     end

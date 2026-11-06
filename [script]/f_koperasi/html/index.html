@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_koperasi</title>
+    <link rel="stylesheet" href="ui/ios.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+        <symbol id="i-store" viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9M3 9h18M3 9v2a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0V9M5 13v7h14v-7M10 20v-4h4v4"/></symbol>
+    </svg>
+
+    <div id="panel" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo"><svg class="ic"><use href="#i-store"/></svg></span><div><h1>Koperasi</h1><small>Jual hasil kerjamu, uang masuk rekening</small></div></div>
+            <div class="head-actions"><button class="circle close" id="close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+        </header>
+
+        <section class="body">
+            <div id="list" class="items"></div>
+
+            <div class="group sum">
+                <div class="row"><span class="t">Kotor</span><span class="d" id="s-gross">Rp 0</span></div>
+                <div class="row"><span class="t">Pajak (<span id="s-rate">2</span>%)</span><span class="d" id="s-tax">Rp 0</span></div>
+                <div class="row total"><span class="t">Diterima</span><span class="d" id="s-net">Rp 0</span></div>
+            </div>
+
+            <div id="msg" class="msg hidden"></div>
+            <div class="menu-actions">
+                <button id="all" class="b b-lg tint-btn">Pilih Semua</button>
+                <button id="sell" class="primary b-lg">Jual</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

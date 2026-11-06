@@ -5,14 +5,14 @@ import { fetchNui, isFiveM } from '@/core/nui';
 import type { RydeLatLng, RydeRequestPush } from '@/core/types';
 import { LEADERBOARD, PLACES } from './data';
 import type { DriverInfo, LeaderEntry, Place } from './data';
-import { apiData } from '@/core/api';
+import { apiCall, apiData } from '@/core/api';
+import type { Envelope } from '@/core/api';
 
 export interface RydeActiveRide {
     id: string; tripId?: string; status: string;
     pickup: RydeLatLng; dropoff: RydeLatLng; distance: number;
     payment?: 'card' | 'cash'; fare?: number; createdAt?: number; riderName?: string; riderNumber?: string;
     driver?: DriverInfo;
-    offers?: { tripId: string; fare: number; driver: DriverInfo }[];
 }
 export interface RydeSync {
     rider?: RydeActiveRide | null;
@@ -29,15 +29,15 @@ async function rydeCall<T = unknown>(event: string, payload?: unknown): Promise<
 
 export const ryde = {
     requestRide: (dropoff: { label: string; x: number; y: number }) =>
-        rydeCall<{ requestId: string }>('f_phone:ryde:requestRide', { dropoff }),
+        apiCall<{ requestId: string; fare: number; distance: number }>('f_phone:ryde:requestRide', { dropoff }),
     sync:       () => rydeCall<RydeSync>('f_phone:ryde:sync'),
     watchTrip:  (tripId: string, on: boolean) => rydeCall('f_phone:ryde:watchTrip', { tripId, on }),
-    respond:    (tripId: string, accept: boolean) => rydeCall('f_phone:ryde:respond', { tripId, accept }),
     cancel:     () => rydeCall('f_phone:ryde:cancel'),
     setOnline:  (online: boolean, vehicle?: { vehicle: string; plate: string; color: string }) =>
         rydeCall<{ online: boolean; requests?: RydeRequestPush[]; waiting?: number }>('f_phone:ryde:setOnline', { online, ...(vehicle ?? {}) }),
     waitingCount: () => rydeCall<{ count: number }>('f_phone:ryde:waitingCount'),
-    accept:     (requestId: string, fare: number) => rydeCall<{ tripId: string }>('f_phone:ryde:accept', { requestId, fare }),
+    accept:     (requestId: string): Promise<Envelope<{ tripId: string; fare: number }>> =>
+        apiCall<{ tripId: string; fare: number }>('f_phone:ryde:accept', { requestId }),
     tripStatus: (tripId: string, status: string) => rydeCall('f_phone:ryde:tripStatus', { tripId, status }),
     complete:   (tripId: string) => rydeCall('f_phone:ryde:complete', { tripId }),
     rate:       (rideId: string, stars: number, tip = 0) => rydeCall<{ rated: number; tipPaid: number }>('f_phone:ryde:rate', { rideId, stars, tip }),
@@ -101,6 +101,28 @@ export function useRydeDriverCut(): number {
         });
     }, []);
     return cut;
+}
+
+export interface RydePricing { baseFare: number; perKm: number; roadFactor: number; minFare: number; maxFare: number }
+
+const DEV_PRICING: RydePricing = { baseFare: 15000, perKm: 25000, roadFactor: 1.3, minFare: 30000, maxFare: 300000 };
+
+export function useRydePricing(): RydePricing {
+    const [p, setP] = useState<RydePricing>(DEV_PRICING);
+    useEffect(() => {
+        if (!isFiveM) return;
+        void rydeCall<Partial<RydePricing>>('f_phone:ryde:config').then(d => {
+            if (d && typeof d.perKm === 'number') setP({ ...DEV_PRICING, ...d } as RydePricing);
+        });
+    }, []);
+    return p;
+}
+
+// Mirrors calcFare/roadKm in server/ryde/actions.lua; the server's figure is the one charged.
+export function estimateFare(p: RydePricing, a: { x: number; y: number }, b: { x: number; y: number }): { km: number; fare: number } {
+    const km = Math.round(Math.hypot(a.x - b.x, a.y - b.y) / 1000 * p.roadFactor * 10) / 10;
+    const raw = Math.round((p.baseFare + km * p.perKm) / 1000) * 1000;
+    return { km, fare: Math.max(p.minFare, Math.min(p.maxFare || raw, raw)) };
 }
 
 export function useRydeLeaderWeight(): { prior: number; weight: number } {

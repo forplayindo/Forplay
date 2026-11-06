@@ -3,7 +3,7 @@ import { useMocks } from './demo';
 import { apiCall, apiData } from '@/core/api';
 import devAvatar from '@/assets/photos/background3.webp';
 
-export let MAIL_DOMAIN = 'forplay.com';
+export let MAIL_DOMAIN = '4play.com';
 
 export function setMailDomain(domain: string): void {
     if (domain) MAIL_DOMAIN = domain;

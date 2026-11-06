@@ -20,6 +20,8 @@ server_scripts {
 ui_page 'html/index.html'
 
 files {
+    'html/ui/ios.css',
+    'html/ui/fonts/*.woff2',
     'config/shared.lua',
     'config/client.lua',
     'config/mods.lua',

@@ -117,6 +117,8 @@ end)
 RegisterNUICallback('send', function(data, cb)
     if data.text and data.text ~= '' then
         if data.text:sub(1, 1) == '/' then
+            -- tutup dulu baru jalankan: command yang membuka NUI sendiri tetap dapat fokus
+            setOpen(false)
             ExecuteCommand(data.text:sub(2))
         else
             TriggerServerEvent('f_chat:send', data.channel, data.text)

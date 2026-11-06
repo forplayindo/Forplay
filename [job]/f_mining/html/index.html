@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_mining</title>
+    <link rel="stylesheet" href="ui/ios.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+        <symbol id="i-pick" viewBox="0 0 24 24"><path d="M14 4c3 0 6 1.5 7 3-2.5-.6-5-.6-7.5.4M14 4c0 3-1.5 6-3 7 .6-2.5.6-5-.4-7.5M12.5 7.5 3 17l2 2 9.5-9.5"/></symbol>
+        <symbol id="i-cave" viewBox="0 0 24 24"><path d="M3 20V12a9 9 0 0 1 18 0v8M8 20v-5a4 4 0 0 1 8 0v5M2 20h20"/></symbol>
+        <symbol id="i-box" viewBox="0 0 24 24"><path d="M3 8l9-5 9 5v8l-9 5-9-5zM3 8l9 5 9-5M12 13v8"/></symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 4v5h-5"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+    </svg>
+
+    <div id="panel" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo"><svg class="ic"><use href="#i-pick"/></svg></span><div><h1 id="title">Tambang</h1><small id="sub"></small></div></div>
+            <div class="head-actions"><button class="circle close" id="close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+        </header>
+
+        <section class="body">
+            <!-- pilih gua -->
+            <div id="view-caves" class="hidden">
+                <div class="group-h head-row">Pilih gua <button class="b-plain" id="refresh"><svg class="ic"><use href="#i-refresh"/></svg></button></div>
+                <div class="group icons" id="caves"></div>
+                <div class="group-f">Maksimal <span id="cave-max">6</span> penambang per gua. Gua yang penuh tidak bisa dimasuki.</div>
+            </div>
+
+            <!-- ambil wadah -->
+            <div id="view-wadah" class="hidden">
+                <div id="busy" class="notice hidden"></div>
+                <div class="group-h amount-h">Isi wadah <span><b id="w-total">0</b> / <b id="w-max">50</b></span></div>
+                <div class="group icons" id="ores"></div>
+                <div class="fill-row">
+                    <button class="cap tint" id="all">Isi Penuh</button>
+                    <button class="cap gray" id="clear">Kosongkan</button>
+                </div>
+                <div class="group">
+                    <div class="row"><span class="t">Hasil</span><span class="d" id="w-out">-</span></div>
+                    <div class="row"><span class="t">Waktu lebur</span><span class="d" id="w-time">-</span></div>
+                </div>
+                <div class="group-f">Diambil dari tas dulu, sisanya dari gudang. Batangan otomatis masuk Gudang Hasil di atas (dekat mulut tambang).</div>
+            </div>
+
+            <div id="msg" class="msg hidden"></div>
+            <div class="menu-actions"><button id="go" class="primary b-lg hidden">Ambil Wadah</button></div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

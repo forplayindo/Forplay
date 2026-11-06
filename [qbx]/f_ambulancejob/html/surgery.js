@@ -16,7 +16,15 @@
         return { have: d.bag && n > 0, text: `${step.item} ×1 · stok ${n}` };
     };
 
+    // data dikirim ulang tiap tahap selesai: gambar ulang tanpa melompat ke atas
     function render() {
+        const side = $('sr-side'), steps = $('sr-steps'), top = [side.scrollTop, steps.scrollTop];
+        draw();
+        side.scrollTop = top[0];
+        steps.scrollTop = top[1];
+    }
+
+    function draw() {
         $('sr-sub').textContent = `${d.table} · ${d.patient}`;
         const tf = d.transfusion;
         const bloodLow = d.blood < tf.need;

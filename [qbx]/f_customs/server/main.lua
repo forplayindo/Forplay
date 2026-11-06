@@ -28,6 +28,8 @@ exports('StationAt', function(coords)
 end)
 
 local function isAdmin(src)
+    -- f_admin: izin 'vehicle.tune' dari Daftar Command (Owner/Admin/Support yang dicentang)
+    if GetResourceState('f_admin') == 'started' then return exports.f_admin:Can(src, 'vehicle.tune') end
     return exports.qbx_core:HasPermission(src, 'admin')
 end
 

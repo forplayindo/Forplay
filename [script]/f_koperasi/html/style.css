@@ -1,0 +1,25 @@
+/* f_koperasi — layout saja; gaya dasar dari ui/ios.css */
+.panel { width: min(460px, 94vw); max-height: 88vh; display: flex; flex-direction: column; }
+
+.body { display: flex; flex-direction: column; gap: 12px; padding: 0 20px 20px; min-height: 0; }
+.items { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; max-height: 48vh; padding-right: 2px; }
+.items .group-h { margin-top: 2px; }
+
+.item-row .img { width: 36px; height: 36px; flex: none; border-radius: 8px; background: var(--fill) center / 30px no-repeat; }
+.item-row.off { opacity: .4; }
+.item-row.on { background: var(--accent-soft); }
+.item-row .t small b { color: var(--label); font-weight: 600; }
+
+.stepper { display: flex; align-items: center; gap: 6px; flex: none; }
+.stepper input { width: 52px; height: 30px; padding: 0; text-align: center; font-size: 15px; font-weight: 600; -moz-appearance: textfield; }
+.stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.stepper .circle { width: 28px; height: 28px; font-size: 16px; }
+
+.sum .row { min-height: 36px; }
+.sum .total .t, .sum .total .d { font-weight: 700; color: var(--green); }
+
+/* not ".actions": the kit styles ".actions button" as small gray list buttons */
+.menu-actions { display: flex; gap: 10px; }
+.menu-actions .b-lg { flex: 1; }
+.menu-actions .tint-btn { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.menu-actions .primary:disabled { opacity: 1; background: var(--fill); color: var(--label-2); }

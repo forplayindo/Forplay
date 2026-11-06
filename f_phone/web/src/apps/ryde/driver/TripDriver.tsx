@@ -11,7 +11,7 @@ import { InitialsAvatar } from '@/shared/ContactAvatar';
 import { useRyde } from '../store';
 import { money } from '../data';
 import type { Place } from '../data';
-import { rydeNearPoint, rydeSameVehicle, useRydeDriverCut, useTripPeer } from '../rydeApi';
+import { estimateFare, rydeNearPoint, rydeSameVehicle, useRydeDriverCut, useRydePricing, useTripPeer } from '../rydeApi';
 import { LiveDot, useSelfLocation } from '@/apps/maps/LiveDot';
 import { useDeckActive } from '@/shell/deckActive';
 import { DropoffPin, MapView, PickupDot, Pin } from '../ui';
@@ -23,6 +23,8 @@ export function TripDriver() {
 
     const [confirmCancel, setConfirmCancel] = useState(false);
     const [confirmCall, setConfirmCall] = useState(false);
+    const [confirmEarly, setConfirmEarly] = useState(false);
+    const pricing = useRydePricing();
     const [near, setNear] = useState(!isFiveM);
     const [dist, setDist] = useState(-1);
     const enroute = r?.status === 'enroute_pickup';
@@ -62,7 +64,9 @@ export function TripDriver() {
     const awaiting = r.status === 'offered';
     const arriveLocked = enroute && !near;
     const startLocked = arriving && !sameVeh;
-    const completeLocked = inTrip && !near;
+    // Away from the drop-off the trip can still be finished; the server charges the meter instead.
+    const completeEarly = inTrip && !near;
+    const meterFare = completeEarly && self ? Math.min(r.fare, estimateFare(pricing, r.pickup, self).fare) : r.fare;
 
     const label: Record<string, string> = {
         enroute_pickup: t('ryde.iveArrivedAtPickup', "I've arrived at pickup"),
@@ -173,13 +177,13 @@ export function TripDriver() {
 
                         <div className="flex gap-3">
                             <button
-                                onClick={g.driverAdvance}
-                                disabled={arriveLocked || startLocked || completeLocked}
+                                onClick={() => completeEarly ? setConfirmEarly(true) : g.driverAdvance()}
+                                disabled={arriveLocked || startLocked}
                                 className="flex flex-1 items-center justify-center gap-2 rounded-[14px] bg-black py-4 text-[17px] font-bold text-white disabled:opacity-40 dark:bg-white dark:text-black"
                             >
                                 <Navigation className="h-[22px] w-[22px]" /> {arriveLocked ? (dist >= 0 ? t('ryde.metersFromPickup', '{dist}m from pickup', { dist }) : t('ryde.driveToPickup', 'Drive to pickup'))
                                     : startLocked ? t('ryde.riderNotInVehicle', 'Rider not in vehicle')
-                                    : completeLocked ? (dist >= 0 ? t('ryde.metersFromDropoff', '{dist}m from drop-off', { dist }) : t('ryde.driveToDropoff', 'Drive to drop-off'))
+                                    : completeEarly ? t('ryde.finishHereMetered', 'Finish here (metered)')
                                     : label[r.status]}
                             </button>
                             <button onClick={() => setConfirmCancel(true)} className="flex h-[56px] w-[56px] shrink-0 items-center justify-center rounded-[14px] bg-black/[0.06] text-[#ff453a] dark:bg-white/10">
@@ -201,6 +205,17 @@ export function TripDriver() {
                     destructive
                     onCancel={() => setConfirmCancel(false)}
                     onConfirm={() => { setConfirmCancel(false); g.driverCancel(); }}
+                />
+            )}
+
+            {confirmEarly && (
+                <AlertDialog
+                    title={t('ryde.finishEarlyQ', 'Finish trip here?')}
+                    message={t('ryde.finishEarlyMessage', 'You are not at the destination yet. The fare follows the meter: about {fare} (full fare {full}).', { fare: money(meterFare), full: money(r.fare) })}
+                    cancelLabel={t('ryde.keep', 'Keep')}
+                    confirmLabel={t('ryde.completeTrip', 'Complete trip')}
+                    onCancel={() => setConfirmEarly(false)}
+                    onConfirm={() => { setConfirmEarly(false); g.driverAdvance(); }}
                 />
             )}
 

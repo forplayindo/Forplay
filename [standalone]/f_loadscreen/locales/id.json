@@ -1,8 +1,8 @@
 {
     "preTitle": "Memuat · Sesi 24",
-    "title": "Foreplay",
+    "title": "4PLAY",
     "subtitle": "Indonesia",
-    "footer": "lastresort_loading · v3.3",
+    "footer": "4PLAY · Indonesia Roleplay",
 
     "online": "Online",
     "offline": "Offline",
@@ -14,14 +14,12 @@
     "tipLabel": "Tips",
     "nowPlaying": "Sedang Diputar",
     "noTrack": "Belum ada lagu",
-    "loadingTrack": "Memuat…",
 
     "rulesTab": "Peraturan",
     "staffTab": "Staf",
     "newsTab": "Berita",
 
     "playlist": "Playlist",
-    "trackCount": "{n} / {total}",
 
     "gateTitle": "Peraturan server",
     "gateIntro": "Baca peraturan sampai habis lalu setujui untuk masuk.",
@@ -34,7 +32,6 @@
     "gateDeclined": "Kamu harus menyetujui peraturan server untuk bermain di sini.",
 
     "stageOf": "Tahap {n} / {total}",
-    "starting": "Memulai",
     "ready": "Siap — masuk",
 
     "roles": {

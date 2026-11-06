@@ -1,0 +1,1476 @@
+{
+ "+": {
+  "res": "ox_lib",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "+crawl": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "+crouch": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "+economydash": {
+  "res": "caticus_economy_dashboard",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "+nxchat": {
+  "res": "f_chat",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "+radiotalk": {
+  "res": "pma-voice",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "+ragdoll": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "+secondary_ptt": {
+  "res": "pma-voice",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "-": {
+  "res": "ox_lib",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "-crawl": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "-crouch": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "-economydash": {
+  "res": "caticus_economy_dashboard",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "-nxchat": {
+  "res": "f_chat",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "-radiotalk": {
+  "res": "pma-voice",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "-ragdoll": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "-secondary_ptt": {
+  "res": "pma-voice",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "911e": {
+  "res": "f_ambulancejob",
+  "help": "Laporan EMS",
+  "restricted": false
+ },
+ "ac": {
+  "res": "f_anticheat",
+  "help": "Anti-cheat admin tools: status | points <id> | resetpoints <id> | unban <identifier> | bans",
+  "restricted": true
+ },
+ "additem": {
+  "res": "ox_inventory",
+  "help": "Gives an item to a player with the given id",
+  "restricted": true
+ },
+ "addjob": {
+  "res": "qbx_core",
+  "help": "Add Job to Player (Admin Only)",
+  "restricted": true
+ },
+ "addpermission": {
+  "res": "qbx_core",
+  "help": "Give Player Permissions (God Only)",
+  "restricted": true
+ },
+ "addsociety": {
+  "res": "f_admin",
+  "help": "Tambah/kurangi saldo rekening organisasi (khusus Owner)",
+  "restricted": true
+ },
+ "admin": {
+  "res": "f_admin",
+  "help": "Buka panel admin (staff)",
+  "restricted": false
+ },
+ "admincar": {
+  "res": "f_admin",
+  "help": "Simpan kendaraan yang kamu naiki sebagai milik (kamu atau pemain tertentu)",
+  "restricted": true
+ },
+ "aheal": {
+  "res": "f_medical",
+  "help": "Sembuhkan pemain atau diri sendiri (khusus admin)",
+  "restricted": true
+ },
+ "anklet": {
+  "res": "f_police",
+  "help": "Pasang gelang kaki pelacak (khusus polisi)",
+  "restricted": false
+ },
+ "ankletlocation": {
+  "res": "f_police",
+  "help": "Lihat lokasi gelang pelacak seseorang",
+  "restricted": false
+ },
+ "announce": {
+  "res": "f_chat",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "announceadmin": {
+  "res": "f_chat",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "answerphonecall": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "appunlock": {
+  "res": "f_phone",
+  "help": "Grant or revoke a permanently unlocked phone app",
+  "restricted": false
+ },
+ "auditpajak": {
+  "res": "f_tax",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "base64mugshotnormal": {
+  "res": "MugShotBase64",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "base64mugshottrasparent": {
+  "res": "MugShotBase64",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "benderapos": {
+  "res": "f_crew",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "binoculars": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "birdyverify": {
+  "res": "f_phone",
+  "help": "Set or clear a Birdy verification badge",
+  "restricted": true
+ },
+ "blackout": {
+  "res": "Renewed-Weathersync",
+  "help": "Nyalakan/matikan pemadaman listrik",
+  "restricted": true
+ },
+ "blippemain": {
+  "res": "f_admin",
+  "help": "Blip semua pemain di peta (staff)",
+  "restricted": false
+ },
+ "bossmanagedoutfits": {
+  "res": "illenium-appearance",
+  "help": "",
+  "restricted": false
+ },
+ "buatktp": {
+  "res": "f_idcard",
+  "help": "Beri KTP (atau KTP Sementara) berisi data pemain",
+  "restricted": true
+ },
+ "callsign": {
+  "res": "f_police",
+  "help": "Tampilkan callsign MDT-mu",
+  "restricted": false
+ },
+ "cam": {
+  "res": "f_police",
+  "help": "Lihat kamera keamanan (khusus polisi)",
+  "restricted": false
+ },
+ "cancelprogress": {
+  "res": "ox_lib",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "cancelrace": {
+  "res": "f_lapraces",
+  "help": "Batalkan balapan yang sedang berjalan..",
+  "restricted": false
+ },
+ "car": {
+  "res": "qbx_core",
+  "help": "Spawn Vehicle (Admin Only)",
+  "restricted": true
+ },
+ "cctvplace": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "cekborgol": {
+  "res": "f_police",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "changejob": {
+  "res": "qbx_core",
+  "help": "Change Active Job of Player (Admin Only)",
+  "restricted": true
+ },
+ "cherryseed": {
+  "res": "f_phone",
+  "help": "Seed Cherry with fake test profiles (random data + photos)",
+  "restricted": true
+ },
+ "cherryseedwipe": {
+  "res": "f_phone",
+  "help": "Remove every Cherry profile created by /cherryseed (and their accounts, matches, chats)",
+  "restricted": true
+ },
+ "cleanplayergroups": {
+  "res": "qbx_core",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "clearactiveidentifier": {
+  "res": "ox_inventory",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "clearblood": {
+  "res": "f_police",
+  "help": "Bersihkan darah di sekitar (khusus polisi)",
+  "restricted": false
+ },
+ "clearcasings": {
+  "res": "f_police",
+  "help": "Bersihkan selongsong peluru di sekitar (khusus polisi)",
+  "restricted": false
+ },
+ "clearchat": {
+  "res": "f_chat",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "clearevidence": {
+  "res": "ox_inventory",
+  "help": "Clears a police evidence locker with the given id",
+  "restricted": false
+ },
+ "clearinv": {
+  "res": "ox_inventory",
+  "help": "Wipes all items from the target inventory",
+  "restricted": true
+ },
+ "clearrecovery": {
+  "res": "f_ambulancejob",
+  "help": "Akhiri masa pemulihan kaki pemain",
+  "restricted": true
+ },
+ "clearstuckprops": {
+  "res": "illenium-appearance",
+  "help": "",
+  "restricted": false
+ },
+ "clip": {
+  "res": "f_smallresources",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "closebankui": {
+  "res": "Renewed-Banking",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "closeserver": {
+  "res": "qbx_core",
+  "help": "Open the server for everyone (Admin Only)",
+  "restricted": true
+ },
+ "convertinventory": {
+  "res": "ox_inventory",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "convertjobs": {
+  "res": "qbx_core",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "crawl": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "createproperty": {
+  "res": "f_properties",
+  "help": "Create a property at your current location",
+  "restricted": false
+ },
+ "createrace": {
+  "res": "f_streetraces",
+  "help": "Start A Street Race",
+  "restricted": false
+ },
+ "crouch": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "crutchpos": {
+  "res": "f_ambulancejob",
+  "help": "Setel posisi prop Crutch: x y z rx ry rz",
+  "restricted": true
+ },
+ "cuff": {
+  "res": "f_police",
+  "help": "Borgol pemain (khusus polisi)",
+  "restricted": false
+ },
+ "cycleproximity": {
+  "res": "pma-voice",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "dealergoto": {
+  "res": "f_drugs",
+  "help": "To teleport to dealer",
+  "restricted": true
+ },
+ "dealers": {
+  "res": "f_drugs",
+  "help": "Lihat daftar dealer",
+  "restricted": true
+ },
+ "delclip": {
+  "res": "f_smallresources",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "deletechar": {
+  "res": "qbx_core",
+  "help": "Delete a players character",
+  "restricted": true
+ },
+ "deletedealer": {
+  "res": "f_drugs",
+  "help": "Pasang dealer (khusus admin)",
+  "restricted": true
+ },
+ "delphone": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "doorlock": {
+  "res": "ox_doorlock",
+  "help": "Buat kunci pintu baru, atau ubah yang sudah ada",
+  "restricted": true
+ },
+ "dv": {
+  "res": "qbx_core",
+  "help": "Delete Vehicle (Admin Only)",
+  "restricted": true
+ },
+ "e": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "ecodebug": {
+  "res": "caticus_economy_dashboard",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "ecowhoami": {
+  "res": "caticus_economy_dashboard",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "editor": {
+  "res": "f_smallresources",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "emote": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "emotecancel": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "emoteextract": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "emotemenu": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "emoteui": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "endphonecall": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "escort": {
+  "res": "f_police",
+  "help": "Kawal pemain",
+  "restricted": false
+ },
+ "evening": {
+  "res": "Renewed-Weathersync",
+  "help": "Atur waktu ke sore (18:00)",
+  "restricted": true
+ },
+ "fakecall": {
+  "res": "f_phone",
+  "help": "Dev: put yourself in the in-call panel to test the call UI",
+  "restricted": true
+ },
+ "fakering": {
+  "res": "f_phone",
+  "help": "Dev: ring your own phone so you (and anyone nearby) can hear an incoming call",
+  "restricted": true
+ },
+ "fix": {
+  "res": "vehiclehandler",
+  "help": "वर्तमान वाहन की मरम्मत करें",
+  "restricted": true
+ },
+ "fls_reload": {
+  "res": "f_loadscreen",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "fls_rules_reset": {
+  "res": "f_loadscreen",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "fold": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "fotokendaraan": {
+  "res": "f_vehimages",
+  "help": "Foto kendaraan addon dengan latar transparan (model1 model2 ... atau ",
+  "restricted": true
+ },
+ "freezetime": {
+  "res": "Renewed-Weathersync",
+  "help": "Freeze / unfreeze time",
+  "restricted": true
+ },
+ "gametype": {
+  "res": "mapmanager",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "gang": {
+  "res": "qbx_core",
+  "help": "Check Your Gang",
+  "restricted": false
+ },
+ "gangoutfits": {
+  "res": "illenium-appearance",
+  "help": "",
+  "restricted": false
+ },
+ "garagediag": {
+  "res": "f_phone",
+  "help": "Print what the f_phone garage bridge detected: system, table, resolved columns and garage coords",
+  "restricted": true
+ },
+ "gemote": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "getintrunk": {
+  "res": "f_radialmenu",
+  "help": "Masuk ke Bagasi",
+  "restricted": false
+ },
+ "givecar": {
+  "res": "f_admin",
+  "help": "Beri kendaraan baru ke garasi pemain (kunci didapat saat pertama dikeluarkan)",
+  "restricted": true
+ },
+ "givecash": {
+  "res": "Renewed-Banking",
+  "help": "Gives an item to a player",
+  "restricted": false
+ },
+ "giveitem": {
+  "res": "ox_inventory",
+  "help": "Gives an item to a player with the given id",
+  "restricted": true
+ },
+ "givemoney": {
+  "res": "qbx_core",
+  "help": "Give A Player Money (Admin Only)",
+  "restricted": true
+ },
+ "givesim": {
+  "res": "f_phone",
+  "help": "Give a player a SIM card (unique-phones mode).",
+  "restricted": true
+ },
+ "grantlicense": {
+  "res": "f_police",
+  "help": "Beri lisensi ke seseorang",
+  "restricted": false
+ },
+ "heading": {
+  "res": "f_admin",
+  "help": "Salin heading ke clipboard",
+  "restricted": true
+ },
+ "hudmapdebug": {
+  "res": "f_hud",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "hudmapset": {
+  "res": "f_hud",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "hygiene_place": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "hygiene_place_back": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "hygiene_place_cancel": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "hygiene_place_down": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "hygiene_place_fwd": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "hygiene_place_left": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "hygiene_place_poop": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "hygiene_place_right": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "hygiene_place_rotl": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "hygiene_place_rotr": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "hygiene_place_save": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "hygiene_place_up": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "hygiene_set": {
+  "res": "f_hygiene",
+  "help": "Set nilai HUD hygiene (testing): mandi | kencing | poop",
+  "restricted": true
+ },
+ "hygiene_status": {
+  "res": "f_hygiene",
+  "help": "Lihat nilai HUD hygiene kamu saat ini",
+  "restricted": true
+ },
+ "hygiene_whoami": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "hygienehud": {
+  "res": "f_hygiene",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "id": {
+  "res": "qbx_core",
+  "help": "Check your Server ID",
+  "restricted": false
+ },
+ "idlecamoff": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "idlecamon": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "importtracks": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "isistok": {
+  "res": "f_mechanicjob",
+  "help": "Tambah semua bahan di Stok Gudang Bengkel (tes mekanik)",
+  "restricted": true
+ },
+ "jail": {
+  "res": "f_police",
+  "help": "Penjarakan pemain (khusus polisi)",
+  "restricted": false
+ },
+ "jailtime": {
+  "res": "f_prison",
+  "help": "Cek masa tahananmu",
+  "restricted": true
+ },
+ "jammer": {
+  "res": "mm_radio",
+  "help": "Setup Jammer",
+  "restricted": false
+ },
+ "job": {
+  "res": "qbx_core",
+  "help": "Check Your Job",
+  "restricted": false
+ },
+ "joboutfits": {
+  "res": "illenium-appearance",
+  "help": "",
+  "restricted": false
+ },
+ "kayupos": {
+  "res": "f_lumberjack",
+  "help": "Salin koordinat posisimu (kalibrasi f_lumberjack)",
+  "restricted": true
+ },
+ "kayutes": {
+  "res": "f_lumberjack",
+  "help": "Uji truk Biff & prop kayu (f_lumberjack)",
+  "restricted": true
+ },
+ "kill": {
+  "res": "f_medical",
+  "help": "Bunuh pemain atau diri sendiri (khusus admin)",
+  "restricted": true
+ },
+ "kondisipenuh": {
+  "res": "f_mechanicjob",
+  "help": "Semua bagian kendaraan kembali 100% (tes mekanik)",
+  "restricted": true
+ },
+ "kurirpos": {
+  "res": "f_courierjob",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "lapor": {
+  "res": "f_admin",
+  "help": "Lapor ke staff (tanpa isi = buka form)",
+  "restricted": false
+ },
+ "logout": {
+  "res": "qbx_core",
+  "help": "Logs you out of your current character",
+  "restricted": true
+ },
+ "map": {
+  "res": "mapmanager",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "mapcal": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "mapcaldone": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "maptiles": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "me": {
+  "res": "qbx_core",
+  "help": "Show local message",
+  "restricted": false
+ },
+ "migrateskins": {
+  "res": "illenium-appearance",
+  "help": "Migrate skins",
+  "restricted": true
+ },
+ "mood": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "morning": {
+  "res": "Renewed-Weathersync",
+  "help": "Atur waktu ke pagi (9:00)",
+  "restricted": true
+ },
+ "mute": {
+  "res": "f_chat",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "names": {
+  "res": "f_admin",
+  "help": "Nama pemain di atas kepala (staff)",
+  "restricted": false
+ },
+ "nearby": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "neveradev:sit:stand_up": {
+  "res": "f_4play",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "neveradev:sit:stand_up_space": {
+  "res": "f_4play",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "neveradev:sit:stand_up_x": {
+  "res": "f_4play",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "newdealer": {
+  "res": "f_drugs",
+  "help": "Pasang dealer (khusus admin)",
+  "restricted": true
+ },
+ "newsbmic": {
+  "res": "f_newsjob",
+  "help": "Ambil mikrofon boom",
+  "restricted": false
+ },
+ "newscam": {
+  "res": "f_newsjob",
+  "help": "Ambil kamera berita",
+  "restricted": false
+ },
+ "newsmic": {
+  "res": "f_newsjob",
+  "help": "Ambil mikrofon berita",
+  "restricted": false
+ },
+ "night": {
+  "res": "Renewed-Weathersync",
+  "help": "Atur waktu ke malam (23:00)",
+  "restricted": true
+ },
+ "noclip": {
+  "res": "f_admin",
+  "help": "Noclip on/off (staff)",
+  "restricted": false
+ },
+ "noon": {
+  "res": "Renewed-Weathersync",
+  "help": "Atur waktu ke siang (12:00)",
+  "restricted": true
+ },
+ "npc": {
+  "res": "f_mechanicjob",
+  "help": "Nyalakan/matikan misi NPC job Derek",
+  "restricted": false
+ },
+ "ooc": {
+  "res": "qbx_core",
+  "help": "OOC Chat Message",
+  "restricted": false
+ },
+ "openserver": {
+  "res": "qbx_core",
+  "help": "Open the server for everyone (Admin Only)",
+  "restricted": true
+ },
+ "opprop": {
+  "res": "f_ambulancejob",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "opputar": {
+  "res": "f_ambulancejob",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "optest": {
+  "res": "f_ambulancejob",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "optin": {
+  "res": "qbx_core",
+  "help": "Nyalakan/matikan opt-in tugas admin (khusus admin)",
+  "restricted": true
+ },
+ "orderan": {
+  "res": "f_cafe",
+  "help": "Buka list pemesanan cafe",
+  "restricted": false
+ },
+ "ox_lib": {
+  "res": "ox_lib",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "paylawyer": {
+  "res": "f_police",
+  "help": "Bayar pengacara (khusus polisi & hakim)",
+  "restricted": false
+ },
+ "paytow": {
+  "res": "f_police",
+  "help": "Bayar sopir derek (khusus polisi)",
+  "restricted": false
+ },
+ "pedmenu": {
+  "res": "illenium-appearance",
+  "help": "",
+  "restricted": true
+ },
+ "peranggang": {
+  "res": "f_crew",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "peranggang_hud": {
+  "res": "f_crew",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "permohonan": {
+  "res": "f_cityhall",
+  "help": "Buka daftar permohonan layanan publik (petugas on duty)",
+  "restricted": false
+ },
+ "petseat": {
+  "res": "f_petshop",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "phone": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "phoneadmin": {
+  "res": "f_phone",
+  "help": "Open the f_phone admin panel",
+  "restricted": true
+ },
+ "phonenotif": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "phonenotif-to": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "pobject": {
+  "res": "f_police",
+  "help": "Pasang/hapus objek (khusus polisi)",
+  "restricted": false
+ },
+ "pointing": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "prisoners": {
+  "res": "f_prison",
+  "help": "Lihat dan kelola tahanan saat ini",
+  "restricted": true
+ },
+ "prop": {
+  "res": "f_4play",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "proplist": {
+  "res": "f_4play",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "quitrace": {
+  "res": "f_streetraces",
+  "help": "Keluar dari balapan. (Uang TIDAK dikembalikan!)",
+  "restricted": false
+ },
+ "radio": {
+  "res": "mm_radio",
+  "help": "Open Radio Menu",
+  "restricted": false
+ },
+ "rechargeradio": {
+  "res": "mm_radio",
+  "help": "Recharge Radio Battery",
+  "restricted": false
+ },
+ "record": {
+  "res": "f_smallresources",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "reloadskin": {
+  "res": "illenium-appearance",
+  "help": "",
+  "restricted": false
+ },
+ "removeitem": {
+  "res": "ox_inventory",
+  "help": "Removes an item to a player with the given id",
+  "restricted": true
+ },
+ "removejob": {
+  "res": "qbx_core",
+  "help": "Remove Job from Player (Admin Only)",
+  "restricted": true
+ },
+ "removepermission": {
+  "res": "qbx_core",
+  "help": "Remove Player Permissions (God Only)",
+  "restricted": true
+ },
+ "remradiodata": {
+  "res": "mm_radio",
+  "help": "Remove Radio Data",
+  "restricted": false
+ },
+ "report": {
+  "res": "f_admin",
+  "help": "Lapor ke staff (sama dengan /lapor)",
+  "restricted": false
+ },
+ "resetgang": {
+  "res": "f_crew",
+  "help": "Reset peringkat antar gang (app Crew) ke 0",
+  "restricted": true
+ },
+ "restoreinv": {
+  "res": "ox_inventory",
+  "help": "Restores a previously confiscated inventory for the target",
+  "restricted": true
+ },
+ "returninv": {
+  "res": "ox_inventory",
+  "help": "Restores a previously confiscated inventory for the target",
+  "restricted": true
+ },
+ "revive": {
+  "res": "f_medical",
+  "help": "Hidupkan pemain atau diri sendiri (khusus admin)",
+  "restricted": true
+ },
+ "revokelicense": {
+  "res": "f_police",
+  "help": "Cabut lisensi seseorang",
+  "restricted": false
+ },
+ "rusakkan": {
+  "res": "f_mechanicjob",
+  "help": "Kerusakan acak pada kendaraan (tes mekanik)",
+  "restricted": true
+ },
+ "saveclip": {
+  "res": "f_smallresources",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "saveinv": {
+  "res": "ox_inventory",
+  "help": "Save all pending inventory changes to the database",
+  "restricted": true
+ },
+ "sc": {
+  "res": "f_police",
+  "help": "Borgol ringan (khusus polisi)",
+  "restricted": false
+ },
+ "screenshotfurniture": {
+  "res": "f_properties",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "sdphone:migrate": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "sdphone:wipedata": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "seedclassifieds": {
+  "res": "f_phone",
+  "help": "Dev: seed Yellow Pages + Marketplace with the dev mock entries",
+  "restricted": true
+ },
+ "seedcontacts": {
+  "res": "f_phone",
+  "help": "Dev: seed filler contacts (+ some recents) into your phone book",
+  "restricted": true
+ },
+ "seedmessages": {
+  "res": "f_phone",
+  "help": "Dev: seed fake message conversations with dummy chatter",
+  "restricted": true
+ },
+ "seedphone": {
+  "res": "f_phone",
+  "help": "Dev: fill every app the admin panel reads with test content",
+  "restricted": true
+ },
+ "setfuel": {
+  "res": "vehiclehandler",
+  "help": "वाहन का ईंधन स्तर सेट करें",
+  "restricted": true
+ },
+ "setgang": {
+  "res": "qbx_core",
+  "help": "Set A Players Gang (Admin Only)",
+  "restricted": true
+ },
+ "setitem": {
+  "res": "ox_inventory",
+  "help": "Sets the item count for a player, removing or adding as needed",
+  "restricted": true
+ },
+ "setjob": {
+  "res": "qbx_core",
+  "help": "Set A Players Job (Admin Only)",
+  "restricted": true
+ },
+ "setkondisi": {
+  "res": "f_mechanicjob",
+  "help": "Atur kondisi bagian kendaraan (tes mekanik)",
+  "restricted": true
+ },
+ "setmodel": {
+  "res": "f_admin",
+  "help": "Ganti model karakter (diri sendiri atau pemain lain)",
+  "restricted": true
+ },
+ "setmoney": {
+  "res": "qbx_core",
+  "help": "Set Players Money Amount (Admin Only)",
+  "restricted": true
+ },
+ "setvoiceintent": {
+  "res": "pma-voice",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "spikestrip": {
+  "res": "f_police",
+  "help": "Pasang paku jalan (khusus polisi)",
+  "restricted": false
+ },
+ "startrace": {
+  "res": "f_streetraces",
+  "help": "Mulai balapan",
+  "restricted": false
+ },
+ "startselling": {
+  "res": "f_drugs",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "startshow": {
+  "res": "f_fireworks",
+  "help": "Mulai pertunjukan",
+  "restricted": true
+ },
+ "staticemitters": {
+  "res": "f_smallresources",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "steal": {
+  "res": "ox_inventory",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "stoprace": {
+  "res": "f_streetraces",
+  "help": "Stop The Race You Created",
+  "restricted": false
+ },
+ "streakadd": {
+  "res": "f_phone",
+  "help": "Raise or revert your Streaks days (admin/testing)",
+  "restricted": true
+ },
+ "streakset": {
+  "res": "f_phone",
+  "help": "Set your Streaks day count (admin/testing)",
+  "restricted": true
+ },
+ "streakwipe": {
+  "res": "f_phone",
+  "help": "Wipe ALL Streaks data for everyone (admin/testing)",
+  "restricted": true
+ },
+ "streamermode": {
+  "res": "xsound",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "tag": {
+  "res": "f_chat",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "takeinv": {
+  "res": "ox_inventory",
+  "help": "Confiscates the target inventory, to restore with /restoreinv",
+  "restricted": true
+ },
+ "tambangpos": {
+  "res": "f_mining",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "tamengpos": {
+  "res": "f_police",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "testmail": {
+  "res": "f_phone",
+  "help": "Dev: send yourself an email (defaults to your first mailbox)",
+  "restricted": true
+ },
+ "time": {
+  "res": "Renewed-Weathersync",
+  "help": "Atur waktu sekarang",
+  "restricted": true
+ },
+ "timescale": {
+  "res": "Renewed-Weathersync",
+  "help": "",
+  "restricted": true
+ },
+ "togglephonecursor": {
+  "res": "f_phone",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "togglepvp": {
+  "res": "qbx_core",
+  "help": "Toggle PVP on the server (Admin Only)",
+  "restricted": true
+ },
+ "togglesetup": {
+  "res": "f_lapraces",
+  "help": "Nyalakan / matikan pengaturan balapan",
+  "restricted": false
+ },
+ "tolarm": {
+  "res": "f_toll",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "tolatur": {
+  "res": "f_toll",
+  "help": "",
+  "restricted": false,
+  "client": false
+ },
+ "toldebug": {
+  "res": "f_toll",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "tp": {
+  "res": "qbx_core",
+  "help": "TP To Player or Coords (Admin Only)",
+  "restricted": true
+ },
+ "tpm": {
+  "res": "qbx_core",
+  "help": "TP To Marker (Admin Only)",
+  "restricted": true
+ },
+ "transfervehicle": {
+  "res": "f_vehicleshop",
+  "help": "Hadiahkan atau jual kendaraanmu",
+  "restricted": false
+ },
+ "unjail": {
+  "res": "f_police",
+  "help": "Bebaskan pemain (khusus polisi)",
+  "restricted": false
+ },
+ "unmute": {
+  "res": "f_chat",
+  "help": "",
+  "restricted": true,
+  "client": false
+ },
+ "vec2": {
+  "res": "f_admin",
+  "help": "Salin vector2 ke clipboard",
+  "restricted": true
+ },
+ "vec3": {
+  "res": "f_admin",
+  "help": "Salin vector3 ke clipboard",
+  "restricted": true
+ },
+ "vec4": {
+  "res": "f_admin",
+  "help": "Salin vector4 ke clipboard",
+  "restricted": true
+ },
+ "viewinv": {
+  "res": "ox_inventory",
+  "help": "Inspect the target inventory without allowing interactions",
+  "restricted": true
+ },
+ "vol": {
+  "res": "pma-voice",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "walk": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "walks": {
+  "res": "rpemotes",
+  "help": "",
+  "restricted": false,
+  "client": true
+ },
+ "wash": {
+  "res": "vehiclehandler",
+  "help": "वर्तमान वाहन को साफ करें",
+  "restricted": true
+ },
+ "weather": {
+  "res": "Renewed-Weathersync",
+  "help": "Lihat dan atur prakiraan cuaca",
+  "restricted": true
+ },
+ "wipemyaccounts": {
+  "res": "f_phone",
+  "help": "Delete YOUR OWN mail and app accounts (logins only, not your phone settings or content).",
+  "restricted": true
+ },
+ "wipemyphone": {
+  "res": "f_phone",
+  "help": "Wipe ALL of YOUR phone data (settings, apps, accounts, content) so your next open is a brand-new phone.",
+  "restricted": true
+ },
+ "wipephoneaccounts": {
+  "res": "f_phone",
+  "help": "Wipe phone app accounts and all their content. No argument wipes every app; pass one of mail, birdy, photogram, cherry, vibez, ryde to wipe just that one.",
+  "restricted": true
+ },
+ "wipephotogram": {
+  "res": "f_phone",
+  "help": "Wipe ALL Photogram accounts and their content. Same as /wipephoneaccounts photogram.",
+  "restricted": true
+ },
+ "zone": {
+  "res": "ox_lib",
+  "help": "",
+  "restricted": true,
+  "client": false
+ }
+}

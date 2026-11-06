@@ -3,6 +3,7 @@ local isLoggedIn = LocalPlayer.state.isLoggedIn
 local carryPackage = nil
 local packageCoords = nil
 local onDuty = false
+local interiorObjects = {}
 
 -- zone check
 local entranceTargetID = 'entranceTarget'
@@ -322,7 +323,17 @@ local function setLocationBlip()
     EndTextCommandSetBlipName(RecycleBlip)
 end
 
+local function destroyInteriorDesign()
+    for i = 1, #interiorObjects do
+        if DoesEntityExist(interiorObjects[i]) then
+            DeleteObject(interiorObjects[i])
+        end
+    end
+    interiorObjects = {}
+end
+
 local function buildInteriorDesign()
+    destroyInteriorDesign()
     for _, pickuploc in pairs(config.pickupLocations) do
         local model = GetHashKey(config.warehouseObjects[math.random(1, #config.warehouseObjects)])
         lib.requestModel(model, 5000)
@@ -330,6 +341,7 @@ local function buildInteriorDesign()
         SetModelAsNoLongerNeeded(model)
         PlaceObjectOnGroundProperly(obj)
         FreezeEntityPosition(obj, true)
+        interiorObjects[#interiorObjects + 1] = obj
     end
 end
 
@@ -359,9 +371,11 @@ local function exitLocation()
     SetEntityCoords(cache.ped, config.outsideLocation.x, config.outsideLocation.y, config.outsideLocation.z + 1)
     DoScreenFadeIn(500)
 
+    if onDuty then TriggerServerEvent('f_recyclejob:server:setDuty', false) end
     onDuty = false
 
     destroyInsideZones()
+    destroyInteriorDesign()
 
     if carryPackage then
         dropPackage()
@@ -442,6 +456,7 @@ end)
 
 RegisterNetEvent('f_recyclejob:client:target:toggleDuty', function()
     onDuty = not onDuty
+    TriggerServerEvent('f_recyclejob:server:setDuty', onDuty)
 
     if onDuty then
         exports.qbx_core:Notify(locale("success.you_have_been_clocked_in"), 'success')
@@ -482,6 +497,7 @@ RegisterNetEvent('f_recyclejob:client:target:pickupPackage', function()
         StopAnimTask(cache.ped, 'mp_car_bomb', 'car_bomb_mechanic', 1.0)
         ClearPedTasks(cache.ped)
         pickupPackage()
+        TriggerServerEvent('f_recyclejob:server:pickup')
         destroyPickupTarget()
         registerDeliveryTarget()
     else
@@ -515,6 +531,8 @@ RegisterNetEvent('f_recyclejob:client:target:dropPackage', function()
         getRandomPackage()
     else
         exports.qbx_core:Notify(locale('error.canceled'), 'error')
+        -- paket sudah dilepas: kasih paket baru supaya tidak macet
+        if onDuty then getRandomPackage() end
     end
 end)
 
@@ -537,6 +555,12 @@ end)
 AddStateBagChangeHandler('isLoggedIn', ('player:%s'):format(cache.serverId), function(_, _, loginState)
     if isLoggedIn == loginState then return end
     isLoggedIn = loginState
+end)
+
+AddEventHandler('onResourceStop', function(resource)
+    if resource ~= cache.resource then return end
+    destroyInteriorDesign()
+    if carryPackage then dropPackage() end
 end)
 
 CreateThread(function()

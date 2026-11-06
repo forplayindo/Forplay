@@ -2,7 +2,7 @@
 -- (config/stock.lua `kasir`). Uang masuk rekening organisasi EMS. Dibaca client & server.
 return {
     job = 'ambulance',            -- rekening organisasi & job invoice f_phone
-    label = 'Apotek Foreplay Hospital',
+    label = 'Apotek 4PLAY Hospital',
     cashItem = 'money',           -- item uang cash ox_inventory
 
     -- Meja apotek (boleh lebih dari satu, semua memakai data yang sama).

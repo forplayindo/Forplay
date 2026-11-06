@@ -1,8 +1,8 @@
 return {
     timeout = 10000,
-    maxSpikes = 5,
-    prisonDeskRadius = 3.0, -- jarak maks tahanan dari meja administrasi penjara (meter)
-    policePlatePrefix = 'LSPD',
+    maxSpikes = 5,   -- total paku jalan terpasang di seluruh kota
+    maxObjects = 30, -- total objek polisi (cone, barrier, dll) terpasang di seluruh kota
+    prisonDeskRadius = 3.0, -- jarak maks tahanan dari meja administrasi penjara (meter)    policePlatePrefix = 'LSPD',
     objects = {
         cone = {model = `prop_roadcone02a`, freeze = false},
         barrier = {model = `prop_barrier_work06a`, freeze = true},
@@ -13,6 +13,24 @@ return {
         chairs = {model = `prop_chair_pile_01`, freeze = true},
         tabe = {model = `prop_table_03`, freeze = true},
         monitor = {model = `des_tvsmash_root`, freeze = true},
+    },
+
+    -- Tameng balistik: item siapa saja, pakai lagi untuk melepas. Hanya bisa bersama pistol,
+    -- tidak bisa lompat/memukul (lari: lihat `sprint`). Lepas otomatis saat item hilang, masuk kendaraan, mati, diborgol, berenang.
+    shield = {
+        item = 'tameng_balistik',
+        model = `prop_ballistic_shield`,
+        bone = 45509, -- SKEL_L_UpperArm (lengan atas kiri), tanpa animasi
+        -- Setel di game: /tamengpos ox oy oz rx ry rz
+        offset = vec3(0.35, 0.05, -0.10),
+        rotation = vec3(300.0, 180.0, 60.0),
+        sprint = true,      -- true = boleh lari (sprint) sambil memegang tameng
+        drawDistance = 80.0, -- prop tameng pemain lain digambar dalam jarak ini (meter)
+        debug = true,        -- perintah /tamengpos untuk menyetel posisi; set false setelah pas
+        text = {
+            inVehicle = 'Tidak bisa memakai tameng di dalam kendaraan',
+            pistolOnly = 'Saat memakai tameng hanya bisa memegang pistol',
+        },
     },
 
     locations = {
@@ -46,8 +64,7 @@ return {
         -- Lab Forensik: identifikasi DNA (darah / sampel) dan sidik jari dari kantong bukti
         lab = {
             vec3(460.9667, -989.180, 24.92),
-        },
-        -- Meja administrasi penjara: polisi [E] -> data penahanan dari MDT -> Masukkan ke Penjara.
+        },        -- Meja administrasi penjara: polisi [E] -> data penahanan dari MDT -> Masukkan ke Penjara.
         -- Tahanan harus berdiri dalam `prisonDeskRadius` meter dari titik meja. (ubah koordinatnya)
         prisonDesk = {
             vec3(1840.2, 2579.6, 46.0),

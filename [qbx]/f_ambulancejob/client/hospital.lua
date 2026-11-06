@@ -198,28 +198,32 @@ else
     CreateThread(function()
         for hospitalName, hospital in pairs(sharedConfig.locations.hospitals) do
             if hospital.checkIn then
-                lib.zones.box({
-                    coords = hospital.checkIn,
-                    size = vec3(2, 1, 2),
-                    rotation = 18,
-                    debug = config.debugPoly,
-                    onEnter = function()
-                        local numDoctors = lib.callback.await('f_ambulancejob:server:getNumDoctors')
-                        if numDoctors >= sharedConfig.minForCheckIn then
-                            lib.showTextUI(locale('text.call_doc'))
-                        else
-                            lib.showTextUI(locale('text.check_in'))
-                        end
-                    end,
-                    onExit = function()
-                        lib.hideTextUI()
-                    end,
-                    inside = function()
-                        if IsControlJustPressed(0, 38) then
-                            checkIn(hospitalName)
-                        end
-                    end,
-                })
+                local points = type(hospital.checkIn) == 'table' and hospital.checkIn or { hospital.checkIn }
+                for i = 1, #points do
+                    lib.zones.box({
+                        -- coords dari /vec3 = lantai (z - 1), jadi tengah kotak dinaikkan supaya badan pemain masuk
+                        coords = points[i] + vec3(0.0, 0.0, 1.0),
+                        size = vec3(2.5, 2.5, 3),
+                        rotation = 18,
+                        debug = config.debugPoly,
+                        onEnter = function()
+                            local numDoctors = lib.callback.await('f_ambulancejob:server:getNumDoctors')
+                            if numDoctors >= sharedConfig.minForCheckIn then
+                                lib.showTextUI(locale('text.call_doc'))
+                            else
+                                lib.showTextUI(locale('text.check_in'))
+                            end
+                        end,
+                        onExit = function()
+                            lib.hideTextUI()
+                        end,
+                        inside = function()
+                            if IsControlJustPressed(0, 38) then
+                                checkIn(hospitalName)
+                            end
+                        end,
+                    })
+                end
             end
 
             for i = 1, #hospital.beds do

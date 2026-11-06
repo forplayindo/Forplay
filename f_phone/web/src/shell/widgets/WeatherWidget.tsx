@@ -30,8 +30,8 @@ function TempBar({ day, min, max }: { day: DayForecast; min: number; max: number
     );
 }
 
-// f_phone: nama kota di widget (server ini: Kota Forplay), bukan Los Santos.
-const CITY = () => t('widgets.cityName', 'Forplay City');
+// f_phone: nama kota di widget (server ini: Kota 4PLAY), bukan Los Santos.
+const CITY = () => t('widgets.cityName', '4PLAY City');
 
 export function WeatherWidget({ size, width, height, align = 'left', stacked = false }: {
     size: WidgetSize; width: number; height: number; align?: WidgetAlign;

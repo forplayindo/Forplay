@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_dashboard</title>
+    <link rel="stylesheet" href="ui/ios.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+        <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9H3z"/><path d="M9 20v-6h6v6"/></symbol>
+        <symbol id="i-crown" viewBox="0 0 24 24"><path d="M3 18h18L19 7l-4 4-3-6-3 6-4-4z"/></symbol>
+        <symbol id="i-brief" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3"/></symbol>
+        <symbol id="i-skull" viewBox="0 0 24 24"><path d="M12 3a8 8 0 0 0-5 14v3h10v-3a8 8 0 0 0-5-14z"/><circle cx="9" cy="11" r="1.5"/><circle cx="15" cy="11" r="1.5"/></symbol>
+        <symbol id="i-flow" viewBox="0 0 24 24"><path d="M4 7h13l-3-3M20 17H7l3 3"/></symbol>
+        <symbol id="i-dist" viewBox="0 0 24 24"><path d="M4 20h16M6 20v-4M10 20v-9M14 20v-6M18 20v-12"/></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2 6M20 4v7h-7"/></symbol>
+        <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10c1 1 1 2 1 3h6c0-1 0-2 1-3a6 6 0 0 0-4-10z"/></symbol>
+    </svg>
+
+    <div id="panel" class="panel split eko hidden">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo"><svg class="ic"><use href="#i-chart"/></svg></div>
+                <div><h1>Ekonomi</h1><small>Analitik kota</small></div>
+            </div>
+            <nav class="nav" id="nav"></nav>
+            <div class="side-foot">
+                <small id="stamp"></small>
+                <button class="b b-gray b-sm" id="refresh"><svg class="ic"><use href="#i-refresh"/></svg> Refresh</button>
+            </div>
+        </aside>
+        <section class="detail">
+            <div class="detail-h">
+                <div><div class="lt" id="title"></div><small id="sub"></small></div>
+                <div class="head-actions"><button class="circle close" id="close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+            </div>
+            <div class="pg" id="page"></div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

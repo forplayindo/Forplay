@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <base href="../../[script]/f_claimreward/html/">
+    <meta charset="UTF-8">
+    <title>f_claimreward</title>
+    <link rel="stylesheet" href="ui/ios.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+        <symbol id="i-gift" viewBox="0 0 24 24"><path d="M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/></symbol>
+        <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2l2.2 6.3L20.5 10l-6.3 2.2L12 18.5l-2.2-6.3L3.5 10l6.3-1.7zM19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></symbol>
+        <symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 7h12l1 14H5zM9 7V5a3 3 0 0 1 6 0v2"/></symbol>
+        <symbol id="i-cal" viewBox="0 0 24 24"><path d="M4 5h16v16H4zM4 10h16M9 3v4M15 3v4"/></symbol>
+        <symbol id="i-ticket" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 0 0 4v0a2 2 0 0 1 0 4v3h18v-3a2 2 0 0 1 0-4 2 2 0 0 1 0-4V5H3zM14 5v14" stroke-dasharray="0"/></symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></symbol>
+        <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17h14v-4l-2-5H7l-2 5zM5 13h14M7.5 17v2M16.5 17v2"/><circle cx="8" cy="14.5" r=".8"/><circle cx="16" cy="14.5" r=".8"/></symbol>
+        <symbol id="i-house" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 9.5V20h14V9.5M10 20v-6h4v6"/></symbol>
+        <symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24"><path d="M6 11h12v10H6zM8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+        <symbol id="i-fire" viewBox="0 0 24 24"><path d="M12 22c4 0 7-2.7 7-7 0-4-3-6-4-10-2 2-2.5 4-2.5 5.5C11 9 10 7 10 5 7 7.5 5 11 5 15c0 4.3 3 7 7 7z"/></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+        <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+    </svg>
+
+    <div id="panel" class="panel fr hidden">
+        <header>
+            <div class="brand"><span class="logo"><svg class="ic"><use href="#i-gift"/></svg></span><div><h1>Hadiah</h1><small>Gacha, toko, harian &amp; kode</small></div></div>
+            <nav class="tabs main-tabs" id="tabs">
+                <button data-tab="gacha" class="active"><svg class="ic"><use href="#i-spark"/></svg>Gacha</button>
+                <button data-tab="shop"><svg class="ic"><use href="#i-bag"/></svg>Toko</button>
+                <button data-tab="daily"><svg class="ic"><use href="#i-cal"/></svg>Harian<span class="dot hidden" id="daily-dot"></span></button>
+                <button data-tab="code"><svg class="ic"><use href="#i-ticket"/></svg>Kode</button>
+                <button data-tab="admin" class="hidden" id="admin-btn"><svg class="ic"><use href="#i-shield"/></svg>Admin</button>
+            </nav>
+            <div class="head-actions">
+                <span class="wallet" title="Koin Hadiah"><i class="ic-coin"></i><b id="w-coins">0</b></span>
+                <button class="circle close" id="close"><svg class="ic"><use href="#i-x"/></svg></button>
+            </div>
+        </header>
+
+        <main>
+            <!-- ================= GACHA ================= -->
+            <section class="tab" id="tab-gacha">
+                <div class="banner">
+                    <div class="banner-bg"></div>
+                    <div class="banner-info">
+                        <span class="kicker-pill"><svg class="ic"><use href="#i-spark"/></svg>BANNER TERBATAS</span>
+                        <h2 id="g-title"></h2>
+                        <p id="g-sub"></p>
+                        <div class="pity-box">
+                            <div class="pity-top"><span>Jaminan Legendaris</span><b id="g-pity"></b></div>
+                            <div class="pity-bar"><i id="g-pity-bar"></i></div>
+                            <small id="g-pity-note"></small>
+                        </div>
+                        <div class="feat-h">Hadiah unggulan</div>
+                        <div class="feat-strip" id="g-feat"></div>
+                    </div>
+                    <div class="banner-hero" id="g-hero"></div>
+                </div>
+                <div class="gacha-foot">
+                    <small id="g-note"></small>
+                    <div class="spacer"></div>
+                    <button class="pull-btn" data-pull="1"><span>Tarik 1x</span><em><i class="ic-coin"></i><b id="g-cost1"></b></em></button>
+                    <button class="pull-btn ten" data-pull="10"><span>Tarik 10x</span><em><i class="ic-coin"></i><b id="g-cost10"></b></em></button>
+                </div>
+            </section>
+
+            <!-- ================= TOKO ================= -->
+            <section class="tab hidden" id="tab-shop">
+                <div class="shop-bar">
+                    <div class="filters" id="s-filters">
+                        <button data-cat="all" class="active">Semua</button>
+                        <button data-cat="bundle">Bundle</button>
+                        <button data-cat="vehicle">Kendaraan</button>
+                        <button data-cat="item">Barang</button>
+                        <button data-cat="other">Lainnya</button>
+                    </div>
+                    <label class="search"><svg class="ic"><use href="#i-search"/></svg><input id="s-search" placeholder="Cari barang..."></label>
+                </div>
+                <div class="scroll" id="s-scroll">
+                    <div id="s-bundles" class="bundles"></div>
+                    <div id="s-grid" class="shop-grid"></div>
+                </div>
+            </section>
+
+            <!-- ================= HARIAN ================= -->
+            <section class="tab hidden" id="tab-daily">
+                <div class="daily-head">
+                    <div><h2>Hadiah Login Harian</h2><p>Klaim setiap hari. Kalau bolong sehari, kembali ke Hari 1.</p></div>
+                    <button class="primary b-lg" id="d-claim">Klaim</button>
+                </div>
+                <div class="daily-grid" id="d-grid"></div>
+                <div class="group daily-info">
+                    <div class="row"><span class="sq" style="background:var(--accent-soft);color:var(--accent)"><svg class="ic"><use href="#i-cal"/></svg></span><span class="t">Login harian<small>Sumber koin utama, ±160 koin per minggu kalau tidak bolong</small></span></div>
+                    <div class="row"><span class="sq" style="background:var(--blue-soft);color:var(--blue)"><svg class="ic"><use href="#i-ticket"/></svg></span><span class="t">Kode referral<small>Ikuti event roleplay, admin membagikan kode berisi koin &amp; hadiah</small></span></div>
+                    <div class="row"><span class="sq" style="background:rgba(191,90,242,.16);color:var(--purple)"><svg class="ic"><use href="#i-spark"/></svg></span><span class="t">Pakai koin<small>Untuk tarik Gacha dan belanja di Toko</small></span></div>
+                </div>
+            </section>
+
+            <!-- ================= KODE ================= -->
+            <section class="tab hidden" id="tab-code">
+                <div class="code-box">
+                    <div class="code-ic"><svg class="ic"><use href="#i-ticket"/></svg></div>
+                    <h2>Tukar Kode Referral</h2>
+                    <p>Masukkan kode yang dibagikan admin saat event.</p>
+                    <div class="code-input">
+                        <input id="c-input" maxlength="24" placeholder="CONTOH: MERDEKA45" autocomplete="off" spellcheck="false">
+                        <button class="primary" id="c-check">Cek Kode</button>
+                    </div>
+                    <div id="c-msg" class="msg hidden"></div>
+                    <div id="c-result" class="c-result hidden">
+                        <div class="c-head"><span>Isi hadiah</span><small id="c-exp" class="cd"></small></div>
+                        <div class="tiles" id="c-tiles"></div>
+                        <button class="primary b-lg b-block" id="c-claim">Klaim Hadiah</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= ADMIN ================= -->
+            <section class="tab hidden" id="tab-admin">
+                <div class="adm-top">
+                    <div class="seg" id="a-seg">
+                        <button data-a="codes" class="active">Kode Referral</button>
+                        <button data-a="shop">Toko</button>
+                        <button data-a="give">Beri Koin</button>
+                        <button data-a="winners">Pemenang</button>
+                    </div>
+                </div>
+
+                <div class="adm-pane" id="a-codes">
+                    <div class="adm-list scroll" id="ac-list"></div>
+                    <div class="adm-form scroll">
+                        <h3>Buat Kode</h3>
+                        <label><span>Kode</span>
+                            <div class="in-row"><input id="ac-code" maxlength="24" placeholder="MERDEKA45" autocomplete="off" spellcheck="false"><button class="b b-gray b-sm" id="ac-rand">Acak</button></div>
+                        </label>
+                        <div class="rb" id="ac-rb"></div>
+                        <label><span>Masa berlaku (menit, waktu nyata)</span>
+                            <div class="quick" data-for="ac-min"><button data-v="30">30 mnt</button><button data-v="60">60 mnt</button><button data-v="180">3 jam</button><button data-v="1440">1 hari</button><button data-v="10080">7 hari</button></div>
+                            <input id="ac-min" type="number" min="1" value="60">
+                        </label>
+                        <label><span>Kuota pemakai (0 = tanpa batas, tiap karakter tetap 1x)</span><input id="ac-max" type="number" min="0" value="0"></label>
+                        <button class="primary b-lg b-block" id="ac-save">Buat Kode</button>
+                    </div>
+                </div>
+
+                <div class="adm-pane hidden" id="a-shop">
+                    <div class="adm-list scroll">
+                        <button class="b b-tinted b-sm new-btn" id="as-new"><svg class="ic"><use href="#i-plus"/></svg>Barang Baru</button>
+                        <div id="as-list"></div>
+                    </div>
+                    <div class="adm-form scroll">
+                        <h3 id="as-title">Barang Baru</h3>
+                        <label><span>Nama</span><input id="as-label" maxlength="60"></label>
+                        <label><span>Deskripsi</span><textarea id="as-desc" maxlength="200" rows="2"></textarea></label>
+                        <div class="two">
+                            <label><span>Kategori</span><select id="as-cat">
+                                <option value="item">Barang</option><option value="vehicle">Kendaraan</option><option value="bundle">Bundle</option>
+                                <option value="other">Lainnya</option></select></label>
+                            <label><span>Urutan</span><input id="as-sort" type="number" value="0"></label>
+                        </div>
+                        <div class="rb" id="as-rb"></div>
+                        <label><span>Harga (koin)</span><input id="as-price" type="number" min="1" value="100"></label>
+                        <div class="two">
+                            <label><span>Batas beli / karakter (0 = bebas)</span><input id="as-limit" type="number" min="0" value="0"></label>
+                            <label><span>Berlaku (menit, 0 = selamanya)</span><input id="as-min" type="number" min="0" placeholder="tetap"></label>
+                        </div>
+                        <div class="sw-row"><span>Aktif dijual</span><button class="switch on" id="as-active"></button></div>
+                        <div class="form-btns">
+                            <button class="b b-red-tint b-lg hidden" id="as-del">Hapus</button>
+                            <button class="primary b-lg" id="as-save">Simpan</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="adm-pane hidden" id="a-give">
+                    <div class="adm-list scroll">
+                        <div class="group-h">Pemain online, klik untuk memilih</div>
+                        <div id="ag-players"></div>
+                    </div>
+                    <div class="adm-form scroll">
+                        <h3>Beri / Kurangi Koin</h3>
+                        <label><span>Target (ID server online atau citizenid)</span><input id="ag-target" placeholder="12 atau F1234567"></label>
+                        <label><span>Jumlah koin (negatif = mengurangi)</span><input id="ag-amount" type="number" value="50"></label>
+                        <button class="primary b-lg b-block" id="ag-send">Kirim</button>
+                    </div>
+                </div>
+
+                <div class="adm-pane full hidden" id="a-winners">
+                    <div class="win-bar">
+                        <div class="filters" id="aw-filter"><button data-v="menunggu" class="active">Menunggu admin</button><button data-v="semua">Semua</button></div>
+                        <small>Legendaris, kendaraan &amp; hadiah manual tercatat di sini untuk verifikasi.</small>
+                        <span class="spacer"></span>
+                        <span class="chip" id="aw-week"></span>
+                    </div>
+                    <div class="scroll" id="aw-list"></div>
+                </div>
+            </section>
+        </main>
+
+        <!-- hasil gacha -->
+        <div id="reveal" class="reveal hidden">
+            <div class="rv-orb" id="rv-orb"><div class="orb"><i></i><i></i></div></div>
+            <div class="rv-cards" id="rv-cards"></div>
+            <div class="rv-foot">
+                <button class="b b-gray" id="rv-skip">Lewati</button>
+                <button class="primary b-lg hidden" id="rv-done">Lanjut</button>
+            </div>
+        </div>
+
+        <div id="modal" class="modal hidden"><div class="modal-box" id="modal-box"></div></div>
+        <div id="toast" class="toast hidden"></div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="../../../_design/claimreward-mockup/mock.js"></script>
+</body>
+</html>

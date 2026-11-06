@@ -6,11 +6,13 @@ import { useNuiEvent } from '@/hooks/useNuiEvent';
 import { isFiveM } from '@/core/nui';
 import type { RydeRequestPush } from '@/core/types';
 import { accountsMe, type AccountMe } from '@/core/accountsApi';
+import { failText } from '@/core/api';
+import { t } from '@/i18n';
 import {
     CAR_COLORS, clearRydeData, DEFAULT_DRIVER, distanceKm, DRIVERS, loadDriver, loadRides, loadState, newId, PLACES,
     resetLiveState, RIDER_NAMES, saveDriver, saveRides, saveState, startOfToday, suggestFare,
 } from './data';
-import type { DriverProfile, Place, Ride, RideOffer, RideStatus, RyderState } from './data';
+import type { DriverProfile, Place, Ride, RideStatus, RyderState } from './data';
 import { ryde } from './rydeApi';
 import type { RydeActiveRide } from './rydeApi';
 
@@ -43,18 +45,18 @@ interface RydeCtx {
 
     requestRide: (pickup: Place, dropoff: Place) => void;
     cancelRider: () => void;
-    acceptOffer: () => void;
-    declineOffer: () => void;
-    switchOffer: () => void;
     submitRating: (stars: number, tip: number) => void;
     skipRating: () => void;
 
     becomeDriver: (car: string, plate: string, color: string) => void;
     unregisterDriver: () => void;
     setOnline: (v: boolean) => void;
-    suggestPrice: (requestId: string, amount: number) => void;
+    takeRequest: (requestId: string) => void;
     driverAdvance: () => void;
     driverCancel: () => void;
+
+    notice: string | null;
+    clearNotice: () => void;
 }
 
 const Ctx = createContext<RydeCtx | null>(null);
@@ -67,7 +69,7 @@ function reqToRide(p: RydeRequestPush): Ride {
         id: p.id, role: 'driver',
         pickup:  { id: 'pk', name: p.pickup.label,  sub: '', x: p.pickup.x,  y: p.pickup.y },
         dropoff: { id: 'dp', name: p.dropoff.label, sub: '', x: p.dropoff.x, y: p.dropoff.y },
-        distanceKm: p.distance, durationMin: Math.max(3, Math.round(p.distance * 2.4)), fare: 0,
+        distanceKm: p.distance, durationMin: Math.max(3, Math.round(p.distance * 2.4)), fare: p.fare ?? 0,
         payment: 'card', status: 'finding', placedAt: p.createdAt, etaMin: 2 + Math.round(p.distance * 0.4),
         riderName: p.riderName,
     };
@@ -75,20 +77,6 @@ function reqToRide(p: RydeRequestPush): Ride {
 
 function mapStatus(s: string): RideStatus {
     return (s === 'declined' ? 'cancelled' : s) as RideStatus;
-}
-
-function showOffer(ride: Ride, tripId: string): Ride {
-    const o = ride.offers?.find(x => x.tripId === tripId) ?? ride.offers?.[0];
-    return o ? { ...ride, tripId: o.tripId, fare: o.fare, driver: o.driver } : ride;
-}
-
-function removeOffer(ride: Ride, tripId: string): Ride {
-    const offers = (ride.offers ?? []).filter(o => o.tripId !== tripId);
-    if (offers.length === 0) {
-        return { ...ride, status: 'finding', offers: undefined, driver: undefined, fare: 0, tripId: undefined };
-    }
-    const shown = offers.some(o => o.tripId === ride.tripId) ? ride.tripId! : offers[0].tripId;
-    return showOffer({ ...ride, offers }, shown);
 }
 
 function ptToPlace(p: { label: string; x: number; y: number }, id: string): Place {
@@ -99,19 +87,14 @@ function syncToRiderRide(a: RydeActiveRide, keepId?: string): Ride {
     const pickup = ptToPlace(a.pickup, 'pk');
     const dropoff = ptToPlace(a.dropoff, 'dp');
     const km = a.distance ?? distanceKm(pickup, dropoff);
-    const offers: RideOffer[] = (a.offers ?? []).map(o => ({ tripId: o.tripId, fare: o.fare, driver: o.driver }));
-    const ride: Ride = {
+    return {
         id: keepId ?? a.id, role: 'rider', tripId: a.tripId,
         pickup, dropoff, distanceKm: km, durationMin: Math.max(3, Math.round(km * 2.4)),
-        fare: a.fare ?? 0, payment: a.payment === 'cash' ? 'cash' : 'card',
-        status: a.status as RideStatus, placedAt: a.createdAt ?? Date.now(),
+        fare: a.fare ?? 0, payment: 'card',
+        status: (a.status === 'offered' ? 'finding' : a.status) as RideStatus, placedAt: a.createdAt ?? Date.now(),
         etaMin: 2 + Math.round(km * 0.4),
-        driver: a.driver, offers: offers.length ? offers : undefined,
+        driver: a.driver,
     };
-    if (ride.status === 'offered' && offers.length) {
-        return { ...ride, tripId: offers[0].tripId, fare: offers[0].fare, driver: offers[0].driver };
-    }
-    return ride;
 }
 
 function syncToDriverRide(a: RydeActiveRide, keepId?: string): Ride {
@@ -149,6 +132,8 @@ export function RydeProvider({ children }: { children: ReactNode }) {
     const [tab, setTab] = useSessionState<Tab>('ryde:tab', 'home');
     const [accountOpen, setAccountOpen] = useState(false);
     const [pendingRatingId, setPendingRatingId] = useSessionState<string | null>('ryde:pendingRating', null);
+    const [notice, setNotice] = useState<string | null>(null);
+    const clearNotice = useCallback(() => setNotice(null), []);
 
     useEffect(() => {
         if ((tab as string) === 'account') setTab('home');
@@ -235,36 +220,24 @@ export function RydeProvider({ children }: { children: ReactNode }) {
         const ride: Ride = {
             id: newId('ride'), role: 'rider',
             pickup, dropoff, distanceKm: km, durationMin: Math.max(3, Math.round(km * 2.4)),
-            fare: 0, payment: state.payment, status: 'finding', placedAt: Date.now(), etaMin: 0,
+            fare: 0, payment: 'card', status: 'finding', placedAt: Date.now(), etaMin: 0,
         };
         commitRides([ride, ...loadRides()]);
-        if (isFiveM) void ryde.requestRide({ label: dropoff.name, x: dropoff.x, y: dropoff.y });
-    }, [state.payment, commitRides]);
+        if (!isFiveM) return;
+        void ryde.requestRide({ label: dropoff.name, x: dropoff.x, y: dropoff.y }).then(res => {
+            if (res.success && res.data) {
+                const d = res.data;
+                commitRides(loadRides().map(r => r.id === ride.id ? { ...r, fare: d.fare, distanceKm: d.distance } : r));
+                return;
+            }
+            commitRides(loadRides().filter(r => r.id !== ride.id));
+            setNotice(failText(res, t('ryde.requestFailed', 'Could not request a ride.')));
+        });
+    }, [commitRides]);
 
     const cancelRider = useCallback(() => {
         if (isFiveM) void ryde.cancel();
         commitRides(loadRides().map(r => (r.role === 'rider' && ACTIVE.includes(r.status)) ? { ...r, status: 'cancelled' } : r));
-    }, [commitRides]);
-
-    const acceptOffer = useCallback(() => {
-        const cur = loadRides();
-        const offered = cur.find(r => r.role === 'rider' && r.status === 'offered');
-        if (isFiveM && offered?.tripId) void ryde.respond(offered.tripId, true);
-        commitRides(cur.map(r => (r.role === 'rider' && r.status === 'offered') ? { ...r, status: 'enroute_pickup', offers: undefined } : r));
-    }, [commitRides]);
-    const declineOffer = useCallback(() => {
-        const cur = loadRides();
-        const offered = cur.find(r => r.role === 'rider' && r.status === 'offered');
-        if (isFiveM && offered?.tripId) void ryde.respond(offered.tripId, false);
-        commitRides(cur.map(r => (r.role === 'rider' && r.status === 'offered' && r.tripId) ? removeOffer(r, r.tripId) : r));
-    }, [commitRides]);
-    const switchOffer = useCallback(() => {
-        commitRides(loadRides().map(r => {
-            if (r.role !== 'rider' || r.status !== 'offered' || (r.offers?.length ?? 0) < 2) return r;
-            const offers = r.offers!;
-            const idx = offers.findIndex(o => o.tripId === r.tripId);
-            return showOffer(r, offers[(idx + 1) % offers.length].tripId);
-        }));
     }, [commitRides]);
 
     const submitRating = useCallback((stars: number, tip: number) => {
@@ -287,14 +260,7 @@ export function RydeProvider({ children }: { children: ReactNode }) {
                 if (r.status === 'finding') {
                     changed = true;
                     const d = DRIVERS[Math.floor(r.placedAt) % DRIVERS.length];
-                    const offer: RideOffer = { tripId: newId('off'), fare: suggestFare(r.distanceKm), driver: d };
-                    return showOffer({ ...r, status: 'offered' as RideStatus, offers: [offer], etaMin: 2 + Math.round(r.distanceKm * 0.4) }, offer.tripId);
-                }
-                if (r.status === 'offered' && (r.offers?.length ?? 0) === 1) {
-                    changed = true;
-                    const d = DRIVERS[(Math.floor(r.placedAt) + 2) % DRIVERS.length];
-                    const offer: RideOffer = { tripId: newId('off'), fare: suggestFare(r.distanceKm) + 3, driver: d };
-                    return { ...r, offers: [...(r.offers ?? []), offer] };
+                    return { ...r, status: 'enroute_pickup', tripId: newId('trip'), driver: d, fare: r.fare || suggestFare(r.distanceKm), etaMin: 2 + Math.round(r.distanceKm * 0.4) };
                 }
                 if (r.status === 'enroute_pickup') { changed = true; return { ...r, status: 'arriving' }; }
                 if (r.status === 'arriving') { changed = true; return { ...r, status: 'in_progress' }; }
@@ -332,21 +298,22 @@ export function RydeProvider({ children }: { children: ReactNode }) {
         }
     }, [driver, commitDriver]);
 
-    const suggestPrice = useCallback((requestId: string, amount: number) => {
+    // First driver to take a request wins it at its fixed fare; a loser gets told it is gone.
+    const takeRequest = useCallback((requestId: string) => {
         const req = requestsRef.current.find(r => r.id === requestId);
         if (!req) return;
         setRequests(prev => prev.filter(r => r.id !== requestId));
-        if (isFiveM) {
-            void ryde.accept(req.id, amount).then(res => {
-                commitRides([{ ...req, tripId: res?.tripId ?? req.id, status: 'offered', fare: amount }, ...loadRides()]);
-            });
-        } else {
-            const ride: Ride = { ...req, status: 'offered', fare: amount };
-            commitRides([ride, ...loadRides()]);
-            window.setTimeout(() => {
-                commitRides(loadRides().map(x => (x.id === ride.id && x.status === 'offered') ? { ...x, status: 'enroute_pickup' } : x));
-            }, 3500);
+        if (!isFiveM) {
+            commitRides([{ ...req, tripId: newId('trip'), status: 'enroute_pickup' }, ...loadRides()]);
+            return;
         }
+        void ryde.accept(req.id).then(res => {
+            if (res.success && res.data) {
+                commitRides([{ ...req, tripId: res.data.tripId, fare: res.data.fare, status: 'enroute_pickup' }, ...loadRides()]);
+                return;
+            }
+            setNotice(failText(res, t('ryde.rideTakenByOther', 'Another driver already took this ride.')));
+        });
     }, [commitRides]);
 
     const driverAdvance = useCallback(() => {
@@ -410,25 +377,12 @@ export function RydeProvider({ children }: { children: ReactNode }) {
         setWaitingCount(requests.length);
     }, [requests, driver.online]);
 
-    useNuiEvent('f_phone:ryde:offer', useCallback((d) => {
+    // A driver took the rider's open request: the trip is engaged straight away (fixed fare).
+    useNuiEvent('f_phone:ryde:matched', useCallback((d) => {
         if (!d) return;
-        const offer: RideOffer = {
-            tripId: d.id, fare: d.fare ?? 0,
-            driver: { name: d.driverName ?? 'Driver', car: d.vehicle ?? '', plate: d.plate ?? '', color: d.color ?? '#111', rating: d.rating ?? 5, number: d.number },
-        };
-        commitRides(loadRides().map(r => {
-            if (r.role !== 'rider' || !(r.status === 'finding' || r.status === 'offered')) return r;
-            const offers = [...(r.offers ?? []).filter(o => o.tripId !== offer.tripId), offer];
-            const shown = r.status === 'offered' && r.tripId ? r.tripId : offer.tripId;
-            return showOffer({ ...r, status: 'offered' as RideStatus, offers }, shown);
-        }));
-    }, [commitRides]));
-
-    useNuiEvent('f_phone:ryde:offerRemoved', useCallback((d) => {
-        if (!d) return;
-        commitRides(loadRides().map(r =>
-            (r.role === 'rider' && r.status === 'offered' && (r.offers ?? []).some(o => o.tripId === d.id))
-                ? removeOffer(r, d.id) : r));
+        const driver = { name: d.driverName ?? 'Driver', car: d.vehicle ?? '', plate: d.plate ?? '', color: d.color ?? '#111', rating: d.rating ?? 5, number: d.number };
+        commitRides(loadRides().map(r => (r.role === 'rider' && r.status === 'finding')
+            ? { ...r, tripId: d.id, status: 'enroute_pickup' as RideStatus, fare: d.fare ?? r.fare, driver } : r));
     }, [commitRides]));
 
     useNuiEvent('f_phone:ryde:tripUpdate', useCallback((d) => {
@@ -465,8 +419,9 @@ export function RydeProvider({ children }: { children: ReactNode }) {
     const value: RydeCtx = {
         rides, driver, state, requests, waitingCount, tab, activeRider, activeDriver, pendingRating,
         authChecked, authed, me, setAuth, accountOpen, setAccountOpen, wipeAccount,
-        setTab, setPayment, setSaved, requestRide, cancelRider, acceptOffer, declineOffer, switchOffer, submitRating, skipRating,
-        becomeDriver, unregisterDriver, setOnline, suggestPrice, driverAdvance, driverCancel,
+        setTab, setPayment, setSaved, requestRide, cancelRider, submitRating, skipRating,
+        becomeDriver, unregisterDriver, setOnline, takeRequest, driverAdvance, driverCancel,
+        notice, clearNotice,
     };
     return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

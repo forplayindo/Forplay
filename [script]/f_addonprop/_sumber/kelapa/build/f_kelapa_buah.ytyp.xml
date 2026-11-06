@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CMapTypes>
+ <extensions />
+ <archetypes>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="80" />
+   <flags value="549453856" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.093135" y="-0.1" z="-0.125" />
+   <bbMax x="0.106865" y="0.1" z="0.129" />
+   <bsCentre x="0.006865" y="0" z="0.002" />
+   <bsRadius value="0.190076" />
+   <hdTextureDist value="80" />
+   <name>f_kelapa_buah</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary>f_kelapa_buah</physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>f_kelapa_buah</assetName>
+   <extensions />
+  </Item>
+ </archetypes>
+ <name>f_kelapa_buah</name>
+ <dependencies />
+ <compositeEntityTypes itemType="CCompositeEntityType" />
+</CMapTypes>

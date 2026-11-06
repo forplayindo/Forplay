@@ -77,7 +77,6 @@ return {
 		stack = false,
 		degrade = 2880, -- 2 hari sejak diambil dari armory
 		description = 'Tas medis EMS. Wajib dibawa untuk tindakan di Cek Pasien; obat diambil dari Stok Gudang.',
-		client = { image = 'medikit.png' },
 	},
 
 	['tas_operasi'] = {
@@ -86,7 +85,6 @@ return {
 		stack = false,
 		degrade = 1440, -- 24 jam sejak diambil dari armory
 		description = 'Tas operasi Dokter. Wajib dibawa untuk operasi; obat diambil dari Stok Gudang.',
-		client = { image = 'advancedkit.png' },
 	},
 
 	['tas_perkakas'] = {
@@ -95,7 +93,6 @@ return {
 		stack = false,
 		degrade = 2880, -- 2 hari sejak diambil di Gudang Bengkel
 		description = 'Tas perkakas mekanik. Wajib dibawa untuk memperbaiki kendaraan; bahan diambil dari Stok Gudang Bengkel.',
-		client = { image = 'WEAPON_WRENCH.png' },
 	},
 
 	['hemostatic'] = {
@@ -158,7 +155,7 @@ return {
 	},
 
 	['crutch'] = {
-		label = 'Kruk',
+		label = 'Crutch',
 		weight = 1500,
 		stack = false,
 		description = 'Tongkat untuk berjalan selama masa pemulihan kaki. Pakai untuk memegang / melepas.',
@@ -240,10 +237,20 @@ return {
 		}
 	},
 
+	['etoll_card'] = {
+		label = 'Kartu E-Toll',
+		weight = 10,
+		stack = false,
+		description = 'Kartu bayar gerbang tol. Saldo tersimpan di kartu; isi ulang di loket tol atau minimarket.',
+		client = {
+			image = 'card_bank.png'
+		}
+	},
+
 	['driver_license'] = {
 		label = 'SIM',
 		client = {
-			image = 'card_id.png'
+			image = 'sim.png'
 		}
 	},
 
@@ -295,6 +302,14 @@ return {
     label = 'Pemotong Besi',
     weight = 2500,
     description = 'Bisa memotong borgol',
+},
+
+['tameng_balistik'] = {
+    label = 'Tameng Balistik',
+    weight = 8000,
+    stack = false,
+    close = true,
+    description = 'Tameng besi anti peluru, dipakai bersama pistol. Pakai lagi untuk melepas',
 },
 
 ['car_key'] = {
@@ -506,72 +521,135 @@ return {
 ['cafe_burger'] = {
     label = 'Classic Beef Burger', weight = 100, degrade = 4320,
     description = 'Burger daging sapi dengan keju. Kadaluarsa 3 hari.',
-    client = { image = 'cafe_burger.png', status = { hunger = 10 }, usetime = 5000,
+    client = { status = { hunger = 15, stress = -2 }, usetime = 5000,
         anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger', flag = 49 },
         prop = { model = `prop_cs_burger_01`, bone = 18905, pos = vec3(0.13, 0.05, 0.02), rot = vec3(-50.0, 16.0, 60.0) } },
 },
 ['cafe_hotdog'] = {
     label = 'Hot Dog Sausage', weight = 100, degrade = 4320,
     description = 'Hot dog sosis dengan mustard. Kadaluarsa 3 hari.',
-    client = { image = 'cafe_hotdog.png', status = { hunger = 10 }, usetime = 5000,
+    client = { status = { hunger = 15, stress = -2 }, usetime = 5000,
         anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger', flag = 49 },
         prop = { model = `prop_cs_hotdog_01`, bone = 18905, pos = vec3(0.13, 0.05, 0.02), rot = vec3(-50.0, 16.0, 60.0) } },
 },
 ['cafe_nachos'] = {
     label = 'Loaded Nachos', weight = 100, degrade = 4320,
     description = 'Nachos dengan keju leleh dan salsa. Kadaluarsa 3 hari.',
-    client = { image = 'cafe_nachos.png', status = { hunger = 10 }, usetime = 5000,
+    client = { status = { hunger = 15, stress = -2 }, usetime = 5000,
         anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger', flag = 49 },
         prop = { model = `prop_taco_01`, bone = 60309, pos = vec3(-0.017, 0.007, -0.021), rot = vec3(107.98, -105.03, 55.78) } },
 },
 ['cafe_donut'] = {
     label = 'Glazed Donut', weight = 80, degrade = 4320,
     description = 'Donat glaze manis. Kadaluarsa 3 hari.',
-    client = { image = 'cafe_donut.png', status = { hunger = 10 }, usetime = 4000,
+    client = { status = { hunger = 15, stress = -2 }, usetime = 4000,
         anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger', flag = 49 },
         prop = { model = `prop_amb_donut`, bone = 18905, pos = vec3(0.13, 0.05, 0.02), rot = vec3(-50.0, 16.0, 60.0) } },
 },
 ['cafe_sandwich'] = {
     label = 'Fresh Sandwich', weight = 100, degrade = 4320,
     description = 'Sandwich ayam dan keju. Kadaluarsa 3 hari.',
-    client = { image = 'cafe_sandwich.png', status = { hunger = 10 }, usetime = 5000,
+    client = { status = { hunger = 15, stress = -2 }, usetime = 5000,
         anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger', flag = 49 },
         prop = { model = `prop_sandwich_01`, bone = 18905, pos = vec3(0.13, 0.05, 0.02), rot = vec3(-50.0, 16.0, 60.0) } },
+},
+['cafe_nasigoreng'] = {
+    label = 'Nasi Goreng', weight = 150, degrade = 4320,
+    description = 'Nasi goreng kecap dengan telur. Kadaluarsa 3 hari.',
+    -- prop & animasi dari f_addonprop (stream/makanan)
+    client = { status = { hunger = 50, stress = -1 }, usetime = 7000,
+        anim = { dict = 'eat@fork', clip = 'fork_clip', flag = 49 },
+        prop = {
+            { model = `prop_sendok`, bone = 57005, pos = vec3(0.14, 0.02, 0.01), rot = vec3(-118.0, 192.0, 24.0) },
+            { model = `prop_nasi_goreng_v2`, bone = 60309, pos = vec3(0.1, 0.03, 0.02), rot = vec3(-11.08, 0.0, 0.0) },
+        } },
+},
+-- prop dari f_addonprop (stream/makanan, dibangun dari _sumber/makanan/*.glb)
+['mie_goreng_telor'] = {
+    label = 'Mie Goreng Telor', weight = 150, degrade = 4320,
+    description = 'Mie goreng dengan telur ceplok, sawi dan kerupuk. Kadaluarsa 3 hari.',
+    client = { status = { hunger = 25, stress = -2 }, usetime = 7000,
+        anim = { dict = 'eat@fork', clip = 'fork_clip', flag = 49 },
+        prop = {
+            { model = `devkit_spork`, bone = 57005, pos = vec3(0.14, 0.02, 0.01), rot = vec3(-118.0, 192.0, 24.0) },
+            { model = `prop_mie_goreng_telor`, bone = 60309, pos = vec3(0.1, 0.03, 0.02), rot = vec3(-11.08, 0.0, 0.0) },
+        } },
+},
+['mie_rebus_telor'] = {
+    label = 'Mie Telor Rebus', weight = 200, degrade = 4320,
+    description = 'Mie rebus berkuah dengan telur ceplok. Kadaluarsa 3 hari.',
+    client = { status = { hunger = 25, stress = -2 }, usetime = 7000,
+        anim = { dict = 'eat@fork', clip = 'fork_clip', flag = 49 },
+        prop = {
+            { model = `prop_sendok`, bone = 57005, pos = vec3(0.14, 0.02, 0.01), rot = vec3(-118.0, 192.0, 24.0) },
+            { model = `prop_mie_rebus_telor`, bone = 60309, pos = vec3(0.09, 0.02, 0.01), rot = vec3(-09.08, 0.0, 0.0) },
+        } },
+},
+['steak'] = {
+    label = 'Steak', weight = 200, degrade = 4320,
+    description = 'Steak daging sapi panggang. Kadaluarsa 3 hari.',
+    client = { status = { hunger = 50, stress = -1 }, usetime = 7000,
+        anim = { dict = 'eat@fork', clip = 'fork_clip', flag = 49 },
+        prop = {
+            { model = `devkit_spork`, bone = 57005, pos = vec3(0.14, 0.02, 0.01), rot = vec3(-118.0, 192.0, 24.0) },
+            { model = `prop_nycsteak`, bone = 60309, pos = vec3(0.1, 0.03, 0.02), rot = vec3(-11.08, 0.0, 0.0) },
+        } },
 },
 ['cafe_cappuccino'] = {
     label = 'Classic Cappuccino', weight = 120, degrade = 4320,
     description = 'Cappuccino hangat dengan kayu manis. Kadaluarsa 3 hari.',
-    client = { image = 'cafe_cappuccino.png', status = { thirst = 10 }, usetime = 5000,
-        anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle', flag = 49 },
-        prop = { model = `p_amb_coffeecup_01`, bone = 60309, pos = vec3(0.01, 0.01, 0.02), rot = vec3(5.0, 5.0, -180.5) } },
+    client = { status = { thirst = 15, stress = -2 }, usetime = 5000,
+        anim = { dict = 'mp_player_intdrink', clip = 'loop', flag = 49 },
+        prop = { model = `prop_cup_warmindo`, bone = 60309, pos = vec3(0.01, -0.03, -0.13), rot = vec3(5.0, 5.0, -180.5) } },
 },
 ['cafe_colafloat'] = {
     label = 'Iced Cola Float', weight = 120, degrade = 4320,
     description = 'Cola dingin dengan es krim vanila. Kadaluarsa 3 hari.',
-    client = { image = 'cafe_colafloat.png', status = { thirst = 10 }, usetime = 5000,
-        anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle', flag = 49 },
-        prop = { model = `prop_ecola_can`, bone = 60309, pos = vec3(0.01, 0.01, 0.06), rot = vec3(5.0, 5.0, -180.5) } },
+    client = { status = { thirst = 15, stress = -2 }, usetime = 5000,
+        anim = { dict = 'mp_player_intdrink', clip = 'loop', flag = 49 },
+        prop = { model = `prop_cup_warmindo`, bone = 60309, pos = vec3(0.01, -0.03, -0.13), rot = vec3(5.0, 5.0, -180.5) } },
 },
 ['cafe_milkshake'] = {
     label = 'Chocolate Milkshake', weight = 120, degrade = 4320,
     description = 'Milkshake coklat dingin. Kadaluarsa 3 hari.',
-    client = { image = 'cafe_milkshake.png', status = { thirst = 10 }, usetime = 5000,
-        anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle', flag = 49 },
-        prop = { model = `prop_cs_bs_cup`, bone = 60309, pos = vec3(0.01, 0.01, 0.02), rot = vec3(5.0, 5.0, -180.5) } },
+    client = { status = { thirst = 25, stress = -2 }, usetime = 5000,
+        anim = { dict = 'mp_player_intdrink', clip = 'loop', flag = 49 },
+        prop = { model = `prop_cup_warmindo`, bone = 60309, pos = vec3(0.01, -0.03, -0.13), rot = vec3(5.0, 5.0, -180.5) } },
 },
 ['cafe_orangejuice'] = {
     label = 'Fresh Orange Juice', weight = 120, degrade = 4320,
     description = 'Jus jeruk segar. Kadaluarsa 3 hari.',
-    client = { image = 'cafe_orangejuice.png', status = { thirst = 10 }, usetime = 5000,
-        anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle', flag = 49 },
-        prop = { model = `prop_plastic_cup_02`, bone = 60309, pos = vec3(0.01, 0.01, 0.02), rot = vec3(5.0, 5.0, -180.5) } },
+    client = { status = { thirst = 25, stress = -2 }, usetime = 5000,
+        anim = { dict = 'mp_player_intdrink', clip = 'loop', flag = 49 },
+        prop = { model = `prop_cup_warmindo`, bone = 60309, pos = vec3(0.01, -0.03, -0.13), rot = vec3(5.0, 5.0, -180.5) } },
 },
 ['cafe_energysoda'] = {
     label = 'Energy Soda', weight = 120, degrade = 4320,
     description = 'Soda berenergi. Kadaluarsa 3 hari.',
-    client = { image = 'cafe_energysoda.png', status = { thirst = 10 }, usetime = 5000,
-        anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle', flag = 49 },
-        prop = { model = `prop_energy_drink`, bone = 60309, pos = vec3(0.008, 0.001, 0.016), rot = vec3(3.57, 4.66, -49.91) } },
+    client = { status = { thirst = 15, stress = -2 }, usetime = 5000,
+        anim = { dict = 'mp_player_intdrink', clip = 'loop', flag = 49 },
+        prop = { model = `prop_cup_warmindo`, bone = 60309, pos = vec3(0.01, -0.03, -0.13), rot = vec3(5.0, 5.0, -180.5) } },
+},
+['cafe_stmj'] = {
+    label = 'STMJ', weight = 150, degrade = 4320,
+    description = 'Susu, telur, madu dan jahe hangat. Kadaluarsa 3 hari.',
+    client = { status = { thirst = 25, stress = -2 }, usetime = 5000,
+        anim = { dict = 'mp_player_intdrink', clip = 'loop', flag = 49 },
+        prop = { model = `prop_cup_warmindo`, bone = 60309, pos = vec3(0.01, -0.03, -0.13), rot = vec3(5.0, 5.0, -180.5) } },
+},
+['cafe_kelapamuda'] = {
+    label = 'Es Kelapa Muda Utuh', weight = 400, degrade = 4320,
+    description = 'Satu buah kelapa muda utuh dengan es. Kadaluarsa 3 hari.',
+    client = { status = { thirst = 50, stress = -1 }, usetime = 7000,
+        anim = { dict = 'mp_player_intdrink', clip = 'loop', flag = 49 },
+        prop = { model = `prop_cup_warmindo`, bone = 60309, pos = vec3(0.01, -0.03, -0.13), rot = vec3(5.0, 5.0, -180.5) } },
+},
+['cafe_jusalpukat'] = {
+    label = 'Jus Alpukat Jumbo', weight = 300, degrade = 4320,
+    description = 'Jus alpukat gelas jumbo dengan susu coklat. Kadaluarsa 3 hari.',
+    client = { status = { thirst = 50, stress = -1 }, usetime = 7000,
+        anim = { dict = 'mp_player_intdrink', clip = 'loop', flag = 49 },
+        prop = { model = `prop_cup_warmindo`, bone = 60309, pos = vec3(0.01, -0.03, -0.13), rot = vec3(5.0, 5.0, -180.5) } },
 },
 
 -----------------------------------------------------------------------
@@ -600,13 +678,22 @@ return {
 ['air_soda']         = { label = 'Air Soda',         weight = 150, description = 'Bahan baku cafe.' },
 ['sirup_energi']     = { label = 'Sirup Energi',     weight = 100, description = 'Bahan baku cafe.' },
 ['jeruk']            = { label = 'Jeruk',            weight = 100, description = 'Bahan baku cafe.' },
+['beras']            = { label = 'Beras',            weight = 200, description = 'Bahan baku cafe.' },
+['telur']            = { label = 'Telur',            weight = 50,  description = 'Bahan baku cafe.' },
+['kecap_manis']      = { label = 'Kecap Manis',      weight = 200, description = 'Bahan baku cafe.' },
+['mie_instan']       = { label = 'Mie Instan',       weight = 80,  description = 'Bahan baku cafe.' },
+['madu']             = { label = 'Madu',             weight = 200, description = 'Bahan baku cafe.' },
+['jahe']             = { label = 'Jahe',             weight = 50,  description = 'Bahan baku cafe.' },
+['kelapa_muda']      = { label = 'Kelapa Muda',      weight = 400, description = 'Bahan baku cafe.' },
+['alpukat']          = { label = 'Alpukat',          weight = 150, description = 'Bahan baku cafe.' },
+['susu_kental_manis'] = { label = 'Susu Kental Manis', weight = 200, description = 'Bahan baku cafe.' },
 
 -- Bahan baku (bengkel mekanik, recycle, scrapyard, house robbery)
 ['metalscrap'] = { label = 'Besi Bekas', weight = 100, description = 'Potongan logam bekas. Bahan perbaikan mesin.' },
 ['plastic']    = { label = 'Plastik',     weight = 100, description = 'Plastik daur ulang. Bahan perbaikan body & tangki.' },
 ['steel']      = { label = 'Baja',       weight = 100, description = 'Baja. Bahan perbaikan radiator & suspensi.' },
 ['aluminum']   = { label = 'Aluminium',    weight = 100, description = 'Aluminium. Bahan perbaikan as roda.' },
-['copper']     = { label = 'Tembaga',      weight = 100, description = 'Tembaga. Bahan perbaikan rem & kopling.' },
+['copper']     = { label = 'Tembaga',      weight = 500, description = 'Tembaga. Bahan perbaikan rem & kopling.' },
 ['iron']       = { label = 'Besi',        weight = 100, description = 'Besi.' },
 ['glass']      = { label = 'Kaca',       weight = 100, description = 'Kaca bekas.' },
 ['rubber']     = { label = 'Karet',      weight = 100, description = 'Karet.' },
@@ -638,6 +725,8 @@ return {
 
 -- Hewan peliharaan (f_petshop). Diberikan lewat target pada hewanmu.
 ['pet_food'] = { label = 'Makanan Hewan', weight = 200, stack = true, close = true, description = 'Makanan untuk hewan peliharaan. Arahkan target ke hewanmu lalu pilih "Beri Makanan Hewan".' },
+['pet_leash'] = { label = 'Tali Anjing', weight = 200, stack = true, close = true, description = 'Tali untuk hewan peliharaan. Pasang/lepas lewat Menu Hewan (target hewanmu).' },
+['pet_water'] = { label = 'Air Minum Hewan', weight = 300, stack = true, close = true, description = 'Air minum untuk hewan peliharaan. Arahkan target ke hewanmu lalu pilih "Beri Air Minum Hewan".' },
 
 -- Gang Wars Rebut Bendera (f_crew). Metadata crew = gang pemilik; hanya dari admin (/peranggang > Bendera) / mafia.
 ['bendera_gang'] = {
@@ -645,4 +734,18 @@ return {
     description = 'Bendera gang. Pakai untuk memegang, tancapkan saat Rebut Bendera.',
     client = { export = 'f_crew.useFlag' },
 },
+
+-- Tambang (f_mining). Bijih tidak bisa dijual: lebur di tungku lobby tambang -> batangan, jual di pengepul.
+-- Hasil lebur memakai item yang sudah ada: copper (mekanik), goldbar & diamond (f_pawnshop / f_bankrobbery).
+['kapak_tambang'] = { label = 'Kapak Tambang', weight = 2000, stack = false, close = true, description = 'Untuk menambang batu di gua. Patah setelah 200 pukulan.' },
+['bijih_tembaga'] = { label = 'Bijih Tembaga', weight = 500, description = 'Bijih mentah. Lebur di tungku tambang jadi Tembaga.' },
+['bijih_perak']   = { label = 'Bijih Perak',   weight = 500, description = 'Bijih mentah. Lebur di tungku tambang jadi Batang Perak.' },
+['bijih_emas']    = { label = 'Bijih Emas',    weight = 500, description = 'Bijih mentah. Lebur di tungku tambang jadi Batang Emas.' },
+['silverbar']     = { label = 'Batang Perak',  weight = 1000, description = 'Batang perak. Jual di pengepul Balai Kota.' },
+['goldbar']       = { label = 'Batang Emas',   weight = 1000, description = 'Batang emas. Jual di pengepul Balai Kota.' },
+['diamond']       = { label = 'Berlian',       weight = 50,   description = 'Berlian. Jual di pengepul Balai Kota.' },
+['chainsaw']      = { label = 'Chainsaw',      weight = 3000, stack = false, close = true, description = 'Untuk menebang pohon. Rusak setelah 50 pohon.' },
+['papan_kayu']    = { label = 'Papan Kayu',    weight = 400,  description = 'Papan hasil sawmill Paleto. Jual di koperasi Balai Kota.' },
+-- Nelayan (f_nelayan): jaring tebar, durability turun 20 tiap tarikan berhasil -> rusak setelah 5 kali dapat ikan
+['jaring_ikan']   = { label = 'Jaring Ikan',   weight = 1500, stack = false, close = true, description = 'Jaring tebar untuk melaut. Rusak setelah 5 kali dapat ikan (tarikan gagal tidak dihitung). Beli di Syahbandar dermaga.' },
 }

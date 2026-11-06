@@ -78,7 +78,7 @@ function open(d) {
 	const u = d.unit || 'L';
 	$('veh').textContent = d.label;
 	$('title').textContent = d.electric ? 'Isi Daya' : 'Isi Bensin';
-	$('logo').textContent = d.electric ? '🔌' : '⛽';
+	$('logo').innerHTML = `<svg class="ic"><use href="#${d.electric ? 'i-plug' : 'i-fuel'}"/></svg>`;
 	$('unitInput').textContent = u;
 	$('types').classList.toggle('single', d.types.length === 1);
 	document.querySelectorAll('.quick button').forEach((b) => {

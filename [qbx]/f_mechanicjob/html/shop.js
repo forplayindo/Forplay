@@ -53,7 +53,7 @@
         h += '<div class="sh-grid">' + menu.items.map(m => {
             const q = cart[m.item] || 0;
             return `<div class="sh-item">
-                <div class="img">${m.emoji || '🧰'}</div>
+                <div class="img">${itemImg(m.item, m.emoji || '🧰')}</div>
                 <h3>${esc(m.label)}</h3><p>${esc(m.desc || '')}</p>
                 <div class="price">Rp ${m.price}</div>
                 <div class="qty"><button data-dec="${m.item}" ${q <= 0 ? 'disabled' : ''}>−</button><b>${q}</b>

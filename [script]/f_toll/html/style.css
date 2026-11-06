@@ -1,0 +1,45 @@
+/* f_toll — layout saja; gaya dasar dari ui/ios.css */
+.panel.side { left: auto; right: 4vw; top: 50%; transform: translateY(-50%); width: 320px; border-radius: 22px; }
+.panel.wide { width: 560px; max-height: 80vh; }
+
+header { padding: 16px 16px 10px; }
+.logo { width: 34px; height: 34px; border-radius: 9px; }
+.logo .ic { width: 18px; height: 18px; }
+h1 { font-size: 17px; }
+
+.body { display: flex; flex-direction: column; gap: 10px; padding: 0 14px 14px; }
+.body.scroll { overflow-y: auto; }
+
+/* kartu */
+.group > button.row .t b { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.row .d.money { color: var(--green); font-weight: 600; }
+.row.sel { box-shadow: inset 3px 0 0 var(--accent); }
+.empty { padding: 12px; border-radius: 12px; background: var(--cell); color: var(--label-2); font-size: 13px; line-height: 1.4; }
+
+.topup { display: flex; flex-direction: column; gap: 8px; }
+.quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.quick button { height: 28px; border-radius: 14px; background: var(--fill); font-size: 11px; font-weight: 600; }
+.quick button:hover { background: var(--fill-2); }
+.quick button.active { background: var(--accent-soft); color: var(--accent); }
+.amount { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 12px; background: var(--cell); color: var(--label-2); font-size: 13px; }
+.amount input { width: 130px; height: 30px; padding: 0 8px; border-radius: 8px; font-weight: 700; text-align: right; }
+
+.methods button { height: auto; padding: 6px 4px; flex-direction: column; gap: 0; }
+.methods button span { display: flex; align-items: center; gap: 5px; }
+.methods button small { font-size: 11px; font-weight: 400; font-variant-numeric: tabular-nums; }
+
+.msg { font-size: 12px; color: var(--red); padding: 0 2px; }
+.msg.ok { color: var(--green); }
+#emsg { padding: 0 16px 14px; }
+
+/* editor */
+.gate { display: flex; flex-direction: column; gap: 6px; }
+.gate-h { display: flex; align-items: center; gap: 6px; padding: 0 2px; }
+.gate-h .name { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; }
+.gate-h .name small { display: block; color: var(--label-3); font-weight: 400; }
+.row-btns { display: flex; gap: 5px; }
+.row-btns .pill { height: 26px; padding: 0 10px; font-size: 12px; }
+.sq.n { --c: var(--green); }
+.sq.s { --c: var(--blue); }
+.row .t small { color: var(--label-2); font-variant-numeric: tabular-nums; }
+.none { padding: 10px 14px; color: var(--label-3); font-size: 12px; }

@@ -180,6 +180,12 @@ local function open()
 
     if characters[1] then previewCharacter(characters[1].citizenid) else previewNew(0) end
 
+    -- f_loadscreen: tunggu panel peraturan (kalau aktif), lalu pudarkan dulu
+    if GetResourceState('f_loadscreen') == 'started' and not exports.f_loadscreen:IsLoadingScreenDone() then
+        while not exports.f_loadscreen:CanShutdown() do Wait(200) end
+        Wait(exports.f_loadscreen:FadeOut(500))
+    end
+
     ShutdownLoadingScreen()
     ShutdownLoadingScreenNui()
     startCam()

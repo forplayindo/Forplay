@@ -1,4 +1,5 @@
 // Kasir bengkel: warga membayar tagihan (cash / transfer), mekanik melihat daftar belum bayar & Master Harga.
+// Mode lain di panel yang sama: Gudang (setor bahan) & Supplier (stok + beli bahan baku, Manager).
 (() => {
     const RES = typeof GetParentResourceName === 'function' ? GetParentResourceName() : 'f_mechanicjob';
     const post = (name, data) => fetch(`https://${RES}/${name}`, { method: 'POST', body: JSON.stringify(data || {}) })
@@ -27,6 +28,13 @@
         document.body.appendChild(wrap);
         wrap.querySelector('[data-x]').onclick = () => wrap.remove();
         wrap.querySelector('[data-ok]').onclick = () => { wrap.remove(); onOk(); };
+    }
+
+    // gambar ulang tanpa melompat ke atas: simpan & kembalikan posisi scroll tiap daftar
+    function keepScroll(fn) {
+        const pos = [...document.querySelectorAll('#kasir .ks-scroll')].map(el => el.scrollTop);
+        fn();
+        document.querySelectorAll('#kasir .ks-scroll').forEach((el, i) => { if (pos[i]) el.scrollTop = pos[i]; });
     }
 
     function apply(res) {
@@ -122,7 +130,6 @@
             <div class="ks-tabs">
                 <button class="tab ${stab === 'unpaid' ? 'on' : ''}" data-t="unpaid">Belum Dibayar <span class="badge ${D.bills.length ? '' : 'hidden'}">${D.bills.length}</span></button>
                 <button class="tab ${stab === 'price' ? 'on' : ''}" data-t="price">${D.canPrice ? '' : '🔒 '}Master Harga</button>
-                <button class="tab ${stab === 'supplier' ? 'on' : ''}" data-t="supplier">Stok Gudang</button>
             </div>
             <div style="padding:0 18px">${msgHtml()}</div>
             <div class="ks-pane" id="ks-pane"></div>`;
@@ -132,25 +139,53 @@
                 const res = await post('ksPrices');
                 if (res && !res.error) P = res; else msg = { ok: false, text: (res && res.error) || 'Gagal' };
             }
-            if (stab === 'supplier' && !S) {
-                const res = await post('ksSupplier');
-                if (res && !res.error) S = res; else msg = { ok: false, text: (res && res.error) || 'Gagal' };
-            }
             render();
         });
         if (stab === 'unpaid') renderUnpaid();
-        else if (stab === 'price') renderPrices();
-        else renderSupplier();
+        else renderPrices();
     }
 
-    // Stok Gudang: semua mekanik melihat sisa stok, hanya Manager yang membeli ke supplier.
+    // ------------------------------------------------------------ supplier: semua mekanik melihat stok, hanya Manager membeli
+    function renderSupplierPage() {
+        $('ks-kicker').textContent = 'Supplier Bahan Baku · Mekanik';
+        $('ks-title').textContent = 'Stok Gudang Bengkel';
+        $('ks-pills').innerHTML = `<span class="pill bank">🏦 Rekening Bengkel ${money(S.balance)}</span>`
+            + (S.canBuy ? '' : '<span class="pill">🔒 Hanya lihat</span>');
+        const body = $('ks-body');
+        body.className = 'ks-body staff';
+        body.innerHTML = `<div style="padding:12px 18px 0">${msgHtml()}</div><div class="ks-pane" id="ks-pane"></div>`;
+        renderSupplier();
+    }
+
+    const supTotal = () => S.items.reduce((t, it) => t + (cart[it.item] || 0) * it.price, 0);
+
+    // bar bawah (total + tombol) diperbarui sendiri, supaya mengisi jumlah tidak menggambar ulang tabel
+    function fillSupBar() {
+        const bar = $('ks-supbar');
+        if (!bar) return;
+        const total = supTotal(), n = Object.keys(cart).length, short = total > S.balance;
+        bar.innerHTML = `<small>${n ? `${n} bahan · total <b style="color:${short ? 'var(--c4)' : 'var(--accent)'}">${money(total)}</b>${short ? ' · saldo tidak cukup' : ''}` : 'Isi jumlah bahan yang mau dibeli'}</small>
+            <button class="ghost" id="ks-sclear" ${n ? '' : 'disabled'}>Kosongkan</button>
+            <button class="primary" id="ks-sbuy" ${n && !short ? '' : 'disabled'}>Beli ${n ? money(total) : ''}</button>`;
+        $('ks-sclear').onclick = () => keepScroll(() => { cart = {}; renderSupplier(); });
+        $('ks-sbuy').onclick = () => {
+            const lines = S.items.filter(it => cart[it.item]).map(it => `<div><span>${cart[it.item]}× ${esc(it.label)}</span><span>${money(cart[it.item] * it.price)}</span></div>`).join('');
+            modal(`<h2>Beli suku cadang?</h2><div class="sumbox">${lines}<div class="tot"><span>Total</span><b>${money(total)}</b></div></div>
+                <p class="note">Dipotong dari rekening bengkel.</p>`, async () => {
+                const res = await post('ksSupplierBuy', { cart });
+                if (res && !res.error) { S = D = res; cart = {}; msg = { ok: true, text: res.msg }; }
+                else {
+                    if (res && res.items) S = D = res;
+                    msg = { ok: false, text: (res && res.error) || 'Gagal membeli' };
+                }
+                keepScroll(render);
+            });
+        };
+    }
+
     function renderSupplier() {
         const pane = $('ks-pane');
-        if (!S) { pane.innerHTML = '<div class="note" style="padding:18px">Memuat…</div>'; return; }
         const buy = S.canBuy;
-        const total = S.items.reduce((t, it) => t + (cart[it.item] || 0) * it.price, 0);
-        const n = Object.keys(cart).length;
-        const short = total > S.balance;
         pane.innerHTML = `
             <div class="ks-tools"><small>${buy
                 ? 'Beli ke supplier: dibayar dari <b>rekening bengkel</b>, langsung menambah stok.'
@@ -160,42 +195,31 @@
                 <thead><tr><th>Bahan</th><th>Dipakai untuk</th><th style="text-align:right">Stok</th>
                     ${buy ? '<th style="text-align:right">Harga</th><th style="text-align:right">Beli</th><th style="text-align:right">Subtotal</th>' : ''}</tr></thead>
                 <tbody>${S.items.map(it => `<tr>
-                    <td><b>${esc(it.label)}</b></td><td><small>${esc(it.use || '')}</small></td>
+                    <td><span class="ks-it">${itemImg(it.item, '', 'iimg lg')}<b>${esc(it.label)}</b></span></td><td><small>${esc(it.use || '')}</small></td>
                     <td style="text-align:right"><b style="color:${it.qty ? 'var(--text)' : 'var(--c4)'}">${it.qty}</b></td>
                     ${buy ? `<td style="text-align:right">${money(it.price)}</td>
                     <td style="text-align:right"><input type="number" min="0" max="${S.max}" step="1" data-i="${esc(it.item)}"
                         value="${cart[it.item] || 0}" class="${cart[it.item] ? 'changed' : ''}"></td>
-                    <td style="text-align:right">${cart[it.item] ? `<b>${money(cart[it.item] * it.price)}</b>` : '<small>—</small>'}</td>` : ''}
+                    <td style="text-align:right" data-sub="${esc(it.item)}">${cart[it.item] ? `<b>${money(cart[it.item] * it.price)}</b>` : '<small>—</small>'}</td>` : ''}
                 </tr>`).join('')}</tbody>
             </table></div>
-            ${buy ? `<div class="ks-savebar"><small>${n ? `${n} bahan · total <b style="color:${short ? 'var(--c4)' : 'var(--accent)'}">${money(total)}</b>${short ? ' · saldo tidak cukup' : ''}` : 'Isi jumlah bahan yang mau dibeli'}</small>
-                <button class="ghost" id="ks-sclear" ${n ? '' : 'disabled'}>Kosongkan</button>
-                <button class="primary" id="ks-sbuy" ${n && !short ? '' : 'disabled'}>Beli ${n ? money(total) : ''}</button></div>` : ''}`;
+            ${buy ? '<div class="ks-savebar" id="ks-supbar"></div>' : ''}`;
         $('ks-sreload').onclick = async () => {
             const res = await post('ksSupplier');
-            if (res && !res.error) { S = res; msg = null; } else msg = { ok: false, text: (res && res.error) || 'Gagal' };
-            render();
+            if (res && !res.error) { S = D = res; msg = null; } else msg = { ok: false, text: (res && res.error) || 'Gagal' };
+            keepScroll(render);
         };
         if (!buy) return;
         pane.querySelectorAll('input[data-i]').forEach(i => i.onchange = () => {
+            const it = S.items.find(x => x.item === i.dataset.i);
             const v = Math.max(0, Math.min(S.max, Math.floor(Number(i.value) || 0)));
-            if (v) cart[i.dataset.i] = v; else delete cart[i.dataset.i];
-            renderSupplier();
+            if (v) cart[it.item] = v; else delete cart[it.item];
+            i.value = v;
+            i.classList.toggle('changed', v > 0);
+            pane.querySelector(`[data-sub="${CSS.escape(it.item)}"]`).innerHTML = v ? `<b>${money(v * it.price)}</b>` : '<small>—</small>';
+            fillSupBar();
         });
-        $('ks-sclear').onclick = () => { cart = {}; renderSupplier(); };
-        $('ks-sbuy').onclick = () => {
-            const lines = S.items.filter(it => cart[it.item]).map(it => `<div><span>${cart[it.item]}× ${esc(it.label)}</span><span>${money(cart[it.item] * it.price)}</span></div>`).join('');
-            modal(`<h2>Beli suku cadang?</h2><div class="sumbox">${lines}<div class="tot"><span>Total</span><b>${money(total)}</b></div></div>
-                <p class="note">Dipotong dari rekening bengkel.</p>`, async () => {
-                const res = await post('ksSupplierBuy', { cart });
-                if (res && !res.error) { S = res; cart = {}; msg = { ok: true, text: res.msg }; }
-                else {
-                    if (res && res.items) S = res;
-                    msg = { ok: false, text: (res && res.error) || 'Gagal membeli' };
-                }
-                render();
-            });
-        };
+        fillSupBar();
     }
 
     // ------------------------------------------------------------ gudang (mekanik): setor bahan, satu arah
@@ -208,8 +232,6 @@
         const body = $('ks-body');
         body.className = 'ks-body staff';
         const rows = D.items.filter(it => it.have > 0);
-        const n = Object.keys(cart).length;
-        const count = Object.values(cart).reduce((a, b) => a + b, 0);
         body.innerHTML = `
             <div style="padding:12px 18px 0">${msgHtml()}</div>
             <div class="ks-pane">
@@ -218,29 +240,36 @@
                 <div class="ks-table ks-scroll ks-sup" style="flex:1"><table>
                     <thead><tr><th>Bahan</th><th>Dipakai untuk</th><th style="text-align:right">Di tasmu</th><th style="text-align:right">Stok gudang</th><th style="text-align:right">Setor</th></tr></thead>
                     <tbody>${rows.map(it => `<tr>
-                        <td><b>${esc(it.label)}</b></td><td><small>${esc(it.use || '')}</small></td>
+                        <td><span class="ks-it">${itemImg(it.item, '', 'iimg lg')}<b>${esc(it.label)}</b></span></td><td><small>${esc(it.use || '')}</small></td>
                         <td style="text-align:right">${it.have}</td><td style="text-align:right">${it.qty}</td>
                         <td style="text-align:right"><input type="number" min="0" max="${Math.min(it.have, D.max)}" step="1" data-i="${esc(it.item)}"
                             value="${cart[it.item] || 0}" class="${cart[it.item] ? 'changed' : ''}">
                             <button class="btn sm" data-all="${esc(it.item)}">Semua</button></td>
                     </tr>`).join('') || '<tr><td colspan="5" class="note" style="text-align:center;padding:30px">Tidak ada bahan bengkel di tasmu.</td></tr>'}</tbody>
                 </table></div>
-                <div class="ks-savebar"><small>${n ? `${count} bahan akan disetor` : 'Isi jumlah bahan yang mau disetor'}</small>
-                    <button class="ghost" id="ks-dclear" ${n ? '' : 'disabled'}>Kosongkan</button>
-                    <button class="primary" id="ks-dep" ${n ? '' : 'disabled'}>Setor ke Stok</button></div>
+                <div class="ks-savebar"><small id="ks-depinfo"></small>
+                    <button class="ghost" id="ks-dclear">Kosongkan</button>
+                    <button class="primary" id="ks-dep">Setor ke Stok</button></div>
             </div>`;
+        // isi jumlah diperbarui di tempat (tanpa gambar ulang tabel) supaya posisi scroll tidak lompat
+        const fillDepBar = () => {
+            const n = Object.keys(cart).length, count = Object.values(cart).reduce((a, b) => a + b, 0);
+            $('ks-depinfo').textContent = n ? `${count} bahan akan disetor` : 'Isi jumlah bahan yang mau disetor';
+            $('ks-dclear').disabled = $('ks-dep').disabled = !n;
+        };
         const limit = item => { const it = D.items.find(x => x.item === item); return it ? Math.min(it.have, D.max) : 0; };
-        body.querySelectorAll('input[data-i]').forEach(i => i.onchange = () => {
-            const v = Math.max(0, Math.min(limit(i.dataset.i), Math.floor(Number(i.value) || 0)));
-            if (v) cart[i.dataset.i] = v; else delete cart[i.dataset.i];
-            renderGudang();
-        });
-        body.querySelectorAll('[data-all]').forEach(b => b.onclick = () => {
-            const v = limit(b.dataset.all);
-            if (v) cart[b.dataset.all] = v;
-            renderGudang();
-        });
-        $('ks-dclear').onclick = () => { cart = {}; renderGudang(); };
+        const setQty = (input, v) => {
+            if (v) cart[input.dataset.i] = v; else delete cart[input.dataset.i];
+            input.value = v;
+            input.classList.toggle('changed', v > 0);
+            fillDepBar();
+        };
+        body.querySelectorAll('input[data-i]').forEach(i => i.onchange = () =>
+            setQty(i, Math.max(0, Math.min(limit(i.dataset.i), Math.floor(Number(i.value) || 0)))));
+        body.querySelectorAll('[data-all]').forEach(b => b.onclick = () =>
+            setQty(body.querySelector(`input[data-i="${CSS.escape(b.dataset.all)}"]`), limit(b.dataset.all)));
+        fillDepBar();
+        $('ks-dclear').onclick = () => keepScroll(() => { cart = {}; renderGudang(); });
         $('ks-dep').onclick = () => {
             const lines = D.items.filter(it => cart[it.item]).map(it => `<div><span>${esc(it.label)}</span><span>${cart[it.item]}×</span></div>`).join('');
             modal(`<h2>Setor ke Stok Gudang?</h2><div class="sumbox">${lines}</div>
@@ -251,7 +280,7 @@
                     if (res && res.items) D = res;
                     msg = { ok: false, text: (res && res.error) || 'Gagal menyetor' };
                 }
-                render();
+                keepScroll(render);
             });
         };
         const bag = $('ks-bag');
@@ -338,9 +367,9 @@
         pane.querySelectorAll('input[data-k]').forEach(i => i.onchange = () => {
             const v = Math.max(0, Math.min(P.max, Math.floor(Number(i.value) || 0)));
             if (v === Number(i.dataset.o)) delete edits[i.dataset.k]; else edits[i.dataset.k] = v;
-            renderPrices();
+            keepScroll(renderPrices);
         });
-        $('ks-undo').onclick = () => { edits = {}; renderPrices(); };
+        $('ks-undo').onclick = () => keepScroll(() => { edits = {}; renderPrices(); });
         $('ks-save').onclick = async () => {
             $('ks-save').disabled = true;
             const res = await post('ksPricesSave', { changes: edits });
@@ -354,6 +383,7 @@
         if (!D) return;
         if (mode === 'staff') renderStaff();
         else if (mode === 'gudang') renderGudang();
+        else if (mode === 'supplier') renderSupplierPage();
         else renderCustomer();
     }
 
@@ -366,7 +396,8 @@
         const d = e.data || {};
         if (d.action === 'kasirOpen') {
             mode = d.mode; D = d.data; msg = null; sel = null; method = 'cash';
-            stab = 'unpaid'; query = ''; P = null; pcat = 0; edits = {}; S = null; cart = {};
+            stab = 'unpaid'; query = ''; P = null; pcat = 0; edits = {}; cart = {};
+            S = mode === 'supplier' ? D : null;
             $('kasir').classList.remove('hidden');
             render();
         } else if (d.action === 'kasirClose') {

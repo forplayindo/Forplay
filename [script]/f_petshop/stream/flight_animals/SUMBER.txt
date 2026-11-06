@@ -1,0 +1,4 @@
+Model kuda & keledai (Donkey, Fullhorse, Rangehorse, Younghorse)
+Sumber : https://github.com/elajnabe/flight-animals (commit 47a09e49ad2aa545831cd6c12cff55d40a7bce54), kredit DevTheBully
+Lisensi: GNU GPL v3 (lihat LICENSE.txt)
+Metadata ped: data/flight_animals_peds.meta (hanya 4 model ini)

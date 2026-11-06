@@ -3,21 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>f_karakter</title>
+    <link rel="stylesheet" href="ui/ios.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></symbol>
+        <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    </svg>
+
     <div id="panel" class="panel hidden">
         <header>
-            <div class="brand"><span class="logo">🗃️</span><div><h1>Kelola Karakter</h1><small>Hapus karakter pemain yang sudah tidak aktif</small></div></div>
+            <div class="brand"><span class="logo"><svg class="ic"><use href="#i-users"/></svg></span><div><h1>Kelola Karakter</h1><small>Hapus karakter pemain yang sudah tidak aktif</small></div></div>
             <div class="head-actions">
-                <button class="icon-btn" id="refresh" title="Refresh">⟳</button>
-                <button class="icon-btn close" id="close">✕</button>
+                <button class="circle" id="refresh" title="Refresh"><svg class="ic"><use href="#i-refresh"/></svg></button>
+                <button class="circle close" id="close"><svg class="ic"><use href="#i-x"/></svg></button>
             </div>
         </header>
-        <div class="banner">Hapus bersifat <b>permanen</b>: karakter, kendaraan, rumah, inventory, data phone, peliharaan, dll. Catatan resmi (MDT polisi, tilang, transaksi bank, tagihan) tetap disimpan.</div>
+        <div class="banner warn">Hapus bersifat <b>permanen</b>: karakter, kendaraan, rumah, inventory, data phone, peliharaan, dll. Catatan resmi (MDT polisi, tilang, transaksi bank, tagihan) tetap disimpan.</div>
         <div class="toolbar">
-            <input id="search" type="text" maxlength="40" placeholder="Cari nama / citizen ID / akun...">
-            <nav class="filters" id="days">
+            <label class="search"><svg class="ic"><use href="#i-search"/></svg><input id="search" type="text" maxlength="40" placeholder="Cari nama / citizen ID / akun"></label>
+            <nav class="seg" id="days">
                 <button data-days="7">&gt; 7 hari</button>
                 <button data-days="30">&gt; 30 hari</button>
                 <button data-days="60">&gt; 60 hari</button>

@@ -4,7 +4,7 @@
 --  * Semua petugas EMS on duty bisa melihat stok di Menu Kasir.
 return {
     job = 'ambulance',
-    label = 'Forplay Hospital',
+    label = '4PLAY Hospital',
 
     -- Titik kasir (boleh lebih dari satu, semua memakai data yang sama).
     -- SEMENTARA: atur dengan /vec3 sambil berdiri di depan meja kasir.
@@ -24,7 +24,7 @@ return {
         { key = 'splint',      label = 'Bidai',           emoji = '🦴', hpp = 8000,  units = 1,  use = 'luka berat tangan/kaki' },
         { key = 'suture',      label = 'Alat Jahit Luka',       emoji = '🧵', hpp = 10000,  units = 1,  use = 'luka berat kepala/badan, jahit operasi' },
         { key = 'firstaid',    label = 'Kotak P3K',    emoji = '⛑️', hpp = 15000,  units = 1,  use = 'revive' },
-        { key = 'crutch',      label = 'Kruk',           emoji = '🩼', hpp = 15000,  units = 1,  use = 'diberikan ke pasien pemulihan' },
+        { key = 'crutch',      label = 'Crutch',         emoji = '🩼', hpp = 15000,  units = 1,  use = 'diberikan ke pasien pemulihan' },
         { key = 'anesthetic',  label = 'Obat Bius',       emoji = '💉', hpp = 30000,  units = 1,  use = 'bius operasi' },
         { key = 'surgery',     label = 'Alat Operasi',     emoji = '🔪', hpp = 200000, units = 10, use = '1 operasi = 1 jatah · 1 kit = 10 jatah', unitLabel = 'jatah' },
         { key = 'blood_bag',   label = 'Kantong Darah',        emoji = '🩸', hpp = nil, units = 1,  use = 'transfusi · hanya dari donor darah' },

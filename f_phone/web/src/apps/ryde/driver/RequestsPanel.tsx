@@ -4,13 +4,16 @@ import { ChevronLeft, Inbox, MapPin } from 'lucide-react';
 import { t } from '@/i18n';
 import { InitialsAvatar } from '@/shared/ContactAvatar';
 import { useRyde } from '../store';
+import { money } from '../data';
 import type { Ride } from '../data';
+import { useSelfLocation } from '@/apps/maps/LiveDot';
 import { OfferSheet } from './IncomingRequest';
 
 export function RequestsPanel({ onClose }: { onClose: () => void }) {
     const g = useRyde();
     const [shown, setShown] = useState(false);
     const [selected, setSelected] = useState<Ride | null>(null);
+    const me = useSelfLocation();
 
     useEffect(() => {
         const id = window.setTimeout(() => setShown(true), 20);
@@ -20,6 +23,10 @@ export function RequestsPanel({ onClose }: { onClose: () => void }) {
         if (g.activeDriver) { setShown(false); window.setTimeout(onClose, 320); }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [g.activeDriver]);
+    // Another driver took the request we were looking at: drop its sheet.
+    useEffect(() => {
+        if (selected && !g.requests.some(r => r.id === selected.id)) setSelected(null);
+    }, [g.requests, selected]);
     function close() {
         setShown(false);
         window.setTimeout(onClose, 320);
@@ -45,7 +52,7 @@ export function RequestsPanel({ onClose }: { onClose: () => void }) {
                     <div className="flex h-full flex-col items-center justify-center px-10 pb-20 text-center">
                         <Inbox className="h-[72px] w-[72px] text-black/25 dark:text-white/25" strokeWidth={1.5} />
                         <p className="mt-4 text-[21px] font-semibold text-black/85 dark:text-white/90">{t('ryde.noRequestsRightNow', 'No requests right now')}</p>
-                        <p className="mt-1.5 text-[16px] font-medium leading-snug text-black/55 dark:text-white/55">{t('ryde.noRequestsBody', "When riders nearby request a trip, they'll show up here for you to offer a fare.")}</p>
+                        <p className="mt-1.5 text-[16px] font-medium leading-snug text-black/55 dark:text-white/55">{t('ryde.noRequestsBodyFixed', "When riders nearby request a trip, they'll show up here. The first driver to take one gets it.")}</p>
                     </div>
                 ) : (
                     <div className="space-y-3">
@@ -59,7 +66,7 @@ export function RequestsPanel({ onClose }: { onClose: () => void }) {
                                 <div className="min-w-0 flex-1">
                                     <div className="flex items-center justify-between gap-2">
                                         <p className="truncate text-[18px] font-bold text-black dark:text-white">{r.riderName}</p>
-                                        <span className="shrink-0 rounded-full bg-black/[0.06] px-2.5 py-1 text-[13px] font-bold text-black dark:bg-white/10 dark:text-white">{r.distanceKm.toFixed(1)} km</span>
+                                        <span className="shrink-0 rounded-full bg-[#22c55e]/15 px-2.5 py-1 text-[13px] font-bold text-[#16a34a] dark:text-[#4ade80]">{money(r.fare)}</span>
                                     </div>
                                     <div className="mt-1 flex items-center gap-1.5 text-[15px] text-ios-gray">
                                         <MapPin className="h-[15px] w-[15px] shrink-0" />
@@ -67,6 +74,10 @@ export function RequestsPanel({ onClose }: { onClose: () => void }) {
                                         <span className="inline-block shrink-0 opacity-50" style={{ transform: 'scaleX(var(--dir-x, 1))' }}>→</span>
                                         <span className="truncate">{r.dropoff.name}</span>
                                     </div>
+                                    <p className="mt-0.5 text-[13px] text-ios-gray">
+                                        {me ? t('ryde.pickupAwayTrip', 'Pickup {away} km away · trip {km} km', { away: (Math.hypot(me.x - r.pickup.x, me.y - r.pickup.y) / 1000).toFixed(1), km: r.distanceKm.toFixed(1) })
+                                            : t('ryde.tripKm', 'Trip {km} km', { km: r.distanceKm.toFixed(1) })}
+                                    </p>
                                 </div>
                             </button>
                         ))}

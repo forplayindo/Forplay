@@ -3,41 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <title>f_cafe</title>
+    <link rel="stylesheet" href="ui/ios.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- MENU PELANGGAN -->
-    <div id="menu" class="panel hidden">
-        <header>
-            <div class="brand"><span class="logo">☕</span><div><h1 id="m-title">Cafe</h1><small id="m-sub">Pilih menu favoritmu</small></div></div>
-            <div class="head-actions">
-                <button id="cart-btn" class="icon-btn" title="Keranjang">
-                    <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM6.2 6l.9 2H20a1 1 0 0 1 .9 1.4l-3.2 6A2 2 0 0 1 16 16.5H8.1a2 2 0 0 1-1.8-1.2L3.4 4H2V2h2.7a1 1 0 0 1 .9.6L6.2 6Z"/></svg>
-                    <span id="cart-count" class="badge hidden">0</span>
-                </button>
-                <button class="icon-btn close" data-close>✕</button>
-            </div>
-        </header>
-        <div id="m-banner" class="banner hidden"></div>
-        <nav class="tabs" id="tabs">
-            <button data-tab="all" class="active">All</button>
-            <button data-tab="promo">Promo</button>
-            <button data-tab="food">Makanan</button>
-            <button data-tab="drink">Minuman</button>
-        </nav>
-        <main id="grid" class="grid"></main>
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+        <symbol id="i-cup" viewBox="0 0 24 24"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM17 10h1.5a2.5 2.5 0 0 1 0 5H17M8 2v3M12 2v3"/></symbol>
+        <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
+        <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
+        <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="8" cy="8" r="1.5"/></symbol>
+        <symbol id="i-food" viewBox="0 0 24 24"><path d="M3 11h18a9 9 0 0 1-18 0zM12 3v4M8 4.5v2.5M16 4.5v2.5"/></symbol>
+        <symbol id="i-drink" viewBox="0 0 24 24"><path d="M6 3h12l-1.5 17a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1zM6.5 8h11"/></symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></symbol>
+        <symbol id="i-cash" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></symbol>
+        <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+        <symbol id="i-truck" viewBox="0 0 24 24"><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+    </svg>
 
-        <aside id="cart" class="cart hidden">
-            <div class="cart-head"><h2>Keranjang</h2><button class="icon-btn" id="cart-close">✕</button></div>
+    <!-- MENU PELANGGAN (split view) -->
+    <div id="menu" class="panel split hidden">
+        <aside class="sidebar">
+            <div class="brand"><span class="logo"><svg class="ic"><use href="#i-cup"/></svg></span><div><h1 id="m-title">Cafe</h1><small id="m-sub">Pilih menu favoritmu</small></div></div>
+            <nav class="nav" id="tabs">
+                <button data-tab="all" class="active"><svg class="ic"><use href="#i-grid"/></svg>Semua</button>
+                <button data-tab="promo"><svg class="ic"><use href="#i-tag"/></svg>Promo</button>
+                <button data-tab="food"><svg class="ic"><use href="#i-food"/></svg>Makanan</button>
+                <button data-tab="drink"><svg class="ic"><use href="#i-drink"/></svg>Minuman</button>
+            </nav>
+        </aside>
+
+        <section class="detail">
+            <div class="detail-h">
+                <div><div class="lt" id="m-head">Semua Menu</div></div>
+                <div class="spacer"></div>
+                <button class="circle close" data-close><svg class="ic"><use href="#i-x"/></svg></button>
+            </div>
+            <div id="m-banner" class="banner hidden"></div>
+            <main id="grid" class="grid"></main>
+        </section>
+
+        <aside id="cart" class="inspector">
+            <div class="cart-head"><h2>Keranjang</h2><span id="cart-count" class="bubble hidden">0</span></div>
             <div id="cart-list" class="cart-list"></div>
             <div class="cart-foot">
-                <div class="total"><span>Total</span><strong id="cart-total">Rp 0</strong></div>
-                <div class="methods">
-                    <button data-method="cash" class="active">💵 Cash</button>
-                    <button data-method="transfer">📱 Transfer</button>
+                <div class="group"><div class="row total"><span class="t">Total</span><strong id="cart-total">Rp 0</strong></div></div>
+                <div>
+                    <div class="group-h">Bayar dengan</div>
+                    <div class="methods">
+                        <button data-method="cash" class="active"><svg class="ic"><use href="#i-cash"/></svg>Cash</button>
+                        <button data-method="transfer"><svg class="ic"><use href="#i-phone"/></svg>Transfer</button>
+                    </div>
                 </div>
                 <div id="cart-msg" class="msg hidden"></div>
-                <button id="order-btn" class="primary">Order</button>
+                <button id="order-btn" class="primary b-lg">Order</button>
             </div>
         </aside>
     </div>
@@ -45,13 +64,34 @@
     <!-- LIST PEMESANAN KARYAWAN -->
     <div id="orders" class="panel hidden">
         <header>
-            <div class="brand"><span class="logo">🧾</span><div><h1>List Pemesanan</h1><small id="o-sub">Pesanan yang sudah dibayar</small></div></div>
+            <div class="brand"><span class="logo"><svg class="ic"><use href="#i-receipt"/></svg></span><div><h1>List Pemesanan</h1><small id="o-sub">Pesanan yang sudah dibayar</small></div></div>
             <div class="head-actions">
-                <button class="icon-btn" id="o-refresh" title="Refresh">⟳</button>
-                <button class="icon-btn close" data-close>✕</button>
+                <button class="circle" id="o-refresh" title="Refresh"><svg class="ic"><use href="#i-refresh"/></svg></button>
+                <button class="circle close" data-close><svg class="ic"><use href="#i-x"/></svg></button>
             </div>
         </header>
         <main id="o-list" class="orders"></main>
+    </div>
+
+    <!-- SUPPLIER BAHAN (Manager) -->
+    <div id="supplier" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo"><svg class="ic"><use href="#i-truck"/></svg></span><div><h1>Supplier Bahan</h1><small>Dibayar dari rekening organisasi, langsung masuk kulkas</small></div></div>
+            <div class="spacer"></div>
+            <div class="head-actions">
+                <span class="chip info" id="s-balance">Rp 0</span>
+                <button class="circle close" data-close><svg class="ic"><use href="#i-x"/></svg></button>
+            </div>
+        </header>
+        <div id="s-msg" class="banner hidden"></div>
+        <div class="sup-head"><span></span><span>Bahan</span><span class="r">Harga</span><span class="c">Beli</span><span class="r">Subtotal</span></div>
+        <main id="s-list" class="sup-list"></main>
+        <footer class="sup-foot">
+            <div class="sum"><small id="s-count">Isi jumlah bahan yang mau dibeli</small><strong id="s-total">Rp 0</strong></div>
+            <div class="spacer"></div>
+            <button class="b b-gray" id="s-clear">Kosongkan</button>
+            <button class="primary" id="s-buy">Beli</button>
+        </footer>
     </div>
 
     <script src="app.js"></script>

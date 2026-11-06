@@ -1,0 +1,38 @@
+{
+    "act:vehicle.spawn": {
+        "s": true,
+        "a": true
+    },
+    "act:vehicle.delete": {
+        "s": true,
+        "a": true
+    },
+    "act:player.setjob": {
+        "s": true,
+        "a": true
+    },
+    "cmd:admincar": {
+        "s": false,
+        "a": false
+    },
+    "cmd:ac": {
+        "s": false,
+        "a": false
+    },
+    "cmd:givecar": {
+        "s": false,
+        "a": false
+    },
+    "act:give.item": {
+        "s": true,
+        "a": true
+    },
+    "act:player.mute": {
+        "s": false,
+        "a": true
+    },
+    "act:vehicle.plate": {
+        "s": false,
+        "a": false
+    }
+}

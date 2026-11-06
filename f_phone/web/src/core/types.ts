@@ -247,7 +247,7 @@ export interface MessagesIncomingPush {
 }
 
 export interface RydeLatLng { label: string; x: number; y: number }
-export interface RydeRequestPush { id: string; riderName: string; pickup: RydeLatLng; dropoff: RydeLatLng; distance: number; createdAt: number }
+export interface RydeRequestPush { id: string; riderName: string; pickup: RydeLatLng; dropoff: RydeLatLng; distance: number; fare?: number; createdAt: number }
 interface RydeTripPush {
     id: string; status: string; role: 'rider' | 'driver';
     requestId?: string;
@@ -337,8 +337,7 @@ export type NuiMessage =
     | { action: 'f_phone:ryde:requestAdded';   data: RydeRequestPush }
     | { action: 'f_phone:ryde:requestRemoved'; data: { id: string } }
     | { action: 'f_phone:ryde:waitingCount';   data: { count: number } }
-    | { action: 'f_phone:ryde:offer';          data: RydeTripPush }
-    | { action: 'f_phone:ryde:offerRemoved';   data: { id: string; requestId?: string } }
+    | { action: 'f_phone:ryde:matched';        data: RydeTripPush }
     | { action: 'f_phone:ryde:tripUpdate';     data: RydeTripPush }
     | { action: 'f_phone:ryde:ratingReceived'; data: { id: string; stars: number; tip?: number } }
     | { action: 'f_phone:ryde:peerLocation';   data: { tripId: string; role: 'rider' | 'driver'; x: number; y: number; h: number } }

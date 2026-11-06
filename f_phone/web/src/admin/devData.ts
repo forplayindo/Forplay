@@ -130,14 +130,14 @@ export function devOverview(cid: string): AdminOverview {
             theme:         'dark',
             darkTheme:     'graphite',
             cardName:      p.name,
-            cardEmail:     `${p.handle}@forplay.com`,
+            cardEmail:     `${p.handle}@4play.com`,
             installedApps: APPS,
             updatedAt:     ago(3 * HOUR),
         },
         accounts: [
-            { id: 101, app: 'birdy',      username: p.handle,          displayName: p.display, email: `${p.handle}@forplay.com`, phone: p.number, createdAt: ago(90 * DAY) },
-            { id: 102, app: 'photogram',  username: `${p.handle}_pics`, displayName: p.display, email: `${p.handle}@forplay.com`, phone: p.number, createdAt: ago(61 * DAY) },
-            { id: 103, app: 'mail',       username: p.handle,          displayName: p.name,    email: `${p.handle}@forplay.com`, phone: null,     createdAt: ago(120 * DAY) },
+            { id: 101, app: 'birdy',      username: p.handle,          displayName: p.display, email: `${p.handle}@4play.com`, phone: p.number, createdAt: ago(90 * DAY) },
+            { id: 102, app: 'photogram',  username: `${p.handle}_pics`, displayName: p.display, email: `${p.handle}@4play.com`, phone: p.number, createdAt: ago(61 * DAY) },
+            { id: 103, app: 'mail',       username: p.handle,          displayName: p.name,    email: `${p.handle}@4play.com`, phone: null,     createdAt: ago(120 * DAY) },
             { id: 104, app: 'marketplace', username: p.handle,         displayName: p.display, email: null,                          phone: p.number, createdAt: ago(30 * DAY) },
         ],
         birdy: [{

@@ -31,6 +31,8 @@ server_scripts {
 ui_page 'html/index.html'
 
 files {
+    'html/ui/ios.css',
+    'html/ui/fonts/*.woff2',
     'config/client.lua',
     'config/editor.lua',
     'locales/*.json',

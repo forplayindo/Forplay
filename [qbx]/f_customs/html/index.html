@@ -6,12 +6,16 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute">
+    <symbol id="i-paint" viewBox="0 0 24 24"><path d="M4 4h12v5H4zM16 6h3v5l-8 2v3M10 16h2v5h-2z"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
+</svg>
 <div id="app" class="hidden">
     <div class="drag" id="drag"></div>
 
     <section class="left glass">
         <div class="head">
-            <div class="logo">🛠️</div>
+            <div class="logo"><svg class="svg-ic"><use href="#i-paint"/></svg></div>
             <div><div class="kicker" id="kicker">Bengkel Kustom</div><h1 id="vname"></h1></div>
             <div class="plate" id="vplate"></div>
         </div>
@@ -21,7 +25,7 @@
     </section>
 
     <section class="right glass">
-        <div class="head"><div class="logo">🧾</div><div><div class="kicker">Daftar Modifikasi</div><h2 id="count">0 item dipilih</h2></div></div>
+        <div class="head"><div class="logo"><svg class="svg-ic"><use href="#i-receipt"/></svg></div><div><div class="kicker">Daftar Modifikasi</div><h2 id="count">0 item dipilih</h2></div></div>
         <div id="status"></div>
         <div class="cart" id="cart"></div>
         <div class="foot">

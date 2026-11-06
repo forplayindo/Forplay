@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>html, body { margin: 0; background: transparent; }</style>
+</head>
+<body>
+<script>
+// Pemroses foto /fotokendaraan (tidak menampilkan apa pun di layar):
+// screenshot -> buang latar hijau -> potong ke kendaraan -> taruh di tengah kanvas -> webp transparan
+const RES = typeof GetParentResourceName === 'function' ? GetParentResourceName() : 'f_vehimages';
+
+function loadImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+    });
+}
+
+// piksel dianggap latar kalau hijaunya jelas lebih kuat dari merah & biru
+function isGreen(r, g, b) {
+    return g > 70 && g > r * 1.35 && g > b * 1.35;
+}
+
+async function processShot({ id, image, width, height, quality }) {
+    try {
+        const img = await loadImage(image);
+        const src = document.createElement('canvas');
+        src.width = img.width; src.height = img.height;
+        const sctx = src.getContext('2d', { willReadFrequently: true });
+        sctx.drawImage(img, 0, 0);
+        const frame = sctx.getImageData(0, 0, src.width, src.height);
+        const px = frame.data;
+
+        let minX = src.width, minY = src.height, maxX = -1, maxY = -1;
+        for (let y = 0; y < src.height; y++) {
+            for (let x = 0; x < src.width; x++) {
+                const i = (y * src.width + x) * 4;
+                const r = px[i], g = px[i + 1], b = px[i + 2];
+                if (isGreen(r, g, b)) {
+                    px[i + 3] = 0;
+                    continue;
+                }
+                // tepi kendaraan yang kena pantulan hijau: redam hijaunya
+                const cap = Math.max(r, b);
+                if (g > cap) px[i + 1] = cap + (g - cap) * 0.35;
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+            }
+        }
+        if (maxX < 0) throw new Error('kendaraan tidak terlihat');
+        sctx.putImageData(frame, 0, 0);
+
+        // potong ke kendaraan, lalu muat di tengah kanvas akhir dengan sedikit jarak
+        const cw = maxX - minX + 1, ch = maxY - minY + 1;
+        const pad = 0.06;
+        const scale = Math.min(width * (1 - pad * 2) / cw, height * (1 - pad * 2) / ch);
+        const out = document.createElement('canvas');
+        out.width = width; out.height = height;
+        const octx = out.getContext('2d');
+        octx.imageSmoothingQuality = 'high';
+        const dw = cw * scale, dh = ch * scale;
+        octx.drawImage(src, minX, minY, cw, ch, (width - dw) / 2, (height - dh) / 2, dw, dh);
+
+        const data = out.toDataURL('image/webp', quality);
+        if (!data.startsWith('data:image/webp')) throw new Error('webp tidak didukung');
+        post({ id, ok: true, data });
+    } catch (e) {
+        post({ id, ok: false, error: String(e && e.message || e) });
+    }
+}
+
+function post(body) {
+    fetch(`https://${RES}/processed`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+}
+
+window.addEventListener('message', (e) => {
+    if (e.data && e.data.action === 'process') processShot(e.data);
+});
+</script>
+</body>
+</html>

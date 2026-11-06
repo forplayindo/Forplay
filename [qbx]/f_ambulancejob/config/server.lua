@@ -10,12 +10,12 @@ return {
     -- Tagihan layanan EMS (tab Tagihan di panel Cek Pasien + daftar Belum Bayar di MDT).
     emsBill = {
         job = 'ambulance',                      -- invoice f_phone atas nama job ini -> uang masuk rekening organisasinya
-        label = 'Foreplay Hospital',            -- nama pengirim di invoice & email
+        label = '4PLAY Hospital',            -- nama pengirim di invoice & email
         -- email saat EMS menarik tagihan langsung dari bank pasien (tombol Tagih di MDT).
         -- %s berurutan: nama pasien, nomor tagihan, total, rincian.
         collectMail = {
             subject = 'Penarikan Tagihan Layanan EMS',
-            body = 'Yth. %s,\n\nTagihan layanan EMS #%s sebesar Rp %s belum dibayar, sehingga telah ditarik langsung dari rekening bank Anda.\n\nRincian:\n%s\n\nTerima kasih.\nForeplay Hospital',
+            body = 'Yth. %s,\n\nTagihan layanan EMS #%s sebesar Rp %s belum dibayar, sehingga telah ditarik langsung dari rekening bank Anda.\n\nRincian:\n%s\n\nTerima kasih.\n4PLAY Hospital',
         },
     },
 

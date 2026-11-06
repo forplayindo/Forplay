@@ -25,7 +25,7 @@
     "give_cash": "Successfully gave $%s to ID %s",
     "received_cash": "Successfully received $%s from ID %s",
     "missing_params": "You have not provided all the required parameters!",
-    "bank_name": "Foreplay Banking",
+    "bank_name": "4PLAY Banking",
     "view_members": "View All Account Members!",
     "no_account": "Account Not Found",
     "no_account_txt": "You need to be the creator",

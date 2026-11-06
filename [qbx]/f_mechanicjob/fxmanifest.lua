@@ -4,8 +4,10 @@ lua54 'yes'
 use_experimental_fxv2_oal 'yes'
 
 name 'f_mechanicjob'
-description 'Bengkel mekanik: Periksa Kendaraan (NUI), keausan & efek kerusakan, lift nteam, tagihan, kasir, kustom, toko bengkel'
+description 'Bengkel mekanik: Periksa Kendaraan (NUI), keausan & efek kerusakan, lift nteam, tagihan, kasir, kustom, toko bengkel, derek flatbed + job Derek'
 version '2.0.0'
+
+provide 'qb-towjob'
 
 shared_scripts {
     '@ox_lib/init.lua',
@@ -21,6 +23,7 @@ client_scripts {
     'client/status.lua',
     'client/shop.lua',
     'client/kasir.lua',
+    'client/tow.lua',
 }
 
 server_scripts {
@@ -36,16 +39,20 @@ server_scripts {
     'server/job.lua',
     'server/shop.lua',
     'server/admin.lua',
+    'server/tow.lua',
 }
 
 ui_page 'html/index.html'
 
 files {
+    'html/ui/ios.css',
+    'html/ui/fonts/*.woff2',
     'config/shared.lua',
     'config/client.lua',
     'config/wear.lua',
     'config/shop.lua',
     'config/stock.lua',
+    'config/tow.lua',
     'html/index.html',
     'html/style.css',
     'html/app.js',

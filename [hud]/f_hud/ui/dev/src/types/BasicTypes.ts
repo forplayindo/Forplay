@@ -140,6 +140,13 @@ export interface iVehicleInfo {
   isSeatbeltOn: boolean;
   isCruiseOn?: boolean;
   veh_class: number;
+  // kapal / helikopter / pesawat
+  heading?: number;
+  altitude?: number;
+  verticalSpeed?: number;
+  rotorHealth?: number;
+  bodyHealth?: number;
+  boatDirection?: "D" | "N" | "R";
 }
 
 export interface iMiniMap {

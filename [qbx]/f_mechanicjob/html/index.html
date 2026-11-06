@@ -6,17 +6,23 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute">
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3z"/></symbol>
+    <symbol id="i-toolbox" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v3M3 13h18M10 13v2M14 13v2"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></symbol>
+</svg>
 
 <!-- Panel Periksa Kendaraan -->
 <div class="panel hidden" id="diag">
     <header>
         <div class="brand">
-            <span class="logo">🔧</span>
+            <span class="logo"><svg class="ic"><use href="#i-wrench"/></svg></span>
             <div><div class="kicker">Diagnosa Bengkel</div><h1 id="vehname"></h1></div>
         </div>
         <div class="head-right">
             <span id="state" class="state-pill"></span>
-            <button class="icon-btn" id="diag-close" title="Tutup (ESC)">✕</button>
+            <button class="icon-btn" id="diag-close" title="Tutup (ESC)"><svg class="ic"><use href="#i-x"/></svg></button>
         </div>
     </header>
     <div class="main">
@@ -58,10 +64,10 @@
 <div class="panel shop hidden" id="shop">
     <header>
         <div class="brand">
-            <span class="logo">🧰</span>
+            <span class="logo"><svg class="ic"><use href="#i-toolbox"/></svg></span>
             <div><h1 id="sh-title">Toko Bengkel</h1><small id="sh-sub"></small></div>
         </div>
-        <button class="icon-btn" id="sh-close" title="Tutup (ESC)">✕</button>
+        <button class="icon-btn" id="sh-close" title="Tutup (ESC)"><svg class="ic"><use href="#i-x"/></svg></button>
     </header>
     <div class="sh-body" id="sh-body"></div>
     <div class="sh-foot hidden" id="sh-foot"></div>
@@ -71,12 +77,12 @@
 <div class="panel kasir hidden" id="kasir">
     <header>
         <div class="brand">
-            <span class="logo">💳</span>
+            <span class="logo"><svg class="ic"><use href="#i-card"/></svg></span>
             <div><div class="kicker" id="ks-kicker">Kasir Bengkel</div><h1 id="ks-title">Tagihan Kamu</h1></div>
         </div>
         <div class="head-right">
             <span id="ks-pills"></span>
-            <button class="icon-btn" id="ks-close" title="Tutup (ESC)">✕</button>
+            <button class="icon-btn" id="ks-close" title="Tutup (ESC)"><svg class="ic"><use href="#i-x"/></svg></button>
         </div>
     </header>
     <div class="ks-body" id="ks-body"></div>

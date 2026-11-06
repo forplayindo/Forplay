@@ -16,6 +16,8 @@ server_script 'server/main.lua'
 ui_page 'html/index.html'
 
 files {
+    'html/ui/ios.css',
+    'html/ui/fonts/*.woff2',
     'html/index.html',
     'html/style.css',
     'html/app.js',

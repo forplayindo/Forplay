@@ -2,11 +2,14 @@
 --  * Bahan perbaikan berupa ANGKA di database (mechanic_stock), bukan item di stash -> tidak bisa
 --    diambil / dicuri karyawan. Panel perbaikan memotong stok ini langsung.
 --  * Mekanik wajib membawa Tas Perkakas yang masih berlaku untuk memperbaiki.
---  * Stok bertambah lewat Supplier (Manager, uang rekening bengkel) atau Setor Bahan di titik Gudang
+--  * Stok bertambah lewat titik Supplier (Manager, uang rekening bengkel) atau Setor Bahan di titik Gudang
 --    (item di tas mekanik -> angka stok, satu arah).
 return {
     -- titik Gudang Bengkel (ox_target): Setor Bahan + Ambil Tas Perkakas. Atur dengan /vec3.
     point = { coords = vec3(-349.66, -1330.34, 30.46), radius = 1.0, distance = 2.5 },
+
+    -- titik Supplier Bahan Baku (ox_target): lihat stok + beli ke supplier (Manager). SEMENTARA, atur dengan /vec3.
+    supplier = { coords = vec3(-343.28, -1333.63, 31.35), radius = 1.0, distance = 2.5 },
 
     bag = 'tas_perkakas',     -- item Tas Perkakas (ox_inventory, degrade = masa berlaku)
 

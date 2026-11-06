@@ -1,189 +1,84 @@
-// lastresort_loading
-// LastResort Development · https://intelnpc.com
+// f_loadscreen — konfigurasi
+// null pada teks = ambil dari locales/<locale>.json
 
-/* =====================================================================
- * lastresort_loading — configuration
- * ---------------------------------------------------------------------
- * Every option below is consumed by index.html. Edit freely.
- * `null` on an i18n-aware field means: use the value from locales/<lang>.json.
- * ===================================================================== */
-
-window.LR_CONFIG = {
-    /* ------------------------------------------------------------------
-     * Language
-     * ---------------------------------------------------------------- */
-    locale: 'id',              // 'en', 'hu', or any locales/<name>.json
+window.FLS_CONFIG = {
+    locale: 'id',
     fallbackLocale: 'en',
 
-    /* ------------------------------------------------------------------
-     * Brand / wordmark / footer
-     * Set to a string to override the locale value, or null to fall back.
-     * ---------------------------------------------------------------- */
     brand: {
-        preTitle: null,        // small caps line above the title
-        title: null,           // big H1 — null or '' shows sv_projectName in-game
-        subtitle: null,        // small caps line below the title
-        footer: null           // tiny footer line at bottom of screen
+        preTitle: null,        // baris kecil di atas judul
+        title: null,           // judul besar — null/'' = pakai sv_projectName
+        subtitle: null,        // baris di bawah judul
+        footer: null           // teks kecil paling bawah
     },
 
-    /* ------------------------------------------------------------------
-     * Server logo (top left, above the wordmark)
-     * Drop the file into assets/img/ — the manifest already packs
-     * .png / .jpg / .svg / .webp from that folder. The logo only appears
-     * once the file really decodes, so a wrong path costs you the logo
-     * and nothing else.
-     * ---------------------------------------------------------------- */
+    // logo server di kiri atas (taruh file di assets/img/)
     logo: {
-        enabled: false,             // bool, default false — show the logo image at all
-        src: 'assets/img/logo.png', // string — path relative to the resource root
-        height: 84,                 // number px, default 84 — rendered height, the width follows the aspect ratio
-        placement: 'above',         // 'above' keeps the H1 title under the logo, 'replace' hides the title
-        glow: true                  // bool, default true — accent drop-shadow behind the logo
+        enabled: false,
+        src: 'assets/img/logo.png',
+        height: 84,
+        placement: 'above',    // 'above' = di atas judul, 'replace' = ganti judul
+        glow: true
     },
 
-    /* ------------------------------------------------------------------
-     * Player name shown in the welcome line.
-     * Overridden at runtime: bridge/server.lua passes the connecting name
-     * via deferrals.handover (window.nuiHandoverData.name) and the
-     * framework bridge pushes the character name once it loads.
-     * ---------------------------------------------------------------- */
-    playerName: '',
+    playerName: '',            // hanya untuk preview browser; in-game diisi otomatis
 
-    /* ------------------------------------------------------------------
-     * Server status chip (top right)
-     * playersCurrent / playersMax / ping are browser-preview values only —
-     * in-game they are replaced by live data from bridge/server.lua.
-     * ---------------------------------------------------------------- */
-    status: {
-        show: true,
-        online: true,          // green dot + "Online" label
-        playersCurrent: 0,
-        playersMax: 0,
-        ping: 0
-    },
+    // chip status kanan atas (angka di sini hanya untuk preview browser)
+    status: { show: true, online: true, playersCurrent: 0, playersMax: 0, ping: 0 },
 
-    /* ------------------------------------------------------------------
-     * Background video
-     * Two kinds of source, in one list.
-     *
-     * A LOCAL FILE: drop .webm / .mp4 (H.264 + AAC) / .mkv into assets/video/.
-     * Matroska (.mkv) plays as long as what is inside it is VP8, VP9 or H.264 —
-     * it is the container WebM is a profile of, and the game's browser demuxes
-     * both with the same code. HEVC, AV1 and AC-3 inside an .mkv do not decode,
-     * so the .webm and .mp4 of the same name are tried after it. .avi, .wmv,
-     * .flv, .mpg, .mov and .m2ts never play and are looked up as the .webm and
-     * .mp4 of the same name instead. The player walks the list in order and
-     * falls back to the gradient background if none of them load, so shipping
-     * without a video file is fine.
-     *
-     * A REMOTE URL works too — any direct link to an .mp4 or .webm, on your
-     * own web server or a CDN. Nothing has to be packed with the resource.
-     * ---------------------------------------------------------------- */
+    // video latar — file lokal (assets/video/) atau URL langsung .mp4/.webm
+    // URL lebih ringan: tidak ikut diunduh saat join, langsung stream
     video: {
         enabled: true,
-        // Played in order until one decodes. Two kinds of entry are allowed:
-        //
-        //   'https://cdn.example.com/bg.webm'    STREAMED from a web server
-        //   'assets/video/loading.webm'          PACKED into the resource
-        //
-        // STREAMED vs PACKED is the choice worth thinking about, and it is not
-        // about quality:
-        //
-        //   A packed file is part of the resource, so every player downloads
-        //   all of it during the connect handshake, BEFORE the loading screen
-        //   they are waiting on can even appear. A 30 MB background makes the
-        //   join 30 MB heavier for everyone, every time the cache is cold.
-        //
-        //   A URL is fetched by the browser while the screen is already up,
-        //   and it streams — playback starts on the first buffered seconds
-        //   instead of the last byte. It costs your web server the bandwidth
-        //   rather than your game server, nothing is in the join download,
-        //   and swapping the video needs no resource restart.
-        //
-        // So: put the file on any web host — your own server, a CDN, object
-        // storage — and paste the direct link here. Anything that serves the
-        // file over https with the right content type works; it does not have
-        // to be anything special.
-        //
-        // The shipped default is a local path only because no URL of yours can
-        // be guessed. Replace it with your link.
-        sources: [
-            'assets/video/loading.mp4'
-        ],
-        autoplay: true,
+        sources: ['assets/video/loading.mp4'],
         loop: true,
-        muted: true,           // muted is required for autoplay everywhere
-        objectFit: 'cover',    // 'cover' | 'contain'
+        objectFit: 'cover',
         opacity: 1.0,
-        blurPx: 0              // optional CSS blur over the video
+        blurPx: 0
     },
 
-    /* ------------------------------------------------------------------
-     * Background image / slideshow
-     * The no-video path: one source is a static background, several
-     * cross-fade as a slideshow. Drawn under the video layer, so it also
-     * covers a video that never decodes — set video.enabled to false if
-     * you want images only.
-     * ---------------------------------------------------------------- */
+    // gambar / slideshow latar (di bawah video)
     image: {
-        enabled: false,        // bool, default false — draw the image layer at all
-        sources: [             // string[] — one entry is a static background, several make a slideshow
-            'assets/img/bg1.jpg',
-            'assets/img/bg2.jpg'
-        ],
-        intervalMs: 9000,      // number ms, default 9000 — how long each slide is held (ignored with a single source)
-        fadeMs: 1200,          // number ms, default 1200 — cross-fade length between slides
-        objectFit: 'cover',    // 'cover' | 'contain', default 'cover'
-        opacity: 1.0,          // number 0–1, default 1 — image layer opacity over the gradient background
-        blurPx: 0,             // number px, default 0 — CSS blur over the image layer
-        kenBurns: true         // bool, default true — slow zoom drift on each slide
+        enabled: false,
+        sources: ['assets/img/bg1.jpg', 'assets/img/bg2.jpg'],
+        intervalMs: 9000,
+        fadeMs: 1200,
+        objectFit: 'cover',
+        opacity: 1.0,
+        blurPx: 0,
+        kenBurns: true
     },
 
-    /* ------------------------------------------------------------------
-     * Music
-     * One playlist. A `src` is a file this resource ships — drop .mp3 /
-     * .ogg into assets/audio/ — and `title` falls back to the filename
-     * when it is left out.
-     * ---------------------------------------------------------------- */
     music: {
         enabled: true,
-        showUI: true,          // hide the whole music panel if false
-        showPlaylist: true,    // bool, default true — the track-list button next to the transport controls; false leaves only prev / play / next
-        rememberVolume: true,  // bool, default true — the volume the player last set is restored on their next join; false always starts at `volume`
-        autoplay: true,        // tries to play on load (gesture unlock fallback)
-        volume: 50,            // 0–100 — the starting volume, and the only one used when rememberVolume is false
-        loop: true,            // loop the whole playlist
+        showUI: true,
+        showPlaylist: true,
+        rememberVolume: true,  // volume terakhir pemain diingat (KVP client)
+        autoplay: true,
+        volume: 50,            // 0–100
+        loop: true,
         shuffle: false,
-        // true = no separate music file: the background video's own soundtrack
-        // is the music, and the play button only turns that sound on / off.
-        // prev / next / playlist are hidden and `tracks` is ignored.
-        useVideoAudio: true,
-        videoTitle: 'Foreplay',  // label shown under "Now Playing"
-        tracks: [],
+        // true = suara video latar jadi musiknya; tracks diabaikan
+        useVideoAudio: false,
+        videoTitle: '4PLAY',
+        // { src: 'assets/audio/lagu.mp3', title: 'Judul' }
+        tracks: [
+            { src: 'assets/audio/4play-audio.mp3', title: '4PLAY' }
+        ],
 
-        /* --------------------------------------------------------------
-         * Visualizer — the cover art IS the spectrum.
-         * The audio is routed through an analyser and the bars follow the
-         * actual frequencies; where the browser will not give the page a
-         * running audio context they are driven by a synthetic signal.
-         * ------------------------------------------------------------ */
         visualizer: {
-            enabled: true,     // bool, default true — false hides both canvases and leaves a plain cover
-            bars: 14,          // number 4–48, default 14 — bars drawn in the cover square
-            wave: true,        // bool, default true — the thin waveform line under the track title
-            analyse: true,     // bool, default true — tap the audio for a real spectrum; false always uses the synthetic signal
-            smoothing: 0.72,   // number 0–0.95, default 0.72 — analyser smoothing; higher is calmer
-            sensitivity: 1.0   // number, default 1 — overall bar height multiplier
+            enabled: true,
+            bars: 14,          // 4–48
+            wave: true,
+            analyse: true,     // false = selalu sinyal sintetis
+            smoothing: 0.72,
+            sensitivity: 1.0,
+            fps: 30            // dibatasi supaya ringan
         }
     },
 
-    /* ------------------------------------------------------------------
-     * Background base (gradient under the video — visible if video fails
-     * or while it loads).
-     * ---------------------------------------------------------------- */
     background: {
         baseColor: '#06080d',
-        // Raw CSS gradients stacked back-to-front. Use as many as you like.
         gradients: [
             'radial-gradient(ellipse 80% 60% at 20% 110%, rgba(95, 224, 255, 0.18) 0%, transparent 60%)',
             'radial-gradient(ellipse 70% 55% at 85% 105%, rgba(167, 139, 250, 0.16) 0%, transparent 60%)',
@@ -192,92 +87,51 @@ window.LR_CONFIG = {
         ]
     },
 
-    /* ------------------------------------------------------------------
-     * Pattern overlay above the video
-     * type: 'stripes' | 'dots' | 'hex' | 'grid' | 'none'
-     * ---------------------------------------------------------------- */
+    // 'stripes' | 'dots' | 'hex' | 'grid' | 'none'
     pattern: {
         enabled: true,
         type: 'stripes',
         color: 'rgba(255, 255, 255, 0.55)',
         opacity: 0.07,
-        maskEdges: true,       // fade pattern toward the screen edges
-
-        // stripes
-        stripeAngle: 35,       // degrees
-        stripeSpacing: 6,      // px between stripe centers
-        stripeThickness: 1,    // px
-
-        // dots
-        dotSize: 1,            // px radius
-        dotSpacing: 22,        // px between dots
-
-        // hex
+        maskEdges: true,
+        stripeAngle: 35, stripeSpacing: 6, stripeThickness: 1,
+        dotSize: 1, dotSpacing: 22,
         hexAccent: 'rgba(95, 224, 255, 0.6)',
-
-        // grid
-        gridSpacing: 28,       // px
-        gridThickness: 1       // px
+        gridSpacing: 28, gridThickness: 1
     },
 
-    /* ------------------------------------------------------------------
-     * Scrim (dark vignette for readability)
-     * ---------------------------------------------------------------- */
     scrim: {
         enabled: true,
-        topDark: 0.55,         // 0..1 darkness at top
+        topDark: 0.55,
         midDark: 0.18,
-        bottomDark: 0.78,      // darkness at bottom
-        vignette: 0.55,        // edge vignette strength
+        bottomDark: 0.78,
+        vignette: 0.55,
         tintTop: 'rgba(95, 224, 255, 0.04)',
         tintBottom: 'rgba(167, 139, 250, 0.03)'
     },
 
-    /* ------------------------------------------------------------------
-     * Film grain
-     * ---------------------------------------------------------------- */
-    grain: {
-        enabled: false,        // off: barely visible, but a full-screen noise layer over the video
-        opacity: 0.035
-    },
+    grain: { enabled: false, opacity: 0.035 },
 
-    /* ------------------------------------------------------------------
-     * Rising particles canvas (the floaty dots)
-     * ---------------------------------------------------------------- */
     particles: {
         enabled: true,
-        density: 32000,        // viewport area / density = count (clamped)
+        density: 32000,        // luas layar / density = jumlah
         minCount: 15,
         maxCount: 25,
-        sizeMin: 0.5,
-        sizeMax: 1.5,
-        speedMin: 0.12,        // px/frame
-        speedMax: 0.47,
+        sizeMin: 0.5, sizeMax: 1.5,
+        speedMin: 0.12, speedMax: 0.47,   // px per frame @60fps
         haloMultiplier: 3.5,
         haloOpacity: 0.45,
-        alphaMin: 0.18,
-        alphaMax: 0.6,
+        alphaMin: 0.18, alphaMax: 0.6,
+        fps: 30,
         palette: [
-            { r: 220, g: 232, b: 248, weight: 0.65 },  // soft white
-            { r: 150, g: 220, b: 255, weight: 0.25 },  // pale cyan
-            { r: 200, g: 180, b: 255, weight: 0.10 }   // faint lilac
+            { r: 220, g: 232, b: 248, weight: 0.65 },
+            { r: 150, g: 220, b: 255, weight: 0.25 },
+            { r: 200, g: 180, b: 255, weight: 0.10 }
         ]
     },
 
-    /* ------------------------------------------------------------------
-     * Corner brackets
-     * ---------------------------------------------------------------- */
-    corners: {
-        enabled: true,
-        color: 'rgba(95, 224, 255, 0.55)',
-        size: 22,              // px
-        thickness: 2,          // px
-        inset: 14              // px from viewport edge
-    },
+    corners: { enabled: true, color: 'rgba(95, 224, 255, 0.55)', size: 22, thickness: 2, inset: 14 },
 
-    /* ------------------------------------------------------------------
-     * Theme colors (applied as CSS variables)
-     * ---------------------------------------------------------------- */
     theme: {
         accent:     '#f3b354',
         accent2:    '#a78bfa',
@@ -293,28 +147,15 @@ window.LR_CONFIG = {
         bg:         '#06080d'
     },
 
-    /* ------------------------------------------------------------------
-     * Info panel tabs (right side)
-     * ---------------------------------------------------------------- */
-    tabs: {
-        rules: true,
-        staff: true,
-        news: true,            // bool, default true — the News tab; it only appears once there is something to show, so this stays harmless on a server that publishes nothing
-        defaultTab: 'rules'
-    },
+    tabs: { rules: true, staff: true, news: true, defaultTab: 'rules' },
 
-    /* ------------------------------------------------------------------
-     * Staff cards
-     * tone: 'owner' | 'admin' | 'dev' | 'mod' (color theming)
-     * Leave role/badge null to use the locale defaults.
-     * ---------------------------------------------------------------- */
+    // tone: 'owner' | 'admin' | 'dev' | 'mod'
     staff: [
         { name: 'Viktor', role: null, badge: null, tone: 'owner', avatar: 'V' },
         { name: 'Dora',   role: null, badge: null, tone: 'admin', avatar: 'D' },
         { name: 'Marcus', role: null, badge: null, tone: 'dev',   avatar: 'M' },
         { name: 'Esther', role: null, badge: null, tone: 'mod',   avatar: 'E' }
     ],
-    // Locale-driven defaults per tone — overridden by an explicit role/badge above.
     staffDefaults: {
         owner: { roleKey: 'roles.founder',    badgeKey: 'badges.owner' },
         admin: { roleKey: 'roles.management', badgeKey: 'badges.admin' },
@@ -322,88 +163,34 @@ window.LR_CONFIG = {
         mod:   { roleKey: 'roles.support',    badgeKey: 'badges.mod'   }
     },
 
-    /* ------------------------------------------------------------------
-     * Socials (bottom right)
-     * icon: any icon name from the bundled Lucide set (assets/lucide),
-     * written without the "icon-" prefix — see lucide.dev/icons.
-     * ---------------------------------------------------------------- */
+    // icon: message-circle, discord, globe, shopping-bag, youtube, instagram, tiktok, link
     socials: [
         { icon: 'message-circle', url: 'https://discord.gg/yourserver' },
         { icon: 'globe',          url: 'https://yourserver.example'   },
         { icon: 'shopping-bag',   url: 'https://store.example'        }
     ],
 
-    /* ------------------------------------------------------------------
-     * Tips rotator (uses locales/<lang>.json → tips[])
-     * A live tip list from the server wins over both of the lists below —
-     * see `data/README.txt` for the file and the `lrl:tipsUrl` convar.
-     * ---------------------------------------------------------------- */
-    tips: {
-        enabled: true,
-        intervalMs: 5000,
-        fadeMs: 400,
-        override: null         // [] to override locale; null to use locale
-    },
+    // tips dari data/tips.json (server) menang atas daftar ini
+    tips: { enabled: true, intervalMs: 5000, fadeMs: 400, override: null },
 
-    /* ------------------------------------------------------------------
-     * Server news / patch notes (the News tab)
-     * The server feeds this list at connect time — a JSON file in data/, a
-     * URL, or a push from another resource — so the notes can change without
-     * anyone touching the resource. The entries below are the fallback for
-     * when the server has nothing to say; leave the list empty and the tab
-     * stays hidden until it does.
-     * ---------------------------------------------------------------- */
+    // berita dari data/news.json (server) menang atas items di sini
     news: {
-        maxItems: 8,           // number, default 8 — how many entries are rendered, newest first as they arrive
-        items: [               // fallback entries: { title, date, tag, body } — body is a string or an array of lines
-            // {
-            //     title: 'Winter update',
-            //     date: '2026-07-24',
-            //     tag: 'Update',
-            //     body: [
-            //         'Two new legal jobs at the docks.',
-            //         'Vehicle handling pass on every sports car.'
-            //     ]
-            // }
+        maxItems: 8,
+        items: [
+            // { title: 'Update musim dingin', date: '2026-07-24', tag: 'Update', body: ['Baris 1', 'Baris 2'] }
         ]
     },
 
-    /* ------------------------------------------------------------------
-     * Rules list (uses locales/<lang>.json → rules[])
-     * Override with an array here to hard-code them across all languages.
-     * ---------------------------------------------------------------- */
-    rules: null,
+    rules: null,               // array untuk override locale
 
-    /* ------------------------------------------------------------------
-     * Rules acceptance gate
-     * The panel the player has to accept before the screen hands over. It is
-     * switched on server-side — `setr lrl:rulesGate 1` — because the
-     * acceptance is recorded there, per identifier; these keys only decide
-     * how the panel behaves once the server asks for one. With the convar
-     * unset nothing below has any effect.
-     * ---------------------------------------------------------------- */
-    rulesGate: {
-        requireScroll: true,   // bool, default true — Accept unlocks only after the rules have been scrolled to the end
-        showDecline: true,     // bool, default true — offer a Decline button, which disconnects the player
-        dim: 0.72              // number 0–1, default 0.72 — how dark the loading screen behind the panel goes
-    },
+    // panel setuju peraturan — diaktifkan dari server: setr fls:rulesGate 1
+    rulesGate: { requireScroll: true, showDecline: true, dim: 0.72 },
 
-    /* ------------------------------------------------------------------
-     * Loading progress
-     * The bar is simulated until FiveM emits its first loadProgress
-     * message; from that point the real load drives it and the travel
-     * that is left is remapped, so the bar never jumps backwards.
-     * ---------------------------------------------------------------- */
     progress: {
         simulate: true,
         intervalMs: 380,
         stepMin: 0.02,
         stepMax: 0.07,
-        logHoldMs: 2500        // number ms, default 2500 — how long a game log line keeps the status row before the stage name takes it back
-    },
-
-    /* ------------------------------------------------------------------
-     * Dev / preview dock (replay button)
-     * ---------------------------------------------------------------- */
-    devDock: false
+        logHoldMs: 2500
+    }
 };

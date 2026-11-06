@@ -83,6 +83,8 @@ end
 
 function Bridge.IsStaff(src)
     if IsPlayerAceAllowed(src, Config.StaffAce) then return true end
+    -- f_admin: Owner / Admin / Support dari panel juga staf chat
+    if GetResourceState('f_admin') == 'started' and exports.f_admin:IsStaff(src) then return true end
     for _, group in ipairs(Config.StaffGroups) do
         if IsPlayerAceAllowed(src, ('group.%s'):format(group)) then return true end
         if Bridge.name == 'qbx' then

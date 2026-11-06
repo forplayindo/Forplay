@@ -240,6 +240,23 @@ local function updateVehicleInfo()
         vehicle_info.isSeatbeltOn = Seatbelt.GetCurrentState()
         vehicle_info.isLightOn = lightson == 1 or highbeams == 1
         vehicle_info.isCruiseOn = isCruiseOn
+        -- data tambahan untuk HUD kapal (14), helikopter (15) dan pesawat (16)
+        local class = vehicle_info.veh_class
+        if class == 14 or class == 15 or class == 16 then
+            vehicle_info.heading = math.floor((360.0 - GetEntityHeading(vehicle)) % 360.0)
+        end
+        if class == 15 or class == 16 then
+            vehicle_info.altitude = math.floor(math.max(0.0, GetEntityHeightAboveGround(vehicle)))
+            vehicle_info.verticalSpeed = math.floor(GetEntityVelocity(vehicle).z * 10 + 0.5) / 10
+            local rotor = class == 15
+                and math.min(GetHeliMainRotorHealth(vehicle), GetHeliTailRotorHealth(vehicle))
+                or GetVehicleBodyHealth(vehicle)
+            vehicle_info.rotorHealth = math.floor(math.max(0.0, rotor) * .1)
+        elseif class == 14 then
+            local forward = GetEntitySpeedVector(vehicle, true).y
+            vehicle_info.boatDirection = (forward > 0.5 and 'D') or (forward < -0.5 and 'R') or 'N'
+            vehicle_info.bodyHealth = math.floor(math.max(0.0, GetVehicleBodyHealth(vehicle)) * .1)
+        end
         Hud.data.bars.vehicle_engine.value = vehicle_info.engineHealth
     else
         if oldVehicle then

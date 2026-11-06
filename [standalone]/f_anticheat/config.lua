@@ -5,7 +5,11 @@ Config.Webhook = ''
 
 -- Player identifiers matching these ACE permissions are never flagged or punished.
 -- (staff testing spawn menus, noclip, etc. should not trip the detectors)
-Config.ExemptAce = 'group.admin'
+-- f_admin: diberikan ke Owner, dan ke Admin/Support kalau dicentang di Daftar Command (anticheat.exempt).
+Config.ExemptAce = 'f_admin.anticheat.exempt'
+
+-- Grup yang boleh memakai command /ac
+Config.CommandGroup = 'group.admin'
 
 -- ============================================================================
 -- Punishment engine

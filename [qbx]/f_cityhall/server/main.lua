@@ -13,7 +13,14 @@ local OfficeByJob = {}
 for key, office in pairs(offices) do
     office.key = key
     OfficeByJob[office.job] = key
+    for _, counter in ipairs(office.counters or {}) do
+        counter.allow = {}
+        for _, cat in ipairs(counter.categories or {}) do counter.allow[cat] = true end
+    end
 end
+
+local JobByName = {}
+for _, j in ipairs(config.employment.jobs) do JobByName[j.name] = j end
 
 local ACTION_LABEL = { new = 'Baru', renew = 'Perpanjang', lost = 'Hilang', pay = 'Bayar', redeem = 'Tebus' }
 
@@ -405,12 +412,29 @@ local function syncUnpaid(cid)
     end
 end
 
+---The office and counter `index` of `officeKey`, only when the player stands at that counter
+local function counterAt(src, officeKey, index)
+    local office = offices[officeKey]
+    local counter = office and office.counters and office.counters[tonumber(index) or 0]
+    if not counter or not near(src, counter.coords, rules.counterDistance + 2.0) then return end
+    return office, counter
+end
+
+---Catalog of the office limited to what this counter serves
+local function counterCatalog(src, office, counter)
+    local list = {}
+    for _, e in ipairs(buildCatalog(src, office.key)) do
+        if counter.allow[e.category] then list[#list + 1] = e end
+    end
+    return list
+end
+
 ---------------------------------------------------------------------------
 -- Citizen callbacks
 ---------------------------------------------------------------------------
-lib.callback.register('f_cityhall:getServices', function(src, officeKey)
-    local office = offices[officeKey]
-    if not office or not near(src, office.counter, rules.counterDistance + 2.0) then return end
+lib.callback.register('f_cityhall:getServices', function(src, officeKey, index)
+    local office, counter = counterAt(src, officeKey, index)
+    if not office then return end
 
     local player = getPlayer(src)
     if not player then return end
@@ -418,23 +442,23 @@ lib.callback.register('f_cityhall:getServices', function(src, officeKey)
     local _, unpaid = pendingOf(player.PlayerData.citizenid)
 
     return {
-        label = office.label,
-        subtitle = office.subtitle,
-        entries = buildCatalog(src, officeKey),
+        label = counter.label,
+        subtitle = counter.subtitle or office.label,
+        categories = counter.categories,
+        companyTax = counter.companyTax or nil,
+        entries = counterCatalog(src, office, counter),
         transfer = Invoice.Available(),
         maxCart = rules.maxCart,
         unpaid = unpaid and unpaid.code or nil,
         closed = dutyList(office.job) == 0, -- services can be browsed, paying is blocked
-        redeem = office.key == config.tickets.office, -- show the Penebusan tab even when empty
     }
 end)
 
-lib.callback.register('f_cityhall:placeOrder', function(src, officeKey, ids, method)
+lib.callback.register('f_cityhall:placeOrder', function(src, officeKey, index, ids, method)
     if not throttle(src, 'order', 3000) then return { ok = false, msg = 'Tunggu sebentar.' } end
-    local office = offices[officeKey]
-    if not office then return { ok = false, msg = 'Loket tidak valid.' } end
     if method ~= 'cash' and method ~= 'transfer' then return { ok = false, msg = 'Metode pembayaran tidak valid.' } end
-    if not near(src, office.counter, rules.counterDistance + 2.0) then return { ok = false, msg = 'Kamu harus berada di loket.' } end
+    local office, counter = counterAt(src, officeKey, index)
+    if not office then return { ok = false, msg = 'Kamu harus berada di loket.' } end
     if dutyList(office.job) == 0 then
         return { ok = false, msg = 'Pelayanan sedang tutup. Silakan datang kembali saat petugas administrasi sudah bertugas.' }
     end
@@ -448,7 +472,7 @@ lib.callback.register('f_cityhall:placeOrder', function(src, officeKey, ids, met
     if unpaid then return { ok = false, msg = ('Selesaikan dulu tagihan #%s.'):format(unpaid.code) } end
 
     local byId = {}
-    for _, e in ipairs(buildCatalog(src, officeKey)) do byId[e.id] = e end
+    for _, e in ipairs(counterCatalog(src, office, counter)) do byId[e.id] = e end
 
     local lines, seen, total = {}, {}, 0
     for _, id in ipairs(ids) do
@@ -741,22 +765,39 @@ lib.addCommand('permohonan', { help = 'Buka daftar permohonan layanan publik (pe
 end)
 
 ---------------------------------------------------------------------------
--- Employment (job center at the government counter)
+-- Employment ([E] Cari Pekerjaan zone of an office)
 ---------------------------------------------------------------------------
-lib.callback.register('f_cityhall:server:applyJob', function(source, job)
-    if not config.employment.enabled or not config.employment.jobs[job] then return false end
-    local player = getPlayer(source)
-    if not player then return false end
-
-    local allowed = false
+local function atJobCenter(src)
     for _, office in pairs(offices) do
-        if office.employment and near(source, office.counter, 20.0) then allowed = true break end
+        if office.jobCenter and near(src, office.jobCenter, rules.counterDistance + 2.0) then return true end
     end
-    if not allowed then return false end
+    return false
+end
+
+lib.callback.register('f_cityhall:getJobs', function(src)
+    if not config.employment.enabled or not atJobCenter(src) then return end
+    local player = getPlayer(src)
+    if not player then return end
+    local job = player.PlayerData.job
+    return { list = config.employment.jobs, current = job.name, currentLabel = job.label }
+end)
+
+lib.callback.register('f_cityhall:server:applyJob', function(source, job)
+    local entry = config.employment.enabled and JobByName[job]
+    if not entry then return { ok = false, msg = 'Pekerjaan tidak tersedia.' } end
+    if not throttle(source, 'job', 3000) then return { ok = false, msg = 'Tunggu sebentar.' } end
+    if not atJobCenter(source) then return { ok = false, msg = 'Kamu harus berada di loket Cari Pekerjaan.' } end
+    local player = getPlayer(source)
+    if not player then return { ok = false } end
+    -- side jobs (f_garbagejob) never change the player's job, they only open their own menu
+    if entry.sideJob then return { ok = true, menu = entry.menu } end
+    if player.PlayerData.job.name == job then
+        if entry.menu then return { ok = true, menu = entry.menu } end
+        return { ok = false, msg = ('Kamu sudah bekerja sebagai %s.'):format(entry.label) }
+    end
 
     player.Functions.SetJob(job, 0)
-    notify(source, 'Selamat atas pekerjaan barumu!', 'success')
-    return true
+    return { ok = true, menu = entry.menu, msg = job == 'unemployed' and 'Kamu berhenti bekerja.' or ('Selamat! Kamu sekarang bekerja sebagai %s.'):format(entry.label) }
 end)
 
 -- shared with server/tickets.lua (police tickets)

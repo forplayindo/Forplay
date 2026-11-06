@@ -604,6 +604,20 @@ RegisterCommand('convertinventory', function(source, args)
 end, true)
 
 
+-- f_admin: uang tunai (item money) lewat command hanya untuk Owner, dan pemberian item dicatat ke Discord.
+local function fAdminBlocked(source, itemName)
+    if source == 0 or itemName ~= 'money' then return false end
+    if IsPlayerAceAllowed(tostring(source), 'f_admin.give.money') then return false end
+    TriggerClientEvent('ox_lib:notify', source, { type = 'error', description = 'Uang tunai hanya bisa diberikan oleh Owner.' })
+    return true
+end
+
+local function fAdminLog(source, text)
+    if source ~= 0 and GetResourceState('f_admin') == 'started' then
+        pcall(function() exports.f_admin:Log(source, 'item', text) end)
+    end
+end
+
 lib.addCommand({ 'additem', 'giveitem' }, {
     help = 'Gives an item to a player with the given id',
     params = {
@@ -617,6 +631,7 @@ lib.addCommand({ 'additem', 'giveitem' }, {
     local item = Items(args.item)
 
     if item then
+        if fAdminBlocked(source, item.name) then return end
         local inventory = Inventory(args.target) --[[@as OxInventory]]
         local count = args.count and math.max(args.count, 1) or 1
 
@@ -627,6 +642,8 @@ lib.addCommand({ 'additem', 'giveitem' }, {
             return Citizen.Trace(('Failed to give %sx %s to player %s (%s)'):format(count, item.name, args.target,
                 response))
         end
+
+        fAdminLog(source, ('memberikan %s%s ke **%s** (lewat /giveitem)'):format(item.label, count > 1 and (' x' .. count) or '', inventory.label))
 
         source = Inventory(source) or { label = 'console', owner = 'console' }
 
@@ -683,6 +700,7 @@ lib.addCommand('setitem', {
     local item = Items(args.item)
 
     if item then
+        if fAdminBlocked(source, item.name) then return end
         local inventory = Inventory(args.target) --[[@as OxInventory]]
         local count = args.count and math.max(args.count, 0) or 0
 
@@ -693,6 +711,8 @@ lib.addCommand('setitem', {
             return Citizen.Trace(('Failed to set %s count to %sx for player %s (%s)'):format(item.name, count,
                 args.target, response))
         end
+
+        fAdminLog(source, ('mengatur %s milik **%s** menjadi %s (lewat /setitem)'):format(item.label, inventory.label, count))
 
         source = Inventory(source) or { label = 'console', owner = 'console' }
 

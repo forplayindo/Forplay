@@ -69,10 +69,10 @@ local function setEquipped(value, silent)
     if value then
         TriggerEvent('ox_inventory:disarm', cache.playerId, true)
         if not cache.vehicle then attachProp() end
-        if not silent then exports.qbx_core:Notify('Kruk dipegang', 'inform') end
+        if not silent then exports.qbx_core:Notify('Crutch dipegang', 'inform') end
     else
         deleteProp()
-        if not silent then exports.qbx_core:Notify('Kruk dilepas', 'inform') end
+        if not silent then exports.qbx_core:Notify('Crutch dilepas', 'inform') end
     end
     forceClip = true
     updateMovement()
@@ -151,7 +151,7 @@ end)
 
 RegisterNetEvent('f_ambulancejob:client:recoveryStarted', function(left)
     if GetInvokingResource() then return end
-    exports.qbx_core:Notify(('Kakimu dibidai. Masa pemulihan %d menit, wajib pakai Kruk.'):format(math.ceil((left or 0) / 60)), 'inform', 8000)
+    exports.qbx_core:Notify(('Kakimu dibidai. Masa pemulihan %d menit, wajib pakai Crutch.'):format(math.ceil((left or 0) / 60)), 'inform', 8000)
 end)
 
 RegisterNetEvent('f_ambulancejob:client:recoveryEnded', function()

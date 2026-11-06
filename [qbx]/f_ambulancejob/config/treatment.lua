@@ -135,7 +135,7 @@ return {
         painkiller = { label = 'Painkillers', price = 10000 },
         revive = { label = 'Revive di lapangan', price = 150000 },
         transfusion = { label = 'Transfusi darah', price = 75000 },
-        crutch = { label = 'Pemberian Kruk', price = 30000 },
+        crutch = { label = 'Pemberian Crutch', price = 30000 },
         surgery = { label = 'Operasi', price = 400000 },
     },
 }

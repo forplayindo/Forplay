@@ -17,7 +17,7 @@ Config.Grades = {
 ---------------------------------------------------------------------------
 -- LOKASI (placeholder, silakan ganti)
 ---------------------------------------------------------------------------
-Config.Center = vec3(-1755.54, -1091.05, 13.06)   -- titik tengah cafe
+Config.Center = vec3(-1715.9, -805.2, 9.24)   -- titik tengah cafe
 Config.Radius = 40.0                           -- radius area cafe (validasi server)
 
 Config.Blip = { enabled = false, sprite = 214, color = 5, scale = 0.8 } -- blip dipindah ke f_blips
@@ -28,29 +28,37 @@ Config.TargetRadius = 1.2    -- radius default zona (meter)
 Config.TargetDistance = 2.5  -- jarak maksimal pemain ke titik yang ditarget
 
 Config.Points = {
-    duty    = { coords = vec3(-1750.66, -1078.58, 14.37) },  -- papan absen
-    locker  = { coords = vec3(-1748.53, -1073.35, 13.06) },  -- loker seragam
-    fridge  = { coords = vec3(-1759.23, -1087.98, 14.36) },  -- kulkas / gudang bahan
-    ready   = { coords = vec3(-1753.05, -1081.94, 14.37) },  -- rak stok siap jual
-    orders  = { coords = vec3(-1756.49, -1088.52, 14.18) },  -- layar list pemesanan
-    counter = { coords = vec3(-1752.75, -1084.17, 14.17) },  -- meja kasir (pelanggan)
+    duty    = { coords = vec3(-1694.55, -798.04, 5.51) },  -- papan absen
+    locker  = { coords = vec3(-1706.0, -796.49, 5.51) },  -- loker seragam
+    fridge  = { coords = vec3(-1701.0, -796.85, 5.77) },  -- kulkas / gudang bahan
+    ready   = { coords = vec3(-1709.76, -799.63, 10.34) },  -- rak stok siap jual
+    orders  = {                                              -- layar list pemesanan, boleh lebih dari satu
+        { coords = vec3(-1708.28, -802.68, 9.24) },
+        { coords = vec3(-1707.64, -799.56, 10.3) },          -- nampan prop_food_tray_01
+    },
+    counter = {                                              -- meja kasir (pelanggan), boleh lebih dari satu
+        { coords = vec3(-1707.76, -803.41, 10.52) },
+    },
 }
 
--- Stasiun masak
+-- Stasiun masak. prop = alat yang dipegang saat masak (bone 28422 = tangan kanan), hapus baris prop kalau tidak mau.
 Config.Stations = {
-    grill = { label = 'Grill',          icon = 'fa-solid fa-fire-burner', coords = vec3(-1755.62, -1084.94, 14.37),
-              anim = { dict = 'amb@prop_human_bbq@male@idle_a', clip = 'idle_b', flag = 1 } },
-    fryer = { label = 'Fryer & Oven',   icon = 'fa-solid fa-bowl-food',   coords = vec3(-1756.15, -1083.75, 14.37),
-              anim = { dict = 'amb@prop_human_bbq@male@idle_a', clip = 'idle_b', flag = 1 } },
-    drink = { label = 'Drink Station',  icon = 'fa-solid fa-mug-hot',     coords = vec3(-1752.83, -1079.77, 14.37),
-              anim = { dict = 'anim@amb@clubhouse@tutorial@bkr_tut_ig3@', clip = 'machinic_loop_mechandplayer', flag = 1 } },
+    grill = { label = 'Grill',          icon = 'fa-solid fa-fire-burner', coords = vec3(-1709.35, -796.01, 10.29),
+              anim = { dict = 'amb@prop_human_bbq@male@idle_a', clip = 'idle_b', flag = 1 },
+              prop = { model = 'prop_fish_slice_01', bone = 28422, pos = vec3(0.0, 0.0, 0.0), rot = vec3(0.0, 0.0, 0.0) } },  -- sudip
+    fryer = { label = 'Fryer & Oven',   icon = 'fa-solid fa-bowl-food',   coords = vec3(-1708.02, -794.86, 10.26),
+              anim = { dict = 'amb@prop_human_bbq@male@idle_a', clip = 'idle_b', flag = 1 },
+              prop = { model = 'prop_fish_slice_01', bone = 28422, pos = vec3(0.0, 0.0, 0.0), rot = vec3(0.0, 0.0, 0.0) } },  -- sudip
+    drink = { label = 'Drink Station',  icon = 'fa-solid fa-mug-hot',     coords = vec3(-1712.79, -802.4, 10.34),
+              anim = { dict = 'anim@amb@clubhouse@tutorial@bkr_tut_ig3@', clip = 'machinic_loop_mechandplayer', flag = 1 },
+              prop = { model = 'p_amb_coffeecup_01', bone = 28422, pos = vec3(0.0, 0.0, 0.0), rot = vec3(0.0, 0.0, 0.0) } },  -- gelas kopi
 }
 
--- NPC kasir: muncul hanya jika tidak ada karyawan yang on duty
+-- NPC kasir (hiasan saja): muncul hanya jika tidak ada karyawan yang on duty. Pembeli pesan lewat Points.counter.
 Config.NPC = {
     enabled = true,
     model = 'a_f_y_business_01',
-    coords = vec4(-1757.21, -1088.3, 14.36, 226.68),  -- ambil dengan /vec4 sambil berdiri di posisi NPC
+    coords = vec4(-1708.44, -802.94, 10.24, 232.88),  -- ambil dengan /vec4 sambil berdiri di posisi NPC
     scenario = 'WORLD_HUMAN_STAND_IMPATIENT',
 }
 
@@ -79,20 +87,29 @@ Config.Order = {
 ---------------------------------------------------------------------------
 -- MENU (harga dalam Rupiah). Stok siap jual TIDAK kadaluarsa, item di tangan
 -- pemain kadaluarsa 3 hari (degrade diatur di ox_inventory/data/items.lua).
+-- Hunger/thirst/stress diatur di items.lua (client.status) dan tampil otomatis di menu.
+-- Harga mengikuti biaya isi bar 100%: makanan ~Rp 100-126rb, minuman ~Rp 68-84rb.
 ---------------------------------------------------------------------------
 Config.Menu = {
     -- Makanan
-    { item = 'cafe_burger',      label = 'Classic Beef Burger', category = 'food',  price = 14000, emoji = '🍔', desc = 'Bun, beef patty, cheese slice' },
-    { item = 'cafe_hotdog',      label = 'Hot Dog Sausage',     category = 'food',  price = 11000, emoji = '🌭', desc = 'Hotdog bun, sausage, mustard' },
-    { item = 'cafe_nachos',      label = 'Loaded Nachos',       category = 'food',  price = 13000, emoji = '🧀', desc = 'Tortilla chips, melted cheese, salsa' },
-    { item = 'cafe_donut',       label = 'Glazed Donut',        category = 'food',  price = 10000, emoji = '🍩', desc = 'Donut dough, sugar glaze' },
-    { item = 'cafe_sandwich',    label = 'Fresh Sandwich',      category = 'food',  price = 12000, emoji = '🥪', desc = 'Bread, chicken, cheese slice' },
+    { item = 'cafe_burger',      label = 'Classic Beef Burger', category = 'food',  price = 18000, emoji = '🍔', desc = 'Bun, beef patty, cheese slice' },
+    { item = 'cafe_hotdog',      label = 'Hot Dog Sausage',     category = 'food',  price = 16000, emoji = '🌭', desc = 'Hotdog bun, sausage, mustard' },
+    { item = 'cafe_nachos',      label = 'Loaded Nachos',       category = 'food',  price = 17000, emoji = '🧀', desc = 'Tortilla chips, melted cheese, salsa' },
+    { item = 'cafe_donut',       label = 'Glazed Donut',        category = 'food',  price = 15000, emoji = '🍩', desc = 'Donut dough, sugar glaze' },
+    { item = 'cafe_sandwich',    label = 'Fresh Sandwich',      category = 'food',  price = 17000, emoji = '🥪', desc = 'Bread, chicken, cheese slice' },
+    { item = 'mie_goreng_telor', label = 'Mie Goreng Telor',    category = 'food',  price = 28000, emoji = '🍜', desc = 'Mie instan goreng, telur ceplok' },
+    { item = 'mie_rebus_telor',  label = 'Mie Telor Rebus',     category = 'food',  price = 28000, emoji = '🍜', desc = 'Mie instan berkuah, telur ceplok' },
+    { item = 'cafe_nasigoreng',  label = 'Nasi Goreng',         category = 'food',  price = 50000, emoji = '🍛', desc = 'Nasi, telur, kecap manis' },
+    { item = 'steak',            label = 'Steak',               category = 'food',  price = 58000, emoji = '🥩', desc = 'Daging sapi panggang' },
     -- Minuman
-    { item = 'cafe_cappuccino',  label = 'Classic Cappuccino',  category = 'drink', price = 8000, emoji = '☕', desc = 'Coffee, milk, cinnamon' },
-    { item = 'cafe_colafloat',   label = 'Iced Cola Float',     category = 'drink', price = 8000, emoji = '🥤', desc = 'Cola, ice, vanilla ice cream' },
-    { item = 'cafe_milkshake',   label = 'Chocolate Milkshake', category = 'drink', price = 9000, emoji = '🍫', desc = 'Milk, chocolate, ice' },
-    { item = 'cafe_orangejuice', label = 'Fresh Orange Juice',  category = 'drink', price = 6000, emoji = '🍊', desc = 'Orange, sugar, ice' },
-    { item = 'cafe_energysoda',  label = 'Energy Soda',         category = 'drink', price = 8000, emoji = '⚡', desc = 'Soda water, energy syrup, ice' },
+    { item = 'cafe_cappuccino',  label = 'Classic Cappuccino',  category = 'drink', price = 12000, emoji = '☕', desc = 'Coffee, milk, cinnamon' },
+    { item = 'cafe_colafloat',   label = 'Iced Cola Float',     category = 'drink', price = 11000, emoji = '🥤', desc = 'Cola, ice, vanilla ice cream' },
+    { item = 'cafe_energysoda',  label = 'Energy Soda',         category = 'drink', price = 11000, emoji = '⚡', desc = 'Soda water, energy syrup, ice' },
+    { item = 'cafe_orangejuice', label = 'Fresh Orange Juice',  category = 'drink', price = 17000, emoji = '🍊', desc = 'Orange, sugar, ice' },
+    { item = 'cafe_milkshake',   label = 'Chocolate Milkshake', category = 'drink', price = 19000, emoji = '🍫', desc = 'Milk, chocolate, ice' },
+    { item = 'cafe_stmj',        label = 'STMJ',                category = 'drink', price = 18000, emoji = '🍵', desc = 'Susu, telur, madu, jahe' },
+    { item = 'cafe_kelapamuda',  label = 'Es Kelapa Muda Utuh', category = 'drink', price = 35000, emoji = '🥥', desc = 'Satu buah kelapa muda, es' },
+    { item = 'cafe_jusalpukat',  label = 'Jus Alpukat Jumbo',   category = 'drink', price = 30000, emoji = '🥑', desc = 'Alpukat, susu kental manis, es' },
 }
 
 -- Promo: harga diatur Manager di game (tersimpan di database).
@@ -102,9 +119,9 @@ Config.Promo = {
     maxPercent = 100,  -- tidak boleh lebih mahal dari harga normal
     maxPromos  = 10,
     defaults = {       -- dipakai sekali saat tabel promo masih kosong
-        { label = 'Burger + Cola Float',      food = 'cafe_burger',   drink = 'cafe_colafloat',  price = 18000 },
-        { label = 'Donut + Cappuccino',       food = 'cafe_donut',    drink = 'cafe_cappuccino', price = 15000 },
-        { label = 'Sandwich + Orange Juice',  food = 'cafe_sandwich', drink = 'cafe_orangejuice', price = 15000 },
+        { label = 'Burger + Cola Float',      food = 'cafe_burger',   drink = 'cafe_colafloat',  price = 25000 },
+        { label = 'Donut + Cappuccino',       food = 'cafe_donut',    drink = 'cafe_cappuccino', price = 23000 },
+        { label = 'Sandwich + Orange Juice',  food = 'cafe_sandwich', drink = 'cafe_orangejuice', price = 29000 },
     },
 }
 
@@ -121,11 +138,18 @@ Config.Recipes = {
     cafe_sandwich    = { station = 'grill', time = 7000, ingredients = { roti_tawar = 5, daging_ayam = 10, keju = 5 } },
     cafe_nachos      = { station = 'fryer', time = 7000, ingredients = { keripik_tortilla = 5, keju = 10, saus_salsa = 5 } },
     cafe_donut       = { station = 'fryer', time = 8000, ingredients = { adonan_donat = 5, gula = 5, minyak_goreng = 2 } },
+    cafe_nasigoreng  = { station = 'fryer', time = 8000, ingredients = { beras = 5, telur = 10, kecap_manis = 2 } },
+    mie_goreng_telor = { station = 'fryer', time = 8000, ingredients = { mie_instan = 10, telur = 10 } },
+    mie_rebus_telor  = { station = 'fryer', time = 8000, ingredients = { mie_instan = 10, telur = 10 } },
+    steak            = { station = 'grill', time = 8000, ingredients = { daging_sapi = 10, minyak_goreng = 2 } },
     cafe_cappuccino  = { station = 'drink', time = 6000, ingredients = { bubuk_kopi = 5, susu = 5, kayu_manis = 2 } },
     cafe_colafloat   = { station = 'drink', time = 6000, ingredients = { soda_cola = 10, es_batu = 5, es_krim_vanila = 3 } },
     cafe_milkshake   = { station = 'drink', time = 6000, ingredients = { susu = 10, bubuk_coklat = 5, es_batu = 5 } },
     cafe_orangejuice = { station = 'drink', time = 6000, ingredients = { jeruk = 10, gula = 2, es_batu = 3 } },
     cafe_energysoda  = { station = 'drink', time = 6000, ingredients = { air_soda = 10, sirup_energi = 5, es_batu = 3 } },
+    cafe_stmj        = { station = 'drink', time = 6000, ingredients = { susu = 10, telur = 10, madu = 5, jahe = 5 } },
+    cafe_kelapamuda  = { station = 'drink', time = 6000, ingredients = { kelapa_muda = 10, gula = 5, es_batu = 10 } },
+    cafe_jusalpukat  = { station = 'drink', time = 6000, ingredients = { alpukat = 20, susu_kental_manis = 5, es_batu = 10 } },
 }
 
 ---------------------------------------------------------------------------
@@ -156,6 +180,15 @@ Config.Supplier = {
     { item = 'air_soda',         label = 'Air Soda',          price = 1000 },
     { item = 'sirup_energi',     label = 'Sirup Energi',      price = 3000 },
     { item = 'jeruk',            label = 'Jeruk',             price = 1500 },
+    { item = 'beras',            label = 'Beras',             price = 3000 },
+    { item = 'telur',            label = 'Telur',             price = 1500 },
+    { item = 'kecap_manis',      label = 'Kecap Manis',       price = 2500 },
+    { item = 'mie_instan',       label = 'Mie Instan',        price = 2500 },
+    { item = 'madu',             label = 'Madu',              price = 4000 },
+    { item = 'jahe',             label = 'Jahe',              price = 2000 },
+    { item = 'kelapa_muda',      label = 'Kelapa Muda',       price = 9000 },
+    { item = 'alpukat',          label = 'Alpukat',           price = 3500 },
+    { item = 'susu_kental_manis', label = 'Susu Kental Manis', price = 2500 },
 }
 Config.SupplierMaxPerBuy = 500  -- jumlah maksimal per item per transaksi
 

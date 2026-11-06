@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>F-Admin Mockup</title>
+<link rel="stylesheet" href="f-ui/ios.css">
+<style>
+/* mockup saja: latar game palsu */
+html, body { background: #3b4a55 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 40L40 0' stroke='%23ffffff10'/%3E%3C/svg%3E"); }
+
+.panel.adm { width: 1200px; height: 740px; max-width: 97vw; max-height: 94vh; }
+.adm .sidebar { width: 220px; }
+.adm .nav button { height: 38px; }
+.nav .sep-h { margin: 10px 10px 4px; font-size: 11px; color: var(--label-3); text-transform: uppercase; letter-spacing: .04em; }
+.nav button.locked { opacity: .35; }
+.side-foot { margin-top: auto; padding: 10px; border-radius: 12px; background: var(--fill); display: flex; align-items: center; gap: 10px; }
+.side-foot b { display: block; font-size: 13px; }
+.av { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none; font-weight: 700; font-size: 13px; background: var(--cell-2); color: var(--label); }
+
+.role { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+.role.owner { background: var(--accent); color: var(--on-accent); }
+.role.admin { background: var(--red-soft); color: var(--red); }
+.role.support { background: var(--blue-soft); color: var(--blue); }
+
+.body { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 20px 20px; }
+.body.flush { padding: 0; display: flex; min-height: 0; overflow: hidden; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+.stat { padding: 14px; border-radius: 14px; background: var(--cell); }
+.stat small { display: block; }
+.stat b { display: block; margin-top: 4px; font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+.sec { margin-bottom: 18px; }
+
+/* tombol aksi cepat (bukan .actions — bentrok kit) */
+.qa { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.qa button { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; border-radius: 12px; background: var(--cell); text-align: left; font-size: 13px; font-weight: 600; }
+.qa button:hover:not(:disabled) { background: var(--cell-2); }
+.qa button small { font-weight: 400; font-size: 11px; }
+.qa button.on { box-shadow: inset 0 0 0 2px var(--green); }
+.qa button.on .sq { background: var(--green); }
+.qa button:disabled { opacity: .3; cursor: not-allowed; }
+.qa.cols3 { grid-template-columns: repeat(3, 1fr); }
+.range { display: flex; align-items: center; gap: 10px; }
+.range input { flex: 1; accent-color: var(--accent); }
+.qa.cols5 { grid-template-columns: repeat(5, 1fr); }
+.qa.cols6 { grid-template-columns: repeat(6, 1fr); }
+
+/* daftar pemain */
+.plist { width: 420px; flex: none; display: flex; flex-direction: column; border-right: 1px solid var(--sep); }
+.plist .search { width: auto; margin: 0 16px 10px; }
+.plist .scroll { flex: 1; overflow-y: auto; padding: 0 10px 14px; }
+.prow { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border-radius: 10px; text-align: left; }
+.prow:hover { background: var(--fill); }
+.prow.sel { background: var(--accent-soft); }
+.prow .id { width: 36px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.prow .t { flex: 1; min-width: 0; }
+.prow .t b { display: block; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prow .t small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ping { font-size: 11px; color: var(--label-2); font-variant-numeric: tabular-nums; }
+.pdetail { flex: 1; min-width: 0; overflow-y: auto; padding: 0 20px 20px; }
+.phead { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.phead .av { width: 54px; height: 54px; font-size: 20px; background: var(--accent-soft); color: var(--accent); }
+.phead h2 { font-size: 20px; }
+.kv { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+.kv div { padding: 9px 11px; border-radius: 10px; background: var(--cell); }
+.kv small { display: block; font-size: 11px; }
+.kv b { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.btns button { display: flex; align-items: center; justify-content: center; gap: 6px; height: 36px; border-radius: 10px; background: var(--fill); font-size: 13px; font-weight: 600; }
+.btns button:hover:not(:disabled) { background: var(--fill-2); }
+.btns button .ic { width: 15px; height: 15px; color: var(--accent); }
+.btns button.red { background: var(--red-soft); color: var(--red); }
+.btns button.red .ic { color: var(--red); }
+.btns button.red:hover:not(:disabled) { background: var(--red); color: #fff; }
+.btns button:disabled { opacity: .3; cursor: not-allowed; }
+.btns button .lk { width: 12px; height: 12px; color: var(--label-2); }
+.gh { margin: 16px 0 8px; font-size: 12px; color: var(--label-2); text-transform: uppercase; letter-spacing: .02em; }
+
+/* izin command */
+.perm-top { display: flex; align-items: center; gap: 10px; padding: 0 20px 10px; }
+.perm-top .search { width: 260px; }
+.ptable { width: 100%; border-collapse: collapse; }
+.ptable th { position: sticky; top: 0; z-index: 1; background: #141416; padding: 8px 10px; text-align: left; font-size: 11px; font-weight: 600; color: var(--label-2); text-transform: uppercase; letter-spacing: .03em; }
+.ptable th.c, .ptable td.c { width: 96px; text-align: center; }
+.ptable td { padding: 7px 10px; border-top: 1px solid var(--sep); font-size: 13px; }
+.ptable td code { font-family: Consolas, monospace; font-size: 13px; color: var(--label); }
+.ptable td small { display: block; font-size: 11px; }
+.ptable tr.grp td { background: var(--cell); font-weight: 700; font-size: 12px; color: var(--accent); }
+.ptable .switch { display: inline-block; vertical-align: middle; transform: scale(.85); }
+.ptable .switch.lock { opacity: .3; cursor: not-allowed; }
+.ptable .switch.fixed { cursor: not-allowed; }
+.lockchip { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: 11px; background: var(--fill); color: var(--label-2); font-size: 11px; font-weight: 600; }
+.lockchip .ic { width: 11px; height: 11px; }
+
+/* item & kendaraan */
+.igrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+.it { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 6px 8px; border-radius: 12px; background: var(--cell); font-size: 12px; font-weight: 600; text-align: center; }
+.it:hover { background: var(--cell-2); }
+.it.sel { box-shadow: inset 0 0 0 2px var(--accent); }
+.it img, .it .ph { width: 52px; height: 52px; object-fit: contain; }
+.it .ph { display: grid; place-items: center; border-radius: 12px; background: var(--fill); color: var(--label-2); font-size: 18px; }
+.it small { font-size: 10px; font-weight: 400; }
+.it .ph .ic { width: 26px; height: 26px; stroke-width: 1.6; }
+.cart { display: flex; flex-direction: column; gap: 6px; }
+.cart .row-c { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px; background: var(--cell); }
+.cart .row-c img { width: 30px; height: 30px; object-fit: contain; }
+.cart .row-c .t { flex: 1; font-size: 13px; font-weight: 600; }
+.cart .row-c input { width: 64px; height: 30px; text-align: center; }
+.split2 { flex: 1; min-width: 0; display: flex; gap: 0; height: 100%; }
+.split2 > .l { flex: 1; min-width: 0; overflow-y: auto; padding: 0 16px 16px 20px; }
+.split2 > .r { width: 330px; flex: none; display: flex; flex-direction: column; gap: 10px; padding: 0 20px 16px 16px; border-left: 1px solid var(--sep); overflow-y: auto; }
+.target { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: var(--cell); }
+.target select { flex: 1; }
+.logprev { padding: 10px 12px; border-radius: 10px; background: #2b2d31; border-left: 4px solid #5865f2; font-size: 12px; color: #dbdee1; line-height: 1.5; }
+.logprev b { color: #fff; }
+.logprev .ts { display: block; margin-top: 4px; font-size: 10px; color: #949ba4; }
+
+/* laporan */
+.rep { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 14px; background: var(--cell); }
+.rep .h { display: flex; align-items: center; gap: 8px; }
+.rep .h b { font-size: 14px; }
+.rep p { font-size: 13px; color: var(--label-2); }
+.rep .bar-b { display: flex; gap: 6px; }
+.rep input { flex: 1; height: 32px; }
+
+/* laporan: chat */
+.rchat { display: flex; flex-direction: column; height: 100%; gap: 10px; }
+.rchat-h { display: flex; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--sep); }
+.rthread { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.bub { max-width: 70%; padding: 8px 11px; border-radius: 14px; font-size: 13px; line-height: 1.4; }
+.bub .who { display: block; font-size: 11px; font-weight: 700; margin-bottom: 2px; }
+.bub small { display: block; font-size: 10px; margin-top: 2px; opacity: .6; }
+.bub.in { align-self: flex-start; background: var(--cell-2); border-bottom-left-radius: 4px; }
+.bub.in .who { color: var(--accent); }
+.bub.out { align-self: flex-end; background: var(--accent); color: var(--on-accent); border-bottom-right-radius: 4px; }
+.rreply { display: flex; gap: 8px; }
+.rreply input { flex: 1; }
+.body.chat { overflow: hidden; }
+
+/* modal & toast */
+.modal-bg { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; background: rgba(0, 0, 0, .55); }
+.modal { width: 420px; padding: 18px; border-radius: 18px; background: #1c1c1e; display: flex; flex-direction: column; gap: 12px; }
+.modal h2 { font-size: 17px; }
+.modal .row2 { display: flex; gap: 8px; }
+.modal .row2 > * { flex: 1; }
+.modal input, .modal select, .modal textarea { width: 100%; }
+.toast { position: absolute; left: 50%; bottom: 18px; z-index: 9; transform: translateX(-50%); max-width: 620px; padding: 10px 16px; border-radius: 12px; background: #2c2c2e; box-shadow: 0 6px 18px rgba(0, 0, 0, .4); font-size: 13px; }
+.toast.ok { border-left: 4px solid var(--green); }
+.toast.bad { border-left: 4px solid var(--red); }
+
+/* mockup saja: pemilih role */
+.mock-bar { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 20; display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 14px; border-radius: 14px; background: #000c; font-size: 12px; color: var(--label-2); }
+.mock-bar .seg { width: 260px; }
+</style>
+</head>
+<body>
+
+<!-- ikon (sprite, sekali muat) -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6"/><path d="M16 4a4 4 0 0 1 0 8M22 21c0-3-2-5-4-5.5"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17h14v-5l-2-5H7l-2 5z"/><circle cx="7.5" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/><path d="M5 12h14"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-ghost" viewBox="0 0 24 24"><path d="M5 21V10a7 7 0 0 1 14 0v11l-2.5-2-2.5 2-2-2-2 2-2.5-2z"/><circle cx="9.5" cy="10" r="1"/><circle cx="14.5" cy="10" r="1"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-3 4.5 4.5 0 0 1 8 3c0 6-8 11-8 11z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-7 7-12a7 7 0 0 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.5"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14"/></symbol>
+  <symbol id="i-arrow-in" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></symbol>
+  <symbol id="i-arrow-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M14 7l5 5-5 5M19 12H8"/></symbol>
+  <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-cash" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></symbol>
+  <symbol id="i-shirt" viewBox="0 0 24 24"><path d="M8 3l4 2 4-2 5 4-3 3v11H6V10L3 7z"/></symbol>
+  <symbol id="i-skull" viewBox="0 0 24 24"><path d="M5 11a7 7 0 0 1 14 0v4h-2v4H7v-4H5z"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/></symbol>
+  <symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M4 4h16v12H8l-4 4z"/></symbol>
+  <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3M3 13h18"/></symbol>
+  <symbol id="i-return" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></symbol>
+  <symbol id="i-broom" viewBox="0 0 24 24"><path d="M19 3l-7 7M9 11l4 4-3 6-7-7z"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18a5 5 0 1 1 1-9.9A6 6 0 0 1 19.5 10 4 4 0 0 1 18 18z"/></symbol>
+  <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></symbol>
+  <symbol id="i-gun" viewBox="0 0 24 24"><path d="M3 8h17v4h-6l-1 3h-3l-1 5H5l1-5H3z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><circle cx="7" cy="12" r="4"/><circle cx="17" cy="12" r="4"/><path d="M11 12h2"/></symbol>
+  <symbol id="i-chair" viewBox="0 0 24 24"><path d="M7 3v9h10V3M5 12h14v3H5zM7 15v6M17 15v6"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+  <symbol id="i-mute" viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4zM17 9l5 6M22 9l-5 6"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 18l4-6"/></symbol>
+  <symbol id="i-plate" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M6 12h3M11 12h2M15 12h3"/></symbol>
+  <symbol id="i-garage" viewBox="0 0 24 24"><path d="M3 21V9l9-6 9 6v12M7 21v-8h10v8M7 17h10"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+</svg>
+
+<div class="mock-bar">MOCKUP · lihat sebagai
+  <div class="seg" id="mockRole">
+    <button data-r="owner">Owner</button><button data-r="admin" class="active">Admin</button><button data-r="support">Support</button>
+  </div>
+</div>
+
+<div class="panel split adm" id="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo"><svg class="ic"><use href="#i-shield"/></svg></div>
+      <div><h1>Admin</h1><small>Foreplay Indonesia</small></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="av" id="meAv">S</div>
+      <div><b id="meName">Sandi</b><span class="role" id="meRole">Admin</span></div>
+    </div>
+  </aside>
+
+  <section class="detail">
+    <div class="detail-h">
+      <div><div class="lt" id="pgTitle">Ringkasan</div><small id="pgSub"></small></div>
+      <div class="head-actions"><button class="icon-btn close" id="btnClose" title="Tutup (ESC)"><svg class="ic"><use href="#i-x"/></svg></button></div>
+    </div>
+    <div class="body" id="page"></div>
+  </section>
+
+  <div id="modal"></div>
+  <div class="toast hidden" id="toast"></div>
+</div>
+
+<script>
+'use strict';
+/* =====================================================================
+   MOCKUP f_admin — semua data di bawah palsu. Di versi asli data datang
+   dari server (callback) dan setiap aksi dicek ulang role di server.
+   ===================================================================== */
+const IMG = '../%5Box%5D/ox_inventory/web/images/';   // in-game: nui://ox_inventory/web/images/
+const ROLE_LABEL = { owner: 'Owner', admin: 'Admin', support: 'Support' };
+const ME = { name: 'Sandi', id: 3 };
+let role = 'admin';
+
+const players = [
+  { id: 1,  name: 'Budi Santoso',    ooc: 'budi_gg',     cid: 'F4821937', job: 'Polisi · Bripda', gang: '-',         cash: 250000, bank: 4100000, ping: 38, hp: 100, ar: 50 },
+  { id: 3,  name: 'Sandi Pratama',   ooc: 'sandi',       cid: 'F1029384', job: 'Pengangguran',    gang: '-',         cash: 12000,  bank: 900000,  ping: 21, hp: 100, ar: 0, staff: 'admin' },
+  { id: 5,  name: 'Rina Wulandari',  ooc: 'rinaa',       cid: 'F7730291', job: 'EMS · Perawat',   gang: '-',         cash: 80000,  bank: 2300000, ping: 55, hp: 100, ar: 0 },
+  { id: 7,  name: 'Agus Hermawan',   ooc: 'agusx',       cid: 'F3391827', job: 'Mekanik · Staf',  gang: 'Kobra',     cash: 410000, bank: 600000,  ping: 74, hp: 62,  ar: 0 },
+  { id: 9,  name: 'Dewi Lestari',    ooc: 'dewi.l',      cid: 'F5582013', job: 'Cafe · Barista',  gang: '-',         cash: 30000,  bank: 1500000, ping: 41, hp: 100, ar: 0, staff: 'support' },
+  { id: 12, name: 'Joko Susilo',     ooc: 'jokoo',       cid: 'F9910283', job: 'Sampah · Kru',    gang: '-',         cash: 5000,   bank: 120000,  ping: 102, hp: 0,  ar: 0 },
+  { id: 14, name: 'Fajar Nugroho',   ooc: 'fajarN',      cid: 'F2208371', job: 'Pengangguran',    gang: 'Naga Hitam', cash: 990000, bank: 50000,  ping: 63, hp: 100, ar: 100 },
+  { id: 18, name: 'Siti Rahmawati',  ooc: 'sitirah',     cid: 'F6650129', job: 'Pemerintah',      gang: '-',         cash: 150000, bank: 8800000, ping: 33, hp: 100, ar: 0 },
+  { id: 21, name: 'Rizky Ramadhan',  ooc: 'rizkyy',      cid: 'F4419028', job: 'Kurir · Kru',     gang: '-',         cash: 22000,  bank: 340000,  ping: 88, hp: 100, ar: 0 },
+  { id: 25, name: 'Andi Wijaya',     ooc: 'andiw',       cid: 'F8037712', job: 'Penambang',       gang: 'Kobra',     cash: 64000,  bank: 710000,  ping: 47, hp: 100, ar: 0 },
+];
+players.forEach((p, i) => Object.assign(p, { food: 40 + (i * 13) % 60, water: 30 + (i * 17) % 70, stress: (i * 11) % 80,
+  phone: '08' + (1200000000 + p.id * 7351177), radio: i % 3 ? '-' : (100 + i) + '.0', repc: (i * 7) % 50, repd: (i * 3) % 30 }));
+const items = [
+  ['bandage', 'Perban'], ['firstaid', 'P3K'], ['water', 'Air Mineral'], ['burger', 'Burger'], ['lockpick', 'Lockpick'],
+  ['phone', 'HP'], ['radio', 'Radio'], ['repairkit', 'Repair Kit'], ['weapon_pistol', 'Pistol'], ['ammo-9', 'Peluru 9mm'],
+  ['money', 'Uang Tunai'],
+];
+const vehicles = [
+  ['asbo', 'Maxwell Asbo', 'Compact'], ['sultan', 'Karin Sultan', 'Sedan'], ['kuruma', 'Karin Kuruma', 'Sport'],
+  ['bati', 'Pegassi Bati 801', 'Motor'], ['faggio', 'Pegassi Faggio', 'Motor'], ['police', 'Police Cruiser', 'Darurat'],
+  ['ambulance', 'Ambulance', 'Darurat'], ['towtruck', 'Tow Truck', 'Servis'], ['adder', 'Truffade Adder', 'Super'],
+  ['rumpo', 'Bravado Rumpo', 'Van'], ['sanchez', 'Maibatsu Sanchez', 'Motor'], ['baller', 'Gallivanter Baller', 'SUV'],
+];
+const reports = [
+  { id: 41, from: 'Joko Susilo', pid: 12, cat: 'Nyangkut / bug', ago: '2 mnt', claimed: null, unread: 1, msgs: [
+    { w: 1, t: 'Bang mobil saya nyangkut di dalam tembok garasi Pillbox', at: '21:02' } ] },
+  { id: 40, from: 'Rizky Ramadhan', pid: 21, cat: 'Pemain melanggar', target: 14, ago: '6 mnt', claimed: 'Dewi', unread: 1, msgs: [
+    { w: 1, t: 'Ada yang nembak random di Legion', at: '20:58' },
+    { w: 0, who: 'Dewi · Support', t: 'Oke saya cek, kamu masih di Legion?', at: '20:59' },
+    { w: 1, t: 'Iya bang masih, dia pakai mobil hitam', at: '21:00' } ] },
+  { id: 38, from: 'Andi Wijaya', pid: 25, cat: 'Item / uang hilang', ago: '19 mnt', claimed: null, unread: 0, msgs: [
+    { w: 1, t: 'Item hilang setelah relog, 3 copper', at: '20:45' } ] },
+];
+let staff = [
+  { name: 'foreplay_indonesia', lic: 'fivem:16512194', role: 'owner', online: false },
+  { name: 'Sandi Pratama', lic: 'license2:3b28ac…c0271', role: 'admin', online: true, id: 3 },
+  { name: 'tifaa', lic: 'fivem:14278571', role: 'admin', online: false },
+  { name: 'Dewi Lestari', lic: 'license2:9a01f2…77d1e', role: 'support', online: true, id: 9 },
+];
+
+/* ---------- daftar izin: command chat + aksi panel ----------
+   a/s = boleh untuk Admin/Support. money:true = hanya Owner (dikunci). */
+const perms = [
+  { g: 'Panel Admin', items: [
+    { k: 'panel.open',      d: 'Buka panel admin (/admin)', a: 1, s: 1 },
+    { k: 'self.noclip',     d: 'Noclip (/noclip)', a: 1, s: 1 },
+    { k: 'self.godmode',    d: 'God mode', a: 1, s: 0 },
+    { k: 'self.invisible',  d: 'Tidak terlihat', a: 1, s: 1 },
+    { k: 'self.names',      d: 'Nama di atas kepala (/names)', a: 1, s: 1 },
+    { k: 'self.blips',      d: 'Blip semua pemain (/blips)', a: 1, s: 1 },
+    { k: 'self.vehgod',     d: 'Godmode kendaraan', a: 1, s: 0 },
+    { k: 'self.ammo',       d: 'Amunisi tak terbatas', a: 1, s: 0 },
+    { k: 'self.ped',        d: 'Ganti model ped (/setmodel)', a: 1, s: 0 },
+    { k: 'self.weapons',    d: 'Beri semua senjata per kategori', a: 1, s: 0 },
+    { k: 'self.cuff',       d: 'Borgol / lepas borgol', a: 1, s: 1 },
+    { k: 'player.goto',     d: 'Teleport ke pemain', a: 1, s: 1 },
+    { k: 'player.bring',    d: 'Tarik pemain ke saya', a: 1, s: 1 },
+    { k: 'player.spectate', d: 'Spectate pemain', a: 1, s: 1 },
+    { k: 'player.freeze',   d: 'Bekukan pemain', a: 1, s: 1 },
+    { k: 'player.revive',   d: 'Revive / heal pemain', a: 1, s: 1 },
+    { k: 'player.dm',       d: 'Kirim pesan ke pemain', a: 1, s: 1 },
+    { k: 'player.sitveh',   d: 'Duduk di kendaraan pemain', a: 1, s: 1 },
+    { k: 'player.bucket',   d: 'Ubah routing bucket pemain', a: 1, s: 0 },
+    { k: 'player.mute',     d: 'Mute suara pemain', a: 1, s: 1 },
+    { k: 'player.setdata',  d: 'Ubah nama / makan / minum / stres', a: 1, s: 0 },
+    { k: 'player.kick',     d: 'Kick pemain', a: 1, s: 1 },
+    { k: 'player.ban',      d: 'Ban pemain', a: 1, s: 0 },
+    { k: 'player.unban',    d: 'Lihat Daftar Ban & cabut ban', a: 1, s: 0 },
+    { k: 'player.kill',     d: 'Bunuh pemain', a: 1, s: 0 },
+    { k: 'player.inventory',d: 'Buka inventaris pemain', a: 1, s: 0 },
+    { k: 'player.clothing', d: 'Menu pakaian pemain', a: 1, s: 0 },
+    { k: 'player.setjob',   d: 'Ubah job / gang pemain', a: 1, s: 0 },
+    { k: 'give.item',       d: 'Beri item (log Discord)', a: 1, s: 0 },
+    { k: 'give.vehicle',    d: 'Beri kendaraan ke garasi (log Discord)', a: 1, s: 0 },
+    { k: 'give.money',      d: 'Beri / atur uang', a: 0, s: 0, money: true },
+    { k: 'vehicle.spawn',   d: 'Spawn kendaraan sementara', a: 1, s: 0 },
+    { k: 'vehicle.fix',     d: 'Perbaiki / bersihkan kendaraan', a: 1, s: 1 },
+    { k: 'vehicle.delete',  d: 'Hapus kendaraan terdekat', a: 1, s: 1 },
+    { k: 'vehicle.save',    d: 'Beli kendaraan (simpan ke garasi sendiri)', a: 1, s: 0 },
+    { k: 'vehicle.tune',    d: 'Tuning kendaraan', a: 1, s: 0 },
+    { k: 'vehicle.plate',   d: 'Ganti plat kendaraan', a: 1, s: 0 },
+    { k: 'server.weather',  d: 'Ganti cuaca', a: 1, s: 0 },
+    { k: 'server.time',     d: 'Ganti waktu', a: 1, s: 0 },
+    { k: 'server.radio',    d: 'Daftar pemain di frekuensi radio', a: 1, s: 1 },
+    { k: 'server.stash',    d: 'Buka stash berdasarkan nama', a: 1, s: 0 },
+    { k: 'reports.manage',  d: 'Lihat & balas laporan', a: 1, s: 1 },
+    { k: 'dev.tools',       d: 'Alat developer (koordinat, entity)', a: 1, s: 0 },
+  ]},
+  { g: 'f_admin (command chat)', items: [
+    { k: '/report',     d: 'Kirim laporan ke staff (semua pemain)', a: 1, s: 1, fixed: true },
+    { k: '/admincar',   d: 'Simpan kendaraan yang dinaiki ke garasi sendiri', a: 1, s: 0 },
+    { k: '/givecar',    d: 'Beri kendaraan ke garasi pemain', a: 1, s: 0 },
+    { k: '/setmodel',   d: 'Ganti model ped', a: 1, s: 0 },
+    { k: '/vec2',       d: 'Salin vector2', a: 1, s: 0 },
+    { k: '/vec3',       d: 'Salin vector3', a: 1, s: 0 },
+    { k: '/vec4',       d: 'Salin vector4', a: 1, s: 0 },
+    { k: '/heading',    d: 'Salin heading', a: 1, s: 0 },
+    { k: '/addsociety', d: 'Tambah akun society', a: 1, s: 0 },
+  ]},
+  { g: 'qbx_core', items: [
+    { k: '/givemoney', d: 'Beri uang ke pemain', a: 0, s: 0, money: true },
+    { k: '/setmoney',  d: 'Atur uang pemain', a: 0, s: 0, money: true },
+    { k: '/setjob',    d: 'Atur job pemain', a: 1, s: 0 },
+    { k: '/setgang',   d: 'Atur gang pemain', a: 1, s: 0 },
+    { k: '/tp',        d: 'Teleport ke koordinat/pemain', a: 1, s: 1 },
+    { k: '/tpm',       d: 'Teleport ke waypoint', a: 1, s: 1 },
+    { k: '/car',       d: 'Spawn kendaraan', a: 1, s: 0 },
+    { k: '/dv',        d: 'Hapus kendaraan', a: 1, s: 1 },
+    { k: '/revive',    d: 'Revive pemain', a: 1, s: 1 },
+    { k: '/kill',      d: 'Bunuh pemain', a: 1, s: 0 },
+    { k: '/logout',    d: 'Kembali ke pilih karakter', a: 1, s: 0 },
+    { k: '/openserver',  d: 'Buka server untuk umum', a: 1, s: 0 },
+    { k: '/closeserver', d: 'Tutup server', a: 1, s: 0 },
+  ]},
+  { g: 'ox_inventory', items: [
+    { k: '/giveitem',   d: 'Beri item', a: 1, s: 0 },
+    { k: '/removeitem', d: 'Hapus item', a: 1, s: 0 },
+    { k: '/clearinv',   d: 'Kosongkan inventaris', a: 1, s: 0 },
+    { k: '/viewinv',    d: 'Lihat inventaris', a: 1, s: 0 },
+    { k: '/clearevidence', d: 'Bersihkan evidence', a: 1, s: 0 },
+  ]},
+  { g: 'f_dirtymoney', items: [
+    { k: '/givedirty', d: 'Beri uang kotor', a: 0, s: 0, money: true },
+  ]},
+  { g: 'f_stash · f_blips · f_garages · lainnya', items: [
+    { k: '/stash',      d: 'Editor stash', a: 1, s: 0, patched: true },
+    { k: '/blips',      d: 'Editor blip', a: 1, s: 0, patched: true },
+    { k: '/garasi',     d: 'Editor garasi', a: 1, s: 0 },
+    { k: '/spawnrumah', d: 'Editor spawn rumah', a: 1, s: 0 },
+    { k: '/tolatur',    d: 'Editor tol', a: 1, s: 0 },
+    { k: '/papannama',  d: 'Editor papan nama', a: 1, s: 0 },
+    { k: '/announce',   d: 'Pengumuman kota', a: 1, s: 1 },
+  ]},
+  { g: 'f_anticheat', items: [
+    { k: 'anticheat.exempt', d: 'Kebal anti-cheat (noclip/teleport/speed tidak ditandai)', a: 1, s: 1 },
+    { k: '/ac',              d: 'Alat anti-cheat (status, unban)', a: 1, s: 0 },
+  ]},
+];
+const PERM = {};
+perms.forEach(g => g.items.forEach(p => PERM[p.k] = p));
+const can = k => {
+  const p = PERM[k];
+  if (role === 'owner') return true;
+  if (!p) return false;
+  return role === 'admin' ? !!p.a : !!p.s;
+};
+
+/* ---------- util ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const ic = n => `<svg class="ic"><use href="#i-${n}"/></svg>`;
+const rp = n => 'Rp ' + n.toLocaleString('id-ID');
+const ini = s => s.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+const img = (name, label) => `<img src="${IMG}${name}.png" alt="" onerror="this.outerHTML='<div class=ph>${esc(label[0])}</div>'">`;
+let toastT;
+function toast(text, bad) {
+  const t = $('#toast');
+  t.className = 'toast ' + (bad ? 'bad' : 'ok');
+  t.innerHTML = text;
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.add('hidden'), 3800);
+}
+function logDiscord(text) { toast('Log Discord terkirim: ' + text); }
+
+/* ---------- navigasi ---------- */
+const PAGES = [
+  { id: 'home',    t: 'Ringkasan',      i: 'home',     sub: 'Aksi cepat untuk diri sendiri', need: 'panel.open' },
+  { id: 'players', t: 'Pemain',         i: 'users',    sub: 'Pemain online', need: 'panel.open' },
+  { id: 'items',   t: 'Beri Item',      i: 'box',      sub: 'Kirim item ke pemain · tercatat di Discord', need: 'give.item' },
+  { id: 'veh',     t: 'Kendaraan',      i: 'car',      sub: 'Spawn sementara atau beri ke garasi pemain', need: 'vehicle.spawn' },
+  { id: 'reports', t: 'Laporan',        i: 'flag',     sub: 'Laporan dari /report', need: 'reports.manage' },
+  { id: 'server',  t: 'Server',         i: 'server',   sub: 'Cuaca, waktu, radio, stash', need: 'server.radio' },
+  { id: 'bans',    t: 'Daftar Ban',     i: 'ban',      sub: 'Ban HWID dari panel & anti-cheat', need: 'player.unban' },
+  { id: 'dev',     t: 'Developer',      i: 'code',     sub: 'Koordinat & entity', need: 'dev.tools' },
+  { sep: 'Owner' },
+  { id: 'staff',   t: 'Staff',          i: 'shield',   sub: 'Angkat / hapus admin & support', owner: true },
+  { id: 'perms',   t: 'Daftar Command', i: 'key',      sub: 'Atur command & aksi yang boleh untuk Admin dan Support', owner: true },
+  { id: 'logs',    t: 'Log Discord',    i: 'send',     sub: 'Webhook & jenis log', owner: true },
+];
+let page = 'home';
+const pageOk = p => p.owner ? role === 'owner' : (p.id === 'veh' ? (can('vehicle.spawn') || can('vehicle.fix'))
+  : p.id === 'server' ? ['server.weather', 'server.time', 'server.radio', 'server.stash'].some(can) : can(p.need));
+
+function renderNav() {
+  $('#nav').innerHTML = PAGES.map(p => {
+    if (p.sep) return role === 'owner' ? `<div class="sep-h">${p.sep}</div>` : '';
+    if (!pageOk(p)) return '';
+    const rc = reports.filter(r => !r.claimed || r.unread).length;
+    const badge = p.id === 'reports' && rc ? `<span class="bubble">${rc}</span>` : '';
+    return `<button data-p="${p.id}" class="${p.id === page ? 'active' : ''}">${ic(p.i)}${p.t}${badge}</button>`;
+  }).join('');
+  $('#meRole').className = 'role ' + role;
+  $('#meRole').textContent = ROLE_LABEL[role];
+}
+$('#nav').addEventListener('click', e => {
+  const b = e.target.closest('button[data-p]');
+  if (b) go(b.dataset.p);
+});
+function go(id) {
+  const p = PAGES.find(x => x.id === id);
+  if (!p || !pageOk(p)) id = 'home';
+  page = id;
+  const cur = PAGES.find(x => x.id === id);
+  $('#pgTitle').textContent = cur.t;
+  $('#pgSub').textContent = cur.sub;
+  renderNav();
+  const el = $('#page');
+  el.className = 'body' + (['players', 'items', 'veh', 'perms'].includes(id) ? ' flush' : '') + (id === 'reports' ? ' chat' : '');
+  if (id !== 'reports') repOpen = null;
+  el.onclick = null; el.oninput = null; el.onchange = null; el.onkeydown = null; el.style.flexDirection = '';
+  R[id](el);
+}
+
+/* ---------- tombol dengan izin ---------- */
+const pbtn = (k, label, icon, act, cls = '') =>
+  `<button data-act="${act}" class="${cls}" ${can(k) ? '' : 'disabled title="Tidak punya izin"'}>${ic(icon)}${label}${can(k) ? '' : `<svg class="ic lk"><use href="#i-lock"/></svg>`}</button>`;
+
+const R = {};
+
+/* ===== RINGKASAN ===== */
+const selfState = { noclip: false, god: false, invis: false, names: false, blips: false, vehgod: false, ammo: false, cuff: false };
+R.home = el => {
+  const q = (k, st, t, d, i, c) =>
+    `<button data-self="${st}" class="${selfState[st] ? 'on' : ''}" ${can(k) ? '' : 'disabled'}><span class="sq" style="--c:${c}">${ic(i)}</span><span>${t}<small style="display:block">${d}</small></span></button>`;
+  const a = (k, act, t, d, i, c) =>
+    `<button data-do="${act}" ${can(k) ? '' : 'disabled'}><span class="sq" style="--c:${c}">${ic(i)}</span><span>${t}<small style="display:block">${d}</small></span></button>`;
+  el.innerHTML = `
+    <div class="stats">
+      <div class="stat"><small>Pemain online</small><b class="num">${players.length}<span class="t-muted" style="font-size:14px"> / 64</span></b></div>
+      <div class="stat"><small>Staff online</small><b class="num">${staff.filter(s => s.online).length}</b></div>
+      <div class="stat"><small>Laporan terbuka</small><b class="num t-orange">${reports.filter(r => !r.claimed).length}</b></div>
+      <div class="stat"><small>Uptime server</small><b class="num">5j 12m</b></div>
+    </div>
+    <div class="sec"><div class="group-h">Mode staff</div><div class="qa">
+      ${q('self.noclip', 'noclip', 'Noclip', 'Terbang tembus objek', 'ghost', 'var(--purple)')}
+      ${q('self.godmode', 'god', 'God Mode', 'Tidak bisa mati', 'star', 'var(--accent)')}
+      ${q('self.invisible', 'invis', 'Tidak Terlihat', 'Pemain lain tak melihat', 'eye', 'var(--teal)')}
+      ${q('self.names', 'names', 'Nama Pemain', 'ID & nama di kepala', 'tag', 'var(--blue)')}
+      ${q('self.blips', 'blips', 'Blip Pemain', 'Semua pemain di peta', 'pin', 'var(--green)')}
+      ${q('self.vehgod', 'vehgod', 'Godmode Kendaraan', 'Kendaraan tidak rusak', 'shield', 'var(--orange)')}
+      ${q('self.ammo', 'ammo', 'Amunisi Tak Terbatas', 'Tidak perlu reload', 'gun', 'var(--red)')}
+      ${q('self.cuff', 'cuff', 'Borgol', 'Borgol / lepas diri sendiri', 'link', 'var(--gray)')}
+    </div></div>
+    <div class="sec"><div class="group-h">Aksi cepat</div><div class="qa cols3">
+      ${a('player.revive', 'revself', 'Revive Diri', 'Hidup + darah penuh', 'heart', 'var(--red)')}
+      ${a('/tpm', 'tpm', 'Ke Waypoint', 'Teleport ke tanda peta', 'pin', 'var(--orange)')}
+      ${a('vehicle.fix', 'fix', 'Perbaiki Kendaraan', 'Kendaraan yang dinaiki', 'wrench', 'var(--gray)')}
+      ${a('vehicle.delete', 'dv', 'Hapus Kendaraan', 'Terdekat / dinaiki', 'trash', 'var(--red)')}
+      ${a('/announce', 'announce', 'Pengumuman', 'Kirim ke tab Pengumuman', 'msg', 'var(--blue)')}
+      ${a('panel.open', 'back', 'Kembali', 'Ke posisi sebelum teleport', 'return', 'var(--gray)')}
+      ${a('self.ped', 'ped', 'Ganti Model Ped', 'Contoh a_m_m_soucent_04', 'user', 'var(--purple)')}
+      ${a('self.weapons', 'weapons', 'Beri Semua Senjata', 'Per kategori ke diri sendiri', 'gun', 'var(--red)')}
+      ${a('player.revive', 'heal', 'Heal Diri', 'Darah & armor penuh', 'heart', 'var(--green)')}
+    </div></div>
+    <div class="notice">${role === 'support'
+      ? 'Kamu <b>Support</b>: bantu & pantau kota. Noclip/teleport kebal anti-cheat, tapi setiap aksi tercatat di Discord.'
+      : role === 'admin' ? 'Kamu <b>Admin</b>: semua fitur kecuali memberi/mengatur uang.' : 'Kamu <b>Owner</b>: akses penuh.'}</div>`;
+  el.onclick = e => {
+    const s = e.target.closest('[data-self]');
+    if (s) {
+      const k = s.dataset.self;
+      selfState[k] = !selfState[k];
+      s.classList.toggle('on', selfState[k]);
+      if (k === 'noclip') logDiscord(`<b>${ME.name}</b> ${selfState[k] ? 'menyalakan' : 'mematikan'} noclip`);
+      return;
+    }
+    const d = e.target.closest('[data-do]');
+    if (!d) return;
+    if (d.dataset.do === 'announce') return modalAnnounce();
+    if (d.dataset.do === 'ped') return modal('<h2>Ganti Model Ped</h2><input id="pm" placeholder="a_m_m_soucent_04">', () => toast('Model diganti ke ' + esc($('#pm').value || 'a_m_m_soucent_04')));
+    if (d.dataset.do === 'weapons') return modal(`<h2>Beri Semua Senjata</h2><select id="wc">${['Pistol', 'SMG', 'Shotgun', 'Assault', 'LMG', 'Sniper', 'Heavy'].map(x => `<option>${x}</option>`).join('')}</select><p class="hint t-muted">Ke diri sendiri. Tercatat di Discord.</p>`, () => logDiscord(`<b>${ME.name}</b> mengambil semua senjata kategori ${$('#wc').value}`));
+    toast({ heal: 'Darah & armor penuh', revself: 'Kamu di-revive', tpm: 'Teleport ke waypoint', fix: 'Kendaraan diperbaiki', dv: 'Kendaraan dihapus', back: 'Kembali ke posisi sebelumnya' }[d.dataset.do]);
+  };
+};
+
+/* ===== PEMAIN ===== */
+let selP = 1, pq = '';
+R.players = el => {
+  el.innerHTML = `
+    <div class="plist">
+      <label class="search">${ic('search')}<input id="pq" placeholder="Cari nama, ID, citizenid" value="${esc(pq)}"></label>
+      <div class="scroll" id="plRows"></div>
+    </div>
+    <div class="pdetail" id="pDet"></div>`;
+  rows(); det();
+  el.oninput = e => { if (e.target.id === 'pq') { pq = e.target.value; rows(); } };
+  el.onclick = e => {
+    const r = e.target.closest('.prow');
+    if (r) { selP = +r.dataset.id; rows(); det(); return; }
+    const b = e.target.closest('button[data-act]');
+    if (b && !b.disabled) playerAct(b.dataset.act);
+  };
+};
+function rows() {
+  const q = pq.toLowerCase();
+  const list = players.filter(p => !q || String(p.id) === q || p.name.toLowerCase().includes(q) || p.cid.toLowerCase().includes(q) || p.ooc.toLowerCase().includes(q));
+  $('#plRows').innerHTML = list.map(p => `
+    <button class="prow ${p.id === selP ? 'sel' : ''}" data-id="${p.id}">
+      <span class="id">${p.id}</span>
+      <span class="t"><b>${esc(p.name)} ${p.staff ? `<span class="role ${p.staff}">${ROLE_LABEL[p.staff]}</span>` : ''}</b><small>${esc(p.job)} · ${esc(p.ooc)}</small></span>
+      ${p.hp === 0 ? '<span class="chip red">Pingsan</span>' : ''}
+      <span class="ping">${p.ping}ms</span>
+    </button>`).join('') || '<div class="empty">Tidak ada pemain</div>';
+}
+function det() {
+  const p = players.find(x => x.id === selP);
+  if (!p) { $('#pDet').innerHTML = '<div class="empty">Pilih pemain</div>'; return; }
+  $('#pDet').innerHTML = `
+    <div class="phead">
+      <div class="av">${ini(p.name)}</div>
+      <div><h2>${esc(p.name)}</h2><small>ID ${p.id} · ${esc(p.ooc)} · ${p.cid}</small></div>
+    </div>
+    <div class="kv">
+      <div><small>Job</small><b>${esc(p.job)}</b></div>
+      <div><small>Gang</small><b>${esc(p.gang)}</b></div>
+      <div><small>Uang tunai</small><b>${rp(p.cash)}</b></div>
+      <div><small>Bank</small><b>${rp(p.bank)}</b></div>
+      <div><small>Darah / Armor</small><b>${p.hp} / ${p.ar}</b></div>
+      <div><small>Makan / Minum</small><b>${p.food}% / ${p.water}%</b></div>
+      <div><small>Stres</small><b>${p.stress}%</b></div>
+      <div><small>Ping</small><b>${p.ping} ms</b></div>
+      <div><small>No HP</small><b>${p.phone}</b></div>
+      <div><small>Radio</small><b>${p.radio}</b></div>
+      <div><small>Rep. Crafting</small><b>${p.repc}</b></div>
+      <div><small>Rep. Dealer</small><b>${p.repd}</b></div>
+    </div>
+    <div class="gh">Bantuan</div>
+    <div class="btns">
+      ${pbtn('player.goto', 'Datangi', 'arrow-in', 'goto')}
+      ${pbtn('player.bring', 'Tarik', 'arrow-out', 'bring')}
+      ${pbtn('player.spectate', 'Spectate', 'eye', 'spectate')}
+      ${pbtn('player.freeze', 'Bekukan', 'snow', 'freeze')}
+      ${pbtn('player.revive', 'Revive', 'heart', 'revive')}
+      ${pbtn('player.dm', 'Pesan', 'msg', 'dm')}
+      ${pbtn('vehicle.fix', 'Perbaiki Mobil', 'wrench', 'fixveh')}
+      ${pbtn('player.goto', 'Kembalikan', 'return', 'sendback')}
+      ${pbtn('player.sitveh', 'Duduk di Mobil', 'chair', 'sitveh')}
+      ${pbtn('player.bucket', 'Routing Bucket', 'layers', 'bucket')}
+      ${pbtn('player.mute', 'Mute', 'mute', 'mute')}
+    </div>
+    <div class="gh">Data pemain</div>
+    <div class="btns">
+      ${pbtn('give.item', 'Beri Item', 'box', 'giveitem')}
+      ${pbtn('give.vehicle', 'Beri Mobil', 'car', 'giveveh')}
+      ${pbtn('give.money', 'Beri Uang', 'cash', 'givemoney')}
+      ${pbtn('player.setjob', 'Job / Gang', 'briefcase', 'setjob')}
+      ${pbtn('player.inventory', 'Inventaris', 'box', 'inv')}
+      ${pbtn('player.clothing', 'Pakaian', 'shirt', 'cloth')}
+      ${pbtn('player.setdata', 'Ubah Data', 'edit', 'setdata')}
+    </div>
+    <div class="gh">Sanksi</div>
+    <div class="btns">
+      ${pbtn('player.kick', 'Kick', 'arrow-out', 'kick', 'red')}
+      ${pbtn('player.ban', 'Ban', 'ban', 'ban', 'red')}
+      ${pbtn('player.kill', 'Bunuh', 'skull', 'kill', 'red')}
+    </div>
+    ${role !== 'owner' ? '<p class="hint t-muted" style="margin-top:12px">Tombol terkunci = tidak diizinkan untuk role kamu (diatur Owner di Daftar Command).</p>' : ''}`;
+}
+function playerAct(a) {
+  const p = players.find(x => x.id === selP);
+  const n = `<b>${esc(p.name)}</b>`;
+  switch (a) {
+    case 'giveitem': selTarget = p.id; return go('items');
+    case 'giveveh': return modalGiveVeh(p);
+    case 'givemoney': return modalMoney(p);
+    case 'setjob': return modalJob(p);
+    case 'setdata': return modalData(p);
+    case 'bucket': return modal(`<h2>Routing bucket ${esc(p.name)}</h2><input id="rb" type="number" min="0" value="0"><p class="hint t-muted">0 = dunia normal.</p>`, () => toast(`${n} dipindah ke bucket ${+$('#rb').value || 0}`));
+    case 'sitveh': return toast(`Duduk di kendaraan ${n}`);
+    case 'mute': return logDiscord(`<b>${ME.name}</b> mute suara ${n}`);
+    case 'dm': return modalText(`Pesan ke ${esc(p.name)}`, 'Tulis pesan…', v => toast(`Pesan terkirim ke ${n}`));
+    case 'kick': return modalText(`Kick ${esc(p.name)}`, 'Alasan kick', v => logDiscord(`<b>${ME.name}</b> kick ${n}: ${esc(v)}`));
+    case 'ban': return modalBan(p);
+    case 'goto': return logDiscord(`<b>${ME.name}</b> teleport ke ${n}`);
+    case 'bring': return logDiscord(`<b>${ME.name}</b> menarik ${n}`);
+    case 'spectate': return logDiscord(`<b>${ME.name}</b> spectate ${n}`);
+    case 'revive': return logDiscord(`<b>${ME.name}</b> revive ${n}`);
+    case 'freeze': return logDiscord(`<b>${ME.name}</b> membekukan ${n}`);
+    case 'kill': return logDiscord(`<b>${ME.name}</b> membunuh ${n}`);
+    default: toast({ fixveh: 'Kendaraan pemain diperbaiki', sendback: 'Pemain dikembalikan ke posisi semula', inv: 'Membuka inventaris ' + n, cloth: 'Membuka menu pakaian ' + n }[a]);
+  }
+}
+
+/* ===== BERI ITEM ===== */
+let selTarget = 1, cart = [], iq = '';
+const playerOpts = sel => players.map(p => `<option value="${p.id}" ${p.id === sel ? 'selected' : ''}>[${p.id}] ${esc(p.name)}</option>`).join('');
+R.items = el => {
+  el.innerHTML = `
+    <div class="split2">
+      <div class="l">
+        <label class="search" style="width:auto;margin-bottom:12px">${ic('search')}<input id="iq" placeholder="Cari item (nama atau kode)" value="${esc(iq)}"></label>
+        <div class="igrid" id="igrid"></div>
+      </div>
+      <div class="r">
+        <div class="group-h" style="padding-top:0">Penerima</div>
+        <div class="target"><select id="tgt">${playerOpts(selTarget)}</select></div>
+        <div class="group-h">Keranjang</div>
+        <div class="cart" id="cart"></div>
+        <div class="group-h">Pratinjau log Discord</div>
+        <div class="logprev" id="lp"></div>
+        <button class="b b-filled b-block" id="sendItems">${ic('send')} Kirim ke pemain</button>
+      </div>
+    </div>`;
+  grid(); cartR();
+  el.oninput = e => {
+    if (e.target.id === 'iq') { iq = e.target.value; grid(); }
+    if (e.target.dataset.q) { const c = cart.find(x => x[0] === e.target.dataset.q); c[2] = Math.max(1, +e.target.value || 1); lp(); }
+  };
+  el.onchange = e => { if (e.target.id === 'tgt') { selTarget = +e.target.value; lp(); } };
+  el.onclick = e => {
+    const it = e.target.closest('.it');
+    if (it) {
+      const i = items.find(x => x[0] === it.dataset.n);
+      const c = cart.find(x => x[0] === i[0]);
+      if (c) c[2]++; else cart.push([i[0], i[1], 1]);
+      grid(); cartR(); return;
+    }
+    const rm = e.target.closest('[data-rm]');
+    if (rm) { cart = cart.filter(x => x[0] !== rm.dataset.rm); grid(); cartR(); return; }
+    if (e.target.closest('#sendItems')) {
+      if (!cart.length) return toast('Keranjang kosong', true);
+      logDiscord(lpText()); cart = []; grid(); cartR();
+    }
+  };
+};
+function grid() {
+  const q = iq.toLowerCase();
+  // uang tunai = item 'money' → hanya Owner (role lain tidak ditampilkan)
+  $('#igrid').innerHTML = items.filter(i => (i[0] !== 'money' || can('give.money')) && (!q || i[0].includes(q) || i[1].toLowerCase().includes(q)))
+    .map(i => `<button class="it ${cart.some(c => c[0] === i[0]) ? 'sel' : ''}" data-n="${i[0]}">${img(i[0], i[1])}${esc(i[1])}<small class="t-muted">${i[0]}</small></button>`).join('');
+}
+function cartR() {
+  $('#cart').innerHTML = cart.map(c => `
+    <div class="row-c">${img(c[0], c[1])}<span class="t">${esc(c[1])}</span>
+      <input type="number" min="1" value="${c[2]}" data-q="${c[0]}">
+      <button class="icon-btn close" data-rm="${c[0]}">${ic('x')}</button></div>`).join('') || '<div class="empty" style="padding:16px">Klik item di kiri untuk menambah</div>';
+  lp();
+}
+function lpText() {
+  const p = players.find(x => x.id === selTarget);
+  return `<b>${ME.name}</b> memberikan ${cart.map(c => `${esc(c[1].toLowerCase())}${c[2] > 1 ? ' x' + c[2] : ''}`).join(', ') || '…'} ke <b>${esc(p.name)}</b>`;
+}
+function lp() { $('#lp').innerHTML = lpText() + `<span class="ts">${ROLE_LABEL[role]} · ID ${ME.id} → ID ${selTarget} · ${new Date().toLocaleTimeString('id-ID').slice(0, 5)}</span>`; }
+
+/* ===== KENDARAAN ===== */
+let vq = '', selV = 'sultan';
+R.veh = el => {
+  el.innerHTML = `
+    <div class="split2">
+      <div class="l">
+        <label class="search" style="width:auto;margin-bottom:12px">${ic('search')}<input id="vq" placeholder="Cari kendaraan (nama atau spawn code)" value="${esc(vq)}"></label>
+        <div class="igrid" id="vgrid"></div>
+      </div>
+      <div class="r">
+        <div class="group-h" style="padding-top:0">Dipilih</div>
+        <div class="target" id="vsel"></div>
+        <button class="b b-tinted b-block" id="vSpawn" ${can('vehicle.spawn') ? '' : 'disabled'}>${ic('bolt')} Spawn sementara</button>
+        <div class="group-h">Beri ke garasi pemain</div>
+        <div class="target"><select id="vtgt">${playerOpts(selTarget)}</select></div>
+        <p class="hint t-muted">Kendaraan masuk ke garasi pemain dengan plat format <b>F 1234 R</b> + kunci fisik, dan tercatat di Discord.</p>
+        <button class="b b-filled b-block" id="vGive" ${can('give.vehicle') ? '' : 'disabled'}>${ic('send')} Beri kendaraan</button>
+        <div class="group-h">Kendaraan saat ini</div>
+        <div class="qa cols3">
+          <button data-v="fix" ${can('vehicle.fix') ? '' : 'disabled'}><span class="sq" style="--c:var(--gray)">${ic('wrench')}</span>Perbaiki</button>
+          <button data-v="clean" ${can('vehicle.fix') ? '' : 'disabled'}><span class="sq" style="--c:var(--teal)">${ic('broom')}</span>Bersihkan</button>
+          <button data-v="dv" ${can('vehicle.delete') ? '' : 'disabled'}><span class="sq" style="--c:var(--red)">${ic('trash')}</span>Hapus</button>
+          <button data-v="save" ${can('vehicle.save') ? '' : 'disabled'}><span class="sq" style="--c:var(--green)">${ic('garage')}</span>Beli / Simpan</button>
+          <button data-v="tune" ${can('vehicle.tune') ? '' : 'disabled'}><span class="sq" style="--c:var(--purple)">${ic('gauge')}</span>Tuning</button>
+          <button data-v="plate" ${can('vehicle.plate') ? '' : 'disabled'}><span class="sq" style="--c:var(--blue)">${ic('plate')}</span>Ganti Plat</button>
+        </div>
+      </div>
+    </div>`;
+  vgrid(); vsel();
+  el.oninput = e => { if (e.target.id === 'vq') { vq = e.target.value; vgrid(); } };
+  el.onchange = e => { if (e.target.id === 'vtgt') selTarget = +e.target.value; };
+  el.onclick = e => {
+    const v = e.target.closest('.it');
+    if (v) { selV = v.dataset.n; vgrid(); vsel(); return; }
+    const veh = vehicles.find(x => x[0] === selV);
+    if (e.target.closest('#vSpawn')) return toast(`${veh[1]} di-spawn`);
+    if (e.target.closest('#vGive')) {
+      const p = players.find(x => x.id === selTarget);
+      return logDiscord(`<b>${ME.name}</b> memberikan kendaraan ${esc(veh[1])} (F 4821 R) ke <b>${esc(p.name)}</b>`);
+    }
+    const b = e.target.closest('[data-v]');
+    if (!b) return;
+    if (b.dataset.v === 'plate') return modal('<h2>Ganti Plat</h2><input id="np" placeholder="F 1234 R" maxlength="8">', () => toast('Plat diganti ke ' + esc($('#np').value || 'F 1234 R')));
+    if (b.dataset.v === 'tune') return modal(`<h2>Tuning Kendaraan</h2><div class="group">${['Mesin', 'Rem', 'Transmisi', 'Suspensi', 'Armor', 'Turbo'].map(x => `<div class="row"><span class="t">${x}</span><select style="width:110px;height:32px"><option>Standar</option><option>Lv 1</option><option>Lv 2</option><option>Lv 3</option><option selected>Maks</option></select></div>`).join('')}</div>`, () => toast('Tuning diterapkan'));
+    if (b.dataset.v === 'save') return logDiscord(`<b>${ME.name}</b> menyimpan kendaraan ${esc(veh[1])} ke garasinya sendiri`);
+    toast({ fix: 'Kendaraan diperbaiki', clean: 'Kendaraan dibersihkan', dv: 'Kendaraan dihapus' }[b.dataset.v]);
+  };
+};
+function vgrid() {
+  const q = vq.toLowerCase();
+  $('#vgrid').innerHTML = vehicles.filter(v => !q || v[0].includes(q) || v[1].toLowerCase().includes(q))
+    .map(v => `<button class="it ${v[0] === selV ? 'sel' : ''}" data-n="${v[0]}"><div class="ph">${ic('car')}</div>${esc(v[1])}<small class="t-muted">${v[0]} · ${v[2]}</small></button>`).join('');
+}
+function vsel() {
+  const v = vehicles.find(x => x[0] === selV);
+  $('#vsel').innerHTML = `<div class="sq" style="--c:var(--accent)">${ic('car')}</div><div class="t" style="flex:1"><b>${esc(v[1])}</b><small class="t-muted" style="display:block">${v[0]} · ${v[2]}</small></div>`;
+}
+
+/* ===== LAPORAN ===== */
+/* daftar dulu → klik baru buka chat (tidak banyak scroll) */
+let repOpen = null;
+const repStatus = r => r.claimed ? `<span class="chip blue">${esc(r.claimed)}</span>` : '<span class="chip orange">Baru</span>';
+R.reports = el => {
+  if (repOpen === null) {
+    el.innerHTML = reports.length ? `<div class="group">${reports.map(r => {
+      const last = r.msgs[r.msgs.length - 1];
+      return `<button class="row" data-ro="${r.id}">
+        <div class="t"><b>#${r.id} · ${esc(r.from)}</b> <small style="display:inline">ID ${r.pid} · ${r.cat} · ${r.ago} lalu</small>
+          ${r.unread ? `<span class="bubble" style="margin-left:4px">${r.unread}</span>` : ''}
+          <small>${last.w ? esc(r.from.split(' ')[0]) : esc(last.who.split(' ')[0])}: ${esc(last.t)}</small></div>
+        ${repStatus(r)}<svg class="ic chev"><use href="#i-chev"/></svg>
+      </button>`;
+    }).join('')}</div>` : '<div class="empty">Tidak ada laporan</div>';
+  } else {
+    const r = reports.find(x => x.id === repOpen);
+    r.unread = 0; renderNav();
+    el.innerHTML = `
+      <div class="rchat">
+        <div class="rchat-h">
+          <button class="icon-btn" data-ra="back" title="Kembali">${ic('back')}</button>
+          <div class="t" style="flex:1"><b>#${r.id} · ${esc(r.from)}</b><small class="t-muted" style="display:block">ID ${r.pid} · ${r.cat}${r.target ? ` · terlapor ID ${r.target}` : ''}</small></div>
+          ${repStatus(r)}
+          <button class="b b-sm b-gray" data-ra="goto" ${can('player.goto') ? '' : 'disabled'}>Datangi</button>
+          <button class="b b-sm b-gray" data-ra="bring" ${can('player.bring') ? '' : 'disabled'}>Tarik</button>
+          ${r.claimed ? '' : '<button class="b b-sm b-tinted" data-ra="claim">Tangani</button>'}
+          <button class="b b-sm b-green-tint" data-ra="close">Selesai</button>
+        </div>
+        <div class="rthread" id="rth">${r.msgs.map(m => m.w
+          ? `<div class="bub in"><span class="who">${esc(r.from)}</span>${esc(m.t)}<small>${m.at}</small></div>`
+          : `<div class="bub out"><span class="who">${esc(m.who)}</span>${esc(m.t)}<small>${m.at}</small></div>`).join('')}</div>
+        <div class="rreply"><input id="rin" placeholder="Balas ke ${esc(r.from)}… (warga melihat kamu sebagai &quot;Staff&quot;)"><button class="b b-sm b-filled" data-ra="send">${ic('send')} Kirim</button></div>
+      </div>`;
+    $('#rth').scrollTop = $('#rth').scrollHeight;
+  }
+  el.onclick = e => {
+    const o = e.target.closest('[data-ro]');
+    if (o) { repOpen = +o.dataset.ro; return R.reports(el); }
+    const b = e.target.closest('[data-ra]');
+    if (!b || b.disabled) return;
+    const r = reports.find(x => x.id === repOpen);
+    switch (b.dataset.ra) {
+      case 'back': repOpen = null; return R.reports(el);
+      case 'claim': r.claimed = ME.name; R.reports(el); return toast(`Laporan #${r.id} kamu tangani`);
+      case 'close': reports.splice(reports.indexOf(r), 1); repOpen = null; R.reports(el); renderNav(); return toast(`Laporan #${r.id} selesai · warga dapat notifikasi`);
+      case 'goto': return logDiscord(`<b>${ME.name}</b> teleport ke <b>${esc(r.from)}</b> (laporan #${r.id})`);
+      case 'bring': return logDiscord(`<b>${ME.name}</b> menarik <b>${esc(r.from)}</b> (laporan #${r.id})`);
+      case 'send': {
+        const v = $('#rin').value.trim();
+        if (!v) return;
+        if (!r.claimed) r.claimed = ME.name;
+        r.msgs.push({ w: 0, who: `${ME.name} · ${ROLE_LABEL[role]}`, t: v, at: new Date().toLocaleTimeString('id-ID').slice(0, 5) });
+        R.reports(el);
+        return toast('Balasan terkirim · warga dapat notifikasi 10 detik');
+      }
+    }
+  };
+  el.onkeydown = e => { if (e.key === 'Enter' && e.target.id === 'rin') el.querySelector('[data-ra="send"]').click(); };
+};
+
+/* ===== DEVELOPER ===== */
+R.dev = el => {
+  el.innerHTML = `
+    <div class="grid2">
+      <div><div class="group-h">Koordinat saya</div>
+        <div class="group">
+          <div class="row"><span class="t">vector2</span><span class="d">-269.41, -955.31</span><button class="icon-btn" data-c="vec2">${ic('copy')}</button></div>
+          <div class="row"><span class="t">vector3</span><span class="d">-269.41, -955.31, 31.22</span><button class="icon-btn" data-c="vec3">${ic('copy')}</button></div>
+          <div class="row"><span class="t">vector4</span><span class="d">-269.41, -955.31, 31.22, 205.8</span><button class="icon-btn" data-c="vec4">${ic('copy')}</button></div>
+          <div class="row"><span class="t">Heading</span><span class="d">205.8</span><button class="icon-btn" data-c="heading">${ic('copy')}</button></div>
+        </div>
+      </div>
+      <div><div class="group-h">Tampilan</div>
+        <div class="group">
+          <div class="row"><span class="t">Tampilkan koordinat di layar</span><button class="switch" data-sw></button></div>
+          <div class="row"><span class="t">Info kendaraan yang dinaiki</span><button class="switch" data-sw></button></div>
+        </div>
+        <div class="group-h" style="margin-top:16px">Entity view</div>
+        <div class="group">
+          <div class="row"><span class="t">Freeaim (arahkan & lihat info)</span><button class="switch" data-sw></button></div>
+          <div class="row"><span class="t">Objek</span><button class="switch" data-sw></button></div>
+          <div class="row"><span class="t">Kendaraan</span><button class="switch" data-sw></button></div>
+          <div class="row"><span class="t">Ped</span><button class="switch" data-sw></button></div>
+          <div class="row"><span class="t">Jarak</span><div class="range" style="width:180px"><input type="range" min="5" max="100" value="20" id="evd"><b class="num" id="evdv">20 m</b></div></div>
+          <div class="row"><span class="t">Hapus entity yang dibidik</span><button class="b b-sm b-red-tint">Hapus</button></div>
+        </div>
+      </div>
+    </div>`;
+  el.onclick = e => {
+    const s = e.target.closest('[data-sw]');
+    if (s) s.classList.toggle('on');
+    const c = e.target.closest('[data-c]');
+    if (c) toast(`${c.dataset.c} disalin ke clipboard`);
+  };
+  el.oninput = e => { if (e.target.id === 'evd') $('#evdv').textContent = e.target.value + ' m'; };
+};
+
+/* ===== SERVER ===== */
+const WEATHER = [['EXTRASUNNY', 'Cerah terik'], ['CLEAR', 'Cerah'], ['NEUTRAL', 'Netral'], ['SMOG', 'Kabut asap'], ['FOGGY', 'Berkabut'], ['OVERCAST', 'Mendung'],
+  ['CLOUDS', 'Berawan'], ['CLEARING', 'Mulai cerah'], ['RAIN', 'Hujan'], ['THUNDER', 'Badai petir'], ['SNOW', 'Salju'], ['BLIZZARD', 'Badai salju'],
+  ['SNOWLIGHT', 'Salju ringan'], ['XMAS', 'Natal'], ['HALLOWEEN', 'Halloween']];
+let wNow = 'CLEAR';
+R.server = el => {
+  el.innerHTML = `
+    <div class="grid2">
+      <div>
+        <div class="group-h">Cuaca</div>
+        <div class="filters" id="wx">${WEATHER.map(w => `<button data-w="${w[0]}" class="${w[0] === wNow ? 'active' : ''}" ${can('server.weather') ? '' : 'disabled'}>${w[1]}</button>`).join('')}</div>
+        <div class="group-h" style="margin-top:16px">Waktu</div>
+        <div class="group"><div class="row">
+          <span class="t">Jam</span>
+          <select id="hh" style="width:110px;height:32px" ${can('server.time') ? '' : 'disabled'}>${Array.from({ length: 24 }, (_, h) => `<option ${h === 12 ? 'selected' : ''}>${String(h).padStart(2, '0')}:00</option>`).join('')}</select>
+          <button class="b b-sm b-tinted" id="setT" ${can('server.time') ? '' : 'disabled'}>Terapkan</button>
+        </div></div>
+      </div>
+      <div>
+        <div class="group-h">Daftar radio</div>
+        <div class="group" style="padding:12px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:8px"><input id="fq" type="number" min="0" max="1000" placeholder="Frekuensi, mis. 100" style="flex:1" ${can('server.radio') ? '' : 'disabled'}><button class="b b-sm b-tinted" id="fqB" ${can('server.radio') ? '' : 'disabled'}>Cari</button></div>
+          <div id="fqR" class="t-muted" style="font-size:13px">Masukkan frekuensi untuk melihat siapa saja di dalamnya.</div>
+        </div>
+        <div class="group-h" style="margin-top:16px">Buka stash</div>
+        <div class="group" style="padding:12px;display:flex;gap:8px">
+          <input id="st" placeholder="Nama stash, mis. police_evidence" style="flex:1" ${can('server.stash') ? '' : 'disabled'}><button class="b b-sm b-tinted" id="stB" ${can('server.stash') ? '' : 'disabled'}>Buka</button>
+        </div>
+      </div>
+    </div>`;
+  el.onclick = e => {
+    const w = e.target.closest('[data-w]');
+    if (w && !w.disabled) { wNow = w.dataset.w; el.querySelectorAll('#wx button').forEach(x => x.classList.toggle('active', x === w)); return toast('Cuaca diganti: ' + w.textContent); }
+    if (e.target.closest('#setT')) return toast('Waktu diganti ke ' + $('#hh').value);
+    if (e.target.closest('#fqB')) {
+      const f = +$('#fq').value || 100;
+      $('#fqR').innerHTML = `<div class="group">${players.slice(0, 3).map(p => `<div class="row"><span class="t">[${p.id}] ${esc(p.name)}</span><span class="d">${f}.0</span></div>`).join('')}</div>`;
+      return;
+    }
+    if (e.target.closest('#stB')) toast('Membuka stash ' + esc($('#st').value || '…'));
+  };
+};
+
+/* ===== DAFTAR BAN ===== */
+const bans = [
+  { id: 12, name: 'Fajar Nugroho', lic: 'license2:7f3a…21c9', reason: 'RDM berulang', by: 'Sandi', src: 'Panel', until: '02 Nov 2026 21:20', ids: 4, hw: 5 },
+  { id: 11, name: 'xX_Modder_Xx', lic: 'license2:1b9e…f04a', reason: 'Speed hack (kecepatan 412 km/j)', by: 'Anti-cheat', src: 'Anti-cheat', until: 'Permanen', ids: 5, hw: 6, alt: 2 },
+  { id: 9,  name: 'Doni Saputra', lic: 'license2:aa21…9d30', reason: 'Exploit duplikasi item', by: 'tifaa', src: 'Panel', until: 'Permanen', ids: 3, hw: 4 },
+];
+let bq = '';
+R.bans = el => {
+  el.innerHTML = `
+    <div class="toolbar" style="padding:0 0 10px"><label class="search">${ic('search')}<input id="bq" placeholder="Cari nama, license, alasan" value="${esc(bq)}"></label><small>Ban mencocokkan semua identifier + hardware token (HWID). Akun baru dari PC yang sama ikut tertolak.</small></div>
+    <table class="ptable"><thead><tr><th>Pemain</th><th>Alasan</th><th>Sumber</th><th>Identitas</th><th>Sampai</th><th class="c"></th></tr></thead><tbody id="bRows"></tbody></table>`;
+  const draw = () => {
+    const q = bq.toLowerCase();
+    $('#bRows').innerHTML = bans.filter(b => !q || (b.name + b.lic + b.reason).toLowerCase().includes(q)).map(b => `
+      <tr><td><b>${esc(b.name)}</b><small class="t-muted">${esc(b.lic)}</small></td>
+        <td>${esc(b.reason)}<small class="t-muted">oleh ${esc(b.by)}</small></td>
+        <td><span class="chip ${b.src === 'Panel' ? 'accent' : 'red'}">${b.src}</span></td>
+        <td><small class="t-muted" style="font-size:12px">${b.ids} ID · ${b.hw} HWID${b.alt ? ` · <span class="t-orange">${b.alt} akun baru tertolak</span>` : ''}</small></td>
+        <td class="num">${b.until}</td>
+        <td class="c"><button class="b b-sm b-green-tint" data-unban="${b.id}">Cabut</button></td></tr>`).join('') || '<tr><td colspan="6"><div class="empty">Tidak ada ban</div></td></tr>';
+  };
+  draw();
+  el.oninput = e => { if (e.target.id === 'bq') { bq = e.target.value; draw(); } };
+  el.onclick = e => {
+    const u = e.target.closest('[data-unban]');
+    if (!u) return;
+    const b = bans.find(x => x.id === +u.dataset.unban);
+    bans.splice(bans.indexOf(b), 1); draw();
+    logDiscord(`<b>${ME.name}</b> mencabut ban <b>${esc(b.name)}</b>`);
+  };
+};
+
+/* ===== STAFF (Owner) ===== */
+R.staff = el => {
+  el.innerHTML = `
+    <div class="grid2">
+      <div><div class="group-h">Staff terdaftar</div>
+        <div class="group">${staff.map((s, i) => `
+          <div class="row">
+            <div class="av">${ini(s.name)}</div>
+            <div class="t"><b>${esc(s.name)}</b> ${s.online ? '<span class="chip green">Online</span>' : ''}<small>${esc(s.lic)}</small></div>
+            ${s.role === 'owner' ? '<span class="role owner">Owner</span><span class="lockchip">' + ic('lock') + 'server.cfg</span>' : `
+            <select data-role="${i}" style="width:110px;height:32px">
+              <option value="admin" ${s.role === 'admin' ? 'selected' : ''}>Admin</option>
+              <option value="support" ${s.role === 'support' ? 'selected' : ''}>Support</option>
+            </select>
+            <button class="icon-btn close" data-del="${i}" title="Copot">${ic('trash')}</button>`}
+          </div>`).join('')}
+        </div>
+        <p class="group-f">Owner hanya bisa diatur di server.cfg. Admin & Support cukup dari sini — tidak perlu edit server.cfg. Langsung aktif tanpa restart.</p>
+      </div>
+      <div><div class="group-h">Tambah staff</div>
+        <div class="group" style="padding:14px;display:flex;flex-direction:column;gap:10px">
+          <label><span>Pemain online</span><select id="addP" style="width:100%">${players.filter(p => !p.staff).map(p => `<option value="${p.id}">[${p.id}] ${esc(p.name)}</option>`).join('')}</select></label>
+          <label><span>Atau identifier (license2 / fivem / discord)</span><input id="addL" placeholder="license2:xxxxxxxx" style="width:100%"></label>
+          <label><span>Role</span>
+            <div class="seg" id="addR"><button data-r="admin">Admin</button><button data-r="support" class="active">Support</button></div></label>
+          <button class="b b-filled b-block" id="addBtn">${ic('plus')} Angkat jadi staff</button>
+        </div>
+        <div class="group-h" style="margin-top:16px">Akses txAdmin <span style="text-transform:none">(akun txAdmin tetap ditambah manual di web txAdmin)</span></div>
+        <div class="group">
+          <div class="row"><span class="role admin">Admin</span><span class="t">Semua kecuali kelola admin, pengaturan txAdmin & Ban</span></div>
+          <div class="row"><span class="role support">Support</span><span class="t">Main: Player Mode, Teleport, Vehicle, Show IDs · Players: Spectate, DM, Warn, Kick, Freeze, Heal</span></div>
+        </div>
+      </div>
+    </div>`;
+  el.onclick = e => {
+    const r = e.target.closest('#addR button');
+    if (r) { el.querySelectorAll('#addR button').forEach(x => x.classList.toggle('active', x === r)); return; }
+    const d = e.target.closest('[data-del]');
+    if (d) { const s = staff[+d.dataset.del]; staff.splice(+d.dataset.del, 1); R.staff(el); return logDiscord(`<b>${ME.name}</b> mencopot ${esc(s.name)} dari ${ROLE_LABEL[s.role]}`); }
+    if (e.target.closest('#addBtn')) {
+      const p = players.find(x => x.id === +$('#addP').value);
+      const rr = el.querySelector('#addR .active').dataset.r;
+      const lic = $('#addL').value.trim();
+      const name = lic || p.name;
+      staff.push({ name, lic: lic || 'license2:…', role: rr, online: !lic, id: p && p.id });
+      if (!lic && p) p.staff = rr;
+      R.staff(el);
+      logDiscord(`<b>${ME.name}</b> mengangkat ${esc(name)} menjadi ${ROLE_LABEL[rr]}`);
+    }
+  };
+  el.onchange = e => {
+    const s = e.target.closest('[data-role]');
+    if (s) { const st = staff[+s.dataset.role]; st.role = s.value; logDiscord(`<b>${ME.name}</b> mengubah ${esc(st.name)} menjadi ${ROLE_LABEL[st.role]}`); }
+  };
+};
+
+/* ===== DAFTAR COMMAND (Owner) ===== */
+let cq = '', cf = 'all';
+R.perms = el => {
+  el.style.flexDirection = 'column';
+  el.innerHTML = `
+    <div class="perm-top">
+      <label class="search">${ic('search')}<input id="cq" placeholder="Cari command atau aksi" value="${esc(cq)}"></label>
+      <div class="filters" id="cf">
+        <button data-f="all" class="${cf === 'all' ? 'active' : ''}">Semua</button>
+        <button data-f="s" class="${cf === 's' ? 'active' : ''}">Boleh Support</button>
+        <button data-f="lock" class="${cf === 'lock' ? 'active' : ''}">Khusus Owner</button>
+      </div>
+      <span class="spacer"></span>
+      <small class="num" id="ccount"></small>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:0 20px 20px" id="pwrap"></div>`;
+  ptable();
+  el.oninput = e => { if (e.target.id === 'cq') { cq = e.target.value; ptable(); } };
+  el.onclick = e => {
+    const f = e.target.closest('[data-f]');
+    if (f) { cf = f.dataset.f; el.querySelectorAll('#cf button').forEach(x => x.classList.toggle('active', x === f)); ptable(); return; }
+    const sw = e.target.closest('.switch[data-k]');
+    if (!sw || sw.classList.contains('lock') || sw.classList.contains('fixed')) return;
+    const p = PERM[sw.dataset.k];
+    p[sw.dataset.c] = p[sw.dataset.c] ? 0 : 1;
+    if (sw.dataset.c === 'a' && !p.a) p.s = 0;          // support tidak boleh melebihi admin
+    if (sw.dataset.c === 's' && p.s) p.a = 1;
+    // ubah satu baris saja (tidak render ulang tabel → posisi scroll tetap)
+    const tr = sw.closest('tr');
+    tr.querySelector('[data-c="a"]').classList.toggle('on', !!p.a);
+    tr.querySelector('[data-c="s"]').classList.toggle('on', !!p.s);
+    toast(`Disimpan · ${p.k}: Admin ${p.a ? '✓' : '✗'} · Support ${p.s ? '✓' : '✗'}`);
+  };
+};
+function ptable() {
+  const q = cq.toLowerCase();
+  let n = 0;
+  const body = perms.map(g => {
+    const rows = g.items.filter(p => (!q || p.k.toLowerCase().includes(q) || p.d.toLowerCase().includes(q))
+      && (cf === 'all' || (cf === 's' && p.s) || (cf === 'lock' && p.money)));
+    n += rows.length;
+    if (!rows.length) return '';
+    return `<tr class="grp"><td colspan="3">${esc(g.g)}</td></tr>` + rows.map(p => `
+      <tr>
+        <td><code>${esc(p.k)}</code>${p.patched ? ' <span class="lockchip">dicek script</span>' : ''}<small class="t-muted">${esc(p.d)}</small></td>
+        <td class="c">${p.money ? `<span class="lockchip">${ic('lock')}Owner</span>` : p.fixed ? '<span class="lockchip">Semua</span>' : `<button class="switch ${p.a ? 'on' : ''}" data-k="${p.k}" data-c="a"></button>`}</td>
+        <td class="c">${p.money ? `<span class="lockchip">${ic('lock')}Owner</span>` : p.fixed ? '<span class="lockchip">Semua</span>' : `<button class="switch ${p.s ? 'on' : ''}" data-k="${p.k}" data-c="s"></button>`}</td>
+      </tr>`).join('');
+  }).join('');
+  $('#pwrap').innerHTML = `
+    <div class="notice" style="margin-bottom:10px">Daftar dibaca otomatis dari semua command yang terdaftar di server + aksi panel. Perubahan langsung aktif tanpa restart. Command uang selalu <b>khusus Owner</b> — Admin diblok walau mengetik command langsung. Command bertanda <span class="lockchip">dicek script</span> sudah di-patch supaya ikut aturan ini.</div>
+    <table class="ptable"><thead><tr><th>Command / aksi</th><th class="c">Admin</th><th class="c">Support</th></tr></thead><tbody>${body}</tbody></table>`;
+  $('#ccount').textContent = n + ' item';
+}
+
+/* ===== LOG DISCORD (Owner) ===== */
+const logCfg = { item: 1, vehicle: 1, money: 1, staff: 1, noclip: 1, teleport: 1, spectate: 1, revive: 1, kick: 1, ban: 1, job: 1, data: 1, weapons: 1, mute: 1 };
+R.logs = el => {
+  const L = [['item', 'Beri item'], ['vehicle', 'Beri kendaraan'], ['money', 'Beri / atur uang'], ['staff', 'Angkat / copot staff'],
+             ['noclip', 'Noclip on/off'], ['teleport', 'Datangi / tarik pemain'], ['spectate', 'Spectate'], ['revive', 'Revive'],
+             ['kick', 'Kick'], ['ban', 'Ban / cabut ban'], ['job', 'Ubah job / gang'], ['data', 'Ubah data pemain'], ['weapons', 'Ambil semua senjata'], ['mute', 'Mute pemain']];
+  el.innerHTML = `
+    <div class="grid2">
+      <div>
+        <div class="group-h">Webhook</div>
+        <div class="group">
+          <div class="row"><span class="t">Status<small>Diatur di server.cfg: <code>set f_admin_webhook "https://discord.com/api/webhooks/…"</code></small></span><span class="chip green">Terhubung</span></div>
+          <div class="row"><span class="t">Kirim pesan uji</span><button class="b b-sm b-tinted" id="testWh">Uji</button></div>
+        </div>
+        <p class="group-f">URL webhook tidak pernah dikirim ke client. Log tidak disimpan di database.</p>
+        <div class="group-h" style="margin-top:16px">Contoh pesan</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="logprev"><b>Sandi</b> memberikan perban x2, pistol, peluru 9mm x50 ke <b>Budi Santoso</b><span class="ts">Admin · ID 3 → ID 1 · 21:14</span></div>
+          <div class="logprev" style="border-color:#f0b232"><b>Dewi</b> menyalakan noclip<span class="ts">Support · ID 9 · 21:16</span></div>
+          <div class="logprev" style="border-color:#f23f43"><b>Sandi</b> ban <b>Fajar Nugroho</b> 3 hari: RDM berulang<span class="ts">Admin · ID 3 → ID 14 · 21:20</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="group-h">Jenis log yang dikirim</div>
+        <div class="group">${L.map(([k, t]) => `<div class="row"><span class="t">${t}</span><button class="switch ${logCfg[k] ? 'on' : ''}" data-lg="${k}"></button></div>`).join('')}</div>
+      </div>
+    </div>`;
+  el.onclick = e => {
+    const s = e.target.closest('[data-lg]');
+    if (s) { logCfg[s.dataset.lg] ^= 1; s.classList.toggle('on'); return; }
+    if (e.target.closest('#testWh')) toast('Pesan uji terkirim ke Discord');
+  };
+};
+
+/* ---------- modal ---------- */
+function modal(html, onOk) {
+  $('#modal').innerHTML = `<div class="modal-bg"><div class="modal">${html}
+    <div class="row2"><button class="b b-gray" data-m="x">Batal</button><button class="b b-filled" data-m="ok">Kirim</button></div></div></div>`;
+  $('#modal').onclick = e => {
+    const b = e.target.closest('[data-m]');
+    if (e.target.classList.contains('modal-bg') || (b && b.dataset.m === 'x')) return closeModal();
+    if (b && b.dataset.m === 'ok') { if (onOk() !== false) closeModal(); }
+  };
+  const f = $('#modal').querySelector('input,textarea');
+  if (f) f.focus();
+}
+const closeModal = () => { $('#modal').innerHTML = ''; };
+function modalText(title, ph, cb) {
+  modal(`<h2>${title}</h2><textarea id="mt" placeholder="${ph}"></textarea>`, () => {
+    const v = $('#mt').value.trim();
+    if (!v) { toast('Isi dulu', true); return false; }
+    cb(v);
+  });
+}
+function modalAnnounce() { modalText('Pengumuman kota', 'Isi pengumuman…', v => logDiscord(`<b>${ME.name}</b> membuat pengumuman`)); }
+function modalBan(p) {
+  modal(`<h2>Ban ${esc(p.name)}</h2>
+    <div class="row2"><label><span>Jam</span><input type="number" min="0" value="0"></label><label><span>Hari</span><input type="number" min="0" value="3"></label><label><span>Bulan</span><input type="number" min="0" value="0"></label></div>
+    <label class="check"><input type="checkbox" id="bperm"><span style="margin:0">Permanen</span></label>
+    <p class="hint t-muted">Disimpan: license, discord, steam, fivem, xbox, IP + hardware token PC. Tidak perlu ban ulang di txAdmin.</p>
+    <label><span>Alasan</span><textarea id="br" placeholder="Alasan ban"></textarea></label>`, () => {
+    const r = $('#br').value.trim();
+    if (!r) { toast('Isi alasan', true); return false; }
+    logDiscord(`<b>${ME.name}</b> ban <b>${esc(p.name)}</b> ${$('#bperm').checked ? 'permanen' : '3 hari'}: ${esc(r)}`);
+  });
+}
+function modalData(p) {
+  modal(`<h2>Ubah data ${esc(p.name)}</h2>
+    <div class="row2"><label><span>Nama depan</span><input value="${esc(p.name.split(' ')[0])}"></label><label><span>Nama belakang</span><input value="${esc(p.name.split(' ').slice(1).join(' '))}"></label></div>
+    ${[['Makan', p.food], ['Minum', p.water], ['Stres', p.stress]].map(([t, v]) => `<label><span>${t}</span><div class="range"><input type="range" min="0" max="100" value="${v}" oninput="this.nextElementSibling.textContent=this.value+'%'"><b class="num">${v}%</b></div></label>`).join('')}`,
+    () => logDiscord(`<b>${ME.name}</b> mengubah data <b>${esc(p.name)}</b>`));
+}
+function modalMoney(p) {
+  modal(`<h2>Uang ${esc(p.name)}</h2>
+    <div class="row2"><label><span>Jenis</span><select id="mty"><option value="cash">Tunai</option><option value="bank">Bank</option></select></label>
+    <label><span>Aksi</span><select id="mac"><option value="give">Beri</option><option value="set">Atur jadi</option><option value="remove">Kurangi</option></select></label></div>
+    <label><span>Jumlah (Rp)</span><input id="mam" type="number" min="1" placeholder="50000"></label>
+    <p class="hint t-muted">Khusus Owner. Tercatat di Discord.</p>`, () => {
+    const v = +$('#mam').value;
+    if (!v) { toast('Isi jumlah', true); return false; }
+    const ac = { give: 'memberikan', set: 'mengatur', remove: 'mengurangi' }[$('#mac').value];
+    logDiscord(`<b>${ME.name}</b> ${ac} ${$('#mty').value === 'cash' ? 'uang tunai' : 'saldo bank'} ${rp(v)} ${$('#mac').value === 'remove' ? 'dari' : 'ke'} <b>${esc(p.name)}</b>`);
+  });
+}
+function modalJob(p) {
+  modal(`<h2>Job / Gang ${esc(p.name)}</h2>
+    <div class="seg" id="jg"><button class="active" data-t="job">Job</button><button data-t="gang">Gang</button></div>
+    <div class="row2"><label><span>Nama</span><select id="jn"><option>police</option><option>ambulance</option><option>mechanic</option><option>cafe</option><option>government</option><option>unemployed</option></select></label>
+    <label><span>Grade</span><select id="jgd"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></label></div>`, () => {
+    logDiscord(`<b>${ME.name}</b> mengubah ${$('#jg .active').dataset.t} <b>${esc(p.name)}</b> → ${$('#jn').value} (${$('#jgd').value})`);
+  });
+  $('#jg').onclick = e => { const b = e.target.closest('button'); if (b) $('#jg').querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b)); };
+}
+function modalGiveVeh(p) {
+  modal(`<h2>Beri kendaraan ke ${esc(p.name)}</h2>
+    <label><span>Kendaraan</span><select id="gv">${vehicles.map(v => `<option value="${v[0]}">${esc(v[1])} (${v[0]})</option>`).join('')}</select></label>
+    <label><span>Garasi tujuan</span><select><option>Garasi publik terdekat</option><option>Legion Square</option><option>Pillbox</option></select></label>
+    <p class="hint t-muted">Plat otomatis (F 1234 R) + kunci fisik masuk ke inventaris pemain.</p>`, () => {
+    const v = vehicles.find(x => x[0] === $('#gv').value);
+    logDiscord(`<b>${ME.name}</b> memberikan kendaraan ${esc(v[1])} (F 7713 R) ke <b>${esc(p.name)}</b>`);
+  });
+}
+
+/* ---------- tutup & role mockup ---------- */
+$('#btnClose').onclick = () => toast('Panel ditutup (ESC)');
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#modal').innerHTML) closeModal(); else toast('Panel ditutup (ESC)'); } });
+$('#mockRole').onclick = e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  role = b.dataset.r;
+  $('#mockRole').querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+  ME.name = role === 'support' ? 'Dewi' : role === 'owner' ? 'foreplay' : 'Sandi';
+  $('#meName').textContent = ME.name;
+  $('#meAv').textContent = ME.name[0].toUpperCase();
+  go(page);
+};
+// mockup: ?role=owner&page=perms
+const U = new URLSearchParams(location.search);
+if (U.get('role')) $('#mockRole').querySelector(`[data-r="${U.get('role')}"]`).click();
+if (U.get('rep')) { page = 'reports'; go('reports'); repOpen = +U.get('rep'); }
+go(U.get('page') || page);
+</script>
+</body>
+</html>

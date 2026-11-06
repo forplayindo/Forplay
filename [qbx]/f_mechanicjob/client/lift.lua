@@ -104,11 +104,11 @@ end
 
 ---Index lift tempat kendaraan berdiri (atau sedang dinaikkan), atau nil.
 local function liftOf(veh)
-    local net = NetworkGetNetworkIdFromEntity(veh)
+    local net = NetworkGetEntityIsNetworked(veh) and NetworkGetNetworkIdFromEntity(veh) or nil
     local pos = GetEntityCoords(veh)
     for i, lift in ipairs(LIFT.lifts) do
         local s = liftState(i)
-        if s.up and s.net == net then return i end
+        if s.up and net and s.net == net then return i end
         if #(pos.xy - lift.coords.xy) <= LIFT.radius and math.abs(pos.z - lift.coords.z) < 2.5 then return i end
     end
 end

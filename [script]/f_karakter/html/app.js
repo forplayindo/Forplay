@@ -27,7 +27,7 @@ function setMsg(text, kind) {
     if (old) old.remove();
     if (!text) return;
     const el = document.createElement('div');
-    el.className = `msg ${kind || 'err'}`;
+    el.className = `msg ${kind === 'ok' ? 'ok' : ''}`;
     el.textContent = text;
     $('list').before(el);
     setTimeout(() => el.remove(), 5000);
@@ -40,7 +40,7 @@ function render() {
     } else {
         list.innerHTML = state.rows.map((r, i) => {
             const a = ago(r.lastSeen);
-            const chip = r.online ? '<i class="chip on">ONLINE</i>' : (a.days >= 30 ? '<i class="chip old">TIDAK AKTIF</i>' : '');
+            const chip = r.online ? '<i class="chip ok">Online</i>' : (a.days >= 30 ? '<i class="chip no">Tidak aktif</i>' : '');
             return `<div class="row">
                 <div><b>${esc(r.name)}${chip}</b><span>${esc(r.citizenid)} · akun ${esc(r.account)}</span></div>
                 <div><span>Terakhir main</span><div class="val">${esc(a.text)}</div><span>${esc(r.job)}</span></div>

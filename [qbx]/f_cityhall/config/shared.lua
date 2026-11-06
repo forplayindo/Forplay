@@ -1,23 +1,28 @@
 return {
-    -- Service offices. `counter` = where citizens press E to apply, `desk` = where staff press E
-    -- to open the request list. Services are only open while at least one `job` member is on duty.
+    -- Service offices. `counters` = zones where citizens press E; each counter only serves its own
+    -- `categories` (license = dokumen, vehicle = kendaraan, redeem = penebusan tilang).
+    -- `companyTax = true` adds the Pajak Perusahaan tab (f_tax, pimpinan perusahaan).
+    -- `desk` = where staff press E to open the request list. `jobCenter` = separate [E] Cari Pekerjaan
+    -- zone (works even when services are closed). Services are only open while a `job` member is on duty.
     offices = {
         government = {
             label = 'Balai Kota',
-            subtitle = 'Layanan KTP & Pajak Kendaraan',
             job = 'government',
-            counter = vec3(-262.79, -964.18, 31.22),
-            desk = vec3(-262.8, -962.2, 31.2),
-            employment = true, -- job center at the counter (works even when services are closed)
+            counters = {
+                { label = 'Balai Kota', subtitle = 'Layanan publik', coords = vec3(220.0, -403.44, 46.77),
+                  categories = { 'license', 'vehicle' }, companyTax = true },
+            },
+            desk = vec3(218.83, -402.98, 46.77),
+            jobCenter = vec3(256.18, -412.04, 46.77),
             -- blip dipindah ke f_blips
         },
         police = {
             label = 'Kepolisian',
-            subtitle = 'Layanan SIM, Lisensi Senjata & STNK',
             job = 'police',
-            counter = vec3(441.1, -978.9, 30.7),
-            desk = vec3(441.1, -981.0, 30.7),
-            employment = false,
+            counters = {
+                { label = 'Layanan Kepolisian', coords = vec3(254.01, -420.78, 46.77), categories = { 'license', 'vehicle', 'redeem' } },
+            },
+            desk = vec3(255.95, -420.62, 46.77),
         },
     },
 
@@ -86,16 +91,19 @@ return {
 
     mailFrom = 'Layanan Publik Kota',
 
+    -- [E] Cari Pekerjaan (office `jobCenter`). Urutan di sini = urutan di menu.
     employment = {
-        enabled = true, -- Set to false to disable the employment menu
+        enabled = true, -- Set to false to disable the job center
         jobs = {
-            unemployed = 'Unemployed',
-            trucker = 'Trucker',
-            taxi = 'Taxi',
-            tow = 'Tow Truck',
-            reporter = 'News Reporter',
-            garbage = 'Garbage Collector',
-            bus = 'Bus Driver',
+            { name = 'trucker', label = 'Sopir Truk', desc = 'Antar muatan ke seluruh kota' },
+            { name = 'taxi', label = 'Sopir Taksi', desc = 'Antar penumpang pakai argo' },
+            { name = 'bus', label = 'Sopir Bus', desc = 'Antar penumpang di rute kota' },
+            { name = 'tow', label = 'Derek', desc = 'Derek kendaraan rusak & parkir liar' },
+            -- sideJob = kerja sampingan: tidak mengganti pekerjaan (tanpa paycheck), hanya membuka menu script-nya
+            { name = 'garbage', label = 'Petugas Kebersihan', desc = 'Kerja sampingan khusus yang belum punya pekerjaan', menu = 'f_garbagejob:client:openMenu', sideJob = true },
+            { name = 'courier', label = 'Kurir Paket', desc = 'Kerja sampingan antar paket GoPostal, khusus yang belum punya pekerjaan', menu = 'f_courierjob:client:openMenu', sideJob = true },
+            { name = 'reporter', label = 'Wartawan', desc = 'Liput berita di kota' },
+            { name = 'unemployed', label = 'Berhenti Bekerja', desc = 'Jadi pengangguran' },
         },
     },
 }

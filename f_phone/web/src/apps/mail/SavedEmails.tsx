@@ -147,7 +147,7 @@ export function SavedEmailsPage({ emails, onAdd, onRemove, onBack }: {
             {adding && (
                 <PromptDialog
                     title={t('mail.addEmail', 'Add Email')}
-                    placeholder="name@forplay.com"
+                    placeholder="name@4play.com"
                     inputMode="email"
                     maxLength={128}
                     validate={v => (isEmailish(v.trim()) ? null : t('mail.invalidEmail', 'Enter a valid email address'))}

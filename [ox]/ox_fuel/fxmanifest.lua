@@ -28,6 +28,8 @@ client_script 'client/init.lua'
 ui_page 'html/menu.html'
 
 files {
+	'html/ui/ios.css',
+	'html/ui/fonts/*.woff2',
 	'locales/*.json',
 	'data/stations.lua',
 	'client/*.lua',

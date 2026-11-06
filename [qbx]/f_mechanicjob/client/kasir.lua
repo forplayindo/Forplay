@@ -1,11 +1,13 @@
 -- Kasir bengkel (client): ox_target di meja kasir. Warga "Bayar Tagihan", mekanik on duty "Menu Kasir".
 -- Titik Gudang Bengkel (mekanik): Setor Bahan ke Stok + Ambil Tas Perkakas.
+-- Titik Supplier (mekanik): lihat Stok Gudang, Manager membeli bahan baku ke supplier.
 -- NUI panel #kasir (html/kasir.js). Semua keputusan di server (server/kasir.lua, server/stock.lua).
 local cfg = require 'config.shared'
 local SC = require 'config.stock'
 
-local open = false ---@type false|'customer'|'staff'|'gudang'
-local OPEN_CB = { customer = 'kasirMine', staff = 'kasirStaff', gudang = 'gudangGet' }
+local open = false ---@type false|'customer'|'staff'|'gudang'|'supplier'
+local OPEN_CB = { customer = 'kasirMine', staff = 'kasirStaff', gudang = 'gudangGet', supplier = 'stockGet' }
+local POINT = { gudang = SC.point, supplier = SC.supplier } -- selain ini: meja kasir
 
 local function isMechanic()
     local job = QBX.PlayerData and QBX.PlayerData.job
@@ -29,9 +31,9 @@ local function openKasir(mode)
     SendNUIMessage({ action = 'kasirOpen', mode = mode, data = data })
     SetNuiFocus(true, true)
 
-    -- tutup kalau menjauh dari meja kasir / gudang (cek ringan tiap detik selama menu terbuka)
-    local center = mode == 'gudang' and SC.point.coords or cfg.cashier.coords
-    local maxDist = (mode == 'gudang' and SC.point.distance or cfg.cashier.distance) + 3.0
+    -- tutup kalau menjauh dari meja kasir / gudang / supplier (cek ringan tiap detik selama menu terbuka)
+    local point = POINT[mode] or cfg.cashier
+    local center, maxDist = point.coords, point.distance + 3.0
     CreateThread(function()
         while open == mode do
             Wait(1000)
@@ -89,7 +91,7 @@ RegisterNUICallback('ksPricesSave', function(data, cb)
 end)
 
 RegisterNUICallback('ksSupplier', function(_, cb)
-    if open ~= 'staff' then return cb({ error = 'Menu tidak terbuka' }) end
+    if open ~= 'supplier' then return cb({ error = 'Menu tidak terbuka' }) end
     cb(call('stockGet'))
 end)
 
@@ -111,7 +113,7 @@ RegisterNUICallback('ksBag', function(_, cb)
 end)
 
 RegisterNUICallback('ksSupplierBuy', function(data, cb)
-    if open ~= 'staff' then return cb({ error = 'Menu tidak terbuka' }) end
+    if open ~= 'supplier' then return cb({ error = 'Menu tidak terbuka' }) end
     local res = call('supplierBuy', data.cart)
     if res.msg then exports.qbx_core:Notify(res.msg, 'success') end
     cb(res)
@@ -163,6 +165,22 @@ exports.ox_target:addSphereZone({
                 local res = lib.callback.await('f_mechanicjob:server:gudangBag', false)
                 if res and res.error then exports.qbx_core:Notify(res.error, 'error') end
             end,
+        },
+    },
+})
+
+exports.ox_target:addSphereZone({
+    name = 'f_mechanicjob:supplier',
+    coords = SC.supplier.coords,
+    radius = SC.supplier.radius,
+    options = {
+        {
+            name = 'supplier_open',
+            icon = 'fa-solid fa-truck-ramp-box',
+            label = 'Supplier Bahan Baku',
+            distance = SC.supplier.distance,
+            canInteract = isMechanic,
+            onSelect = function() openKasir('supplier') end,
         },
     },
 })

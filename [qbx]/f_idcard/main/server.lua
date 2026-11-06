@@ -165,6 +165,28 @@ end
 
 exports('CheckIdentity', checkIdentity)
 
+--- Admin: beri KTP / KTP Sementara lengkap dengan data pemilik (spawn /giveitem tidak punya citizenid)
+lib.addCommand('buatktp', {
+    help = 'Beri KTP (atau KTP Sementara) berisi data pemain',
+    restricted = 'group.admin',
+    params = {
+        { name = 'id', help = 'ID pemain (me = diri sendiri)', type = 'playerId', optional = true },
+        { name = 'jenis', help = 'ktp / sementara (default ktp)', type = 'string', optional = true },
+    },
+}, function(source, args)
+    local target = args.id or source
+    local item = args.jenis == 'sementara' and 'ktp_sementara' or 'id_card'
+    if not exports.qbx_core:GetPlayer(target) then
+        return exports.qbx_core:Notify(source, 'Pemain tidak ditemukan', 'error')
+    end
+    exports.f_idcard:CreateMetaLicense(target, item)
+    local label = item == 'id_card' and 'KTP' or 'KTP Sementara'
+    exports.qbx_core:Notify(target, ('Anda menerima %s'):format(label), 'success')
+    if target ~= source then
+        exports.qbx_core:Notify(source, ('%s diberikan ke ID %s'):format(label, target), 'success')
+    end
+end)
+
 function CreateRegisterItem(k)
     exports.qbx_core:CreateUseableItem(k, function(source, item)
         useCard(source, k, item.info or item.metadata)

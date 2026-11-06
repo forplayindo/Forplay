@@ -25,6 +25,14 @@ local function ban(source, category, reason)
     local ids = getIdentifiers(source)
     local name = GetPlayerName(source) or ('id:%s'):format(source)
 
+    -- f_admin: satu sistem ban HWID untuk panel & anti-cheat (muncul di Daftar Ban, bisa dicabut dari panel)
+    if GetResourceState('f_admin') == 'started' then
+        exports.f_admin:BanPlayer(source, ('[%s] %s'):format(category, reason), 0, 'Anti-cheat')
+        lib.print.warn(('f_anticheat: BANNED %s (%s) - category: %s - reason: %s'):format(name, ids.license or 'unknown', category, reason))
+        Webhook.Send('🔨 Player banned', ('**%s** (`%s`)\nCategory: `%s`\nReason: %s'):format(name, ids.license or 'unknown', category, reason), 'red')
+        return
+    end
+
     Storage.InsertBan({
         name = name,
         license = ids.license,

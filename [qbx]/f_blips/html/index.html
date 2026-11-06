@@ -3,28 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <title>f_blips</title>
+    <link rel="stylesheet" href="ui/ios.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    </svg>
     <div id="panel" class="panel hidden">
         <header>
-            <div class="brand"><span class="logo">📍</span><div><h1>Kelola Blips</h1><small id="sub"></small></div></div>
+            <div class="brand"><span class="logo"><svg class="ic"><use href="#i-pin"/></svg></span><div><h1>Kelola Blips</h1><small id="sub"></small></div></div>
             <div class="head-actions">
-                <button class="pill accent" id="add-btn">＋ Tambah di Posisi Saya</button>
-                <button class="icon-btn close" data-close>✕</button>
+                <button class="b b-filled b-sm" id="add-btn"><svg class="ic"><use href="#i-plus"/></svg>Tambah di Posisi Saya</button>
+                <button class="circle close" data-close><svg class="ic"><use href="#i-x"/></svg></button>
             </div>
         </header>
 
         <div class="toolbar">
-            <nav class="tabs" id="tabs"></nav>
-            <input id="search" placeholder="Cari nama blip...">
+            <nav class="filters" id="tabs"></nav>
+            <label class="search"><svg class="ic"><use href="#i-search"/></svg><input id="search" placeholder="Cari nama blip"></label>
         </div>
         <div id="pending" class="pending hidden"></div>
         <div id="msg" class="banner hidden"></div>
         <main id="list" class="list"></main>
 
         <aside id="sheet" class="sheet hidden">
-            <div class="sheet-head"><h2 id="sheet-title">Tambah Blip</h2><button class="icon-btn" id="sheet-close">✕</button></div>
+            <div class="sheet-head"><h2 id="sheet-title">Tambah Blip</h2><button class="circle" id="sheet-close"><svg class="ic"><use href="#i-x"/></svg></button></div>
             <div class="sheet-body">
                 <label>Koordinat</label>
                 <div class="note"><span id="f-coords"></span><button id="use-pos">Pakai posisi saya</button></div>
@@ -45,13 +52,13 @@
                 <label>Ukuran</label>
                 <div class="range"><input type="range" id="f-scale" step="0.1"><b id="scale-val"></b></div>
 
-                <div class="switch"><label for="f-active">Aktif (tampil di peta)</label><input type="checkbox" id="f-active"></div>
+                <div class="switch-row"><label for="f-active">Aktif (tampil di peta)</label><input type="checkbox" id="f-active"></div>
 
-                <div class="note info">Blip uji berkedip muncul di minimap kamu selama form ini terbuka.</div>
+                <div class="notice">Blip uji berkedip muncul di minimap kamu selama form ini terbuka.</div>
             </div>
             <div class="sheet-foot">
                 <div id="sheet-msg" class="msg hidden"></div>
-                <button id="save-btn" class="primary">Simpan</button>
+                <button id="save-btn" class="primary b-lg">Simpan</button>
             </div>
         </aside>
     </div>

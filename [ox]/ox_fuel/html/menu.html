@@ -3,13 +3,21 @@
 <head>
 	<meta charset="UTF-8">
 	<title>ox_fuel</title>
+	<link rel="stylesheet" href="ui/ios.css">
 	<link rel="stylesheet" href="menu.css">
 </head>
 <body>
+	<svg width="0" height="0" style="position:absolute">
+		<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+		<symbol id="i-fuel" viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M4 10h10M14 8l3 2v7a1.5 1.5 0 0 0 3 0V9l-3-3"/></symbol>
+		<symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v5M15 3v5M6 8h12v3a6 6 0 0 1-12 0zM12 17v4"/></symbol>
+		<symbol id="i-cash" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></symbol>
+		<symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+	</svg>
 	<div id="panel" class="panel hidden">
 		<header>
-			<div class="brand"><span class="logo" id="logo">⛽</span><div><h1 id="title">Isi Bensin</h1><small id="veh">-</small></div></div>
-			<button class="x" id="close">✕</button>
+			<div class="brand"><span class="logo" id="logo"><svg class="ic"><use href="#i-fuel"/></svg></span><div><h1 id="title">Isi Bensin</h1><small id="veh">-</small></div></div>
+			<button class="circle close" id="close"><svg class="ic"><use href="#i-x"/></svg></button>
 		</header>
 
 		<section class="body">
@@ -32,8 +40,8 @@
 			</div>
 
 			<div class="methods">
-				<button data-m="cash" class="active">💵 Cash<small id="cash">Rp 0</small></button>
-				<button data-m="bank">📱 Transfer<small id="bank">Rp 0</small></button>
+				<button data-m="cash" class="active"><span><svg class="ic"><use href="#i-cash"/></svg>Cash</span><small id="cash">Rp 0</small></button>
+				<button data-m="bank"><span><svg class="ic"><use href="#i-phone"/></svg>Transfer</span><small id="bank">Rp 0</small></button>
 			</div>
 
 			<div class="total"><span id="unit">Rp 0 / L</span><b id="total">Rp 0</b></div>

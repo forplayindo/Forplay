@@ -1,0 +1,76 @@
+PROMPT GAMBAR MENU f_cafe
+=========================
+Simpan hasil di folder ini dengan nama file = nama item, contoh: cafe_burger.png
+(format jpg/png/webp bebas, ukuran berapa saja; nanti diproses jadi PNG 256x256 transparan).
+
+Cara pakai: tempel GAYA DASAR, lalu ganti [MENU] dengan deskripsi item di bawah.
+Kalau generate di satu chat, tambahkan: "Keep exactly the same style, camera angle and lighting as the previous image."
+
+GAYA DASAR
+----------
+Photorealistic product photo of [MENU]. Single serving, centered, three-quarter view from slightly above (about 35 degrees), the whole item fully visible with empty space around it, soft studio lighting, sharp focus, highly detailed, appetizing. No text, no logo, no hands, no table, no other objects. Isolated on a transparent background, square 1:1.
+
+Kalau generator tidak bisa background transparan (Gemini, Midjourney, dll), ganti kalimat terakhir dengan:
+Isolated on a plain solid light gray background, square 1:1.
+
+DESKRIPSI [MENU]
+----------------
+cafe_burger       a classic beef burger with a toasted sesame bun, juicy beef patty, melted cheddar cheese slice, fresh lettuce and tomato
+cafe_hotdog       a hot dog with a grilled sausage in a soft golden bun, topped with a zigzag line of yellow mustard
+cafe_nachos       loaded nachos: tortilla chips topped with melted cheese sauce, tomato salsa, diced tomato and jalapeno slices, in a red and white striped paper tray
+cafe_donut        a glazed donut, golden brown with a shiny translucent sugar glaze
+cafe_sandwich     a fresh sandwich cut into two triangles, white bread filled with grilled chicken, cheese, lettuce and tomato, cut side facing the camera
+cafe_nasigoreng   (opsional, sudah ada) Indonesian nasi goreng on a white plate with a sunny side up fried egg, cucumber and tomato slices and prawn crackers
+cafe_cappuccino   a cappuccino in a white ceramic cup on a saucer, heart latte art on the milk foam, lightly dusted with cinnamon
+cafe_colafloat    an iced cola float in a tall clear glass: cola with ice cubes, a scoop of vanilla ice cream on top with creamy foam, red and white striped straw
+cafe_milkshake    a chocolate milkshake in a tall clear sundae glass, topped with whipped cream, chocolate syrup drizzle and a cherry, with a straw
+cafe_orangejuice  a glass of fresh orange juice with ice cubes and an orange slice on the rim, with a straw
+cafe_energysoda   an energy soda: bright lime green to blue fizzy drink with ice in a clear plastic cup with a flat lid and a black straw, bubbles and condensation drops, no brand
+cafe_stmj         Indonesian STMJ hot drink in a clear glass mug: creamy pale brown milk with a frothy egg foam on top, a slice of ginger and a small honey dipper beside the mug
+cafe_kelapamuda   a whole young green coconut with the top cut open, a pink straw and small spoon sticking out, ice cubes and white coconut flesh visible inside, condensation drops
+cafe_jusalpukat   a jumbo tall glass of thick green avocado juice with a swirl of chocolate condensed milk drizzled inside the glass, a wide straw
+
+BAHAN BAKU (untuk Gemini: pakai background abu-abu polos, BUKAN transparan)
+---------------------------------------------------------------------------
+GAYA DASAR BAHAN (ganti [ITEM] dengan deskripsi di bawah):
+Photorealistic product photo of [ITEM]. Centered, three-quarter view from slightly above (about 35 degrees), the whole object fully visible with empty space around it, soft studio lighting, sharp focus, highly detailed, fresh grocery look. No text, no letters, no brand logo, no hands, no table, no other objects. Isolated on a plain solid light gray background, square 1:1.
+
+-- Roti & daging
+roti_burger       a pack of four round sesame burger buns in a clear plastic bag, golden brown, blank bag
+roti_hotdog       a pack of four long soft hot dog buns in a clear plastic bag, light golden, blank bag
+roti_tawar        a loaf of sliced white bread in a clear plastic bag tied with a twist tie, blank bag
+daging_sapi       a slab of raw red beef with white marbling on a white styrofoam tray wrapped in clear plastic film, no label
+daging_ayam       raw chicken breast fillets on a white styrofoam tray wrapped in clear plastic film, no label
+sosis             a bundle of six raw pink pork sausages in a clear vacuum sealed pack, blank pack
+
+-- Keju & saus
+keju              a block of yellow cheddar cheese with a few sliced cheese squares stacked next to it
+saus_mustard      a yellow plastic squeeze bottle of mustard with a pointed nozzle cap, blank bottle
+saus_salsa        a clear glass jar of chunky red tomato salsa with a red metal lid, blank jar
+kecap_manis       a glass bottle of dark thick Indonesian sweet soy sauce with a red cap, blank label
+
+-- Kering / dapur
+keripik_tortilla  a clear plastic bag filled with triangular yellow corn tortilla chips, blank bag
+adonan_donat      several raw uncooked donut dough rings, pale and soft, on a sheet of baking paper
+minyak_goreng     a clear plastic bottle of golden yellow cooking oil with a yellow cap, blank label
+gula              a clear plastic bag of white granulated sugar, tied at the top, blank bag
+beras             a white woven rice sack bag of uncooked white rice, top folded open showing the rice grains, blank sack
+telur             a cardboard egg tray holding ten brown chicken eggs
+mie_instan        a single block of dry instant noodles (curly wavy pale yellow noodle cake) in a clear plastic wrapper without any text or logo
+
+-- Minuman
+bubuk_kopi        a brown kraft paper coffee bag opened at the top showing dark ground coffee powder, blank bag
+bubuk_coklat      a clear plastic tub of dark brown cocoa powder with the lid removed beside it, blank tub
+kayu_manis        a small bundle of cinnamon sticks tied with twine next to a little pile of ground cinnamon
+susu              a white plastic one liter milk jug with a blue cap, blank label
+es_batu           a clear plastic bag full of clear ice cubes with frost and condensation, blank bag
+es_krim_vanila    a white plastic tub of vanilla ice cream with the lid off showing a scooped creamy surface, blank tub
+soda_cola         a red aluminum soda can with condensation drops, plain red with no text or logo
+air_soda          a clear glass bottle of sparkling soda water with bubbles and a silver cap, blank label
+sirup_energi      a clear plastic bottle of bright neon green energy syrup with a black cap, blank label
+jeruk             a small mesh bag of fresh whole oranges with one orange cut in half next to it
+madu              a glass jar of golden honey with a wooden honey dipper resting on top, blank jar
+jahe              a few fresh ginger roots with one piece sliced showing the yellow inside
+kelapa_muda       a whole young green coconut, unopened, with a smooth green husk
+alpukat           two ripe avocados, one whole and one cut in half showing the green flesh and brown seed
+susu_kental_manis a small white tin can of sweetened condensed milk with a pull-tab lid, blank label

@@ -1,8 +1,11 @@
 return {
     taxRate = 5,                -- % potongan pajak saat paycheck dicairkan
     govAccount = 'government',  -- rekening Renewed-Banking penerima pajak
-    mailFrom = 'Kantor Gaji',   -- pengirim email f_phone
-    useDistance = 4.0,          -- jarak maksimal (meter) dari NPC, dicek ulang di server
+    mailFrom = 'Penggajian',    -- pengirim email f_phone
+
+    -- Ambil Gaji lewat ox_target di ATM & NPC bank (lokasi dari config Renewed-Banking)
+    atmDistance = 3.0,          -- jarak maksimal (meter) player ke ATM, dicek ulang di server
+    bankDistance = 6.0,         -- jarak maksimal (meter) player ke NPC bank, dicek ulang di server
 
     -- notifikasi ox_lib tiap paycheck masuk (tiap qbx_core paycheckTimeout)
     notify = {
@@ -16,17 +19,6 @@ return {
             color = '#e8edf6',
             borderLeft = '3px solid #4ade80',
             ['.description'] = { color = '#93a0b8' },
-        },
-    },
-
-    -- NPC kantor gaji (koordinat placeholder dekat Balai Kota Alta, sesuaikan)
-    locations = {
-        {
-            label = 'Kantor Gaji',
-            coords = vec4(-265.0, -960.9, 31.22, 205.0),
-            model = `a_m_y_business_03`,
-            scenario = 'WORLD_HUMAN_CLIPBOARD',
-            blip = { sprite = 500, colour = 2, scale = 0.7 },
         },
     },
 }

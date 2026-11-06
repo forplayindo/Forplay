@@ -82,9 +82,11 @@ local unarmedHash = `WEAPON_UNARMED`
 
 -- true kalau player sedang melakukan hal lain yang tidak boleh ditimpa animasi reaksi:
 -- pegang senjata, di kendaraan, emote rpemotes / handsup / pointing / tiarap, scenario,
--- progressbar, ragdoll, berenang, jatuh, panjat
+-- progressbar, ragdoll, berenang, jatuh, panjat, ditempel ke entity (panjat kelapa / digendong),
+-- flag umum LocalPlayer.state.sibukAnim (dipasang script aksi lain, mis. f_kelapa) atau canEmote dimatikan
 local function HygieneOtherActivity()
     local ped = PlayerPedId()
+    if IsEntityAttached(ped) or LocalPlayer.state.sibukAnim or LocalPlayer.state.canEmote == false then return true end
     if IsPedInAnyVehicle(ped, true) or GetSelectedPedWeapon(ped) ~= unarmedHash then return true end
     if IsPedUsingAnyScenario(ped) then return true end
     if IsPedRagdoll(ped) or IsPedSwimming(ped) or IsPedFalling(ped) or IsPedClimbing(ped) or IsPedJumping(ped) then return true end

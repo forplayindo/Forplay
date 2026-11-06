@@ -4,6 +4,7 @@ import { Car, Clock, MapPin, Trophy, User } from 'lucide-react';
 import { t } from '@/i18n';
 import { initials as libInitials } from '@/lib/format';
 import { TabBar, type TabBarItem } from '@/ui/TabBar';
+import { AlertDialog } from '@/ui/AlertDialog';
 import { RydeProvider, useRyde } from './store';
 import { Home } from './rider/Home';
 import { Activity } from './history/Activity';
@@ -57,6 +58,9 @@ function Shell() {
             {g.activeRider && <TripRider />}
             {g.activeDriver && <TripDriver />}
             {g.pendingRating && <Rating />}
+            {g.notice && (
+                <AlertDialog title="Ryde" message={g.notice} confirmLabel={t('common.ok', 'OK')} hideCancel onCancel={g.clearNotice} onConfirm={g.clearNotice} />
+            )}
         </div>
     );
 }

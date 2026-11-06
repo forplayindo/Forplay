@@ -16,7 +16,7 @@ Config.DefaultRate = 7             -- tarif awal (%), setelah diubah di menu pem
 Config.MinRate = 0
 Config.MaxRate = 50
 
-Config.PayTopGrades = 2            -- N grade tertinggi job yang boleh /bayarpajak
+Config.PayTopGrades = 2            -- N grade tertinggi job yang boleh bayar pajak (menu Balai Kota)
 Config.RateTopGrades = 2           -- N grade tertinggi pemerintah yang boleh ubah tarif pajak
 
 Config.HistoryLimit = 20           -- jumlah riwayat pembayaran yang ditampilkan

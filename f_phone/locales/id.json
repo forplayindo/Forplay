@@ -4623,7 +4623,22 @@
     "yourRider": "penumpangmu",
     "yourVehicle": "Kendaraanmu",
     "yourVehicles": "Kendaraanmu",
-    "unknownArea": "Area tidak dikenal"
+    "unknownArea": "Area tidak dikenal",
+    "requestFailed": "Gagal memesan Ryde.",
+    "rideTakenByOther": "Pesanan ini sudah diambil supir lain.",
+    "fixedFare": "Tarif",
+    "paidFromBankOnArrival": "{km} km · dibayar dari saldo bank saat selesai",
+    "paymentBank": "Saldo bank",
+    "requestRideFixedMessage": "Ke {name}, sekitar {km} km. Tarif {fare}, dipotong dari saldo bank saat perjalanan selesai (turun sebelum tujuan = sesuai argo). Supir pertama yang mengambil pesanan akan menjemputmu.",
+    "pickupAwayTrip": "Jemput {away} km · perjalanan {km} km",
+    "tripKm": "Perjalanan {km} km",
+    "noRequestsBodyFixed": "Pesanan penumpang di sekitar akan muncul di sini. Supir pertama yang mengambil, dia yang dapat.",
+    "takeThisRide": "Ambil pesanan ini?",
+    "afterTaxYouGet": "Setelah pajak {pct}%, kamu dapat ",
+    "takeRide": "Ambil pesanan",
+    "finishHereMetered": "Selesai di sini (argo)",
+    "finishEarlyQ": "Selesaikan di sini?",
+    "finishEarlyMessage": "Belum sampai tujuan. Tarif mengikuti argo: sekitar {fare} (tarif penuh {full})."
   },
   "schedule": {
     "atLabel": "{day} pukul {time}",
@@ -6673,7 +6688,7 @@
     "unitsHeld": "{n} dimiliki",
     "wallet": "Dompet",
     "weather": "Cuaca",
-    "cityName": "Kota Forplay",
+    "cityName": "Kota 4PLAY",
     "noEventsToday": "Tidak Ada Acara Hari Ini",
     "highShort": "T",
     "lowShort": "R"

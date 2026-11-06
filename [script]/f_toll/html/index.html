@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+	<meta charset="UTF-8">
+	<title>f_toll</title>
+	<link rel="stylesheet" href="ui/ios.css">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<svg width="0" height="0" style="position:absolute">
+		<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+		<symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></symbol>
+		<symbol id="i-cash" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></symbol>
+		<symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+		<symbol id="i-road" viewBox="0 0 24 24"><path d="M5 21 9 3M19 21 15 3M12 6v2M12 11v2M12 16v2"/></symbol>
+		<symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+		<symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></symbol>
+	</svg>
+
+	<!-- Loket: beli kartu & isi saldo -->
+	<div id="loket" class="panel side hidden">
+		<header>
+			<div class="brand"><span class="logo"><svg class="ic"><use href="#i-card"/></svg></span><div><h1>E-Toll</h1><small>Kartu &amp; isi saldo</small></div></div>
+			<span class="spacer"></span>
+			<button class="circle close" data-close><svg class="ic"><use href="#i-x"/></svg></button>
+		</header>
+		<section class="body">
+			<div id="cards" class="group"></div>
+			<div id="nocard" class="empty hidden">Belum punya kartu e-toll. Kartu baru saldonya Rp 0, isi ulang setelah dibeli.</div>
+
+			<div id="topup" class="topup hidden">
+				<div class="group-h">Isi saldo</div>
+				<div class="quick" id="quick"></div>
+				<div class="amount"><span>Jumlah</span><input id="amount" type="number" min="0" step="1000" placeholder="0"></div>
+			</div>
+
+			<div class="methods">
+				<button data-m="cash" class="active"><span><svg class="ic"><use href="#i-cash"/></svg>Cash</span><small id="cash">Rp 0</small></button>
+				<button data-m="bank"><span><svg class="ic"><use href="#i-phone"/></svg>Transfer</span><small id="bank">Rp 0</small></button>
+			</div>
+
+			<div id="msg" class="msg hidden"></div>
+			<button id="doTopup" class="primary hidden">Isi Saldo</button>
+			<button id="buy" class="b b-gray b-block">Beli Kartu Baru</button>
+		</section>
+	</div>
+
+	<!-- Editor admin -->
+	<div id="editor" class="panel wide hidden">
+		<header>
+			<div class="brand"><span class="logo"><svg class="ic"><use href="#i-road"/></svg></span><div><h1>Atur Gerbang Tol</h1><small>Lajur, palang &amp; loket NPC</small></div></div>
+			<span class="spacer"></span>
+			<button class="circle close" data-close><svg class="ic"><use href="#i-x"/></svg></button>
+		</header>
+		<section class="body scroll" id="gates"></section>
+		<div id="emsg" class="msg hidden"></div>
+	</div>
+
+	<script src="app.js"></script>
+</body>
+</html>

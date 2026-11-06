@@ -135,8 +135,23 @@ local function removeAll(inv, needs)
     for item, count in pairs(needs) do ox:RemoveItem(inv, item, count) end
 end
 
+--- Buang kadaluarsa yang terlanjur menempel di stok siap jual (mis. item masuk saat hook belum terpasang)
+local function cleanReady()
+    local items = ox:GetInventoryItems(READY)
+    if not items then return end
+    for _, it in pairs(items) do
+        local meta = it.metadata
+        if MenuByItem[it.name] and meta and (meta.durability or meta.degrade) then
+            meta.durability = nil
+            meta.degrade = nil
+            ox:SetMetadata(READY, it.slot, meta)
+        end
+    end
+end
+
 local function addAll(inv, needs)
     for item, count in pairs(needs) do ox:AddItem(inv, item, count) end
+    if inv == READY then cleanReady() end
 end
 
 local function needsWeight(needs)
@@ -268,6 +283,18 @@ local function identityError(src)
     if ok and not valid then return message or 'Anda tidak membawa KTP' end
 end
 
+---Menu + efek hunger/thirst/stress tiap item (sumber: client.status di items.lua via f_consumables).
+local function menuList()
+    local list = {}
+    for i, m in ipairs(Config.Menu) do
+        local ok, status = pcall(function() return exports.f_smallresources:GetItemStatus(m.item) end)
+        local row = { effects = ok and status or nil }
+        for k, v in pairs(m) do row[k] = v end
+        list[i] = row
+    end
+    return list
+end
+
 lib.callback.register('f_cafe:getMenu', function(src)
     local idErr = identityError(src)
     if idErr then
@@ -278,7 +305,7 @@ lib.callback.register('f_cafe:getMenu', function(src)
     local active = cid and activeOrderOf(cid)
     return {
         label = Config.Label,
-        menu = Config.Menu,
+        menu = menuList(),
         promos = promoList(),
         order = { default = Config.Order.defaultQty, min = Config.Order.minQty, max = Config.Order.maxQty },
         npc = refreshStaffCount() == 0 and Config.NPC.enabled,
@@ -291,7 +318,11 @@ lib.callback.register('f_cafe:placeOrder', function(src, cart, method)
     if not throttle(src, 'order', Config.Order.cooldown * 1000) then return { ok = false, msg = 'Tunggu sebentar sebelum order lagi.' } end
     if method ~= 'cash' and method ~= 'transfer' then return { ok = false, msg = 'Metode pembayaran tidak valid.' } end
     local range = Config.Order.counterDistance + 2.0
-    if not near(src, Config.Points.counter.coords, range) and not (Config.NPC.enabled and near(src, Config.NPC.coords.xyz, range)) then
+    local atCounter = false
+    for _, point in ipairs(Config.Points.counter) do
+        if near(src, point.coords, range) then atCounter = true break end
+    end
+    if not atCounter then
         return { ok = false, msg = 'Kamu harus berada di meja kasir.' }
     end
     local idErr = identityError(src)
@@ -519,6 +550,7 @@ lib.callback.register('f_cafe:finishCook', function(src)
     end
     Cooking[src] = nil
     ox:AddItem(READY, c.item, c.portions)
+    cleanReady()
     return { ok = true, msg = ('%dx %s masuk ke stok siap jual.'):format(c.portions, itemLabel(c.item)) }
 end)
 
@@ -527,34 +559,61 @@ RegisterNetEvent('f_cafe:server:cancelCook', function() refundCooking(source) en
 ---------------------------------------------------------------------------
 -- Manager: supplier, buang stok, promo
 ---------------------------------------------------------------------------
-lib.callback.register('f_cafe:getSupplier', function(src)
-    if not staffJob(src, Config.Grades.restock, true) then return false end
+local function supplierData()
     local list = {}
     for i, s in ipairs(Config.Supplier) do
         list[i] = { item = s.item, label = s.label, price = s.price, have = stockOf(FRIDGE, s.item) }
     end
-    return { balance = Society.Balance(), items = list, max = Config.SupplierMaxPerBuy }
+    return { label = Config.Label, balance = Society.Balance(), items = list, max = Config.SupplierMaxPerBuy }
+end
+
+lib.callback.register('f_cafe:getSupplier', function(src)
+    if not staffJob(src, Config.Grades.restock, true) then return false end
+    return supplierData()
 end)
 
-lib.callback.register('f_cafe:restock', function(src, item, amount)
-    if not throttle(src, 'restock', 1000) then return { ok = false, msg = 'Tunggu sebentar.' } end
+---Beli beberapa bahan sekaligus (panel NUI supplier). Semua dicek dulu, baru saldo dipotong sekali.
+---@param cart table<string, number> item -> jumlah
+lib.callback.register('f_cafe:restockCart', function(src, cart)
+    local function fail(msg)
+        local data = supplierData()
+        data.ok, data.msg = false, msg
+        return data
+    end
+    if not throttle(src, 'restock', 1500) then return fail('Tunggu sebentar.') end
     if not staffJob(src, Config.Grades.restock, true) then return { ok = false, msg = 'Hanya Manager yang bisa restock.' } end
-    if not near(src, Config.Points.fridge.coords, 4.0) then return { ok = false, msg = 'Kamu harus berada di dekat gudang.' } end
+    if not near(src, Config.Points.fridge.coords, 4.0) then return fail('Kamu harus berada di dekat gudang.') end
+    if type(cart) ~= 'table' then return fail('Pesanan tidak valid.') end
 
-    local s = SupplierByItem[item]
-    amount = tonumber(amount)
-    if not s or not amount or not isInt(amount, 1, Config.SupplierMaxPerBuy) then return { ok = false, msg = 'Jumlah tidak valid.' } end
-    if not ox:CanCarryItem(FRIDGE, item, amount) then return { ok = false, msg = 'Gudang penuh.' } end
+    local lines, cost = {}, 0
+    for item, raw in pairs(cart) do
+        local s, n = SupplierByItem[item], tonumber(raw)
+        if not s or not n or not isInt(n, 0, Config.SupplierMaxPerBuy) then return fail('Jumlah tidak valid.') end
+        n = math.tointeger(n)
+        if n > 0 then
+            if not ox:CanCarryItem(FRIDGE, item, n) then return fail(('Gudang penuh untuk %s.'):format(s.label)) end
+            lines[#lines + 1] = { s = s, n = n }
+            cost += s.price * n
+        end
+    end
+    if #lines == 0 then return fail('Belum ada bahan yang dipilih.') end
 
-    local cost = s.price * amount
-    if not Society.Remove(cost, ('Restock %dx %s'):format(amount, s.label)) then
-        return { ok = false, msg = ('Saldo organisasi tidak cukup (Rp %d).'):format(cost) }
+    if not Society.Remove(cost, ('Restock %d jenis bahan'):format(#lines)) then
+        return fail(('Saldo organisasi tidak cukup (butuh Rp %s).'):format(lib.math.groupdigits(cost, '.')))
     end
-    if not ox:AddItem(FRIDGE, item, amount) then
-        Society.Add(cost, 'Refund restock')
-        return { ok = false, msg = 'Gagal menambah stok.' }
+    -- bahan yang gagal masuk gudang dikembalikan uangnya
+    local refund = 0
+    for _, l in ipairs(lines) do
+        if not ox:AddItem(FRIDGE, l.s.item, l.n) then refund += l.s.price * l.n end
     end
-    return { ok = true, msg = ('Membeli %dx %s seharga Rp %d.'):format(amount, s.label, cost) }
+    if refund > 0 then Society.Add(refund, 'Refund restock') end
+
+    local data = supplierData()
+    data.ok = refund < cost
+    data.msg = refund == 0 and ('Pembelian Rp %s berhasil. Stok gudang bertambah.'):format(lib.math.groupdigits(cost, '.'))
+        or refund < cost and ('Sebagian bahan gagal masuk gudang, Rp %s dikembalikan.'):format(lib.math.groupdigits(refund, '.'))
+        or 'Gagal menambah stok, uang dikembalikan.'
+    return data
 end)
 
 lib.callback.register('f_cafe:getReadyStock', function(src)
@@ -689,7 +748,19 @@ CreateThread(function()
         end
         promos = MySQL.query.await('SELECT * FROM cafe_promos') or {}
     end
-    for _, p in ipairs(promos) do Promos[p.id] = p end
+    for _, p in ipairs(promos) do
+        -- harga menu berubah: tarik harga promo lama ke batas min/max yang berlaku sekarang
+        local food, drink = MenuByItem[p.food], MenuByItem[p.drink]
+        if food and drink then
+            local normal = food.price + drink.price
+            local price = math.max(math.ceil(normal * Config.Promo.minPercent / 100), math.min(math.floor(normal * Config.Promo.maxPercent / 100), p.price))
+            if price ~= p.price then
+                MySQL.update.await('UPDATE cafe_promos SET price = ? WHERE id = ?', { price, p.id })
+                p.price = price
+            end
+        end
+        Promos[p.id] = p
+    end
 
     -- Orders lama (yang masih dicatat 'delivered'/'cancelled' tidak dimuat)
     MySQL.update.await("DELETE FROM cafe_orders WHERE status IN ('delivered', 'cancelled') AND updated_at < ?", { os.time() - 7 * 86400 })
@@ -705,9 +776,18 @@ CreateThread(function()
 
     -- Stash kulkas & siap jual didaftarkan oleh f_stash (ID tetap Config.Stash.*.id); lokasi diatur lewat /stash.
 
-    local menuFilter = {}
-    for item in pairs(MenuByItem) do menuFilter[item] = true end
+    refreshStaffCount()
+    SetTimeout(5000, cleanReady) -- tunggu f_stash mendaftarkan stash
+end)
 
+---------------------------------------------------------------------------
+-- Hook ox_inventory (dipasang langsung, bukan setelah query DB, dan dipasang ulang
+-- saat ox_inventory restart karena hook lama ikut hilang)
+---------------------------------------------------------------------------
+local menuFilter = {}
+for item in pairs(MenuByItem) do menuFilter[item] = true end
+
+local function registerHooks()
     -- Stok siap jual tidak punya kadaluarsa
     ox:registerHook('createItem', function(payload)
         local meta = payload.metadata
@@ -724,6 +804,12 @@ CreateThread(function()
         end
         return false
     end, { inventoryFilter = { '^' .. READY .. '$' } })
+end
 
-    refreshStaffCount()
+registerHooks()
+
+AddEventHandler('onServerResourceStart', function(resource)
+    if resource ~= 'ox_inventory' then return end
+    registerHooks()
+    SetTimeout(5000, cleanReady)
 end)

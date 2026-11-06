@@ -311,14 +311,7 @@ return {
                 event = 'police:client:EscortPlayer',
             },
         },
-        mechanic = {
-            {
-                id = 'towVehicle',
-                icon = 'truck-pickup',
-                label = 'Derek Kendaraan',
-                event = 'qb-tow:client:TowVehicle',
-            },
-        },
+        -- mechanic: derek pakai ox_target di bak flatbed (f_mechanicjob)
         taxi = {
             {
                 id = 'togglemeter',
@@ -345,12 +338,6 @@ return {
                 icon = 'toggle-on',
                 label = 'NPC On/Off',
                 event = 'jobs:client:ToggleNpc',
-            },
-            {
-                id = 'towVehicle',
-                icon = 'truck-pickup',
-                label = 'Derek Kendaraan',
-                event = 'qb-tow:client:TowVehicle',
             },
         },
     },

@@ -18,7 +18,7 @@ function showMsg(text) {
 }
 
 function render(d) {
-    $('sub').textContent = d.label || 'Kantor Gaji';
+    $('sub').textContent = d.label || 'ATM';
     $('net').textContent = rupiah(d.net);
     $('net2').textContent = rupiah(d.net);
     $('gross').textContent = rupiah(d.gross);

@@ -3,7 +3,8 @@ local sharedConfig = require 'config.shared'
 local offices = sharedConfig.offices
 local blips, zones = {}, {}
 local activeText -- text UI of the zone the player is standing in
-local view       -- nil | 'services' | 'staff'
+local view       -- nil | 'services' | 'staff' | 'jobs'
+local VIEW = { openServices = 'services', openStaff = 'staff', openJobs = 'jobs' }
 local initialized = false
 
 local function restoreText()
@@ -14,7 +15,7 @@ end
 -- NUI
 ---------------------------------------------------------------------------
 local function openNui(action, data)
-    view = action == 'openServices' and 'services' or 'staff'
+    view = VIEW[action]
     lib.hideTextUI()
     SendNUIMessage({ action = action, data = data })
     SetNuiFocus(true, true)
@@ -28,11 +29,18 @@ local function closeNui()
     restoreText()
 end
 
-local function openServices(officeKey)
-    local data = lib.callback.await('f_cityhall:getServices', false, officeKey)
-    if not data then return end
-    data.office = officeKey
+local function openServices(officeKey, index)
+    local data = lib.callback.await('f_cityhall:getServices', false, officeKey, index)
+    if not data then return restoreText() end
+    data.office, data.counter = officeKey, index
+    data.police = officeKey == 'police'
     openNui('openServices', data)
+end
+
+local function openJobs()
+    local data = lib.callback.await('f_cityhall:getJobs', false)
+    if not data then return restoreText() end
+    openNui('openJobs', data)
 end
 
 local function openStaff()
@@ -50,7 +58,7 @@ RegisterNUICallback('close', function(_, cb)
 end)
 
 RegisterNUICallback('order', function(data, cb)
-    local res = lib.callback.await('f_cityhall:placeOrder', false, data.office, data.ids, data.method)
+    local res = lib.callback.await('f_cityhall:placeOrder', false, data.office, data.counter, data.ids, data.method)
     if res and res.ok then
         if res.paid then
             lib.notify({ type = 'success', description = ('Permohonan #%s dibayar. Silakan tunggu petugas.'):format(res.code) })
@@ -71,6 +79,37 @@ local function handled(res)
     if res and res.msg then lib.notify({ description = res.msg, type = res.ok and 'success' or 'error' }) end
     return res or { ok = false }
 end
+
+RegisterNUICallback('applyJob', function(data, cb)
+    local res = handled(lib.callback.await('f_cityhall:server:applyJob', false, data.job))
+    if res.ok then closeNui() end
+    cb(res)
+    -- job scripts with their own menu (f_garbagejob) open it right after applying
+    if res.ok and res.menu then TriggerEvent(res.menu) end
+end)
+
+-- tab Pajak Perusahaan: diteruskan ke f_tax (validasi pimpinan & saldo ada di server f_tax)
+local function taxCall(name, ...)
+    if GetResourceState('f_tax') ~= 'started' then return { err = 'Layanan pajak perusahaan sedang tidak aktif.' } end
+    return lib.callback.await(name, false, ...)
+end
+
+RegisterNUICallback('companyTax', function(_, cb)
+    if view ~= 'services' then return cb(false) end
+    cb(taxCall('f_tax:open', 'pay') or { err = 'Server tidak merespons.' })
+end)
+
+RegisterNUICallback('companyTaxHistory', function(data, cb)
+    if view ~= 'services' then return cb(false) end
+    cb(taxCall('f_tax:history', data.job) or false)
+end)
+
+RegisterNUICallback('payCompanyTax', function(_, cb)
+    if view ~= 'services' then return cb({ ok = false }) end
+    local res = taxCall('f_tax:pay')
+    if res and res.err then res = { ok = false, msg = res.err } end
+    cb(handled(res))
+end)
 
 RegisterNUICallback('approve', function(data, cb)
     cb(handled(lib.callback.await('f_cityhall:approve', false, data.id)))
@@ -121,44 +160,8 @@ end)
 RegisterNetEvent('f_cityhall:client:openStaff', openStaff)
 
 ---------------------------------------------------------------------------
--- Counter (citizens) & desk (staff)
+-- Counters & job center (citizens), desk (staff)
 ---------------------------------------------------------------------------
-local function openEmploymentMenu()
-    local jobs = sharedConfig.employment.jobs
-    local keys = {}
-    for k in pairs(jobs) do keys[#keys + 1] = k end
-    table.sort(keys)
-
-    local options = {}
-    for _, job in ipairs(keys) do
-        options[#options + 1] = {
-            title = jobs[job],
-            onSelect = function()
-                lib.callback.await('f_cityhall:server:applyJob', false, job)
-                restoreText()
-            end
-        }
-    end
-    lib.registerContext({ id = 'cityhall_employment_menu', title = 'Lowongan Kerja', menu = 'cityhall_counter_menu', onExit = restoreText, options = options })
-    lib.showContext('cityhall_employment_menu')
-end
-
-local function openCounter(officeKey)
-    local office = offices[officeKey]
-    if not (office.employment and sharedConfig.employment.enabled) then return openServices(officeKey) end
-
-    lib.registerContext({
-        id = 'cityhall_counter_menu',
-        title = office.label,
-        onExit = restoreText,
-        options = {
-            { title = 'Layanan Administrasi', description = office.subtitle, icon = 'id-card', onSelect = function() openServices(officeKey) end },
-            { title = 'Lowongan Kerja', description = 'Pilih pekerjaan baru', icon = 'briefcase', onSelect = openEmploymentMenu },
-        }
-    })
-    lib.showContext('cityhall_counter_menu')
-end
-
 local function openDesk(officeKey)
     local job = QBX.PlayerData.job
     if job.name ~= offices[officeKey].job then return end
@@ -213,9 +216,9 @@ local function init()
     initialized = true
 
     for key, office in pairs(offices) do
-        if office.blip then
-            local b = office.blip
-            local blip = AddBlipForCoord(office.counter.x, office.counter.y, office.counter.z)
+        if office.blip and office.counters[1] then
+            local b, at = office.blip, office.counters[1].coords
+            local blip = AddBlipForCoord(at.x, at.y, at.z)
             SetBlipSprite(blip, b.sprite or 1)
             SetBlipDisplay(blip, b.display or 4)
             SetBlipScale(blip, b.scale or 0.7)
@@ -227,7 +230,12 @@ local function init()
             blips[#blips + 1] = blip
         end
 
-        addZone(office.counter, ('[E] %s'):format(office.label), alwaysTrue, function() openCounter(key) end)
+        for i, counter in ipairs(office.counters or {}) do
+            addZone(counter.coords, ('[E] %s'):format(counter.label), alwaysTrue, function() openServices(key, i) end)
+        end
+        if office.jobCenter and sharedConfig.employment.enabled then
+            addZone(office.jobCenter, '[E] Cari Pekerjaan', alwaysTrue, openJobs)
+        end
         addZone(office.desk, '[E] Meja Petugas', function()
             return QBX.PlayerData.job and QBX.PlayerData.job.name == office.job
         end, function() openDesk(key) end)

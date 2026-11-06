@@ -90,6 +90,7 @@ local function cook(stationId, recipe)
         canCancel = true,
         disable = { move = true, car = true, combat = true },
         anim = st.anim,
+        prop = st.prop,
     })
     cooking = false
 
@@ -129,31 +130,6 @@ end
 ---------------------------------------------------------------------------
 -- Manager: supplier, buang stok, promo
 ---------------------------------------------------------------------------
-local function openSupplier()
-    local data = lib.callback.await('f_cafe:getSupplier', false)
-    if not data then return notify('Hanya Manager yang bisa restock.', 'error') end
-
-    local options = {}
-    for _, s in ipairs(data.items) do
-        options[#options + 1] = {
-            title = ('%s - Rp %d/pcs'):format(s.label, s.price),
-            description = ('Stok gudang: %d'):format(s.have),
-            icon = 'box',
-            onSelect = function()
-                local input = lib.inputDialog(('Beli %s'):format(s.label), {
-                    { type = 'number', label = 'Jumlah', description = ('Harga Rp %d/pcs, dibayar dari rekening organisasi'):format(s.price),
-                      min = 1, max = data.max, default = 10, required = true },
-                })
-                if not input then return end
-                result(lib.callback.await('f_cafe:restock', false, s.item, tonumber(input[1])))
-                openSupplier()
-            end,
-        }
-    end
-    lib.registerContext({ id = 'f_cafe_supplier', title = ('Supplier - Saldo Rp %d'):format(data.balance or 0), options = options })
-    lib.showContext('f_cafe_supplier')
-end
-
 local function openDiscard()
     local list = lib.callback.await('f_cafe:getReadyStock', false)
     if not list then return end
@@ -258,7 +234,7 @@ CreateThread(function()
     -- Buka kulkas & stok siap jual: lewat [E] dari f_stash.
     addZone('fridge', P.fridge, {
         { name = 'f_cafe_supplier', icon = 'fa-solid fa-truck', label = 'Pesan Bahan (Supplier)',
-          canInteract = function() return onDuty(Config.Grades.restock) end, onSelect = openSupplier },
+          canInteract = function() return onDuty(Config.Grades.restock) end, onSelect = function() OpenSupplier() end },
     })
 
     addZone('ready', P.ready, {
@@ -266,17 +242,21 @@ CreateThread(function()
           canInteract = function() return onDuty(Config.Grades.discard) end, onSelect = openDiscard },
     })
 
-    addZone('orders', P.orders, {
-        { name = 'f_cafe_orders', icon = 'fa-solid fa-receipt', label = 'List Pemesanan',
-          canInteract = function() return onDuty() end, onSelect = function() OpenOrders() end },
-        { name = 'f_cafe_promos', icon = 'fa-solid fa-tags', label = 'Kelola Promo',
-          canInteract = function() return onDuty(Config.Grades.promo) end, onSelect = function() openPromos() end },
-    })
+    for i, point in ipairs(P.orders) do
+        addZone('orders_' .. i, point, {
+            { name = 'f_cafe_orders_' .. i, icon = 'fa-solid fa-receipt', label = 'List Pemesanan',
+              canInteract = function() return onDuty() end, onSelect = function() OpenOrders() end },
+            { name = 'f_cafe_promos_' .. i, icon = 'fa-solid fa-tags', label = 'Kelola Promo',
+              canInteract = function() return onDuty(Config.Grades.promo) end, onSelect = function() openPromos() end },
+        })
+    end
 
-    addZone('counter', P.counter, {
-        { name = 'f_cafe_menu', icon = 'fa-solid fa-utensils', label = 'Lihat Menu & Pesan', distance = Config.Order.counterDistance,
-          onSelect = function() OpenMenu() end },
-    })
+    for i, point in ipairs(P.counter) do
+        addZone('counter_' .. i, point, {
+            { name = 'f_cafe_menu_' .. i, icon = 'fa-solid fa-utensils', label = 'Lihat Menu & Pesan', distance = Config.Order.counterDistance,
+              onSelect = function() OpenMenu() end },
+        })
+    end
 
     for id, st in pairs(Config.Stations) do
         addZone('station_' .. id, st, {
@@ -294,10 +274,7 @@ local npc
 local inRange = false
 
 local function despawnNpc()
-    if npc and DoesEntityExist(npc) then
-        exports.ox_target:removeLocalEntity(npc)
-        DeleteEntity(npc)
-    end
+    if npc and DoesEntityExist(npc) then DeleteEntity(npc) end
     npc = nil
 end
 
@@ -312,10 +289,6 @@ local function spawnNpc()
     SetBlockingOfNonTemporaryEvents(npc, true)
     FreezeEntityPosition(npc, true)
     if Config.NPC.scenario then TaskStartScenarioInPlace(npc, Config.NPC.scenario, 0, true) end
-    exports.ox_target:addLocalEntity(npc, {
-        { name = 'f_cafe_npc', icon = 'fa-solid fa-utensils', label = 'Pesan ke Kasir', distance = Config.Order.counterDistance,
-          onSelect = function() OpenMenu() end },
-    })
 end
 
 local function updateNpc()

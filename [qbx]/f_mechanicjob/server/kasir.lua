@@ -339,7 +339,6 @@ local function staffData(src, player)
         bills = list, unpaid = unpaid, wait = wait, sum = sum,
         balance = okBal and tonumber(balance) or nil,
         canPrice = canPrice(player),
-        canSupply = Stock.CanBuy(player.PlayerData.job),
     }
 end
 

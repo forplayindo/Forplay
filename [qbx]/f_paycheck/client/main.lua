@@ -1,6 +1,6 @@
-local config = require 'config'
-local blips, points = {}, {}
+local banking = require 'shared.banking'
 local open = false
+local spot -- lokasi pencairan yang sedang dibuka: { kind = 'atm', pos = vec3 } / { kind = 'bank' }
 
 ---------------------------------------------------------------------------
 -- NUI
@@ -8,18 +8,20 @@ local open = false
 local function closeNui()
     if not open then return end
     open = false
+    spot = nil
     SetNuiFocus(false, false)
     SendNUIMessage({ action = 'close' })
 end
 
-local function openNui(label)
+local function openNui(where)
     if open then return end
-    local data = lib.callback.await('f_paycheck:get', false)
+    local data = lib.callback.await('f_paycheck:get', false, where)
     if not data then
-        return lib.notify({ type = 'error', description = 'Kamu terlalu jauh dari petugas.' })
+        return lib.notify({ type = 'error', description = 'Kamu terlalu jauh dari ATM / bank.' })
     end
-    data.label = label
+    data.label = where.kind == 'atm' and 'ATM' or 'Bank'
     open = true
+    spot = where
     SendNUIMessage({ action = 'open', data = data })
     SetNuiFocus(true, true)
 end
@@ -30,7 +32,7 @@ RegisterNUICallback('close', function(_, cb)
 end)
 
 RegisterNUICallback('withdraw', function(data, cb)
-    local res = lib.callback.await('f_paycheck:withdraw', false, data.method) or { ok = false, msg = 'Server tidak merespons.' }
+    local res = lib.callback.await('f_paycheck:withdraw', false, data.method, spot) or { ok = false, msg = 'Server tidak merespons.' }
     if res.ok then
         closeNui()
         lib.notify({ type = 'success', title = 'Paycheck Dicairkan', description = 'Rincian dikirim ke Email kamu.', icon = 'envelope' })
@@ -39,59 +41,38 @@ RegisterNUICallback('withdraw', function(data, cb)
 end)
 
 ---------------------------------------------------------------------------
--- NPC (spawn hanya saat dekat)
+-- ox_target: opsi "Ambil Gaji" terpisah dari Buka ATM / Buka Bank
 ---------------------------------------------------------------------------
-local function spawnPed(point)
-    local loc = point.loc
-    lib.requestModel(loc.model)
-    local c = loc.coords
-    local ped = CreatePed(4, loc.model, c.x, c.y, c.z - 1.0, c.w, false, true)
-    SetModelAsNoLongerNeeded(loc.model)
-    SetEntityInvincible(ped, true)
-    FreezeEntityPosition(ped, true)
-    SetBlockingOfNonTemporaryEvents(ped, true)
-    if loc.scenario then TaskStartScenarioInPlace(ped, loc.scenario, 0, true) end
-    exports.ox_target:addLocalEntity(ped, {{
-        name = 'f_paycheck', icon = 'fas fa-money-check-dollar', label = 'Ambil Paycheck',
-        distance = 2.5,
-        onSelect = function() openNui(loc.label) end,
-    }})
-    point.ped = ped
-end
-
-local function removePed(point)
-    if point.ped and DoesEntityExist(point.ped) then
-        exports.ox_target:removeLocalEntity(point.ped, 'f_paycheck')
-        DeleteEntity(point.ped)
+local function atBank(entity)
+    local pos = GetEntityCoords(entity).xy
+    for i = 1, #banking.banks do
+        if #(pos - banking.banks[i].xy) <= 2.0 then return true end
     end
-    point.ped = nil
+    return false
 end
 
 CreateThread(function()
-    for i = 1, #config.locations do
-        local loc = config.locations[i]
-        local c = loc.coords
-        if loc.blip then
-            local blip = AddBlipForCoord(c.x, c.y, c.z)
-            SetBlipSprite(blip, loc.blip.sprite or 500)
-            SetBlipColour(blip, loc.blip.colour or 2)
-            SetBlipScale(blip, loc.blip.scale or 0.7)
-            SetBlipAsShortRange(blip, true)
-            BeginTextCommandSetBlipName('STRING')
-            AddTextComponentString(loc.label)
-            EndTextCommandSetBlipName(blip)
-            blips[#blips + 1] = blip
-        end
-        points[#points + 1] = lib.points.new({
-            coords = c.xyz, distance = 40.0, loc = loc,
-            onEnter = spawnPed, onExit = removePed,
-        })
+    if #banking.atms > 0 then
+        exports.ox_target:addModel(banking.atms, {{
+            name = 'f_paycheck_atm', icon = 'fas fa-money-check-dollar', label = 'Ambil Gaji',
+            distance = 2.5,
+            onSelect = function(data) openNui({ kind = 'atm', pos = GetEntityCoords(data.entity) }) end,
+        }})
+    end
+    if #banking.pedModels > 0 then
+        -- model ped bank juga bisa dipakai NPC lain, jadi hanya aktif di titik NPC bank
+        exports.ox_target:addModel(banking.pedModels, {{
+            name = 'f_paycheck_bank', icon = 'fas fa-money-check-dollar', label = 'Ambil Gaji',
+            distance = 4.5,
+            canInteract = atBank,
+            onSelect = function() openNui({ kind = 'bank' }) end,
+        }})
     end
 end)
 
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= cache.resource then return end
     closeNui()
-    for i = 1, #points do removePed(points[i]); points[i]:remove() end
-    for i = 1, #blips do RemoveBlip(blips[i]) end
+    exports.ox_target:removeModel(banking.atms, 'f_paycheck_atm')
+    exports.ox_target:removeModel(banking.pedModels, 'f_paycheck_bank')
 end)

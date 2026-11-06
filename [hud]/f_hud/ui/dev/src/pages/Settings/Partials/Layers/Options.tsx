@@ -274,10 +274,6 @@ const Options = () => {
     }));
   };
 
-  const handleEditMiniMap = () => {
-    fetchNui("ui:OpenEditMiniMap", true, true);
-  };
-
   const handleResetMiniMap = () => {
     localStorage.setItem("map_placer", JSON.stringify({}));
     setMiniMap((p) => ({
@@ -532,24 +528,6 @@ const Options = () => {
           </div>
         </div>
         <hr className="border-white/10" />
-        <div className="flex gap-1.5 items-center select-none">
-          <div className="min-w-8 min-h-8 rounded border border-white/15 bg-white/20 flex items-center justify-center">
-            <IoMove />
-          </div>
-          <div className="relative flex w-full items-center">
-            <div className="w-full min-h-8 rounded border border-white/10 bg-white/10 flex items-center pl-2.5">
-              <h1 className="text-white text-xs font-bold">
-                {t("edit_mini_map")}
-              </h1>
-              <div className="ml-auto flex items-center justify-center px-1">
-                <button
-                  onClick={handleEditMiniMap}
-                  className="w-5 h-5 bg-121212 border border-white/10 rounded-full hover:bg-01DEA7 transition-colors"
-                ></button>
-              </div>
-            </div>
-          </div>
-        </div>
         <div className="flex gap-1.5 items-center select-none">
           <div className="min-w-8 min-h-8 rounded border border-white/15 bg-white/20 flex items-center justify-center">
             <IoMove />

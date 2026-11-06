@@ -92,6 +92,12 @@
     "gta6": "Sora",
     "mandi": "Mandi",
     "kencing": "Kencing",
-    "poop": "BAB"
+    "poop": "BAB",
+    "altitude": "Ketinggian",
+    "climb": "Naik m/s",
+    "speed_short": "Kec",
+    "rotor": "Rotor",
+    "body": "Bodi",
+    "too_low": "Terlalu rendah"
   }
 }

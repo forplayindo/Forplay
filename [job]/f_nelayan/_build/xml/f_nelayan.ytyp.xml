@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CMapTypes>
+ <extensions />
+ <archetypes>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="60" />
+   <flags value="32" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.171875" y="-0.158443" z="0" />
+   <bbMax x="0.171875" y="0.158443" z="0.516857" />
+   <bsCentre x="0" y="0" z="0.258428" />
+   <bsRadius value="0.348469" />
+   <hdTextureDist value="60" />
+   <name>f_nelayan_jaring_tangan</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary></physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>f_nelayan_jaring_tangan</assetName>
+   <extensions />
+  </Item>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="120" />
+   <flags value="32" />
+   <specialAttribute value="0" />
+   <bbMin x="-2.131378" y="-1.530847" z="0" />
+   <bbMax x="2.131378" y="1.530847" z="2.700723" />
+   <bsCentre x="0" y="0" z="1.350362" />
+   <bsRadius value="2.951227" />
+   <hdTextureDist value="120" />
+   <name>f_nelayan_jaring_lempar</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary></physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>f_nelayan_jaring_lempar</assetName>
+   <extensions />
+  </Item>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="200" />
+   <flags value="32" />
+   <specialAttribute value="0" />
+   <bbMin x="-4.205082" y="-2.561424" z="0" />
+   <bbMax x="4.205082" y="2.561424" z="0.11375" />
+   <bsCentre x="0" y="0" z="0.056875" />
+   <bsRadius value="4.924109" />
+   <hdTextureDist value="200" />
+   <name>f_nelayan_jaring_laut</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary></physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>f_nelayan_jaring_laut</assetName>
+   <extensions />
+  </Item>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="100" />
+   <flags value="32" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.500453" y="-0.544609" z="0" />
+   <bbMax x="0.500453" y="0.544609" z="1.210013" />
+   <bsCentre x="0" y="0" z="0.605007" />
+   <bsRadius value="0.955555" />
+   <hdTextureDist value="100" />
+   <name>f_nelayan_jaring_ikan</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary></physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>f_nelayan_jaring_ikan</assetName>
+   <extensions />
+  </Item>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="80" />
+   <flags value="32" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.307948" y="-0.207981" z="0" />
+   <bbMax x="0.307948" y="0.207981" z="0.300304" />
+   <bsCentre x="0" y="0" z="0.150152" />
+   <bsRadius value="0.400792" />
+   <hdTextureDist value="80" />
+   <name>f_nelayan_peti_ikan</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary>f_nelayan_peti_ikan</physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>f_nelayan_peti_ikan</assetName>
+   <extensions />
+  </Item>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="80" />
+   <flags value="32" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.307948" y="-0.207981" z="0" />
+   <bbMax x="0.307948" y="0.207981" z="0.300304" />
+   <bsCentre x="0" y="0" z="0.150152" />
+   <bsRadius value="0.400792" />
+   <hdTextureDist value="80" />
+   <name>f_nelayan_peti_kosong</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary>f_nelayan_peti_kosong</physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>f_nelayan_peti_kosong</assetName>
+   <extensions />
+  </Item>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="100" />
+   <flags value="32" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.342689" y="-0.229595" z="0" />
+   <bbMax x="0.342689" y="0.229595" z="0.910809" />
+   <bsCentre x="0" y="0" z="0.455404" />
+   <bsRadius value="0.614445" />
+   <hdTextureDist value="100" />
+   <name>f_nelayan_peti_tumpuk</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary>f_nelayan_peti_tumpuk</physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>f_nelayan_peti_tumpuk</assetName>
+   <extensions />
+  </Item>
+ </archetypes>
+ <name>f_nelayan</name>
+ <dependencies />
+ <compositeEntityTypes itemType="CCompositeEntityType" />
+</CMapTypes>

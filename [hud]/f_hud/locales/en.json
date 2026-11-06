@@ -92,6 +92,12 @@
     "gta6": "Sora",
     "mandi": "Bath",
     "kencing": "Pee",
-    "poop": "Poop"
+    "poop": "Poop",
+    "altitude": "Altitude",
+    "climb": "Climb m/s",
+    "speed_short": "Spd",
+    "rotor": "Rotor",
+    "body": "Body",
+    "too_low": "Too low"
   }
 }

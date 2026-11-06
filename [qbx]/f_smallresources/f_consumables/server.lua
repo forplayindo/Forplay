@@ -17,6 +17,14 @@ end
 ---@param key 'hunger' | 'thirst' | 'stress'
 ---@param amount number
 local function addStatus(source, key, amount)
+    -- stress lives in the statebag (f_hud stress module), metadata can lag behind it
+    if key == 'stress' and GetResourceState('f_hud') == 'started' then
+        local ok = pcall(function()
+            if amount < 0 then exports.f_hud:RelieveStress(source, -amount) else exports.f_hud:AddStress(source, amount) end
+        end)
+        if ok then return end
+    end
+
     local player = exports.qbx_core:GetPlayer(source)
     if not player then return end
 
@@ -110,6 +118,11 @@ local function registerStatusHook()
 end
 
 CreateThread(registerStatusHook)
+
+---Status an item gives when used, e.g. { hunger = 15, stress = -2 } (for menus/shops).
+---@param item string
+---@return table<string, number>?
+exports('GetItemStatus', function(item) return itemStatus[item] end)
 
 AddEventHandler('onResourceStart', function(resource)
     if resource == 'ox_inventory' then SetTimeout(1000, registerStatusHook) end

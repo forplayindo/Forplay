@@ -1,6 +1,6 @@
 lib.addCommand('ac', {
     help = 'Anti-cheat admin tools: status | points <id> | resetpoints <id> | unban <identifier> | bans',
-    restricted = Config.ExemptAce,
+    restricted = Config.CommandGroup,
     params = {
         { name = 'action', help = 'status | points | resetpoints | unban | bans', type = 'string' },
         { name = 'target', help = 'player id or ban identifier', type = 'string', optional = true },

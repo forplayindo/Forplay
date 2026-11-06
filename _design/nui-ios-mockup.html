@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>F-UI iOS Mockup</title>
+<!-- Mockup saja: di FiveM nanti Inter dibundel lokal (woff2) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   BAGIAN 1 — BASE KIT GAYA iOS (nanti jadi base.css bersama)
+   ===================================================================== */
+:root {
+    --alpha: .85;
+    --bg: rgba(242, 242, 247, var(--alpha));        /* latar panel (grouped background) */
+    --side: rgba(255, 255, 255, .4);                /* sidebar / inspector */
+    --cell: rgba(255, 255, 255, .94);               /* baris & kartu */
+    --seg-on: #ffffff;
+    --fill: rgba(118, 118, 128, .12);
+    --fill-2: rgba(118, 118, 128, .2);
+    --sep: rgba(60, 60, 67, .16);
+    --label: #1c1c1e;
+    --label-2: rgba(60, 60, 67, .62);
+    --label-3: rgba(60, 60, 67, .3);
+    --alert: rgba(242, 242, 247, .97);
+
+    --accent: #b8761f;
+    --accent-rgb: 184, 118, 31;
+    --on-accent: #ffffff;
+    --accent-soft: rgba(var(--accent-rgb), .14);
+
+    --green: #34c759; --red: #ff3b30; --orange: #ff9500; --blue: #007aff;
+    --indigo: #5856d6; --teal: #30b0c7; --pink: #ff2d55; --gray: #8e8e93;
+    --green-t: #248a3d; --red-t: #d70015; --orange-t: #c93400;   /* versi teks */
+
+    --font: 'Inter', -apple-system, 'Segoe UI', system-ui, sans-serif;
+}
+:root[data-mode="dark"] {
+    --bg: rgba(0, 0, 0, var(--alpha));
+    --side: rgba(28, 28, 30, .45);
+    --cell: rgba(28, 28, 30, .95);
+    --seg-on: #636366;
+    --fill: rgba(118, 118, 128, .24);
+    --fill-2: rgba(118, 118, 128, .36);
+    --sep: rgba(84, 84, 88, .55);
+    --label: #ffffff;
+    --label-2: rgba(235, 235, 245, .6);
+    --label-3: rgba(235, 235, 245, .3);
+    --alert: rgba(44, 44, 46, .97);
+    --accent: #f3b354; --accent-rgb: 243, 179, 84; --on-accent: #1d1406;
+    --green: #30d158; --red: #ff453a; --orange: #ff9f0a; --blue: #0a84ff;
+    --indigo: #5e5ce6; --teal: #40c8e0; --pink: #ff375f;
+    --green-t: #30d158; --red-t: #ff453a; --orange-t: #ff9f0a;
+}
+:root[data-accent="blue"]   { --accent: #007aff; --accent-rgb: 0, 122, 255;  --on-accent: #fff; }
+:root[data-accent="green"]  { --accent: #248a3d; --accent-rgb: 36, 138, 61;  --on-accent: #fff; }
+:root[data-accent="purple"] { --accent: #af52de; --accent-rgb: 175, 82, 222; --on-accent: #fff; }
+:root[data-mode="dark"][data-accent="blue"]   { --accent: #0a84ff; --accent-rgb: 10, 132, 255; --on-accent: #fff; }
+:root[data-mode="dark"][data-accent="green"]  { --accent: #30d158; --accent-rgb: 48, 209, 88;  --on-accent: #052e12; }
+:root[data-mode="dark"][data-accent="purple"] { --accent: #bf5af2; --accent-rgb: 191, 90, 242; --on-accent: #fff; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); font-size: 14px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+button { border: 0; background: none; cursor: pointer; }
+.ic { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.spacer { flex: 1; }
+
+/* ---------- Panel ---------- */
+.ios { color: var(--label); background: var(--bg); border-radius: 26px; box-shadow: 0 8px 24px rgba(0, 0, 0, .16); overflow: hidden; }
+.ios ::selection { background: var(--accent-soft); }
+
+/* ---------- Tipografi ---------- */
+.large-title { font-size: 28px; font-weight: 700; letter-spacing: -.025em; line-height: 1.15; }
+.title2 { font-size: 20px; font-weight: 700; letter-spacing: -.015em; }
+.headline { font-size: 15px; font-weight: 600; }
+.body { font-size: 14px; }
+.subhead { font-size: 13px; color: var(--label-2); }
+.footnote { font-size: 12px; color: var(--label-2); }
+.caption { font-size: 11px; color: var(--label-2); }
+.num { font-variant-numeric: tabular-nums; }
+.t-green { color: var(--green-t); } .t-red { color: var(--red-t); } .t-orange { color: var(--orange-t); } .t-accent { color: var(--accent); }
+
+/* ---------- Navbar ---------- */
+.navbar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 50px; padding: 0 14px; }
+.navbar .ttl { font-size: 15px; font-weight: 600; }
+.navbar .l { display: flex; align-items: center; }
+.navbar .r { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.back { display: flex; align-items: center; gap: 2px; color: var(--accent); font-size: 15px; }
+.back .ic { width: 20px; height: 20px; stroke-width: 2.4; }
+.circle { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--fill); color: var(--label-2); position: relative; transition: background .12s; }
+.circle:hover { background: var(--fill-2); }
+.circle .ic { width: 14px; height: 14px; stroke-width: 2.8; }
+.circle.tint { background: var(--accent-soft); color: var(--accent); }
+
+/* ---------- Tombol ---------- */
+.b { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 18px; border-radius: 12px; font-size: 15px; font-weight: 600; white-space: nowrap; transition: opacity .12s, background .12s; }
+.b:active { opacity: .6; }
+.b-filled { background: var(--accent); color: var(--on-accent); }
+.b-tinted { background: var(--accent-soft); color: var(--accent); }
+.b-gray { background: var(--fill); color: var(--label); }
+.b-plain { color: var(--accent); padding: 0 6px; font-weight: 500; }
+.b-red { background: var(--red); color: #fff; }
+.b-red-plain { color: var(--red-t); padding: 0 6px; font-weight: 500; }
+.b-lg { height: 50px; border-radius: 14px; font-size: 16px; }
+.b-block { width: 100%; }
+.b-cap { height: 28px; padding: 0 14px; border-radius: 14px; font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+.b[disabled] { opacity: .35; pointer-events: none; }
+.spin { width: 15px; height: 15px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: rot .7s linear infinite; }
+@keyframes rot { to { transform: rotate(360deg); } }
+.bubble { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--red); color: #fff; font-size: 11px; font-weight: 700; }
+.circle .bubble { position: absolute; top: -4px; right: -5px; }
+
+/* ---------- Grouped list ---------- */
+.group-h { padding: 0 16px 6px; font-size: 12px; color: var(--label-2); text-transform: uppercase; letter-spacing: .02em; }
+.group { background: var(--cell); border-radius: 12px; overflow: hidden; }
+.group-f { padding: 6px 16px 0; font-size: 12px; color: var(--label-2); }
+.row { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 6px 14px; text-align: left; }
+button.row:hover, .row.tap:hover { background: var(--fill); }
+.row + .row::before { content: ""; position: absolute; top: 0; right: 0; left: 55px; height: 1px; background: var(--sep); }
+.group.plain .row + .row::before { left: 14px; }
+.row .sq { width: 29px; height: 29px; border-radius: 7px; display: grid; place-items: center; background: var(--c, var(--gray)); color: #fff; flex: none; }
+.row .sq .ic { width: 17px; height: 17px; }
+.row .t { flex: 1; min-width: 0; }
+.row .t small { display: block; font-size: 12px; color: var(--label-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .d { color: var(--label-2); font-variant-numeric: tabular-nums; }
+.row .chev { width: 14px; height: 14px; color: var(--label-3); stroke-width: 2.6; }
+.row .chk { color: var(--accent); stroke-width: 2.8; opacity: 0; }
+.row.sel .chk { opacity: 1; }
+.row .field { flex: 1; text-align: right; background: none; border: 0; outline: 0; color: var(--label); }
+.row .field::placeholder { color: var(--label-3); }
+.row.action { color: var(--accent); }
+.row.danger { color: var(--red-t); }
+.minus { width: 22px; height: 22px; border-radius: 50%; background: var(--red); display: grid; place-items: center; flex: none; }
+.minus::after { content: ""; width: 10px; height: 2px; border-radius: 1px; background: #fff; }
+
+/* ---------- Kontrol ---------- */
+.search { display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 10px; border-radius: 10px; background: var(--fill); color: var(--label-2); }
+.search .ic { width: 16px; height: 16px; }
+.search input { flex: 1; background: none; border: 0; outline: 0; color: var(--label); }
+.search input::placeholder { color: var(--label-2); }
+.seg { display: flex; padding: 2px; border-radius: 9px; background: var(--fill); }
+.seg button { flex: 1; height: 28px; padding: 0 12px; border-radius: 7px; font-size: 13px; font-weight: 500; transition: background .15s, box-shadow .15s; }
+.seg button.active { background: var(--seg-on); font-weight: 600; box-shadow: 0 3px 8px rgba(0, 0, 0, .12), 0 1px 1px rgba(0, 0, 0, .04); }
+.switch { position: relative; width: 46px; height: 28px; border-radius: 14px; background: var(--fill-2); transition: background .2s; flex: none; }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, .2); transition: transform .2s; }
+.switch.on { background: var(--green); }
+.switch.on::after { transform: translateX(18px); }
+.stepper { display: inline-flex; align-items: center; height: 30px; border-radius: 8px; background: var(--fill); }
+.stepper button { width: 40px; height: 100%; display: grid; place-items: center; }
+.stepper button .ic { width: 15px; height: 15px; stroke-width: 2.4; }
+.stepper i { width: 1px; height: 16px; background: var(--sep); }
+.stepper.v { gap: 0; }
+.stepper.v span { min-width: 28px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+.slider { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; outline: 0; cursor: pointer;
+    background: linear-gradient(var(--accent), var(--accent)) 0 / var(--p, 50%) 100% no-repeat, var(--fill-2); }
+.slider::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, .25), 0 0 0 .5px rgba(0, 0, 0, .06); }
+.bar { height: 4px; border-radius: 2px; background: var(--fill-2); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: var(--v, 50%); background: var(--accent); border-radius: inherit; }
+.bar.green > i { background: var(--green); } .bar.red > i { background: var(--red); }
+.tag { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 12px; background: var(--fill); font-size: 12px; font-weight: 600; }
+.tag.green { background: rgba(52, 199, 89, .16); color: var(--green-t); }
+.tag.orange { background: rgba(255, 149, 0, .16); color: var(--orange-t); }
+.tag.red { background: rgba(255, 59, 48, .14); color: var(--red-t); }
+.tag.accent { background: var(--accent-soft); color: var(--accent); }
+
+/* ---------- Alert, action sheet, banner ---------- */
+.alert { width: 290px; border-radius: 16px; background: var(--alert); color: var(--label); text-align: center; overflow: hidden; box-shadow: 0 12px 32px rgba(0, 0, 0, .25); }
+.alert .in { padding: 20px 16px 16px; display: flex; flex-direction: column; gap: 4px; }
+.alert .at { font-size: 16px; font-weight: 600; }
+.alert .am { font-size: 13px; color: var(--label); opacity: .85; }
+.alert .tf { margin-top: 8px; border-radius: 9px; overflow: hidden; border: 1px solid var(--sep); background: var(--cell); }
+.alert .tf input { width: 100%; height: 34px; padding: 0 10px; background: none; border: 0; outline: 0; font-size: 13px; }
+.alert .tf input + input { border-top: 1px solid var(--sep); }
+.alert .acts { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--sep); }
+.alert .acts button { height: 46px; color: var(--accent); font-size: 15px; }
+.alert .acts button + button { border-left: 1px solid var(--sep); font-weight: 600; }
+.alert .acts button:hover { background: var(--fill); }
+
+.sheet-acts { display: flex; flex-direction: column; gap: 8px; width: 320px; }
+.sheet-acts .group { background: var(--alert); text-align: center; }
+.sheet-acts .row { justify-content: center; min-height: 52px; font-size: 16px; color: var(--accent); }
+.sheet-acts .row::before { left: 0 !important; }
+.sheet-acts .row.hd { min-height: 40px; font-size: 12px; color: var(--label-2); }
+.sheet-acts .row.danger { color: var(--red-t); }
+.sheet-acts .cancel { font-weight: 600; }
+
+.banner { display: flex; gap: 10px; width: 340px; padding: 12px 14px; border-radius: 20px; background: var(--alert); color: var(--label); box-shadow: 0 8px 24px rgba(0, 0, 0, .2); animation: drop .25s ease-out; }
+.banner .app { width: 36px; height: 36px; border-radius: 9px; display: grid; place-items: center; background: var(--c, var(--accent)); color: #fff; flex: none; }
+.banner .app .ic { width: 20px; height: 20px; }
+.banner .bt { flex: 1; min-width: 0; }
+.banner .bh { display: flex; justify-content: space-between; font-size: 12px; color: var(--label-2); }
+.banner .bh b { text-transform: uppercase; font-weight: 600; letter-spacing: .02em; }
+.banner .ttl { font-size: 14px; font-weight: 600; }
+.banner .msg { font-size: 13px; }
+@keyframes drop { from { opacity: 0; transform: translateY(-10px); } }
+
+/* ---------- HUD kecil: prompt & progress ---------- */
+.prompt { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 18px 0 7px; border-radius: 22px; background: var(--alert); color: var(--label); font-weight: 600; box-shadow: 0 8px 24px rgba(0, 0, 0, .2); }
+.prompt .key { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); font-weight: 800; font-size: 13px; }
+.progcap { width: 320px; padding: 12px 16px; border-radius: 18px; background: var(--alert); color: var(--label); box-shadow: 0 8px 24px rgba(0, 0, 0, .2); }
+.progcap .top { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; font-weight: 600; }
+
+/* =====================================================================
+   BAGIAN 2 — HANYA UNTUK HALAMAN MOCKUP
+   ===================================================================== */
+body { background: #06080c; color: #eef2f8; }
+.toolbar { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; padding: 12px 24px; background: rgba(6, 8, 12, .95); border-bottom: 1px solid rgba(255, 255, 255, .08); font-size: 12px; color: #96a2b6; }
+.toolbar .brand { margin-right: auto; color: #eef2f8; }
+.toolbar .brand b { display: block; font-size: 14px; }
+.toolbar label, .toolbar .ctrl { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.tb-seg { display: flex; gap: 2px; padding: 3px; border-radius: 10px; background: rgba(255, 255, 255, .06); }
+.tb-seg button { height: 26px; padding: 0 12px; border-radius: 8px; color: #96a2b6; font-size: 12px; font-weight: 600; }
+.tb-seg button.active { background: rgba(255, 255, 255, .14); color: #fff; }
+.toolbar .slider { width: 110px; }
+.toolbar .slider::-webkit-slider-thumb { width: 16px; height: 16px; }
+
+.doc { max-width: 1200px; margin: 0 auto; padding: 32px 24px 80px; }
+.intro p { color: #96a2b6; margin-top: 8px; max-width: 720px; }
+.sec { margin-top: 44px; }
+.sec-h { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.sec-h .n { font-size: 12px; font-weight: 800; color: var(--accent); }
+.sec-h h2 { font-size: 20px; }
+.sec-h p { color: #96a2b6; font-size: 13px; }
+
+.game {
+    --sky: linear-gradient(180deg, #25304d 0%, #5d4e72 42%, #c9805a 72%, #2b2530 100%);
+    --glow: rgba(255, 176, 104, .55);
+    position: relative; border-radius: 20px; overflow: hidden; padding: 28px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 300' preserveAspectRatio='none'%3E%3Cg fill='%23171b28' opacity='.6'%3E%3Crect x='0' y='120' width='60' height='180'/%3E%3Crect x='50' y='90' width='80' height='210'/%3E%3Crect x='140' y='140' width='50' height='160'/%3E%3Crect x='200' y='60' width='70' height='240'/%3E%3Crect x='280' y='110' width='90' height='190'/%3E%3Crect x='380' y='40' width='60' height='260'/%3E%3Crect x='450' y='100' width='80' height='200'/%3E%3Crect x='540' y='70' width='50' height='230'/%3E%3Crect x='600' y='130' width='90' height='170'/%3E%3Crect x='700' y='30' width='70' height='270'/%3E%3Crect x='780' y='90' width='60' height='210'/%3E%3Crect x='850' y='60' width='100' height='240'/%3E%3Crect x='960' y='120' width='70' height='180'/%3E%3Crect x='1040' y='50' width='80' height='250'/%3E%3Crect x='1130' y='100' width='70' height='200'/%3E%3C/g%3E%3Cg fill='%230b0e16'%3E%3Crect x='0' y='190' width='90' height='110'/%3E%3Crect x='80' y='160' width='60' height='140'/%3E%3Crect x='150' y='210' width='110' height='90'/%3E%3Crect x='250' y='150' width='70' height='150'/%3E%3Crect x='330' y='200' width='90' height='100'/%3E%3Crect x='420' y='170' width='50' height='130'/%3E%3Crect x='480' y='220' width='120' height='80'/%3E%3Crect x='610' y='140' width='60' height='160'/%3E%3Crect x='680' y='190' width='90' height='110'/%3E%3Crect x='780' y='160' width='70' height='140'/%3E%3Crect x='860' y='210' width='100' height='90'/%3E%3Crect x='970' y='170' width='60' height='130'/%3E%3Crect x='1040' y='200' width='80' height='100'/%3E%3Crect x='1110' y='150' width='90' height='150'/%3E%3Crect x='0' y='270' width='1200' height='30'/%3E%3C/g%3E%3C/svg%3E") bottom / 100% 46% no-repeat, radial-gradient(55% 40% at 72% 62%, var(--glow), transparent 70%), var(--sky);
+}
+body[data-scene="siang"] .game { --sky: linear-gradient(180deg, #4f9df2 0%, #a6d1ff 52%, #eef4f7 74%, #8f9aa3 100%); --glow: rgba(255, 255, 255, .7); }
+body[data-scene="malam"] .game { --sky: linear-gradient(180deg, #04060d 0%, #0c1330 55%, #1a2342 76%, #06070c 100%); --glow: rgba(90, 120, 255, .25); }
+.game.wide { aspect-ratio: 16 / 9; padding: 0; min-height: 580px; }
+.center { position: absolute; inset: 0; display: grid; place-items: center; }
+.kit { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; align-items: start; }
+.kit .ios { padding: 16px 0 18px; }
+.kit .ios > .pad { padding: 0 16px; }
+.kit .ios > .pad + .pad { margin-top: 14px; }
+.kit .wrap { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.kit h3 { font-size: 13px; font-weight: 600; color: var(--label-2); padding: 0 16px 10px; text-transform: uppercase; letter-spacing: .03em; }
+
+/* Layout A — split view */
+.split { width: min(1060px, 95%); height: min(620px, 92%); display: flex; }
+.sidebar { width: 240px; flex: none; display: flex; flex-direction: column; gap: 10px; padding: 16px 10px; background: var(--side); border-right: 1px solid var(--sep); }
+.sidebar .large-title { padding: 4px 8px 0; font-size: 24px; }
+.sidebar .caption { padding: 0 8px; }
+.side-row { display: flex; align-items: center; gap: 10px; width: 100%; height: 40px; padding: 0 10px; border-radius: 10px; font-weight: 500; text-align: left; transition: background .12s; }
+.side-row .ic { color: var(--accent); }
+.side-row:hover { background: var(--fill); }
+.side-row.active { background: var(--accent); color: var(--on-accent); }
+.side-row.active .ic { color: var(--on-accent); }
+.side-row .bubble { margin-left: auto; }
+.side-row.active .bubble { background: rgba(255, 255, 255, .3); color: inherit; }
+.me { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 12px; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), rgba(var(--accent-rgb), .6)); color: var(--on-accent); font-weight: 700; font-size: 13px; }
+.detail { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.detail-h { display: flex; align-items: flex-end; gap: 10px; padding: 18px 20px 12px; }
+.detail .seg { margin: 0 20px; }
+.cards { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; align-content: start; padding: 14px 20px 20px; scrollbar-width: none; }
+.app-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 14px; background: var(--cell); }
+.app-card .thumb { width: 54px; height: 54px; border-radius: 13px; display: grid; place-items: center; flex: none; color: #fff; background: linear-gradient(135deg, var(--c1, var(--accent)), var(--c2, rgba(var(--accent-rgb), .55))); }
+.app-card .thumb .ic { width: 26px; height: 26px; stroke-width: 1.8; }
+.app-card .t { flex: 1; min-width: 0; }
+.app-card .t b { display: block; font-size: 14px; font-weight: 600; }
+.app-card .t small { display: block; font-size: 12px; color: var(--label-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app-card .buy { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.app-card .buy .caption { font-variant-numeric: tabular-nums; }
+.app-card.off { opacity: .5; }
+.inspector { width: 290px; flex: none; display: flex; flex-direction: column; background: var(--side); border-left: 1px solid var(--sep); }
+.inspector .navbar { grid-template-columns: 1fr auto; padding: 0 16px; height: 56px; }
+.inspector .scroll { flex: 1; overflow-y: auto; padding: 4px 14px; display: flex; flex-direction: column; gap: 14px; scrollbar-width: none; }
+.inspector .foot { padding: 12px 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+
+/* Layout B */
+.garage { position: absolute; right: 3%; top: 50%; transform: translateY(-50%); width: 340px; display: flex; flex-direction: column; }
+.garage .body { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 14px; }
+.at-bottom { position: absolute; left: 50%; transform: translateX(-50%); }
+.at-top { position: absolute; left: 50%; top: 4%; transform: translateX(-50%); }
+
+/* Layout C */
+.dim { position: absolute; inset: 0; background: rgba(0, 0, 0, .3); }
+.banners { position: absolute; top: 5%; right: 3%; display: flex; flex-direction: column; gap: 8px; }
+</style>
+</head>
+<body data-scene="senja">
+
+<svg width="0" height="0" style="position:absolute">
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-id" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="12" r="2.5"/><path d="M14 10h4M14 14h3"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24"><path d="M3 13l2-5a2 2 0 0 1 1.9-1.4h10.2A2 2 0 0 1 19 8l2 5v4H3z"/><path d="M5 17v2M19 17v2"/><circle cx="7.5" cy="13.5" r="1"/><circle cx="16.5" cy="13.5" r="1"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M16 13.5h2"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 1 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-chevl" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.4a1 1 0 0 0 1 .8h9.7a1 1 0 0 0 1-.8L21 7H6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="i-cash" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6"/></symbol>
+    <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3z"/></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></symbol>
+</svg>
+
+<header class="toolbar">
+    <div class="brand"><b>F-UI · Gaya iOS</b>Mockup v1 — susunan menu ala iOS untuk semua NUI</div>
+    <div class="ctrl">Mode
+        <div class="tb-seg" id="mode"><button class="active" data-m="">Terang</button><button data-m="dark">Gelap</button></div>
+    </div>
+    <div class="ctrl">Aksen
+        <div class="tb-seg" id="accent"><button class="active" data-a="">Emas</button><button data-a="blue">Biru iOS</button><button data-a="green">Hijau</button><button data-a="purple">Ungu</button></div>
+    </div>
+    <label>Transparansi <input id="alpha" class="slider" type="range" min=".5" max="1" step=".01" value=".85"><span id="alphaOut" class="num" style="width:34px;color:#fff">85%</span></label>
+    <div class="ctrl">Latar game
+        <div class="tb-seg" id="scene"><button data-s="siang">Siang</button><button class="active" data-s="senja">Senja</button><button data-s="malam">Malam</button></div>
+    </div>
+</header>
+
+<main class="doc">
+    <div class="intro">
+        <div style="font-size:12px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.08em">Base NUI · iOS</div>
+        <h1 style="font-size:28px;margin-top:6px;letter-spacing:-.02em">Semua menu terasa seperti aplikasi iPhone / iPad</h1>
+        <p>Judul besar, daftar berkelompok, segmented control, alert & banner gaya iOS. Ada mode <b>Terang</b> dan <b>Gelap</b> (malam hari tidak silau). Tanpa blur CSS supaya tetap ringan.</p>
+    </div>
+
+    <!-- 01 KOMPONEN -->
+    <section class="sec">
+        <div class="sec-h"><span class="n">01</span><h2>Komponen</h2><p>Tombol, daftar berkelompok, kontrol, tipografi</p></div>
+        <div class="game">
+            <div class="kit">
+                <div class="ios">
+                    <h3>Tombol</h3>
+                    <div class="pad"><button class="b b-filled b-lg b-block">Ajukan & Bayar</button></div>
+                    <div class="pad wrap">
+                        <button class="b b-filled">Filled</button>
+                        <button class="b b-tinted">Tinted</button>
+                        <button class="b b-gray">Gray</button>
+                        <button class="b b-plain">Plain</button>
+                    </div>
+                    <div class="pad wrap">
+                        <button class="b b-red">Hapus</button>
+                        <button class="b b-red-plain">Batalkan</button>
+                        <button class="b b-filled" disabled>Nonaktif</button>
+                        <button class="b b-gray"><span class="spin"></span>Memuat</button>
+                    </div>
+                    <div class="pad wrap">
+                        <button class="b b-tinted b-cap">TAMBAH</button>
+                        <button class="b b-filled b-cap">BELI</button>
+                        <button class="b b-gray b-cap">TERKUNCI</button>
+                        <button class="circle"><svg class="ic"><use href="#i-x"/></svg></button>
+                        <button class="circle tint"><svg class="ic"><use href="#i-plus"/></svg></button>
+                        <button class="circle"><svg class="ic"><use href="#i-cart"/></svg><span class="bubble">2</span></button>
+                    </div>
+                </div>
+
+                <div class="ios">
+                    <h3>Daftar berkelompok</h3>
+                    <div class="pad">
+                        <div class="group-h">Pengaturan</div>
+                        <div class="group">
+                            <div class="row"><span class="sq" style="--c:var(--red)"><svg class="ic"><use href="#i-bell"/></svg></span><span class="t">Notifikasi</span><button class="switch on"></button></div>
+                            <div class="row"><span class="sq" style="--c:var(--indigo)"><svg class="ic"><use href="#i-moon"/></svg></span><span class="t">Mode anonim</span><button class="switch"></button></div>
+                            <div class="row"><span class="sq" style="--c:var(--blue)"><svg class="ic"><use href="#i-bag"/></svg></span><span class="t">Jumlah</span><div class="stepper v"><button data-d="-1"><svg class="ic"><use href="#i-minus"/></svg></button><i></i><span>1</span><i></i><button data-d="1"><svg class="ic"><use href="#i-plus"/></svg></button></div></div>
+                            <button class="row"><span class="sq" style="--c:var(--green)"><svg class="ic"><use href="#i-wallet"/></svg></span><span class="t">Metode bayar</span><span class="d">Cash</span><svg class="ic chev"><use href="#i-chev"/></svg></button>
+                        </div>
+                        <div class="group-f">Pembayaran transfer dikirim sebagai tagihan ke HP.</div>
+                    </div>
+                    <div class="pad">
+                        <div class="group-h">Data diri</div>
+                        <div class="group plain">
+                            <label class="row"><span>Nama</span><input class="field" placeholder="Budi Santoso"></label>
+                            <label class="row"><span>Plat</span><input class="field" placeholder="F 1111 R"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ios">
+                    <h3>Kontrol</h3>
+                    <div class="pad"><div class="search"><svg class="ic"><use href="#i-search"/></svg><input placeholder="Cari"></div></div>
+                    <div class="pad"><div class="seg"><button class="active">Harian</button><button>Mingguan</button><button>Bulanan</button></div></div>
+                    <div class="pad" style="display:flex;align-items:center;gap:12px;color:var(--label-2)"><svg class="ic"><use href="#i-volume"/></svg><input class="slider" type="range" value="60"></div>
+                    <div class="pad">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px" class="footnote"><span>Bensin</span><span class="num">82%</span></div>
+                        <div class="bar green"><i style="--v:82%"></i></div>
+                    </div>
+                    <div class="pad">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px" class="footnote"><span>Mesin</span><span class="num">34%</span></div>
+                        <div class="bar red"><i style="--v:34%"></i></div>
+                    </div>
+                    <div class="pad wrap">
+                        <span class="tag green">Aktif</span><span class="tag orange">Menunggu</span><span class="tag red">Ditolak</span><span class="tag accent">VIP</span><span class="tag">Draf</span><span class="bubble">3</span>
+                    </div>
+                </div>
+
+                <div class="ios" style="color:var(--label)">
+                    <h3>Tipografi · Inter</h3>
+                    <div class="pad" style="display:flex;flex-direction:column;gap:8px">
+                        <div class="large-title">Balai Kota</div>
+                        <div class="title2">Keranjang</div>
+                        <div class="headline">Headline 15 · semibold</div>
+                        <div class="body">Body 14 · teks utama menu</div>
+                        <div class="subhead">Subhead 13 · keterangan</div>
+                        <div class="footnote">Footnote 12 · catatan kecil</div>
+                        <div class="caption">Caption 11 · label harga kecil</div>
+                        <div class="large-title num t-accent">Rp 2.450.000</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 02 LAYOUT A -->
+    <section class="sec">
+        <div class="sec-h"><span class="n">02</span><h2>Layout A · Split view (iPad)</h2><p>Menu besar: Balai Kota, toko, kasir, MDT</p></div>
+        <div class="game wide">
+            <div class="center">
+                <div class="ios split">
+                    <aside class="sidebar">
+                        <div class="large-title">Balai Kota</div>
+                        <div class="caption">Layanan publik · buka 24 jam</div>
+                        <div class="search"><svg class="ic"><use href="#i-search"/></svg><input placeholder="Cari layanan"></div>
+                        <div data-group style="display:flex;flex-direction:column;gap:2px">
+                            <button class="side-row active"><svg class="ic"><use href="#i-id"/></svg>Dokumen<span class="bubble">6</span></button>
+                            <button class="side-row"><svg class="ic"><use href="#i-car"/></svg>Kendaraan</button>
+                            <button class="side-row"><svg class="ic"><use href="#i-wallet"/></svg>Pajak<span class="bubble">1</span></button>
+                            <button class="side-row"><svg class="ic"><use href="#i-shield"/></svg>Penebusan</button>
+                            <button class="side-row"><svg class="ic"><use href="#i-clock"/></svg>Riwayat</button>
+                        </div>
+                        <div class="spacer"></div>
+                        <div class="me"><div class="avatar">BS</div><div><div class="headline" style="font-size:14px">Budi Santoso</div><div class="caption num">F4829174</div></div></div>
+                    </aside>
+                    <section class="detail">
+                        <div class="detail-h">
+                            <div class="large-title">Dokumen</div>
+                            <div class="spacer"></div>
+                            <button class="circle tint"><svg class="ic"><use href="#i-cart"/></svg><span class="bubble">2</span></button>
+                            <button class="circle"><svg class="ic"><use href="#i-x"/></svg></button>
+                        </div>
+                        <div class="seg"><button class="active">Semua</button><button>Baru</button><button>Perpanjang</button></div>
+                        <div class="cards">
+                            <div class="app-card"><div class="thumb"><svg class="ic"><use href="#i-id"/></svg></div><div class="t"><b>KTP</b><small>Kartu identitas resmi</small></div><div class="buy"><button class="b b-gray b-cap"><svg class="ic" style="width:13px;height:13px;stroke-width:3"><use href="#i-check"/></svg></button><span class="caption">Rp 25.000</span></div></div>
+                            <div class="app-card"><div class="thumb" style="--c1:#5ac8fa;--c2:#007aff"><svg class="ic"><use href="#i-car"/></svg></div><div class="t"><b>SIM A</b><small>Izin mengemudi mobil</small></div><div class="buy"><button class="b b-tinted b-cap">TAMBAH</button><span class="caption">Rp 150.000</span></div></div>
+                            <div class="app-card"><div class="thumb" style="--c1:#34c759;--c2:#248a3d"><svg class="ic"><use href="#i-car"/></svg></div><div class="t"><b>SIM C</b><small>Izin mengemudi motor</small></div><div class="buy"><button class="b b-gray b-cap"><svg class="ic" style="width:13px;height:13px;stroke-width:3"><use href="#i-check"/></svg></button><span class="caption">Rp 100.000</span></div></div>
+                            <div class="app-card"><div class="thumb" style="--c1:#af52de;--c2:#5856d6"><svg class="ic"><use href="#i-file"/></svg></div><div class="t"><b>STNK</b><small>Surat tanda nomor kendaraan</small></div><div class="buy"><button class="b b-tinted b-cap">TAMBAH</button><span class="caption">Rp 75.000</span></div></div>
+                            <div class="app-card"><div class="thumb" style="--c1:#ff9500;--c2:#ff5e3a"><svg class="ic"><use href="#i-user"/></svg></div><div class="t"><b>Surat Kerja</b><small>Keterangan kerja resmi</small></div><div class="buy"><button class="b b-tinted b-cap">TAMBAH</button><span class="caption">Rp 30.000</span></div></div>
+                            <div class="app-card off"><div class="thumb" style="--c1:#8e8e93;--c2:#636366"><svg class="ic"><use href="#i-shield"/></svg></div><div class="t"><b>Lisensi Senjata</b><small>Butuh persetujuan polisi</small></div><div class="buy"><button class="b b-gray b-cap" disabled>TERKUNCI</button><span class="caption">Rp 500.000</span></div></div>
+                        </div>
+                    </section>
+                    <aside class="inspector">
+                        <div class="navbar"><div class="title2">Keranjang</div><button class="b b-plain" style="height:30px">Edit</button></div>
+                        <div class="scroll">
+                            <div>
+                                <div class="group">
+                                    <div class="row" style="padding-left:12px"><span class="minus"></span><span class="t">KTP<small>Buat baru</small></span><span class="d">Rp 25.000</span></div>
+                                    <div class="row" style="padding-left:12px"><span class="minus"></span><span class="t">SIM C<small>Perpanjang</small></span><span class="d">Rp 100.000</span></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="group plain">
+                                    <div class="row"><span class="t">Subtotal</span><span class="d">Rp 125.000</span></div>
+                                    <div class="row"><span class="t">Biaya admin</span><span class="d">Rp 5.000</span></div>
+                                    <div class="row"><span class="t headline">Total</span><span class="headline num">Rp 130.000</span></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="group-h">Bayar dengan</div>
+                                <div class="seg"><button class="active">Cash</button><button>Transfer</button></div>
+                            </div>
+                        </div>
+                        <div class="foot">
+                            <button class="b b-filled b-lg b-block">Ajukan & Bayar</button>
+                            <div class="footnote" style="text-align:center">Disetujui petugas terdekat</div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 03 LAYOUT B -->
+    <section class="sec">
+        <div class="sec-h"><span class="n">03</span><h2>Layout B · Menu samping</h2><p>Pengganti context menu: garasi, interaksi, pilihan cepat</p></div>
+        <div class="game wide">
+            <div class="banner at-top" style="--c:var(--green)"><div class="app"><svg class="ic"><use href="#i-wallet"/></svg></div><div class="bt"><div class="bh"><b>Bank</b><span>sekarang</span></div><div class="ttl">Gaji masuk</div><div class="msg">Rp 450.000 dari Pemerintah Kota</div></div></div>
+
+            <div class="ios garage">
+                <div class="navbar"><div class="l"><button class="back"><svg class="ic"><use href="#i-chevl"/></svg>Kembali</button></div><div class="ttl">Garasi Pillbox</div><div class="r"><button class="circle"><svg class="ic"><use href="#i-x"/></svg></button></div></div>
+                <div class="body">
+                    <div class="search"><svg class="ic"><use href="#i-search"/></svg><input placeholder="Cari plat atau nama"></div>
+                    <div>
+                        <div class="group-h">Kendaraan · 3</div>
+                        <div class="group" data-group>
+                            <button class="row sel"><span class="sq" style="--c:var(--blue)"><svg class="ic"><use href="#i-car"/></svg></span><span class="t">Sultan RS<small>F 1234 R · Bensin 82%</small></span><span class="tag green">Ada</span><svg class="ic chk"><use href="#i-check"/></svg></button>
+                            <button class="row"><span class="sq" style="--c:var(--orange)"><svg class="ic"><use href="#i-car"/></svg></span><span class="t">Asbo<small>F 5521 R · Diderek</small></span><span class="tag orange">Depot</span><svg class="ic chk"><use href="#i-check"/></svg></button>
+                            <button class="row"><span class="sq" style="--c:var(--indigo)"><svg class="ic"><use href="#i-car"/></svg></span><span class="t">Bati 801<small>F 7710 R · Bensin 40%</small></span><span class="tag green">Ada</span><svg class="ic chk"><use href="#i-check"/></svg></button>
+                        </div>
+                    </div>
+                    <div class="group">
+                        <button class="row action"><span class="sq" style="--c:var(--green)"><svg class="ic"><use href="#i-plus"/></svg></span><span class="t">Simpan kendaraan terdekat</span></button>
+                    </div>
+                    <button class="b b-filled b-lg b-block">Ambil Kendaraan</button>
+                </div>
+            </div>
+
+            <div class="prompt at-bottom" style="bottom:24%"><span class="key">E</span>Buka Garasi</div>
+            <div class="progcap at-bottom" style="bottom:8%">
+                <div class="top"><span>Memperbaiki mesin…</span><span class="num" style="color:var(--label-2)">62%</span></div>
+                <div class="bar"><i style="--v:62%"></i></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 04 LAYOUT C -->
+    <section class="sec">
+        <div class="sec-h"><span class="n">04</span><h2>Layout C · Alert, action sheet & notifikasi</h2><p>Konfirmasi, input jumlah, pilihan cepat, pesan singkat</p></div>
+        <div class="game wide">
+            <div class="dim"></div>
+            <div class="center" style="grid-template-columns:1fr 1fr;align-items:center;justify-items:center">
+                <div class="alert">
+                    <div class="in">
+                        <div class="at">Transfer ke rekening</div>
+                        <div class="am">Transaksi tidak bisa dibatalkan. Saldo: Rp 2.450.000</div>
+                        <div class="tf"><input class="num" placeholder="Nomor rekening" value="F7731045"><input class="num" placeholder="Jumlah (Rp)" value="500.000"></div>
+                    </div>
+                    <div class="acts"><button>Batal</button><button>Kirim</button></div>
+                </div>
+                <div class="sheet-acts">
+                    <div class="group">
+                        <div class="row hd">Pilih metode pembayaran</div>
+                        <button class="row">Bayar Cash</button>
+                        <button class="row">Transfer Bank</button>
+                        <button class="row danger">Batalkan Pesanan</button>
+                    </div>
+                    <div class="group"><button class="row cancel">Batal</button></div>
+                </div>
+            </div>
+            <div class="banners" id="banners">
+                <div class="banner" style="--c:var(--green)"><div class="app"><svg class="ic"><use href="#i-check"/></svg></div><div class="bt"><div class="bh"><b>Balai Kota</b><span>2 mnt lalu</span></div><div class="ttl">Pembayaran berhasil</div><div class="msg">Rp 130.000 dipotong dari bank</div></div></div>
+                <div class="banner" style="--c:var(--orange)"><div class="app"><svg class="ic"><use href="#i-car"/></svg></div><div class="bt"><div class="bh"><b>Kendaraan</b><span>sekarang</span></div><div class="ttl">Bensin hampir habis</div><div class="msg">Sisa 8% — cari SPBU terdekat</div></div></div>
+            </div>
+            <button class="b b-filled b-cap" id="bannerBtn" style="position:absolute;left:20px;bottom:20px">TES NOTIFIKASI</button>
+        </div>
+    </section>
+</main>
+
+<script>
+const root = document.documentElement;
+const setP = el => el.style.setProperty('--p', ((el.value - el.min) / (el.max - el.min) * 100) + '%');
+document.querySelectorAll('.slider').forEach(r => { setP(r); r.addEventListener('input', () => setP(r)); });
+
+const alpha = document.getElementById('alpha');
+alpha.addEventListener('input', () => {
+    root.style.setProperty('--alpha', alpha.value);
+    document.getElementById('alphaOut').textContent = Math.round(alpha.value * 100) + '%';
+});
+
+const single = (group, sel, onPick) => group.addEventListener('click', e => {
+    const b = e.target.closest(sel);
+    if (!b || !group.contains(b)) return;
+    group.querySelectorAll(sel).forEach(x => x.classList.toggle(sel === '.row' ? 'sel' : 'active', x === b));
+    if (onPick) onPick(b);
+});
+single(document.getElementById('mode'), 'button', b => b.dataset.m ? root.dataset.mode = b.dataset.m : delete root.dataset.mode);
+single(document.getElementById('accent'), 'button', b => b.dataset.a ? root.dataset.accent = b.dataset.a : delete root.dataset.accent);
+single(document.getElementById('scene'), 'button', b => document.body.dataset.scene = b.dataset.s);
+document.querySelectorAll('.ios .seg').forEach(g => single(g, 'button'));
+document.querySelectorAll('[data-group]').forEach(g => single(g, g.querySelector('.side-row') ? '.side-row' : '.row'));
+
+document.querySelectorAll('.switch').forEach(s => s.addEventListener('click', () => s.classList.toggle('on')));
+document.querySelectorAll('.stepper.v').forEach(st => st.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const v = st.querySelector('span');
+    v.textContent = Math.max(0, (parseInt(v.textContent) || 0) + Number(b.dataset.d));
+}));
+
+const demo = [
+    ['var(--accent)', 'i-file', 'Balai Kota', 'Tagihan baru', 'Rp 45.000 — bayar lewat Bank'],
+    ['var(--blue)', 'i-send', 'Bank', 'Transfer masuk', 'Rp 200.000 dari F7731045'],
+    ['var(--red)', 'i-x', 'Inventaris', 'Gagal', 'Inventaris penuh'],
+];
+let di = 0;
+document.getElementById('bannerBtn').addEventListener('click', () => {
+    const box = document.getElementById('banners');
+    const [c, ic, app, t, m] = demo[di++ % demo.length];
+    const el = document.createElement('div');
+    el.className = 'banner';
+    el.style.setProperty('--c', c);
+    el.innerHTML = `<div class="app"><svg class="ic"><use href="#${ic}"/></svg></div><div class="bt"><div class="bh"><b>${app}</b><span>sekarang</span></div><div class="ttl">${t}</div><div class="msg">${m}</div></div>`;
+    box.prepend(el);
+    while (box.children.length > 4) box.lastChild.remove();
+    setTimeout(() => el.remove(), 4000);
+});
+</script>
+</body>
+</html>

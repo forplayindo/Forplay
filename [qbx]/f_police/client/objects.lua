@@ -5,8 +5,7 @@ local function checkIsSpikeObject(spikeStrips, fixedCoords, position, maxDistanc
     for i = 1, #spikeStrips do
         local coords = fixedCoords[spikeStrips[i]]
 
-        local distance = #(position - coords)
-        if distance < maxDistance then
+        if coords and #(position - coords) < maxDistance then
             return true
         end
     end
@@ -25,8 +24,8 @@ local function getClosestObject(objects, position, maxDistance, isFixed)
             coords = GetEntityCoords(object)
         end
 
-        local distance = #(position - coords)
-        if distance < maxDistance then
+        local distance = coords and #(position - coords)
+        if distance and distance < maxDistance then
             if not minDistance or distance < minDistance then
                 minDistance = distance
                 currentIndex = i
@@ -41,6 +40,8 @@ end
 ---@param item string name from `config/shared.lua`
 RegisterNetEvent('police:client:spawnPObj', function(item)
     if QBX.PlayerData.job.type ~= 'leo' or not QBX.PlayerData.job.onduty then return end
+    local objectConfig = sharedConfig.objects[item]
+    if not objectConfig then return end
 
     if cache.vehicle then return exports.qbx_core:Notify(locale('error.in_vehicle'), 'error') end
 
@@ -60,11 +61,10 @@ RegisterNetEvent('police:client:spawnPObj', function(item)
             clip = 'drop_front'
         }
     }) then
-        local objectConfig = sharedConfig.objects[item]
         local forward = GetEntityForwardVector(cache.ped)
         local spawnCoords = GetEntityCoords(cache.ped) + forward * 0.5
         local netid, error = lib.callback.await('police:server:spawnObject', false,
-                                                objectConfig.model, spawnCoords, GetEntityHeading(cache.ped))
+                                                item, spawnCoords, GetEntityHeading(cache.ped))
 
         if not netid then return exports.qbx_core:Notify(locale(error), 'error') end
 
@@ -77,8 +77,10 @@ RegisterNetEvent('police:client:spawnPObj', function(item)
 end)
 
 RegisterNetEvent('police:client:deleteObject', function()
-    local objectId = getClosestObject(GlobalState.policeObjects, GetEntityCoords(cache.ped) , 5.0)
+    local policeObjects = GlobalState.policeObjects
+    local objectId = getClosestObject(policeObjects, GetEntityCoords(cache.ped) , 5.0)
     if not objectId then return end
+    local netid = policeObjects[objectId]
     if lib.progressBar({
         duration = 2500,
         label = locale('progressbar.remove_object'),
@@ -95,7 +97,7 @@ RegisterNetEvent('police:client:deleteObject', function()
             clip = 'plant_floor'
         }
     }) then
-        TriggerServerEvent('police:server:despawnObject', objectId)
+        TriggerServerEvent('police:server:despawnObject', netid)
     else
         exports.qbx_core:Notify(locale('error.canceled'), 'error')
     end
@@ -239,8 +241,10 @@ local keybind
 local function onPressed()
     if cache.vehicle then return end
     keybind:disable(true)
-    local spike = getClosestObject(GlobalState.spikeStrips, GetEntityCoords(cache.ped), 4, true)
+    local spikeStrips = GlobalState.spikeStrips
+    local spike = getClosestObject(spikeStrips, GetEntityCoords(cache.ped), 4, true)
     if spike ~= nil then
+        local netid = spikeStrips[spike]
         if lib.progressBar({
             duration = 2500,
             label = locale('progressbar.remove_object'),
@@ -257,7 +261,7 @@ local function onPressed()
                 clip = 'plant_floor'
             }
         }) then
-            TriggerServerEvent('police:server:despawnSpikeStrip', spike)
+            TriggerServerEvent('police:server:despawnSpikeStrip', netid)
             lib.hideTextUI()
         else
             exports.qbx_core:Notify(locale('error.canceled'), 'error')

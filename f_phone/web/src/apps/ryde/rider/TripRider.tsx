@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeftRight, Phone, MessageSquare, X } from 'lucide-react';
+import { Phone, MessageSquare, X } from 'lucide-react';
 
 import { device } from '@device';
 import { AlertDialog } from '@/ui/AlertDialog';
@@ -40,7 +40,6 @@ function TripRiderView({ r }: { r: Ride }) {
     const driverPos = peer ?? driverApprox;
 
     const inTrip = r.status === 'in_progress';
-    const offered = r.status === 'offered';
     const finding = r.status === 'finding';
     const enroute = r.status === 'enroute_pickup';
     const arrived = r.status === 'arriving';
@@ -63,9 +62,6 @@ function TripRiderView({ r }: { r: Ride }) {
         const pollId = window.setInterval(sample, 10000);
         return () => window.clearInterval(pollId);
     }, [enroute, inTrip, active]);
-
-    const offerCount = r.offers?.length ?? 0;
-    const offerIdx = r.offers ? r.offers.findIndex(o => o.tripId === r.tripId) : -1;
 
     const [confirmCall, setConfirmCall] = useState(false);
     const [confirmCancel, setConfirmCancel] = useState(false);
@@ -92,7 +88,6 @@ function TripRiderView({ r }: { r: Ride }) {
             <div className="shrink-0 rounded-t-[18px] bg-surface px-5 pb-[calc(var(--safe-bottom)+16px)] pt-4 shadow-[0_-6px_24px_rgba(0,0,0,0.12)]">
                 <p className="text-[22px] font-extrabold tracking-tight text-black dark:text-white">
                     {finding ? rideStatusLabel.finding
-                        : offered ? rideStatusLabel.offered
                         : enroute ? t('ryde.statusEnroutePickup', 'Driver on the way')
                         : arrived ? t('ryde.driverHasArrived', 'Your driver has arrived')
                         : inTrip ? t('ryde.headingToDestination', 'Heading to {name}', { name: r.dropoff.name })
@@ -100,7 +95,6 @@ function TripRiderView({ r }: { r: Ride }) {
                 </p>
                 <p className="mb-3.5 text-[15px] text-ios-gray">
                     {finding ? t('ryde.matchingNearbyDriver', 'Matching you with a nearby driver')
-                        : offered ? t('ryde.driverCanTakeYouFor', '{name} can take you for {fare}', { name: r.driver?.name ?? t('ryde.aDriver', 'A driver'), fare: money(r.fare) })
                         : enroute ? (awayM != null ? t('ryde.driverAwayDistance', 'Your driver is {dist} away', { dist: formatDist(awayM) }) : t('ryde.driverOnTheWay', 'Your driver is on the way'))
                         : arrived ? t('ryde.hopInReady', 'Hop in when you’re ready, they’re waiting for you')
                         : inTrip ? (awayM != null ? t('ryde.distanceToDestination', '{dist} to your destination', { dist: formatDist(awayM) }) : t('ryde.onTheWayToDestination', 'On the way to your destination'))
@@ -121,36 +115,28 @@ function TripRiderView({ r }: { r: Ride }) {
                     </div>
                 )}
 
-                {r.driver && !inTrip && !offered && (
+                {r.driver && !inTrip && (
                     <div className={`mb-3.5 grid ${device.calls ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
                         {device.calls && <Action icon={<Phone className="h-[24px] w-[24px]" />} label={t('ryde.call', 'Call')} onClick={() => setConfirmCall(true)} />}
                         <Action icon={<MessageSquare className="h-[24px] w-[24px]" />} label={t('ryde.message', 'Message')} onClick={messageDriver} />
                     </div>
                 )}
 
-                {offered ? (
+                {finding ? (
                     <>
-                        {offerCount > 1 && (
-                            <button onClick={g.switchOffer} className="mb-3 flex w-full items-center justify-center gap-2 rounded-[14px] bg-black/[0.06] py-3 text-[15px] font-semibold text-ios-blue active:opacity-70 dark:bg-white/10">
-                                <ArrowLeftRight className="h-[17px] w-[17px]" strokeWidth={2.4} />
-                                {offerCount === 2 ? t('ryde.viewOtherOffer', 'View other offer') : t('ryde.viewOtherOffers', 'View other offers ({n})', { n: offerCount - 1 })}
-                            </button>
-                        )}
                         <div className="mb-3.5 flex items-center justify-between rounded-2xl bg-black/[0.05] px-4 py-3.5 dark:bg-white/[0.08]">
-                            <p className="text-[15px] font-semibold text-ios-gray">{offerCount > 1 ? t('ryde.offerXOfY', 'Offer {idx} of {count}', { idx: offerIdx + 1, count: offerCount }) : t('ryde.offeredFare', 'Offered fare')}</p>
-                            <p className="text-[26px] font-extrabold tracking-tight text-black dark:text-white">{money(r.fare)}</p>
+                            <div>
+                                <p className="text-[15px] font-semibold text-ios-gray">{t('ryde.fixedFare', 'Fare')}</p>
+                                <p className="text-[13px] text-ios-gray">{t('ryde.paidFromBankOnArrival', '{km} km · paid from bank when the trip ends', { km: r.distanceKm.toFixed(1) })}</p>
+                            </div>
+                            <p className="text-[26px] font-extrabold tracking-tight text-black dark:text-white">{r.fare > 0 ? money(r.fare) : '…'}</p>
                         </div>
-                        <div className="flex gap-3">
-                            <button onClick={g.declineOffer} className="flex-1 rounded-[14px] bg-black/[0.06] py-4 text-[17px] font-bold text-[#ff453a] dark:bg-white/10">{t('common.decline', 'Decline')}</button>
-                            <button onClick={g.acceptOffer} className="flex-[2] rounded-[14px] bg-black py-4 text-[17px] font-bold text-white dark:bg-white dark:text-black">{t('ryde.acceptFare', 'Accept fare')}</button>
-                        </div>
+                        <button onClick={() => setConfirmCancel(true)} className="w-full rounded-[14px] bg-black/[0.06] py-4 text-[17px] font-bold text-[#ff453a] dark:bg-white/10">{t('ryde.cancelRequestAction', 'Cancel request')}</button>
                     </>
-                ) : finding ? (
-                    <button onClick={() => setConfirmCancel(true)} className="w-full rounded-[14px] bg-black/[0.06] py-4 text-[17px] font-bold text-[#ff453a] dark:bg-white/10">{t('ryde.cancelRequestAction', 'Cancel request')}</button>
                 ) : (
                     <div className="flex items-center justify-between rounded-2xl bg-black/[0.05] px-4 py-4 dark:bg-white/[0.07]">
                         <div>
-                            <p className="text-[14px] text-ios-gray">{r.payment === 'card' ? t('ryde.paymentCard', 'Card') : t('ryde.paymentCash', 'Cash')}</p>
+                            <p className="text-[14px] text-ios-gray">{t('ryde.paymentBank', 'Bank balance')}</p>
                             <p className="text-[20px] font-bold text-black dark:text-white">{money(r.fare)}</p>
                         </div>
                         {!inTrip && (

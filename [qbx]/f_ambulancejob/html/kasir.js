@@ -89,7 +89,7 @@
     function renderTabs() {
         $('ks-tabs').innerHTML = TABS().map(([id, label, badge, lock]) =>
             `<button data-t="${id}" class="${id === tab ? 'on' : ''} ${lock ? 'lock' : ''}">${label}${badge ? `<span class="badge">${badge}</span>` : ''}</button>`).join('');
-        $('ks-tabs').querySelectorAll('[data-t]').forEach(b => b.onclick = () => { tab = b.dataset.t; msg = null; render(); });
+        $('ks-tabs').querySelectorAll('[data-t]').forEach(b => b.onclick = () => { tab = b.dataset.t; msg = null; render(); $('ks-body').scrollTop = 0; });
     }
 
     function renderApproval() {
@@ -162,18 +162,34 @@
                     <input data-qty="${s.key}" type="number" min="0" max="${D.maxPerBuy}" value="${n}">
                     <button data-inc="${s.key}" ${n >= D.maxPerBuy ? 'disabled' : ''}>+</button></span></td></tr>`;
         });
+        return h + `</tbody></table><div class="cart-bar" id="ks-cartbar">${supplierBar()}</div>`;
+    }
+
+    function supplierBar() {
         const cost = cartCost();
-        h += `</tbody></table><div class="cart-bar"><div class="sum"><small>${cartCount()} pcs dipilih</small><br><strong>${money(cost)}</strong></div>
+        return `<div class="sum"><small>${cartCount()} pcs dipilih</small><br><strong>${money(cost)}</strong></div>
             <button class="primary" id="ks-buy" style="padding:11px 18px" ${cost <= 0 || cost > D.balance ? 'disabled' : ''}>
-                ${cost > D.balance ? 'Saldo tidak cukup' : 'Beli ke Supplier'}</button></div>`;
-        return h;
+                ${cost > D.balance ? 'Saldo tidak cukup' : 'Beli ke Supplier'}</button>`;
     }
 
     function bindSupplier(body) {
-        const set = (key, v) => { cart[key] = Math.max(0, Math.min(D.maxPerBuy, Math.floor(Number(v) || 0))); msg = null; render(); };
+        // ubah jumlah di tempat (tanpa gambar ulang tabel) supaya posisi scroll & fokus tidak hilang
+        const set = (key, v) => {
+            const n = cart[key] = Math.max(0, Math.min(D.maxPerBuy, Math.floor(Number(v) || 0)));
+            const k = CSS.escape(key);
+            body.querySelector(`[data-qty="${k}"]`).value = n;
+            body.querySelector(`[data-dec="${k}"]`).disabled = n <= 0;
+            body.querySelector(`[data-inc="${k}"]`).disabled = n >= D.maxPerBuy;
+            $('ks-cartbar').innerHTML = supplierBar();
+            bindBuy();
+        };
         body.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => set(b.dataset.inc, (cart[b.dataset.inc] || 0) + 1));
         body.querySelectorAll('[data-dec]').forEach(b => b.onclick = () => set(b.dataset.dec, (cart[b.dataset.dec] || 0) - 1));
         body.querySelectorAll('[data-qty]').forEach(i => i.onchange = () => set(i.dataset.qty, i.value));
+        bindBuy();
+    }
+
+    function bindBuy() {
         const buy = $('ks-buy');
         if (buy) buy.onclick = async () => {
             if (buy.dataset.sure !== '1') { buy.dataset.sure = '1'; buy.textContent = `Yakin beli ${money(cartCost())}? Klik lagi`; return; }
@@ -195,19 +211,29 @@
             });
             h += '</tbody></table>';
         });
-        const n = Object.keys(priceEdit).length;
-        if (D.boss) h += `<div class="cart-bar"><div class="sum"><small>${n ? `${n} harga diubah, belum disimpan` : 'Belum ada perubahan'}</small></div>
-            <button class="primary" id="ks-save-price" style="padding:11px 18px" ${n ? '' : 'disabled'}>Simpan Harga</button></div>`;
+        if (D.boss) h += `<div class="cart-bar" id="ks-pricebar">${hargaBar()}</div>`;
         return h;
+    }
+
+    function hargaBar() {
+        const n = Object.keys(priceEdit).length;
+        return `<div class="sum"><small>${n ? `${n} harga diubah, belum disimpan` : 'Belum ada perubahan'}</small></div>
+            <button class="primary" id="ks-save-price" style="padding:11px 18px" ${n ? '' : 'disabled'}>Simpan Harga</button>`;
     }
 
     function bindHarga(body) {
         body.querySelectorAll('[data-price]').forEach(i => i.onchange = () => {
             const p = D.prices.find(x => x.code === i.dataset.price);
             const v = Math.max(0, Math.floor(Number(i.value) || 0));
+            i.value = v;
             if (p && v !== p.price) priceEdit[p.code] = v; else delete priceEdit[i.dataset.price];
-            msg = null; render();
+            $('ks-pricebar').innerHTML = hargaBar();
+            bindSavePrice();
         });
+        bindSavePrice();
+    }
+
+    function bindSavePrice() {
         const save = $('ks-save-price');
         if (save) save.onclick = async () => {
             save.disabled = true;
@@ -256,8 +282,11 @@
         bind(body);
     }
 
+    // gambar ulang tanpa melompat ke atas (posisi scroll dikembalikan)
     function render() {
+        const body = $('ks-body'), top = body.scrollTop;
         if (mode === 'staff') renderStaff(); else renderPatient();
+        body.scrollTop = top;
     }
 
     // jangan menimpa layar saat petugas sedang mengetik
@@ -273,6 +302,7 @@
         if (d.action === 'kasirOpen') {
             mode = d.mode; D = d.data; tab = 'approval'; cart = {}; priceEdit = {}; payMethod = {}; msg = null;
             render();
+            $('ks-body').scrollTop = 0;
             $('kasir').classList.remove('hidden');
         } else if (d.action === 'kasirUpdate') {
             if (!D || typing() || (mode === 'staff' && (tab === 'supplier' || tab === 'harga'))) return;

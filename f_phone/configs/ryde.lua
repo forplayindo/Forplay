@@ -17,13 +17,28 @@ return {
         { name = 'Diamond Casino',          sub = 'East Vinewood',        x = 925.0,   y = 46.0 },
     },
 
-    -- Fraction of the agreed fare the driver actually receives on drop-off.
-    -- 1.0 = the driver keeps the whole fare; 0.9 would skim a 10% platform cut.
-    DriverCut = 0.8,
+    -- Tarif tetap (tanpa tawar-menawar), dihitung server saat penumpang memesan:
+    --     tarif = BaseFare + jarak_km * PerKm, lalu dijepit ke MinFare..MaxFare
+    -- jarak_km = jarak garis lurus jemput -> tujuan * RoadFactor (perkiraan jarak lewat jalan).
+    -- Disamakan dengan argo f_taxijob (Rp 40rb/mil ~ Rp 25rb/km).
+    BaseFare   = 15000,
+    PerKm      = 25000,
+    RoadFactor = 1.3,
+    MinFare    = 30000,
+    MaxFare    = 300000,
 
-    -- Guard rails on the fare a driver may quote (whole dollars).
-    MinFare = 1,
-    MaxFare = 100000,
+    -- Pajak dari tarif yang dipotong saat perjalanan selesai; supir menerima sisanya.
+    -- Masuk ke rekening Renewed-Banking TaxAccount + dihitung "Pajak Warga" di f_tax.
+    TaxRate    = 0.05,
+    TaxAccount = 'government',
+
+    -- Supir boleh menekan "Selesai" di mana saja: dalam ArriveRadius meter dari tujuan = tarif
+    -- penuh, di luar itu = argo (BaseFare + km jemput -> posisi supir * PerKm, maks tarif penuh).
+    ArriveRadius = 250.0,
+
+    -- Detik perjalanan ditahan saat penumpang/supir crash. Kembali dalam waktu ini = lanjut;
+    -- tidak kembali = batal tanpa biaya. Tidak ada pemotongan saldo saat pemain offline.
+    DisconnectGrace = 300,
 
     -- Leaderboard ranking. Drivers are ranked by a confidence-weighted rating, so a
     -- driver with one lucky 5-star can't outrank a high-volume driver with a strong

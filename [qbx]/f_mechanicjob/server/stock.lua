@@ -95,7 +95,7 @@ local function near(src, coords, dist)
 end
 
 local function nearPoint(src) return near(src, SC.point.coords, SC.point.distance + 2.0) end
-local function nearCashier(src) return near(src, cfg.cashier.coords, cfg.cashier.distance + 2.0) end
+local function nearSupplier(src) return near(src, SC.supplier.coords, SC.supplier.distance + 2.0) end
 
 ---------------------------------------------------------------------------
 -- Rekening organisasi (Renewed-Banking)
@@ -156,7 +156,7 @@ CreateThread(function()
 end)
 
 ---------------------------------------------------------------------------
--- Menu Kasir: tab Stok Gudang (lihat: semua mekanik on duty, beli: grade SC.grade)
+-- Titik Supplier: Stok Gudang (lihat: semua mekanik on duty, beli: grade SC.grade)
 ---------------------------------------------------------------------------
 local function stockList()
     local list = {}
@@ -175,7 +175,7 @@ function Stock.CanBuy(job) return job.grade.level >= SC.grade end
 lib.callback.register('f_mechanicjob:server:stockGet', function(src)
     local player, job = mechanicOf(src)
     if not player then return { error = 'Hanya mekanik yang sedang bertugas' } end
-    if not nearCashier(src) then return { error = 'Kamu harus berada di meja kasir' } end
+    if not nearSupplier(src) then return { error = 'Kamu harus berada di titik Supplier' } end
     return stockData(job)
 end)
 
@@ -185,7 +185,7 @@ lib.callback.register('f_mechanicjob:server:supplierBuy', function(src, cart)
     local player, job = mechanicOf(src)
     if not player then return { error = 'Hanya mekanik yang sedang bertugas' } end
     if not Stock.CanBuy(job) then return { error = 'Hanya Manager yang bisa membeli ke supplier' } end
-    if not nearCashier(src) then return { error = 'Kamu harus berada di meja kasir' } end
+    if not nearSupplier(src) then return { error = 'Kamu harus berada di titik Supplier' } end
     if not ready then return { error = 'Stok gudang belum siap, coba lagi' } end
     if type(cart) ~= 'table' then return { error = 'Pesanan tidak valid' } end
 

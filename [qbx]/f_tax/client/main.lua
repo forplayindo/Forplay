@@ -20,11 +20,10 @@ local function open(m)
 end
 
 RegisterCommand('auditpajak', function() open('audit') end, false)
-RegisterCommand('bayarpajak', function() open('pay') end, false)
+-- bayar pajak perusahaan pindah ke menu Balai Kota (f_cityhall, tab Pajak Perusahaan)
 
 CreateThread(function()
     TriggerEvent('chat:addSuggestion', '/auditpajak', 'Audit pajak perusahaan (pemerintah, on duty)')
-    TriggerEvent('chat:addSuggestion', '/bayarpajak', 'Bayar pajak perusahaan (pimpinan)')
 end)
 
 RegisterNUICallback('close', function(_, cb)

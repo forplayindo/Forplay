@@ -26,6 +26,8 @@ server_scripts {
 ui_page 'html/index.html'
 
 files {
+    'html/ui/ios.css',
+    'html/ui/fonts/*.woff2',
     'html/index.html',
     'html/vue.min.js',
     'html/script.js',

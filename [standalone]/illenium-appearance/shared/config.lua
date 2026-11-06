@@ -580,7 +580,16 @@ Config.ClothingRooms = {
             vector3(454.35513305664, -988.46459960938, 30.69),
             vector3(460.4231262207, -987.94573974609, 30.69)
         }
-    }
+    },
+    {
+        job = "ambulance",
+        coords = vector4(-2789.23, -79.13, 17.61, 163.38), -- isi dari /vec4 di ruang ganti RS
+        size = vector3(4, 4, 4),
+        rotation = 45,
+        usePoly = false,
+    },
+
+    
 }
 
 

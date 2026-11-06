@@ -1488,7 +1488,7 @@ export async function mdtPhoneSummary(citizenid: string): Promise<HandsetSummary
         if (!person?.phone) return { device: null };
         return {
             device: {
-                number: person.phone, name: person.name, email: `${person.name.split(' ')[0].toLowerCase()}@forplay.com`,
+                number: person.phone, name: person.name, email: `${person.name.split(' ')[0].toLowerCase()}@4play.com`,
                 address: 'Vespucci Beach, Apt 4', locale: 'en', apps: 14, lastSeen: new Date().toISOString(),
                 sim: { identity: person.citizenid, owner: person.citizenid, adopted: null, since: '2026-01-04' },
             },
@@ -1571,7 +1571,7 @@ export async function mdtPhoneNote(citizenid: string, id: string): Promise<strin
 export async function mdtPhoneAccounts(citizenid: string): Promise<HandsetAccounts> {
     if (!isFiveM) {
         return {
-            mail: [{ email: 'e.moreno@forplay.com', display_name: 'Elena Moreno', created_at: '2026-02-11' }],
+            mail: [{ email: 'e.moreno@4play.com', display_name: 'Elena Moreno', created_at: '2026-02-11' }],
             apps: [
                 { app: 'photogram', username: 'elena.m', display_name: 'Elena', created_at: '2026-02-12' },
                 { app: 'birdy', username: 'emoreno', display_name: 'Elena M', created_at: '2026-03-01' },

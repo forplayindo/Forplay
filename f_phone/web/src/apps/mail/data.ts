@@ -117,7 +117,7 @@ export function saveActiveAccountId(id: string | null): void {
 }
 
 
-const PRIMARY_EMAIL = 'you@forplay.com';
+const PRIMARY_EMAIL = 'you@4play.com';
 
 const MIN = 60_000, HR = 3_600_000, DAY = 86_400_000;
 const MOCK_NOW = Date.now();
@@ -126,12 +126,12 @@ const ME = { name: 'Personal', email: PRIMARY_EMAIL };
 
 const MOCK: { accounts: MailAccount[]; messages: MailMessage[]; savedEmails: string[]; declinedEmails: string[] } = {
     accounts: [{ id: PRIMARY_EMAIL, name: 'Personal', email: PRIMARY_EMAIL }],
-    savedEmails: ['samuelwhite@forplay.com', 'marcus@forplay.com'],
+    savedEmails: ['samuelwhite@4play.com', 'marcus@4play.com'],
     declinedEmails: [],
     messages: [
         {
             id: 'm1', accountId: PRIMARY_EMAIL, folder: 'inbox',
-            from: { name: 'LifeInvader', email: 'noreply@forplay.com' }, to: [PRIMARY_EMAIL],
+            from: { name: 'LifeInvader', email: 'noreply@4play.com' }, to: [PRIMARY_EMAIL],
             subject: 'Welcome to LifeInvader Mail',
             body: 'Your inbox is ready.\n\nTap the pencil to compose, or pick an email to read.\n\nThe LifeInvader Team',
             sentAt: ago(8 * MIN), read: false, flagged: false,
@@ -172,7 +172,7 @@ const MOCK: { accounts: MailAccount[]; messages: MailMessage[]; savedEmails: str
 
         {
             id: 'd1', accountId: PRIMARY_EMAIL, folder: 'drafts',
-            from: ME, to: ['mike@forplay.com'],
+            from: ME, to: ['mike@4play.com'],
             subject: 'Re: this weekend',
             body: 'Hey, sounds good, I should be free after',
             sentAt: ago(20 * MIN), read: true, flagged: false,
@@ -194,7 +194,7 @@ const MOCK: { accounts: MailAccount[]; messages: MailMessage[]; savedEmails: str
         },
         {
             id: 's2', accountId: PRIMARY_EMAIL, folder: 'sent',
-            from: ME, to: ['jordan@forplay.com'],
+            from: ME, to: ['jordan@4play.com'],
             subject: 'Meeting tomorrow',
             body: 'Works for me. Let us say 11am at the usual place.\n\nSee you then.',
             sentAt: ago(5 * HR), read: true, flagged: false,

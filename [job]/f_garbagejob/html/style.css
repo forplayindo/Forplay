@@ -1,0 +1,39 @@
+/* f_garbagejob — layout saja; gaya dasar dari ui/ios.css */
+.panel { width: min(440px, 94vw); }
+
+.body { display: flex; flex-direction: column; gap: 14px; padding: 0 20px 20px; }
+.seg button { flex: 1; }
+.diff-info { margin-top: 8px; }
+.head-row { display: flex; align-items: center; justify-content: space-between; }
+.head-row .b-plain { height: 22px; padding: 0 4px; }
+.head-row .ic { width: 15px; height: 15px; }
+
+#crew .row .d, #near .row .d { font-size: 12px; }
+#near:empty::after { content: "Tidak ada pemain lain di dekatmu."; display: block; padding: 14px; text-align: center; color: var(--label-2); font-size: 13px; }
+
+/* HUD progres: kanan tengah, kecil, tanpa blur / animasi berat */
+.hud {
+    position: fixed; right: 18px; top: 50%; transform: translateY(-50%); width: 230px;
+    display: flex; flex-direction: column; gap: 8px; padding: 12px 14px;
+    background: rgba(28, 28, 30, .85); border-radius: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
+    color: var(--label); font-size: 12px; pointer-events: none;
+}
+.hud-h { display: flex; align-items: center; gap: 10px; }
+.hud-h b { display: block; font-size: 13px; }
+.hud-h small { display: block; color: var(--label-2); font-size: 11px; }
+.hud-ic { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border-radius: 8px; background: var(--accent); color: var(--on-accent); }
+.hud-ic .ic { width: 16px; height: 16px; }
+.hud-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.hud-row span { color: var(--label-2); }
+.hud-row b { font-variant-numeric: tabular-nums; }
+.hud-row b.ok { color: var(--green); }
+#h-rows { display: flex; flex-direction: column; gap: 6px; }
+.hud .bar { margin-bottom: 2px; }
+.hud-f { display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--sep); }
+.hud-f b { color: var(--green); font-variant-numeric: tabular-nums; }
+
+.menu-actions { display: flex; gap: 10px; }
+/* not ".actions": the kit styles ".actions button" as small gray list buttons */
+.menu-actions .primary:disabled { opacity: 1; background: var(--fill); color: var(--label-2); }
+.menu-actions .b-lg { flex: 1; }
+.menu-actions #leave { flex: 0 0 34%; }

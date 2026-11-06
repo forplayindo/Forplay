@@ -1,0 +1,58 @@
+-- Derek (dibaca client & server). Dulu resource f_towjob, sekarang modul f_mechanicjob.
+return {
+    -- truk yang bisa menaikkan kendaraan (ox_target Naikkan/Turunkan Kendaraan di bak belakang).
+    -- Dipakai job tow dan semua job bertipe mekanik, wajib on-duty.
+    flatbeds = { 'flatbed' },
+    attach = vec3(0.0, -2.35, 1.15), -- posisi kendaraan di bak (relatif ke bodyshell flatbed)
+    dropBehind = 3.5,                -- jarak kendaraan diturunkan di belakang bak (meter)
+
+    -- Job Derek (job 'tow' dari balai kota): ambil flatbed + misi NPC (/npc) + slip gaji
+    job = 'tow',
+    depot = { label = 'Markas Derek', coords = vec3(471.39, -1311.03, 29.21) },             -- ambil slip gaji
+    truck = { label = 'Flatbed Derek', coords = vec4(489.65, -1331.82, 29.33, 306.5), model = 'flatbed', deposit = 500000 },
+    dropoff = vec3(491.00, -1314.69, 29.25), -- turunkan kendaraan misi di sini
+    dropoffRadius = 25.0,
+    pay = { min = 85000, max = 95000, tax = 15 }, -- per kendaraan, pajak persen
+    spots = {
+        { model = 'sultanrs', coords = vec3(-2480.87, -211.96, 17.40) },
+        { model = 'zion', coords = vec3(-2723.39, 13.21, 15.13) },
+        { model = 'oracle', coords = vec3(-3169.62, 976.18, 15.04) },
+        { model = 'chino', coords = vec3(-3139.76, 1078.72, 20.19) },
+        { model = 'baller2', coords = vec3(-1656.94, -246.16, 54.51) },
+        { model = 'stanier', coords = vec3(-1586.66, -647.56, 29.44) },
+        { model = 'washington', coords = vec3(-1036.15, -491.06, 36.21) },
+        { model = 'buffalo', coords = vec3(-1029.19, -475.53, 36.42) },
+        { model = 'feltzer2', coords = vec3(75.21, 164.85, 104.69) },
+        { model = 'asea', coords = vec3(-534.60, -756.72, 31.60) },
+        { model = 'fq2', coords = vec3(487.24, -30.83, 88.86) },
+        { model = 'jackal', coords = vec3(-772.20, -1281.81, 4.56) },
+        { model = 'sultanrs', coords = vec3(-663.84, -1206.99, 10.17) },
+        { model = 'zion', coords = vec3(719.12, -767.78, 24.89) },
+        { model = 'oracle', coords = vec3(-970.95, -2410.45, 13.34) },
+        { model = 'chino', coords = vec3(-1067.52, -2571.41, 13.21) },
+        { model = 'baller2', coords = vec3(-619.24, -2207.29, 5.57) },
+        { model = 'stanier', coords = vec3(1192.08, -1336.91, 35.11) },
+        { model = 'washington', coords = vec3(-432.81, -2166.05, 9.89) },
+        { model = 'buffalo', coords = vec3(-451.82, -2269.35, 7.17) },
+        { model = 'asea', coords = vec3(939.27, -2197.54, 30.55) },
+        { model = 'fq2', coords = vec3(-556.11, -1794.73, 22.04) },
+        { model = 'jackal', coords = vec3(591.74, -2628.22, 5.57) },
+        { model = 'sultanrs', coords = vec3(1654.52, -2535.83, 74.49) },
+        { model = 'oracle', coords = vec3(1642.61, -2413.32, 93.14) },
+        { model = 'chino', coords = vec3(1371.32, -2549.53, 47.58) },
+        { model = 'baller2', coords = vec3(383.84, -1652.87, 37.28) },
+        { model = 'stanier', coords = vec3(27.22, -1030.88, 29.41) },
+        { model = 'washington', coords = vec3(229.26, -365.91, 43.75) },
+        { model = 'asea', coords = vec3(-85.81, -51.67, 61.11) },
+        { model = 'fq2', coords = vec3(-4.60, -670.27, 31.86) },
+        { model = 'oracle', coords = vec3(-111.90, 91.97, 71.08) },
+        { model = 'zion', coords = vec3(-314.26, -698.23, 32.55) },
+        { model = 'buffalo', coords = vec3(-366.91, 115.54, 65.58) },
+        { model = 'fq2', coords = vec3(-592.07, 138.21, 60.07) },
+        { model = 'zion', coords = vec3(-1613.86, 18.76, 61.80) },
+        { model = 'baller2', coords = vec3(-1709.80, 55.11, 65.71) },
+        { model = 'chino', coords = vec3(-521.89, -266.78, 34.94) },
+        { model = 'washington', coords = vec3(-451.09, -333.52, 34.02) },
+        { model = 'baller2', coords = vec3(322.36, -1900.50, 25.77) },
+    },
+}

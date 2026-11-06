@@ -1,0 +1,65 @@
+@font-face{font-family:Anton;src:url(fonts/Anton.woff2) format('woff2');font-display:block}
+@font-face{font-family:"Chakra Petch";font-weight:700;src:url(fonts/ChakraPetch-Bold.woff2) format('woff2');font-display:block}
+
+html,body{margin:0;background:transparent;overflow:hidden}
+
+/* Ringan: tidak ada animasi infinite. Animasi hanya jalan sebentar per fase (class p-in / p-mid / p-out
+   dari index.html), di luar itu logo diam total sehingga NUI tidak menggambar ulang apa pun.
+   Tajam: semua ukuran = N * --u (1px desain x --size), jadi logo digambar langsung di ukuran akhirnya, tanpa transform: scale. */
+#l4p{--u:calc(var(--size, 1) * 1px);display:none;position:fixed;top:var(--top);right:var(--right);opacity:var(--opacity);pointer-events:none;z-index:9999}
+#l4p.on{display:block}
+.wrap{position:relative}
+.glow{filter:drop-shadow(0 calc(3*var(--u)) 0 rgba(0,0,0,.45)) drop-shadow(0 0 calc(6*var(--u)) var(--accent-glow))}
+.row{display:flex;align-items:center;gap:calc(16*var(--u));transform:skewX(-10deg)}
+.persp{perspective:calc(600*var(--u))}
+.badge{width:calc(124*var(--u));height:calc(124*var(--u));position:relative;overflow:hidden;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 calc(-8*var(--u)) 0 rgba(0,0,0,.22),inset 0 calc(3*var(--u)) 0 rgba(255,255,255,.25)}
+.badge .n{font-family:Anton,sans-serif;font-size:calc(112*var(--u));line-height:1;color:#fff;margin-top:calc(4*var(--u))}
+.badge .shine{position:absolute;top:calc(-40*var(--u));bottom:calc(-40*var(--u));width:calc(46*var(--u));left:50%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);transform:translateX(calc(-140*var(--u))) rotate(18deg)}
+.col{display:flex;flex-direction:column;align-items:flex-start;gap:calc(6*var(--u))}
+.play{font-family:Anton,sans-serif;font-size:calc(108*var(--u));line-height:.92;letter-spacing:calc(2*var(--u));color:transparent;background-image:linear-gradient(100deg,#fff 0%,#fff 42%,var(--accent-light) 47%,#fff 50%,var(--accent-light) 53%,#fff 58%,#fff 100%);background-size:300% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text}
+.tag{display:flex;align-items:center;gap:calc(12*var(--u))}
+.line{height:calc(4*var(--u));width:calc(56*var(--u));background:var(--accent)}
+.txt{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:calc(22*var(--u));letter-spacing:.42em;color:#fff;white-space:pre}
+.ghost{display:none;position:absolute;inset:0;mix-blend-mode:screen;opacity:0}
+.ghost .badge,.ghost .line{background:var(--g);box-shadow:none}
+.ghost .badge .n,.ghost .txt{color:var(--g)}
+.ghost .shine{display:none}
+.ghost .play{background:none;color:var(--g)}
+.ghost.r{--g:#ff2a3c}
+.ghost.c{--g:#22e1ff}
+
+/* fase masuk (±1.3 dtk) */
+.p-in .wrap{animation:fadeIn .3s linear both}
+.p-in .badge{animation:badgeIn .5s cubic-bezier(.34,1.56,.64,1) .05s both}
+.p-in .shine{animation:shine .5s ease .45s both}
+.p-in .play{animation:playIn .5s cubic-bezier(.33,1,.68,1) .35s both}
+.p-in .line{animation:lineIn .35s cubic-bezier(.33,1,.68,1) .7s both}
+.p-in .txt{animation:txtIn .45s cubic-bezier(.33,1,.68,1) .85s both}
+/* fase tengah: glitch + flip + kilau (±1.3 dtk) */
+.p-mid .ghost{display:block}
+.p-mid .ghost.r{animation:glR .3s steps(1) both}
+.p-mid .ghost.c{animation:glC .3s steps(1) both}
+.p-mid .badge{animation:flip .9s cubic-bezier(.33,1,.68,1) .1s both}
+.p-mid .shine{animation:shine .6s ease .5s both}
+.p-mid .play{animation:sweep 1s cubic-bezier(.33,1,.68,1) .3s both}
+/* fase keluar (±1.2 dtk) */
+.p-out .line{animation:lineOut .3s cubic-bezier(.32,0,.67,0) both}
+.p-out .txt{animation:txtOut .3s ease both}
+.p-out .play{animation:playOut .4s cubic-bezier(.32,0,.67,0) .2s both}
+.p-out .badge{animation:badgeOut .4s cubic-bezier(.32,0,.67,0) .5s both}
+.p-out .wrap{animation:fadeOut .5s linear .7s both}
+
+@keyframes fadeIn{from{opacity:0}}
+@keyframes fadeOut{to{opacity:0}}
+@keyframes badgeIn{from{transform:scale(0) rotate(-90deg)}}
+@keyframes badgeOut{to{transform:scale(0) rotate(90deg)}}
+@keyframes flip{to{transform:rotateY(360deg)}}@keyframes shine{to{transform:translateX(calc(140*var(--u))) rotate(18deg)}}
+@keyframes playIn{from{clip-path:inset(calc(-10*var(--u)) 100% calc(-10*var(--u)) calc(-10*var(--u)));transform:translateX(calc(-30*var(--u)))}to{clip-path:inset(calc(-10*var(--u)) 0% calc(-10*var(--u)) calc(-10*var(--u)))}}
+@keyframes playOut{from{clip-path:inset(calc(-10*var(--u)) 0% calc(-10*var(--u)) calc(-10*var(--u)))}to{clip-path:inset(calc(-10*var(--u)) 100% calc(-10*var(--u)) calc(-10*var(--u)));transform:translateX(calc(-30*var(--u)))}}
+@keyframes sweep{to{background-position:0% 0}}
+@keyframes lineIn{from{width:0}}
+@keyframes lineOut{to{width:0}}
+@keyframes txtIn{from{opacity:0;transform:translateY(calc(8*var(--u)))}}
+@keyframes txtOut{to{opacity:0}}
+@keyframes glR{0%{opacity:.8;transform:translateX(calc(-10*var(--u)))}32%{transform:translateX(calc(7*var(--u)))}49%{transform:translateX(calc(-13*var(--u)))}70%{opacity:.5;transform:translateX(calc(4*var(--u)))}100%{opacity:0;transform:none}}
+@keyframes glC{0%{opacity:.8;transform:translateX(calc(10*var(--u)))}32%{transform:translateX(calc(-7*var(--u)))}49%{transform:translateX(calc(13*var(--u)))}70%{opacity:.5;transform:translateX(calc(-4*var(--u)))}100%{opacity:0;transform:none}}

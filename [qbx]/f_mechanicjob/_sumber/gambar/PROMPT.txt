@@ -1,0 +1,41 @@
+PROMPT GAMBAR ITEM MEKANIK (untuk Gemini)
+==========================================
+Simpan hasil di folder ini dengan nama file = nama item, contoh: engine_oil.jpg
+(format jpg/png/webp bebas). Nanti diproses jadi PNG 256x256 transparan ke ox_inventory.
+
+PENTING untuk Gemini: JANGAN minta "transparent background". Gemini akan menggambar pola
+kotak-kotak palsu yang ikut tercetak di gambar dan susah dihapus. Pakai background abu-abu polos
+seperti di GAYA DASAR di bawah.
+
+Cara pakai: tempel GAYA DASAR, lalu ganti [ITEM] dengan deskripsi item.
+Kalau generate di satu chat, tambahkan: "Keep exactly the same style, camera angle and lighting as the previous image."
+
+GAYA DASAR
+----------
+Photorealistic product photo of [ITEM]. Centered, three-quarter view from slightly above (about 35 degrees), the whole object fully visible with empty space around it, soft studio lighting, sharp focus, highly detailed. No text, no letters, no brand logo, no hands, no table, no other objects. Isolated on a plain solid light gray background, square 1:1.
+
+DESKRIPSI [ITEM]
+----------------
+-- Cairan & suku cadang (Stok Gudang Bengkel)
+engine_oil    a 1 liter plastic bottle of engine motor oil, black bottle with a blank silver label, golden amber oil visible through a small window strip, black screw cap
+coolant       a 1 liter translucent white plastic jug filled with bright green engine coolant, green screw cap, blank label
+brake_fluid   a small 500 ml translucent plastic bottle of amber brake fluid with a yellow screw cap, blank label
+trans_fluid   a 1 liter translucent plastic bottle filled with bright red transmission fluid, red screw cap, blank label
+spark_plug    a set of four new automotive spark plugs with white ceramic insulators and shiny metal threads, lying neatly side by side
+air_filter    a new rectangular car engine air filter with pleated orange paper element and a dark rubber frame
+
+-- Bahan baku
+metalscrap    a small pile of rusty scrap metal: bent metal offcuts, old bolts, nuts and washers
+steel         a neat bundle of brushed steel bars with a cool gray metallic shine
+aluminum      a small stack of bright silver aluminum ingots
+copper        a coil of shiny copper wire next to two short copper pipes
+plastic       a stack of recycled plastic sheets in mixed colors with a few plastic pellets
+iron          (opsional) a small stack of dark gray cast iron ingots
+glass         (opsional) a stack of clear glass panes with slightly green edges
+rubber        (opsional) a rolled up thick black rubber sheet
+
+-- Peralatan (toko bengkel)
+repairkit     an open red metal toolbox filled with wrenches, screwdrivers and pliers
+tirekit       an open red plastic tire repair kit case showing tire plug strips, a T-handle plug insertion tool and a small tube of rubber cement
+cleaningkit   a car cleaning kit: a blue plastic bucket with yellow sponges, a microfiber cloth and a spray bottle
+tas_perkakas  (opsional, sekarang pinjam gambar kunci inggris) a heavy duty black and orange canvas mechanic tool bag, open at the top with tools sticking out

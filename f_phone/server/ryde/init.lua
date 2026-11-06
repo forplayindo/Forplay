@@ -22,7 +22,6 @@ lib.callback.register('f_phone:server:ryde:me',            function(src)        
 lib.callback.register('f_phone:server:ryde:sync',          function(src)          return actions.sync(src) end)
 lib.callback.register('f_phone:server:ryde:deleteAccount', function(src)          return actions.deleteAccount(src) end)
 lib.callback.register('f_phone:server:ryde:requestRide',   function(src, payload) return actions.requestRide(src, payload) end)
-lib.callback.register('f_phone:server:ryde:respond',       function(src, payload) return actions.respond(src, payload) end)
 lib.callback.register('f_phone:server:ryde:cancel',        function(src)          return actions.cancel(src) end)
 lib.callback.register('f_phone:server:ryde:setOnline',     function(src, payload) return actions.setOnline(src, payload) end)
 lib.callback.register('f_phone:server:ryde:requestsBoard', function(src)          return actions.requestsBoard(src) end)
@@ -36,18 +35,13 @@ lib.callback.register('f_phone:server:ryde:rate',          function(src, payload
 lib.callback.register('f_phone:server:ryde:history',       function(src)          return actions.history(src) end)
 lib.callback.register('f_phone:server:ryde:leaderboard',   function()             return actions.leaderboard() end)
 
----/rydeoffer - DEV/TEST: injects a dummy fare offer onto the caller's own active ride request.
----Restricted: it mints a synthetic trip record per run, so it must not be player-reachable.
----@param source integer player server id
-lib.addCommand('rydeoffer', {
-    help = 'Ryde: add a test fare offer to your active ride request',
-    restricted = 'group.admin',
-}, function(source)
-    local msg = actions.devOffer(source)
-    TriggerClientEvent('ox_lib:notify', source, { title = 'Ryde', description = msg, type = 'inform' })
-end)
-
 ---Cancels anything a leaving player was in and clears their per-src caches.
 AddEventHandler('playerDropped', function()
     actions.onPlayerDropped(source)
+end)
+
+---Resumes a trip held for a player who crashed and came back within the grace window.
+AddEventHandler('QBCore:Server:PlayerLoaded', function(p)
+    local src = p and p.PlayerData and p.PlayerData.source
+    if src then actions.onPlayerLoaded(src) end
 end)

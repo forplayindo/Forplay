@@ -8,7 +8,7 @@ return {
         grades = {
             [0] = {
                 name = 'Pekerja Lepas',
-                payment = 75000
+                payment = 25000 -- warga sipil tanpa gaji: harus kerja sampingan (sampah, kurir) untuk dapat uang
             },
         },
     },
@@ -274,17 +274,6 @@ return {
         grades = {
             [0] = {
                 name = 'Sopir',
-                payment = 75000
-            },
-        },
-    },
-    ['garbage'] = {
-        label = 'Kebersihan',
-        defaultDuty = true,
-        offDutyPay = false,
-        grades = {
-            [0] = {
-                name = 'Petugas Sampah',
                 payment = 75000
             },
         },

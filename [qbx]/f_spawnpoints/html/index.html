@@ -3,15 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>f_spawnpoints</title>
+    <link rel="stylesheet" href="ui/ios.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+        <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    </svg>
     <div id="panel" class="panel hidden">
         <header>
-            <div class="brand"><span class="logo">🏠</span><div><h1>Spawn Rumah</h1><small id="sub"></small></div></div>
+            <div class="brand"><span class="logo"><svg class="ic"><use href="#i-home"/></svg></span><div><h1>Spawn Rumah</h1><small id="sub"></small></div></div>
             <div class="head-actions">
-                <button class="pill accent" id="add-btn">＋ Tambah di Posisi Saya</button>
-                <button class="icon-btn close" data-close>✕</button>
+                <button class="b b-filled b-sm" id="add-btn"><svg class="ic"><use href="#i-plus"/></svg>Tambah di Posisi Saya</button>
+                <button class="circle close" data-close><svg class="ic"><use href="#i-x"/></svg></button>
             </div>
         </header>
 
@@ -21,15 +28,15 @@
                 <button data-tab="owned">Ada Pemilik</button>
                 <button data-tab="empty">Kosong</button>
             </nav>
-            <input id="search" placeholder="Cari nama rumah / pemilik / citizenid...">
+            <label class="search"><svg class="ic"><use href="#i-search"/></svg><input id="search" placeholder="Cari nama rumah / pemilik / citizenid"></label>
         </div>
         <div id="msg" class="banner hidden"></div>
         <main id="list" class="list"></main>
 
         <aside id="sheet" class="sheet hidden">
-            <div class="sheet-head"><h2 id="sheet-title">Tambah Rumah</h2><button class="icon-btn" id="sheet-close">✕</button></div>
+            <div class="sheet-head"><h2 id="sheet-title">Tambah Rumah</h2><button class="circle" id="sheet-close"><svg class="ic"><use href="#i-x"/></svg></button></div>
             <div class="sheet-body">
-                <div id="loc-note" class="note"></div>
+                <div id="loc-note" class="notice"></div>
 
                 <div id="label-box">
                     <label>Nama rumah</label>
@@ -46,7 +53,7 @@
             </div>
             <div class="sheet-foot">
                 <div id="sheet-msg" class="msg hidden"></div>
-                <button id="save-btn" class="primary">Simpan</button>
+                <button id="save-btn" class="primary b-lg">Simpan</button>
             </div>
         </aside>
     </div>

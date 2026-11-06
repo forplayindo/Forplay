@@ -7,7 +7,18 @@ function HygieneSyncHud(src)
         kencing = meta.kencing or 0,
         poop = meta.poop or 0,
     })
+
+    -- statebag lalat: dibaca semua client buat nampilin lalat + dengung di player ini
+    local flies = (meta.mandi or 0) >= Config.Mandi.FliesPercent
+    local state = Player(src).state
+    if state.hygieneFlies ~= flies then
+        state:set('hygieneFlies', flies, true)
+    end
 end
+
+RegisterNetEvent('QBCore:Server:OnPlayerUnload', function(src)
+    Player(src).state:set('hygieneFlies', false, true)
+end)
 
 function HygieneClampSet(src, key, value)
     local player = exports.qbx_core:GetPlayer(src)

@@ -10,7 +10,9 @@
 ---@field id number
 ---@field pet string
 ---@field name string
+---@field variant number texture warna (lihat Config.Pets[].variants)
 ---@field hunger number
+---@field thirst number
 ---@field health number
 ---@field dead boolean
 
@@ -23,6 +25,12 @@
 ---@field slot number posisi ikut di belakang pemain
 ---@field vehicle number? kendaraan tempat hewan (hidup) duduk, ditempel ke bone kursi
 ---@field seat number? indeks kursi kendaraan
+---@field reserve { veh: number, seat: number }? kursi yang sedang dituju (naik otomatis)
+---@field auto boolean? naik otomatis bersama pemilik -> ikut turun saat pemilik keluar
+---@field fetching boolean? sedang main lempar bola
+---@field trickToken table? trik sekali jalan yang sedang berjalan
+---@field attackTarget table? token serangan yang sedang berjalan
+---@field guard { pos: vector3, radius: number }? sedang menjaga area
 
 Pet = {
     ---@type table<number, FPet>
@@ -157,12 +165,18 @@ local function seatTaken(veh, seat)
     if not IsVehicleSeatFree(veh, seat) then return true end
     for _, p in pairs(Pet.list) do
         if p.vehicle == veh and p.seat == seat then return true end
+        if p.reserve and p.reserve.veh == veh and p.reserve.seat == seat then return true end
     end
-    -- hewan mati (milik siapa pun) yang ditaruh di kursi ini
-    local vehNet = NetworkGetNetworkIdFromEntity(veh)
+    -- hewan milik siapa pun (hidup / mati) yang sudah duduk di kursi ini
+    local vehNet = NetworkGetEntityIsNetworked(veh) and NetworkGetNetworkIdFromEntity(veh)
+    local seatPos = GetWorldPositionOfEntityBone(veh, GetEntityBoneIndexByName(veh, SEAT_BONES[seat]))
     for _, n in ipairs(lib.getNearbyPeds(GetEntityCoords(veh), 6.0)) do
         local s = petState(n.ped)
-        if s and s.seatVeh == vehNet and s.seat == seat then return true end
+        if s then
+            if vehNet and s.seatVeh == vehNet and s.seat == seat then return true end
+            -- hewan hidup pemain lain: tertempel ke kendaraan ini, dekat titik kursi ini
+            if IsEntityAttachedToEntity(n.ped, veh) and #(GetEntityCoords(n.ped) - seatPos) < 0.7 then return true end
+        end
     end
     return false
 end
@@ -174,10 +188,27 @@ local function freeSeat(veh)
     end
 end
 
+local function canRide(cfg)
+    return cfg and Config.VehicleEnter[cfg.kind] ~= false
+end
+
 local function attachToSeat(ped, cfg, veh, seat)
     local o = (cfg and cfg.seat) or (cfg and Config.VehicleSeat[cfg.kind]) or Config.VehicleSeat.default
-    AttachEntityToEntity(ped, veh, GetEntityBoneIndexByName(veh, SEAT_BONES[seat]),
-        o.x, o.y, o.z, 0.0, 0.0, o.w or 0.0, false, false, false, true, 2, true)
+    local bone = GetEntityBoneIndexByName(veh, SEAT_BONES[seat])
+    local rot = o.w or 0.0
+    local function attach(rz)
+        AttachEntityToEntity(ped, veh, bone, o.x, o.y, o.z, 0.0, 0.0, rz, false, false, false, true, 2, true)
+    end
+    attach(rot)
+
+    -- arah bone kursi beda-beda antar kendaraan (ada yang menghadap ke belakang):
+    -- setelah ditempel, pastikan hewan menghadap ke depan kendaraan, kalau terbalik putar 180
+    CreateThread(function()
+        Wait(0)
+        if not DoesEntityExist(ped) or not DoesEntityExist(veh) or GetEntityAttachedTo(ped) ~= veh then return end
+        local diff = (GetEntityHeading(ped) - GetEntityHeading(veh) - rot) % 360.0
+        if diff > 90.0 and diff < 270.0 then attach(rot + 180.0) end
+    end)
 end
 
 local function seatPet(p, veh, seat)
@@ -189,21 +220,42 @@ local function seatPet(p, veh, seat)
     p.mode = 'vehicle'
 end
 
+-- pintu untuk kursi 0-2 (kursi 0 = depan sebelah sopir -> pintu 1)
+local function doorOf(veh, seat)
+    local door = seat + 1
+    if seat <= 2 and GetIsDoorValid(veh, door) then return door end
+end
+
+-- hewan HIDUP yang turun dari kendaraan jangan sampai ragdoll ("pingsan") saat mendarat
+local function noRagdollFor(ped, ms)
+    SetPedCanRagdoll(ped, false)
+    SetTimeout(ms, function()
+        local s = DoesEntityExist(ped) and petState(ped)
+        if s and not s.dead then SetPedCanRagdoll(ped, true) end -- hewan mati (lemas) tetap tanpa ragdoll
+    end)
+end
+
 local function unseat(p, pos)
     if not p.vehicle then return end
-    DetachEntity(p.ped, true, false)
+    DetachEntity(p.ped, false, true) -- false = tidak membawa laju kendaraan
     SetEntityCollision(p.ped, true, true)
-    p.vehicle, p.seat = nil, nil
-    if pos then SetEntityCoords(p.ped, pos.x, pos.y, pos.z, false, false, false, false) end
+    p.vehicle, p.seat, p.auto = nil, nil, nil
+    if pos then
+        local found, z = GetGroundZFor_3dCoord(pos.x, pos.y, pos.z + 1.0, false)
+        SetEntityCoords(p.ped, pos.x, pos.y, found and z or pos.z, false, false, false, false)
+    end
 end
 
 local function enterVehicle(list)
     local veh = cache.vehicle or lib.getClosestVehicle(GetEntityCoords(cache.ped), 6.0, false)
     if not veh then return notify('Tidak ada kendaraan di dekatmu.', 'error') end
 
-    local placed = 0
+    local placed, skipped = 0, 0
     for _, p in ipairs(list) do
-        if p.vehicle then
+        if not canRide(p.cfg) then
+            skipped += 1
+            notify(('%s tidak bisa naik kendaraan.'):format(p.row.name), 'error')
+        elseif p.vehicle then
             placed += 1
         else
             local seat = freeSeat(veh)
@@ -212,14 +264,23 @@ local function enterVehicle(list)
             placed += 1
         end
     end
-    if placed < #list then notify('Kursi kendaraan tidak cukup untuk semua hewan.', 'error') end
+    if placed + skipped < #list then notify('Kursi kendaraan tidak cukup untuk semua hewan.', 'error') end
 end
 
 local function exitVehicle(p)
     if not p.vehicle then return follow(p) end
-    local o = FOLLOW_OFFSETS[p.slot] or FOLLOW_OFFSETS[1]
-    local out = DoesEntityExist(p.vehicle) and GetOffsetFromEntityInWorldCoords(p.vehicle, -2.0 + o.x, -1.0 + o.y, 0.0)
-        or GetEntityCoords(p.ped)
+    local veh = p.vehicle
+    local door = DoesEntityExist(veh) and doorOf(veh, p.seat)
+    local out
+    if door then
+        out = GetEntryPositionOfDoor(veh, door) -- turun di samping pintu kursinya
+    elseif DoesEntityExist(veh) then
+        local o = FOLLOW_OFFSETS[p.slot] or FOLLOW_OFFSETS[1]
+        out = GetOffsetFromEntityInWorldCoords(veh, -2.0 + o.x, -1.0 + o.y, 0.0)
+    else
+        out = GetEntityCoords(p.ped)
+    end
+    noRagdollFor(p.ped, 2000)
     ClearPedTasksImmediately(p.ped)
     unseat(p, out)
     follow(p)
@@ -245,6 +306,101 @@ if Config.Debug then
 end
 
 ---------------------------------------------------------------------------
+-- Naik/turun kendaraan OTOMATIS: hewan yang sedang mengikuti jalan ke pintu dan naik saat
+-- pemiliknya masuk kendaraan, lalu ikut turun saat pemiliknya keluar.
+-- Anjing besar ('scene') melompat masuk/keluar dengan animasi asli GTA yang ditempel ke kursi.
+---------------------------------------------------------------------------
+local IN_VEH_DICT = 'creatures@rottweiler@in_vehicle@std_car'
+
+-- animasi naik/turun: diputar di titik kursi; animasinya dibuat dari sisi kanan,
+-- jadi kursi belakang kiri (1) diputar 180 derajat
+local function seatScene(veh, seat, ped, clip)
+    lib.requestAnimDict(IN_VEH_DICT)
+    local scene = NetworkCreateSynchronisedScene(0.0, 0.0, 0.0, 0.0, 0.0, seat == 1 and 180.0 or 0.0, 2, false, false, 1.0, 0.0, 1.0)
+    NetworkAttachSynchronisedSceneToEntity(scene, veh, GetEntityBoneIndexByName(veh, SEAT_BONES[seat]))
+    NetworkAddPedToSynchronisedScene(ped, scene, IN_VEH_DICT, clip, 1.5, -4.0, 0, 0, 1000.0, 0)
+    NetworkStartSynchronisedScene(scene)
+    return math.floor(GetAnimDuration(IN_VEH_DICT, clip) * 1000)
+end
+
+local function autoBoard(p, veh)
+    local seat = freeSeat(veh)
+    if not seat then return notify(('Tidak ada kursi untuk %s.'):format(p.row.name), 'error') end
+    p.reserve = { veh = veh, seat = seat }
+    p.mode = 'boarding'
+
+    local door = doorOf(veh, seat)
+    local entry = door and GetEntryPositionOfDoor(veh, door) or GetOffsetFromEntityInWorldCoords(veh, 0.0, -3.0, 0.0)
+    ClearPedTasks(p.ped)
+    TaskGoToCoordAnyMeans(p.ped, entry.x, entry.y, entry.z, 3.0, 0, false, 786603, 0.0)
+
+    local deadline = GetGameTimer() + (Config.BoardTimeout or 8000)
+    while p.reserve and exists(p) and DoesEntityExist(veh) and cache.vehicle == veh do
+        if #(GetEntityCoords(p.ped) - entry) < 1.6 or GetGameTimer() > deadline or GetEntitySpeed(veh) > 2.0 then break end
+        Wait(100)
+    end
+
+    if not p.reserve or not exists(p) or p.row.dead or not DoesEntityExist(veh) then p.reserve = nil return end
+    if cache.vehicle ~= veh then -- pemilik keburu turun lagi
+        p.reserve = nil
+        return follow(p)
+    end
+
+    local close = #(GetEntityCoords(p.ped) - entry) < 2.0 and GetEntitySpeed(veh) < 1.0
+    if door and close and Config.VehicleEnter[p.cfg.kind] == 'scene' then
+        SetVehicleDoorOpen(veh, door, false, false)
+        SetEntityCollision(p.ped, false, true)
+        Wait(seatScene(veh, seat, p.ped, 'get_in'))
+    end
+
+    p.reserve = nil
+    if not exists(p) or p.row.dead or not DoesEntityExist(veh) then return end
+    seatPet(p, veh, seat)
+    p.auto = true
+    if door then SetVehicleDoorShut(veh, door, false) end
+    changed()
+end
+
+local function autoExit(p)
+    local veh, seat = p.vehicle, p.seat
+    p.auto = nil
+    local door = veh and DoesEntityExist(veh) and doorOf(veh, seat)
+    if not door or Config.VehicleEnter[p.cfg.kind] ~= 'scene' or GetEntitySpeed(veh) > 1.0 then
+        return exitVehicle(p)
+    end
+
+    -- lepas dari kursi dulu supaya pemantau tidak memutar ulang animasi duduk
+    p.vehicle, p.seat, p.mode = nil, nil, 'boarding'
+    noRagdollFor(p.ped, 5000)
+    SetVehicleDoorOpen(veh, door, false, false)
+    DetachEntity(p.ped, false, true)
+    SetEntityCollision(p.ped, true, true)
+    Wait(seatScene(veh, seat, p.ped, 'get_out'))
+    if not exists(p) then return end
+    ClearPedTasks(p.ped)
+    if DoesEntityExist(veh) then SetVehicleDoorShut(veh, door, false) end
+    if not p.row.dead then follow(p) end
+    changed()
+end
+
+lib.onCache('vehicle', function(veh)
+    for _, p in pairs(Pet.list) do
+        if exists(p) and not p.row.dead and not Pet.isCarried(p.ped) then
+            if veh and p.mode == 'follow' and not p.vehicle and canRide(p.cfg) then
+                CreateThread(function()
+                    Wait(0) -- cache.vehicle baru terisi setelah event ini selesai
+                    if ensureControl(p.ped, 500) then autoBoard(p, veh) end
+                end)
+            elseif not veh and p.auto and p.vehicle then
+                CreateThread(function()
+                    if ensureControl(p.ped, 500) then autoExit(p) end
+                end)
+            end
+        end
+    end
+end)
+
+---------------------------------------------------------------------------
 -- Spawn / despawn (hewan milik sendiri)
 ---------------------------------------------------------------------------
 local function remove(id)
@@ -254,6 +410,24 @@ local function remove(id)
     if exists(p) then DeleteEntity(p.ped) end
     Pet.list[id] = nil
     changed()
+end
+
+-- baru dipanggil: bangun dulu (animasi keluar dari tidur/duduk), baru mengikuti
+local function wakeUp(p)
+    local anim = animFor(p.cfg, 'wake')
+    if not anim or not DoesAnimDictExist(anim[1]) then return follow(p) end
+    lib.requestAnimDict(anim[1])
+    TaskPlayAnim(p.ped, anim[1], anim[2], 8.0, -4.0, -1, 0, 0.0, false, false, false)
+    local ms = math.floor(GetAnimDuration(anim[1], anim[2]) * 1000)
+    RemoveAnimDict(anim[1])
+    p.mode = 'idle'
+    SetTimeout(math.max(ms - 150, 300), function()
+        -- belum diberi perintah lain selama bangun -> mulai mengikuti
+        if exists(p) and not p.row.dead and p.mode == 'idle' and not p.vehicle then
+            follow(p)
+            changed()
+        end
+    end)
 end
 
 ---@param inFront boolean? true = muncul di depan pemain menghadap ke arahnya (setelah membeli)
@@ -288,7 +462,7 @@ function Pet.summon(id, inFront)
         local heading = GetEntityHeading(cache.ped) + (inFront and 180.0 or 0.0)
         local ped = CreatePed(28, model, spawn.x, spawn.y, found and z or spawn.z - 1.0, heading % 360.0, true, true)
         SetModelAsNoLongerNeeded(model)
-        if cfg.texture then SetPedComponentVariation(ped, 0, 0, cfg.texture, 0) end
+        if cfg.variants then SetPedComponentVariation(ped, cfg.variants.comp, 0, p.row.variant or 0, 0) end
         setupPed(ped)
         p.ped = ped
         TriggerServerEvent('f_petshop:server:spawned', id, NetworkGetNetworkIdFromEntity(ped))
@@ -296,8 +470,8 @@ function Pet.summon(id, inFront)
         if p.row.dead then
             dropDead(ped)
         else
-            follow(p)
             notify(('%s datang!'):format(p.row.name), 'success')
+            wakeUp(p)
         end
         changed()
     end
@@ -348,7 +522,7 @@ RegisterNetEvent('f_petshop:client:status', function(data)
     local p = Pet.list[data.id]
     if not p then return end
     local revived = p.row.dead and not data.dead
-    p.row.hunger, p.row.health, p.row.dead = data.hunger, data.health, data.dead
+    p.row.hunger, p.row.thirst, p.row.health, p.row.dead = data.hunger, data.thirst, data.health, data.dead
     if revived and exists(p) then
         -- hewan dihidupkan (bisa saat dikendalikan client lain): ambil kendali lalu ikut lagi
         CreateThread(function()
@@ -439,10 +613,34 @@ function Pet.command(cmd, target)
         return
     end
 
+    if cmd == 'leash' then
+        local p = Pet.list[tonumber(target)]
+        if not exists(p) or p.row.dead then return end
+        local s = petState(p.ped)
+        lib.callback.await('f_petshop:leash', false, p.id, not (s and s.leash))
+        Wait(200) -- tunggu statebag baru sampai sebelum panel diperbarui
+        return changed()
+    end
+
+    -- serang / jaga area: satu hewan, panel ditutup dulu untuk memilih target / luas area
+    if cmd == 'attack' or cmd == 'guard' then
+        local p = Pet.list[tonumber(target)]
+        if not exists(p) or p.row.dead then return end
+        if cmd == 'guard' and p.guard then return Pet.stopGuard(p) end
+        CreateThread(function()
+            if cmd == 'attack' then Pet.pickTarget(p) else Pet.placeGuard(p) end
+        end)
+        return
+    end
+
     local list = targets(target)
     if #list == 0 then return notify('Tidak ada hewan hidup yang bisa diperintah.', 'error') end
 
-    for _, p in ipairs(list) do ensureControl(p.ped, 500) end
+    for _, p in ipairs(list) do
+        ensureControl(p.ped, 500)
+        -- perintah baru membatalkan trik / lempar bola / serangan / jaga area
+        p.fetching, p.trickToken, p.attackTarget, p.guard = nil, nil, nil, nil
+    end
 
     if cmd == 'enter' then
         enterVehicle(list)
@@ -593,6 +791,7 @@ end
 
 -- hewan mati (milik siapa pun) yang ditaruh di kendaraan ini
 local function deadPetIn(veh)
+    if not NetworkGetEntityIsNetworked(veh) then return end
     local vehNet = NetworkGetNetworkIdFromEntity(veh)
     for _, n in ipairs(lib.getNearbyPeds(GetEntityCoords(veh), 6.0)) do
         local s = petState(n.ped)
@@ -659,6 +858,315 @@ CreateThread(function()
 end)
 
 ---------------------------------------------------------------------------
+-- Trik, lempar bola, dielus (hewan milik sendiri)
+---------------------------------------------------------------------------
+-- kembali ke perintah sebelumnya setelah trik sekali jalan / dielus
+local function resume(p, mode)
+    if not exists(p) or p.row.dead or p.vehicle then return end
+    if mode == 'follow' or mode == 'idle' then
+        follow(p)
+    elseif (mode == 'sit' or mode == 'lay') and playAnim(p.ped, animFor(p.cfg, mode)) then
+        p.mode = mode
+    else
+        TaskStandStill(p.ped, -1)
+        p.mode = 'stay'
+    end
+    changed()
+end
+
+local function trickOf(cfg, trickId)
+    for _, t in ipairs(Config.Tricks[cfg.kind] or {}) do
+        if t.id == trickId then return t end
+    end
+end
+
+---@return { id: string, label: string, icon: string }[]
+function Pet.tricksFor(cfg)
+    local out = {}
+    for _, t in ipairs(Config.Tricks[cfg.kind] or {}) do out[#out + 1] = { id = t.id, label = t.label, icon = t.icon } end
+    if Config.Fetch.kinds[cfg.kind] then out[#out + 1] = { id = 'fetch', label = 'Lempar Bola', icon = '🎾' } end
+    return out
+end
+
+local function fetch(p)
+    local f = Config.Fetch
+    local set = f.kinds[p.cfg.kind]
+    if not set then return end
+    if cache.vehicle then return notify('Turun dari kendaraan dulu.', 'error') end
+    if exports.ox_inventory:Search('count', f.item) < 1 then
+        return notify('Kamu butuh Bola Tenis (beli di Toko Hewan → Perlengkapan).', 'error')
+    end
+    if #(GetEntityCoords(cache.ped) - GetEntityCoords(p.ped)) > 15.0 then
+        return notify(('%s terlalu jauh.'):format(p.row.name), 'error')
+    end
+
+    p.fetching, p.mode = true, 'fetch'
+    changed()
+    local ball
+    local ok = pcall(function()
+        local model = joaat(f.prop)
+        lib.requestModel(model, 5000)
+        lib.requestAnimDict('weapons@projectile@', 3000)
+        local c = GetEntityCoords(cache.ped)
+        ball = CreateObject(model, c.x, c.y, c.z + 1.0, true, true, false)
+        SetModelAsNoLongerNeeded(model)
+        AttachEntityToEntity(ball, cache.ped, GetPedBoneIndex(cache.ped, 57005), 0.12, 0.0, 0.0, 0.0, 0.0, 0.0,
+            false, false, false, false, 2, true)
+        ClearPedTasks(p.ped)
+        TaskStandStill(p.ped, 2500)
+        TaskPlayAnim(cache.ped, 'weapons@projectile@', 'throw_m_fb_stand', 3.0, -3.0, 1200, 48, 0.0, false, false, false)
+        Wait(550)
+
+        -- lempar ke arah kamera
+        DetachEntity(ball, true, true)
+        local rot = GetGameplayCamRot(2)
+        local rx, rz = math.rad(rot.x), math.rad(rot.z)
+        local dir = vec3(-math.sin(rz) * math.cos(rx), math.cos(rz) * math.cos(rx), math.sin(rx))
+        SetEntityVelocity(ball, dir.x * 14.0, dir.y * 14.0, math.max(dir.z * 14.0, 0.0) + 4.0)
+        Wait(400)
+        local settle = GetGameTimer() + 4000
+        while GetGameTimer() < settle and GetEntitySpeed(ball) > 0.5 do Wait(100) end
+
+        local deadline = GetGameTimer() + f.timeout
+        local function check()
+            if not p.fetching or not exists(p) or p.row.dead or GetGameTimer() > deadline then error('batal') end
+        end
+
+        -- kejar bola
+        TaskGoToEntity(p.ped, ball, -1, 1.0, 3.0, 1073741824.0, 0)
+        while #(GetEntityCoords(p.ped) - GetEntityCoords(ball)) > 1.2 do check() Wait(100) end
+
+        -- gigit bola
+        if set.pickup and DoesAnimDictExist(set.pickup[1]) then
+            lib.requestAnimDict(set.pickup[1])
+            TaskPlayAnim(p.ped, set.pickup[1], set.pickup[2], 4.0, -4.0, 1200, 0, 0.0, false, false, false)
+            Wait(700)
+        end
+        local mouth = GetPedBoneIndex(p.ped, 17188)
+        if mouth == -1 then mouth = GetPedBoneIndex(p.ped, 31086) end
+        AttachEntityToEntity(ball, p.ped, mouth, 0.15, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
+
+        -- bawa pulang
+        TaskGoToEntity(p.ped, cache.ped, -1, 1.4, 2.5, 1073741824.0, 0)
+        while #(GetEntityCoords(p.ped) - GetEntityCoords(cache.ped)) > 1.8 do check() Wait(100) end
+    end)
+
+    if ball and DoesEntityExist(ball) then DeleteEntity(ball) end
+    StopAnimTask(cache.ped, 'weapons@projectile@', 'throw_m_fb_stand', 2.0)
+    local cancelled = not p.fetching -- diberi perintah lain saat mengejar bola
+    p.fetching = nil
+    if cancelled then return end
+    if ok then notify(('%s membawa bolanya kembali!'):format(p.row.name), 'success') end
+    if exists(p) and not p.row.dead then follow(p) end
+    changed()
+end
+
+---@param id number id hewan
+---@param trickId string id di Config.Tricks, atau 'fetch'
+function Pet.trick(id, trickId)
+    local p = Pet.list[tonumber(id)]
+    if not exists(p) or p.row.dead or p.vehicle or p.fetching then return end
+    ensureControl(p.ped, 500)
+    if trickId == 'fetch' then return CreateThread(function() fetch(p) end) end
+
+    local t = trickOf(p.cfg, trickId)
+    if not t or not DoesAnimDictExist(t.anim[1]) then return end
+    local before = p.mode == 'trick' and 'stay' or p.mode
+    ClearPedTasks(p.ped)
+    lib.requestAnimDict(t.anim[1])
+    TaskPlayAnim(p.ped, t.anim[1], t.anim[2], 8.0, -8.0, -1, t.loop and 1 or 0, 0.0, false, false, false)
+    local ms = math.floor(GetAnimDuration(t.anim[1], t.anim[2]) * 1000)
+    RemoveAnimDict(t.anim[1])
+    if t.bark and PlayAnimalVocalization then PlayAnimalVocalization(p.ped, 3, 'BARK') end
+    p.mode = 'trick'
+
+    if not t.loop then
+        local token = {}
+        p.trickToken = token
+        SetTimeout(math.max(ms, 500), function()
+            if p.trickToken == token and p.mode == 'trick' then resume(p, before) end
+        end)
+    end
+    changed()
+end
+
+-- ada yang mengelus hewan kita (atau kita sendiri): berhenti, hadapkan ke pengelus, animasi dielus
+RegisterNetEvent('f_petshop:client:petted', function(netId, petter, duration)
+    if not NetworkDoesNetworkIdExist(netId) then return end
+    local p = ownedByPed(NetworkGetEntityFromNetworkId(netId))
+    if not exists(p) or p.row.dead or p.vehicle or p.fetching or Pet.isCarried(p.ped) then return end
+    local player = GetPlayerFromServerId(petter)
+    local petterPed = player ~= -1 and GetPlayerPed(player) or 0
+    if petterPed == 0 then return end
+
+    ensureControl(p.ped, 500)
+    local set = Config.Petting[p.cfg.kind] or Config.Petting.default
+    local before = p.mode
+    ClearPedTasks(p.ped)
+    local a, b = GetEntityCoords(p.ped), GetEntityCoords(petterPed)
+    SetEntityHeading(p.ped, GetHeadingFromVector_2d(b.x - a.x, b.y - a.y))
+    if set.pet and DoesAnimDictExist(set.pet[1]) then
+        lib.requestAnimDict(set.pet[1])
+        TaskPlayAnim(p.ped, set.pet[1], set.pet[2], 8.0, -8.0, duration, 1, 0.0, false, false, false)
+        RemoveAnimDict(set.pet[1])
+    else
+        TaskStandStill(p.ped, duration)
+    end
+    p.mode = 'petted'
+    SetTimeout(duration + 200, function()
+        if p.mode == 'petted' then resume(p, before) end
+    end)
+end)
+
+---------------------------------------------------------------------------
+-- Serang & jaga area (hewan dengan `attack = true` di Config.Pets). Serangan ke PEMAIN selalu
+-- minta izin server dulu (daftar teman, jarak, job) dan tercatat di console server.
+---------------------------------------------------------------------------
+function Pet.canFight(cfg)
+    return Config.Attack.enabled and cfg ~= nil and cfg.attack == true
+end
+
+local guardChecked = {} -- [server id] = waktu terakhir pemain itu dicek / diserang saat jaga area
+
+local function validTarget(p, ped)
+    if not DoesEntityExist(ped) or IsPedDeadOrDying(ped, true) or ped == cache.ped or ped == p.ped then return false end
+    if petState(ped) then return false end -- hewan peliharaan (milik siapa pun)
+    if IsPedAPlayer(ped) then return Config.Attack.players end
+    return Config.Attack.npcs and not IsPedInAnyVehicle(ped, false)
+end
+
+-- selesai menyerang: kembali ke tempat jaga, atau mengikuti pemilik
+local function backToPost(p)
+    if not exists(p) or p.row.dead then return end
+    if p.guard then
+        local g = p.guard.pos
+        TaskGoStraightToCoord(p.ped, g.x, g.y, g.z, 2.0, 15000, 0.0, 0.5)
+        p.mode = 'guard'
+    else
+        follow(p)
+    end
+    changed()
+end
+
+local function attack(p, ped)
+    if not validTarget(p, ped) then return false end
+    if IsPedAPlayer(ped) then
+        local sid = GetPlayerServerId(NetworkGetPlayerIndexFromPed(ped))
+        if not lib.callback.await('f_petshop:canAttack', false, p.id, sid) then return false end
+    end
+    if not ensureControl(p.ped, 1000) then return false end
+
+    local token = {}
+    p.fetching, p.trickToken, p.attackTarget = nil, nil, token
+    if not p.guard then p.mode = 'attack' end
+    ClearPedTasks(p.ped)
+    SetPedCombatAttributes(p.ped, 46, true) -- selalu bertarung, tidak kabur
+    SetPedCombatAttributes(p.ped, 5, true)
+    SetPedFleeAttributes(p.ped, 0, false)
+    TaskCombatPed(p.ped, ped, 0, 16)
+    changed()
+
+    CreateThread(function()
+        local deadline = GetGameTimer() + Config.Attack.maxTime * 1000
+        while p.attackTarget == token and exists(p) and not p.row.dead do
+            if not DoesEntityExist(ped) or IsPedDeadOrDying(ped, true) or GetGameTimer() > deadline
+                or #(GetEntityCoords(p.ped) - GetEntityCoords(ped)) > Config.Attack.range
+                or (Config.Attack.stopWhenDown and IsPedRagdoll(ped))
+                or (p.guard and #(GetEntityCoords(ped) - p.guard.pos) > p.guard.radius * 2.0) then
+                break
+            end
+            Wait(250)
+        end
+        if p.attackTarget ~= token then return end -- dibatalkan perintah lain
+        p.attackTarget = nil
+        if exists(p) then ClearPedTasks(p.ped) end
+        backToPost(p)
+    end)
+    return true
+end
+
+-- arahkan kamera ke target lalu tekan E
+function Pet.pickTarget(p)
+    if not Pet.canFight(p.cfg) then return end
+    if cache.vehicle then return notify('Turun dari kendaraan dulu.', 'error') end
+    TriggerEvent('f_petshop:client:closeUi')
+    lib.showTextUI(('[E] Suruh %s menyerang  \n[Backspace] Batal'):format(p.row.name), { icon = 'crosshairs' })
+    local chosen
+    while exists(p) and not p.row.dead do
+        local hit, ent = lib.raycast.cam(511, 4, Config.Attack.range)
+        local ped = hit and ent and ent ~= 0 and IsEntityAPed(ent) and validTarget(p, ent) and ent or nil
+        if ped then
+            local c = GetEntityCoords(ped)
+            DrawMarker(2, c.x, c.y, c.z + 1.2, 0.0, 0.0, 0.0, 180.0, 0.0, 0.0, 0.3, 0.3, 0.3, 255, 69, 58, 200,
+                true, true, 2, false, nil, nil, false)
+        end
+        DisableControlAction(0, 38, true)
+        if ped and IsDisabledControlJustPressed(0, 38) then chosen = ped break end
+        if IsControlJustPressed(0, 177) or IsControlJustPressed(0, 194) then break end
+        Wait(0)
+    end
+    lib.hideTextUI()
+    if chosen and not attack(p, chosen) then
+        notify('Target itu tidak bisa diserang (teman, terlalu jauh, atau tidak diizinkan).', 'error')
+    end
+end
+
+-- tentukan luas area (panah atas/bawah) lalu Enter; hewan menjaga di tempatnya sekarang
+function Pet.placeGuard(p)
+    if not Pet.canFight(p.cfg) or p.vehicle then return end
+    TriggerEvent('f_petshop:client:closeUi')
+    local r = Config.Attack.guardRadius
+    local radius = r.default
+    lib.showTextUI('[↑/↓] Ubah luas area  \n[Enter] Jaga di sini  \n[Backspace] Batal', { icon = 'shield-dog' })
+    local ok = false
+    while exists(p) and not p.row.dead do
+        local c = GetEntityCoords(p.ped)
+        DrawMarker(1, c.x, c.y, c.z - 0.95, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, radius * 2, radius * 2, 0.6,
+            243, 179, 84, 90, false, false, 2, false, nil, nil, false)
+        if IsControlJustPressed(0, 172) then radius = math.min(r.max, radius + r.step) end
+        if IsControlJustPressed(0, 173) then radius = math.max(r.min, radius - r.step) end
+        if IsControlJustPressed(0, 191) then ok = true break end
+        if IsControlJustPressed(0, 177) or IsControlJustPressed(0, 194) then break end
+        Wait(0)
+    end
+    lib.hideTextUI()
+    if not ok or not exists(p) or p.row.dead then return end
+
+    ensureControl(p.ped, 500)
+    local token = { pos = GetEntityCoords(p.ped), radius = radius }
+    p.fetching, p.trickToken, p.attackTarget, p.guard = nil, nil, nil, token
+    p.mode = 'guard'
+    ClearPedTasks(p.ped)
+    TaskStandStill(p.ped, -1)
+    notify(('%s menjaga area (%d m). Teman di Daftar Teman tidak diserang.'):format(p.row.name, radius), 'success')
+    changed()
+
+    -- hanya PEMAIN yang masuk area yang diserang (NPC lewat tidak diganggu)
+    CreateThread(function()
+        while p.guard == token and exists(p) and not p.row.dead do
+            if not p.attackTarget then
+                for _, pl in ipairs(lib.getNearbyPlayers(token.pos, token.radius, false)) do
+                    local sid = GetPlayerServerId(pl.id)
+                    local last = guardChecked[sid]
+                    if (not last or GetGameTimer() - last > Config.Attack.guardCooldown * 1000)
+                        and not IsPedDeadOrDying(pl.ped, true) and not IsPedInAnyVehicle(pl.ped, false) then
+                        guardChecked[sid] = GetGameTimer()
+                        if attack(p, pl.ped) then break end
+                    end
+                end
+            end
+            Wait(500)
+        end
+    end)
+end
+
+function Pet.stopGuard(p)
+    p.guard, p.attackTarget = nil, nil
+    if exists(p) and not p.row.dead then follow(p) end
+    changed()
+end
+
+---------------------------------------------------------------------------
 -- ox_target pada hewan peliharaan (statebag fpet)
 ---------------------------------------------------------------------------
 local function mine(entity)
@@ -668,12 +1176,15 @@ local function mine(entity)
     return p and p.ped == entity and p or nil
 end
 
--- makan: hanya pemilik
+-- makan & minum: hanya pemilik
 local feedOptions = {}
-for _, food in ipairs(Config.Food) do
+local consumables = {}
+for _, f in ipairs(Config.Food) do consumables[#consumables + 1] = f end
+for _, d in ipairs(Config.Drinks) do consumables[#consumables + 1] = d end
+for _, food in ipairs(consumables) do
     feedOptions[#feedOptions + 1] = {
         name = 'fpet_feed_' .. food.item,
-        icon = 'fa-solid fa-bone',
+        icon = food.thirst and 'fa-solid fa-droplet' or 'fa-solid fa-bone',
         label = ('Beri %s'):format(food.label),
         distance = 2.5,
         canInteract = function(entity)
@@ -692,36 +1203,22 @@ exports.ox_target:addGlobalPed(feedOptions)
 -- elus: siapa pun, hewan hidup
 local petting = false
 
-local function restoreMode(p)
-    if p.mode == 'follow' then follow(p)
-    elseif p.mode == 'sit' or p.mode == 'lay' then playAnim(p.ped, animFor(p.cfg, p.mode))
-    else TaskStandStill(p.ped, -1) end
-end
-
 local function stroke(entity)
     local s = petState(entity)
     local cfg = s and petsById[s.pet]
     if not cfg then return end
     local set = Config.Petting[cfg.kind] or Config.Petting.default
-    local own = mine(entity)
     petting = true
 
-    -- hewan sendiri: diam dulu supaya tidak lari saat dielus
-    if own then
-        ClearPedTasks(own.ped)
-        TaskStandStill(own.ped, Config.Petting.duration)
-    end
+    -- pemilik hewan (yang mengendalikan ped-nya) menghentikan hewan & menghadapkannya ke kita,
+    -- jadi semua pemain melihat animasi yang sama
+    TriggerServerEvent('f_petshop:server:petting', NetworkGetNetworkIdFromEntity(entity))
+    Wait(350)
 
     -- pemain berdiri di depan hewan, menghadap ke arahnya
     local pos = GetOffsetFromEntityInWorldCoords(entity, set.offset.x, set.offset.y, 0.0)
     SetEntityCoordsNoOffset(cache.ped, pos.x, pos.y, GetEntityCoords(cache.ped).z, false, false, false)
     SetEntityHeading(cache.ped, (GetEntityHeading(entity) + 180.0) % 360.0)
-
-    if own and set.pet and DoesAnimDictExist(set.pet[1]) then
-        lib.requestAnimDict(set.pet[1])
-        TaskPlayAnim(own.ped, set.pet[1], set.pet[2], 8.0, -8.0, Config.Petting.duration, 0, 0.0, false, false, false)
-        RemoveAnimDict(set.pet[1])
-    end
 
     lib.progressCircle({
         duration = Config.Petting.duration,
@@ -732,11 +1229,25 @@ local function stroke(entity)
         anim = DoesAnimDictExist(set.player[1]) and { dict = set.player[1], clip = set.player[2], flag = 1 } or nil,
     })
     ClearPedTasks(cache.ped)
-    if own and exists(own) and not own.row.dead then restoreMode(own) end
     petting = false
 end
 
 exports.ox_target:addGlobalPed({
+    {
+        -- menu hewan langsung dari hewannya (hanya pemilik), hewan itu yang terpilih
+        name = 'fpet_menu',
+        icon = 'fa-solid fa-paw',
+        label = 'Menu Hewan',
+        distance = 2.5,
+        canInteract = function(entity)
+            local p = mine(entity)
+            return p ~= nil and not carry
+        end,
+        onSelect = function(data)
+            local p = mine(data.entity)
+            if p then TriggerEvent('f_petshop:client:openMenu', p.id) end
+        end,
+    },
     {
         name = 'fpet_pet',
         icon = 'fa-solid fa-hand-holding-heart',
@@ -819,6 +1330,6 @@ AddEventHandler('onResourceStop', function(res)
         if exists(p) then DeleteEntity(p.ped) end
     end
     exports.ox_target:removeGlobalVehicle('fpet_take_from_vehicle')
-    exports.ox_target:removeGlobalPed({ 'fpet_carry', 'fpet_ems_revive', 'fpet_pet' })
+    exports.ox_target:removeGlobalPed({ 'fpet_menu', 'fpet_carry', 'fpet_ems_revive', 'fpet_pet' })
     for _, o in ipairs(feedOptions) do exports.ox_target:removeGlobalPed(o.name) end
 end)
