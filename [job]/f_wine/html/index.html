@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_wine</title>
+    <link rel="stylesheet" href="ui/ios.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+        <symbol id="i-grape" viewBox="0 0 24 24"><path d="M12 3c0 2 1 3 3 3M9 9.5a2 2 0 1 0 0-.1M15 9.5a2 2 0 1 0 0-.1M12 13.5a2 2 0 1 0 0-.1M9 17.5a2 2 0 1 0 0-.1M15 17.5a2 2 0 1 0 0-.1M12 21.5a2 2 0 1 0 0-.1M6.5 13.5a2 2 0 1 0 0-.1M17.5 13.5a2 2 0 1 0 0-.1"/></symbol>
+        <symbol id="i-barrel" viewBox="0 0 24 24"><path d="M6 3h12c1.5 3 1.5 15 0 18H6C4.5 18 4.5 6 6 3zM5 8h14M5 16h14"/></symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></symbol>
+        <symbol id="i-bottle" viewBox="0 0 24 24"><path d="M10 2h4v5c2 1 3 3 3 5v9a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-9c0-2 1-4 3-5zM7 14h10"/></symbol>
+        <symbol id="i-shirt" viewBox="0 0 24 24"><path d="M8 3 3 6l2 4 2-1v12h10V9l2 1 2-4-5-3c0 2-1.5 3-4 3S8 5 8 3z"/></symbol>
+    </svg>
+
+    <!-- Mandor + Tong Fermentasi -->
+    <div id="panel" class="panel hidden">
+        <header>
+            <div class="brand"><span class="logo"><svg class="ic"><use id="h-icon" href="#i-grape"/></svg></span><div><h1 id="title">Mandor Kebun</h1><small id="sub">Kebun Anggur Marlowe</small></div></div>
+            <div class="head-actions"><button class="circle" id="close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+        </header>
+
+        <section class="body">
+            <!-- MANDOR -->
+            <div id="view-mandor" class="view hidden">
+                <div id="m-status" class="notice hidden"></div>
+                <div id="m-baju" class="notice warn hidden">
+                    Kamu tidak memakai baju kerja, jadi belum bisa memetik.
+                    <button class="cap fill" id="m-baju-btn"><svg class="ic"><use href="#i-shirt"/></svg>Pakai lagi</button>
+                </div>
+
+                <div>
+                    <div class="group-h">Blok kebun</div>
+                    <div class="group icons" id="m-blok"></div>
+                </div>
+                <div class="cols">
+                    <div>
+                        <div class="group-h">Hari ini</div>
+                        <div class="group" id="m-stat"></div>
+                    </div>
+                    <div>
+                        <div class="group-h">Tong fermentasimu</div>
+                        <div class="group" id="m-tong"></div>
+                    </div>
+                </div>
+                <div class="group-f" id="m-alur"></div>
+            </div>
+
+            <!-- TONG FERMENTASI -->
+            <div id="view-tong" class="view hidden">
+                <div>
+                    <div class="group-h">Botol jus di tasmu</div>
+                    <div class="chips" id="t-jus"></div>
+                </div>
+                <div>
+                    <div class="group-h">Tongmu</div>
+                    <div class="group icons" id="t-list"></div>
+                </div>
+                <div class="group-f" id="t-info"></div>
+            </div>
+
+            <div id="msg" class="msg hidden"></div>
+            <div class="menu-actions" id="m-actions">
+                <button id="m-go" class="primary b-lg">Mulai Kerja</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- HUD minigame injak -->
+    <div id="injak" class="hud hidden">
+        <div class="hud-h"><span>Injak anggur</span><small>[X] berhenti</small></div>
+        <div class="keys">
+            <div class="key now" id="k-now">A</div>
+            <div class="key next" id="k-next">D</div>
+        </div>
+        <div class="jbar"><i id="k-bar"></i></div>
+        <div class="hud-f" id="k-hint">Tekan tombol yang menyala</div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

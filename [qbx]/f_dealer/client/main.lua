@@ -154,8 +154,12 @@ end)
 ---------------------------------------------------------------------------
 -- Admin (data diambil lewat NUI, semua dicek ulang di server)
 ---------------------------------------------------------------------------
-RegisterNUICallback('admin:data', function(d, cb)
-    cb(lib.callback.await('f_dealer:admin:data', false, d.catalog == true) or false)
+RegisterNUICallback('admin:data', function(_, cb)
+    cb(lib.callback.await('f_dealer:admin:data', false) or false)
+end)
+
+RegisterNUICallback('admin:search', function(d, cb)
+    cb(lib.callback.await('f_dealer:admin:search', false, d.q) or {})
 end)
 
 RegisterNUICallback('admin:save', function(d, cb)

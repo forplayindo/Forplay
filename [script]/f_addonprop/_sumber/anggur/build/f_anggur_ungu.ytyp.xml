@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CMapTypes>
+ <extensions />
+ <archetypes>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="50" />
+   <flags value="549453856" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.077798" y="-0.063933" z="-0.296234" />
+   <bbMax x="0.066883" y="0.073234" z="0.002689" />
+   <bsCentre x="-0.005457" y="0.004651" z="-0.146772" />
+   <bsRadius value="0.179654" />
+   <hdTextureDist value="50" />
+   <name>f_anggur_ungu</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary>f_anggur_ungu</physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>f_anggur_ungu</assetName>
+   <extensions />
+  </Item>
+ </archetypes>
+ <name>f_anggur_ungu</name>
+ <dependencies />
+ <compositeEntityTypes itemType="CCompositeEntityType" />
+</CMapTypes>

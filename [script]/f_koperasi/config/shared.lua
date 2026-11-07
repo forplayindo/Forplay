@@ -43,5 +43,13 @@ return {
                 { item = 'kelapa_muda', price = 3500 },  -- dari f_kelapa (cafe beli dari supplier 9.000)
             },
         },
+        {
+            label = 'Wine',
+            items = {                                    -- dari f_wine (kebun anggur Marlowe), ±1,2-1,3 jt/jam
+                { item = 'wine_merah', price = 24000 },
+                { item = 'wine_putih', price = 27000 },
+                { item = 'wine_rose', price = 30000 },
+            },
+        },
     },
 }

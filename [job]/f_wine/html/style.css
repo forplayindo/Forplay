@@ -1,0 +1,53 @@
+/* f_wine — layout saja; gaya dasar dari ui/ios.css (jangan pakai class .actions, lihat kit) */
+.panel { width: min(470px, 94vw); max-height: 92vh; }
+.logo { background: linear-gradient(135deg, #b46ad0, #6d2a86); color: #fff; }
+
+.body { display: flex; flex-direction: column; gap: 14px; padding: 0 20px 20px; overflow-y: auto; }
+.view { display: flex; flex-direction: column; gap: 14px; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cols .group > .row { min-height: 38px; padding: 6px 12px; }
+
+.notice { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+.notice .cap { flex: none; }
+
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--c, var(--gray)); }
+.row .price { color: var(--label); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.row .ok { color: var(--green); font-weight: 600; }
+
+.chips { display: flex; gap: 8px; }
+.chip { flex: 1; display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 12px; background: var(--cell); }
+.chip b { margin-left: auto; font-variant-numeric: tabular-nums; }
+.chip.off { opacity: .45; }
+
+/* tong: baris + panel isi di bawahnya */
+.tong-run { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; min-width: 96px; }
+.tong-run .bar { width: 96px; }
+.fill-row { display: flex; flex-direction: column; gap: 10px; padding: 10px 14px 14px 55px; background: var(--cell-2); }
+.fill-row .seg button { flex: 1; height: 30px; font-size: 13px; }
+.fill-line { display: flex; align-items: center; gap: 10px; }
+.stepper { display: flex; align-items: center; gap: 8px; }
+.stepper .circle { width: 28px; height: 28px; font-size: 16px; }
+.stepper b { min-width: 22px; text-align: center; font-size: 16px; font-variant-numeric: tabular-nums; }
+.fill-line .t-muted { flex: 1; font-size: 12px; }
+
+.menu-actions { display: flex; gap: 10px; }
+.menu-actions .b-lg { flex: 1; }
+.menu-actions .pill { flex: 1; height: 50px; border-radius: 14px; font-size: 16px; }
+
+/* HUD injak (tanpa fokus NUI) */
+.hud {
+    position: absolute; left: 50%; bottom: 9vh; transform: translateX(-50%);
+    width: 300px; padding: 14px 16px 12px; border-radius: 20px; background: var(--bg);
+    display: flex; flex-direction: column; gap: 10px; box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+}
+.hud-h { display: flex; justify-content: space-between; align-items: baseline; font-weight: 700; font-size: 15px; }
+.keys { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.key { display: grid; place-items: center; border-radius: 14px; font-weight: 800; transition: transform .08s, background .12s; }
+.key.now { width: 72px; height: 72px; font-size: 34px; background: var(--accent); color: var(--on-accent); }
+.key.next { width: 40px; height: 40px; font-size: 18px; background: var(--fill); color: var(--label-2); }
+.key.now.ok { transform: scale(.9); background: var(--green); color: #062a10; }
+.key.now.bad { background: var(--red); color: #fff; animation: goyang .18s; }
+@keyframes goyang { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+.jbar { height: 10px; border-radius: 5px; background: var(--fill-2); overflow: hidden; }
+.jbar i { display: block; height: 100%; width: 0; background: var(--jus, #8e3fae); border-radius: inherit; transition: width .12s; }
+.hud-f { text-align: center; font-size: 12px; color: var(--label-2); }

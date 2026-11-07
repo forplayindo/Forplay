@@ -213,6 +213,35 @@ lib.callback.register('consumables:client:Drink', function(anim, prop)
     end
 end)
 
+-- f_wine patch: mabuk ringan. 3 minuman beralkohol dalam 20 menit = kamera goyang + jalan sempoyongan
+-- selama 3 menit (diperpanjang tiap minum lagi), lalu hilang sendiri.
+local minumTerakhir, mabukSampai = {}, 0
+local function mabukRingan()
+    local now = GetGameTimer()
+    local baru = {}
+    for _, t in ipairs(minumTerakhir) do
+        if now - t < 20 * 60000 then baru[#baru + 1] = t end
+    end
+    baru[#baru + 1] = now
+    minumTerakhir = baru
+    if #baru < 3 then return end
+    local sedang = mabukSampai > now
+    mabukSampai = now + 3 * 60000
+    if sedang then return end
+    CreateThread(function()
+        local clip = 'move_m@drunk@slightlydrunk'
+        lib.requestAnimSet(clip)
+        ShakeGameplayCam('DRUNK_SHAKE', 0.8)
+        while GetGameTimer() < mabukSampai do
+            SetPedMovementClipset(cache.ped, clip, 1.0)
+            Wait(1000)
+        end
+        ResetPedMovementClipset(cache.ped, 1.0)
+        StopGameplayCamShaking(true)
+        RemoveAnimSet(clip)
+    end)
+end
+
 lib.callback.register('consumables:client:DrinkAlcohol', function(alcoholLevel, anim, prop)
     if lib.progressBar({
         duration = math.random(3000, 6000),
@@ -240,6 +269,7 @@ lib.callback.register('consumables:client:DrinkAlcohol', function(alcoholLevel, 
         }
     }) then -- if completed
         alcoholCount += alcoholLevel or 1
+        mabukRingan()
         if alcoholCount > 1 and alcoholCount < 4 then
             TriggerEvent('evidence:client:SetStatus', 'alcohol', 200)
         elseif alcoholCount >= 4 then

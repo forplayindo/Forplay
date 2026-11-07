@@ -5,18 +5,35 @@ local catalogCache
 local function catalogList()
     if catalogCache then return catalogCache end
     local out = {}
-    for model, v in pairs(exports.qbx_core:GetVehiclesByName()) do
+    for model, v in pairs(Dealer.vehicles()) do
+        local label = Dealer.labelOf(model)
         out[#out + 1] = {
             model = model,
-            label = Dealer.labelOf(model),
+            label = label,
             category = v.category or '',
             price = math.floor(tonumber(v.price) or 0),
+            key = (label .. ' ' .. model):lower(),
         }
     end
     table.sort(out, function(a, b) return a.label < b.label end)
     catalogCache = out
     return out
 end
+
+-- Cari di katalog (server-side, maks 40 hasil) supaya NUI tidak perlu menerima ~900 kendaraan sekaligus
+local SEARCH_MAX = 40
+lib.callback.register('f_dealer:admin:search', function(source, q)
+    if not Dealer.isAdmin(source) then return end
+    q = type(q) == 'string' and q:lower():gsub('^%s+', ''):gsub('%s+$', ''):sub(1, 40) or ''
+    local out = {}
+    for _, c in ipairs(catalogList()) do
+        if q == '' or c.key:find(q, 1, true) then
+            out[#out + 1] = { model = c.model, label = c.label, category = c.category, price = c.price, inShop = Dealer.shop[c.model] ~= nil }
+            if #out >= SEARCH_MAX then break end
+        end
+    end
+    return out
+end)
 
 local function adminName(src)
     local player = exports.qbx_core:GetPlayer(src)
@@ -45,13 +62,12 @@ local function requestRows()
     return rows
 end
 
-lib.callback.register('f_dealer:admin:data', function(source, withCatalog)
+lib.callback.register('f_dealer:admin:data', function(source)
     if not Dealer.isAdmin(source) then return end
     return {
         vehicles = Dealer.list,
         requests = requestRows(),
         categories = Config.Categories,
-        catalog = withCatalog and catalogList() or nil,
     }
 end)
 

@@ -757,4 +757,11 @@ return {
 ['papan_kayu']    = { label = 'Papan Kayu',    weight = 400,  description = 'Papan hasil sawmill Paleto. Jual di koperasi Balai Kota.' },
 -- Nelayan (f_nelayan): jaring tebar, durability turun 20 tiap tarikan berhasil -> rusak setelah 5 kali dapat ikan
 ['jaring_ikan']   = { label = 'Jaring Ikan',   weight = 1500, stack = false, close = true, description = 'Jaring tebar untuk melaut. Rusak setelah 5 kali dapat ikan (tarikan gagal tidak dihitung). Beli di Syahbandar dermaga.' },
+-- Wine (f_wine): botol jus dari tong injak kebun Marlowe -> tong fermentasi winery -> wine (diminum lewat f_consumables / dijual di koperasi)
+['botol_jus_merah'] = { label = 'Botol Jus Anggur Merah', weight = 3000, description = 'Jus anggur ungu dalam botol kaca besar. Tuang ke tong fermentasi di winery Marlowe. Tidak bisa dijual.' },
+['botol_jus_putih'] = { label = 'Botol Jus Anggur Putih', weight = 3000, description = 'Jus anggur hijau dalam botol kaca besar. Tuang ke tong fermentasi di winery Marlowe. Tidak bisa dijual.' },
+['botol_jus_rose']  = { label = 'Botol Jus Anggur Rosé',  weight = 3000, description = 'Jus anggur merah dalam botol kaca besar. Tuang ke tong fermentasi di winery Marlowe. Tidak bisa dijual.' },
+['wine_merah']      = { label = 'Wine Merah', weight = 1000, description = 'Wine merah kebun Marlowe. Bisa diminum (beralkohol) atau dijual di Koperasi Balai Kota.' },
+['wine_putih']      = { label = 'Wine Putih', weight = 1000, description = 'Wine putih kebun Marlowe. Bisa diminum (beralkohol) atau dijual di Koperasi Balai Kota.' },
+['wine_rose']       = { label = 'Wine Rosé',  weight = 1000, description = 'Wine rosé kebun Marlowe. Bisa diminum (beralkohol) atau dijual di Koperasi Balai Kota.' },
 }

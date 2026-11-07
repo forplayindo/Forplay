@@ -7,7 +7,7 @@ return {
     key = 'F7',             -- tombol default buka / tutup (pemain bisa ganti di Settings > Key Bindings > FiveM)
     autoDelay = 1200,       -- jeda setelah Mulai Kerja sebelum panel muncul (menu job sempat tertutup dulu)
 
-    order = { 'kayu', 'tambang', 'nelayan', 'sampah', 'kurir' },
+    order = { 'kayu', 'tambang', 'nelayan', 'sampah', 'kurir', 'wine' },
 
     jobs = {
         kayu = {
@@ -108,6 +108,29 @@ return {
             },
             rules = {
                 'Van ditinggal lebih dari 300 meter selama 5 menit, atau van rusak/tenggelam = pekerjaan dibatalkan.',
+            },
+        },
+
+        wine = {
+            name = 'Pembuat Wine', icon = 'grape',
+            steps = {
+                { 'Ambil kerja di Mandor Kebun',
+                  'Bicara dengan <b>Mandor Kebun</b> di winery Marlowe lalu pilih <b>Mulai Kerja</b>. Baju petani dan keranjang langsung terpasang. <b>Tanpa baju kerja kamu tidak bisa memetik.</b>' },
+                { 'Pilih blok dan taruh keranjang',
+                  'Warna anggur menentukan jenis wine: <b>ungu = Merah</b>, <b>hijau = Putih</b>, <b>merah = Rosé</b>. Pasang rute dari menu Mandor, lalu tekan <b>[G]</b> untuk menaruh keranjang di dekat pohon.' },
+                { 'Petik tandan dan masukkan ke keranjang',
+                  'Arahkan target ke tandan anggur di antara daun lalu pilih <b>Petik anggur</b>. Bawa tandan di tanganmu ke keranjang dan pilih <b>Masukkan anggur</b>. Ulangi sampai <b>20 tandan</b>. Satu keranjang hanya untuk satu jenis anggur.' },
+                { 'Injak anggur di tong pinggir blok',
+                  'Pilih <b>Angkat keranjang</b>, bawa ke tong kayu di pinggir blok, lalu pilih <b>Tuang & injak anggur</b>. Tekan <b>A</b> atau <b>D</b> sesuai tombol yang menyala sampai bar jus penuh. Kamu dapat <b>1 botol jus</b> (= 4 botol wine).' },
+                { 'Fermentasi di winery',
+                  'Bawa botol jus ke <b>Tong Fermentasi</b> di winery dan tuang (maksimal 5 botol jus per tong, 1 tong 1 jenis). Fermentasi berjalan <b>15 menit</b>, sementara itu kamu bisa lanjut memetik.' },
+                { 'Botolkan dan jual',
+                  'Kalau tong sudah matang, pilih <b>Botolkan</b>. Jual wine di <b>Koperasi Balai Kota</b> (Merah Rp 24.000, Putih Rp 27.000, Rosé Rp 30.000) atau minum sendiri.' },
+            },
+            rules = {
+                'Tandan yang sudah kamu petik tumbuh lagi setelah 10 menit. Tandan pemain lain tidak terpengaruh.',
+                'Selesai kerja saat keranjang masih berisi = anggurnya hilang. Botol jus dan isi tong tetap aman.',
+                'Minum 3 botol wine dalam waktu singkat = mabuk ringan selama 3 menit.',
             },
         },
     },

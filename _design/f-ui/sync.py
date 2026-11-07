@@ -32,6 +32,7 @@ TARGETS = [
     '[job]/f_mining/html',
     '[job]/f_lumberjack/html',
     '[job]/f_nelayan/html',
+    '[job]/f_wine/html',
     '[script]/f_koperasi/html',
     '[script]/f_toll/html',
     '[script]/f_claimreward/html',

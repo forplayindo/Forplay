@@ -69,7 +69,7 @@ local function rowOf(d)
         n = d.name, l = d.label, c = d.cat, p = d.pellets, hs = d.hs,
         d = { b = d.b, a = d.a, h = d.h, r = d.r },
         s = s and { b = s.b, a = s.a, h = s.h, r = s.r } or nil,
-        by = s and s.by, at = s.at,
+        by = s and s.by, at = s and s.at,
     }
 end
 

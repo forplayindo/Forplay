@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CMapTypes>
+ <extensions />
+ <archetypes>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="120" />
+   <flags value="549453856" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.56" y="-0.56" z="0" />
+   <bbMax x="0.56" y="0.56" z="0.62" />
+   <bsCentre x="0" y="0" z="0.31" />
+   <bsRadius value="0.85047" />
+   <hdTextureDist value="120" />
+   <name>f_wine_tong_putih</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary>f_wine_tong_putih</physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>f_wine_tong_putih</assetName>
+   <extensions />
+  </Item>
+ </archetypes>
+ <name>f_wine_tong_putih</name>
+ <dependencies />
+ <compositeEntityTypes itemType="CCompositeEntityType" />
+</CMapTypes>

@@ -15,6 +15,7 @@ client_scripts {
     'bridge/client.lua',
     'client/main.lua',
     'client/nui.lua',
+    'client/animtest.lua', -- SEMENTARA: /cafeanim tes animasi, hapus setelah dipilih
 }
 
 server_scripts {

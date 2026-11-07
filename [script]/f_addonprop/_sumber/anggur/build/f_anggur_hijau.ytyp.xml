@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CMapTypes>
+ <extensions />
+ <archetypes>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="50" />
+   <flags value="549453856" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.078095" y="-0.070449" z="-0.296539" />
+   <bbMax x="0.06668" y="0.073646" z="0.002689" />
+   <bsCentre x="-0.005707" y="0.001598" z="-0.146925" />
+   <bsRadius value="0.181149" />
+   <hdTextureDist value="50" />
+   <name>f_anggur_hijau</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary>f_anggur_hijau</physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>f_anggur_hijau</assetName>
+   <extensions />
+  </Item>
+ </archetypes>
+ <name>f_anggur_hijau</name>
+ <dependencies />
+ <compositeEntityTypes itemType="CCompositeEntityType" />
+</CMapTypes>

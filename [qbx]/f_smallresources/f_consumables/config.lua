@@ -112,6 +112,25 @@ return {
                     max = 4
                 },
             },
+            -- f_wine (kebun anggur Marlowe): botol wine di tangan; 3 botol dalam 20 menit = mabuk ringan (client.lua mabukRingan)
+            wine_merah = {
+                min = 10, max = 10,
+                stressRelief = { min = 1, max = 4 },
+                alcoholLevel = 1,
+                prop = { { model = 'prop_wine_red', bone = 18905, pos = { x = 0.10, y = -0.02, z = 0.04 }, rot = { x = 240.0, y = -60.0, z = 0.0 } } },
+            },
+            wine_putih = {
+                min = 10, max = 10,
+                stressRelief = { min = 1, max = 4 },
+                alcoholLevel = 1,
+                prop = { { model = 'prop_wine_white', bone = 18905, pos = { x = 0.10, y = -0.02, z = 0.04 }, rot = { x = 240.0, y = -60.0, z = 0.0 } } },
+            },
+            wine_rose = {
+                min = 10, max = 10,
+                stressRelief = { min = 1, max = 4 },
+                alcoholLevel = 1,
+                prop = { { model = 'prop_wine_rose', bone = 18905, pos = { x = 0.10, y = -0.02, z = 0.04 }, rot = { x = 240.0, y = -60.0, z = 0.0 } } },
+            },
         },
     },
 }

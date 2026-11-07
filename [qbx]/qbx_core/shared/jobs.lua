@@ -278,17 +278,7 @@ return {
             },
         },
     },
-    ['vineyard'] = {
-        label = 'Kebun Anggur',
-        defaultDuty = true,
-        offDutyPay = false,
-        grades = {
-            [0] = {
-                name = 'Pemetik',
-                payment = 75000
-            },
-        },
-    },
+    -- 'vineyard' dihapus 2026-11-07: kebun anggur sekarang job bebas f_wine (tanpa gaji)
     ['hotdog'] = {
         label = 'Hotdog',
         defaultDuty = true,

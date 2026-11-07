@@ -21,8 +21,15 @@ function Dealer.rupiah(n)
     return 'Rp ' .. out:gsub('^%.', '')
 end
 
+-- Katalog qbx_core diambil SEKALI (export lintas resource menyalin seluruh tabel tiap panggilan)
+local VEHICLES
+function Dealer.vehicles()
+    if not VEHICLES then VEHICLES = exports.qbx_core:GetVehiclesByName() or {} end
+    return VEHICLES
+end
+
 function Dealer.catalog(model)
-    return exports.qbx_core:GetVehiclesByName()[model]
+    return Dealer.vehicles()[model]
 end
 
 function Dealer.labelOf(model)

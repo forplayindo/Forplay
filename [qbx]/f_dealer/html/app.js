@@ -38,7 +38,7 @@ const S = {
     busy: false,
     modal: null,          // 'pay' | 'ticket'
     method: null,
-    A: { tab: 'veh', vehicles: [], requests: [], catalog: null, cats: [], filter: 'pending', q: '', cat: '', edit: null, pick: null },
+    A: { tab: 'veh', vehicles: [], requests: [], found: {}, cats: [], filter: 'pending', q: '', cat: '', edit: null, pick: null },
 };
 
 const catLabel = (key, cats) => ((cats || []).find((c) => c.key === key) || {}).label || key;
@@ -353,13 +353,12 @@ async function openAdmin(fromShop) {
     $('a-back').classList.toggle('hidden', !fromShop);
     $('admin').classList.remove('hidden');
     $('a-list').innerHTML = '<div class="empty">Memuat...</div>';
-    const d = await post('admin:data', { catalog: !S.A.catalog });
+    const d = await post('admin:data');
     if (!d) { $('a-list').innerHTML = '<div class="empty">Tidak punya akses</div>'; return; }
     S.A.loaded = true;
     S.A.vehicles = d.vehicles || [];
     S.A.requests = d.requests || [];
     S.A.cats = d.categories || [];
-    if (d.catalog) S.A.catalog = d.catalog;
     $('a-cat').innerHTML = '<option value="">Semua kategori</option>' + S.A.cats.map((c) => `<option value="${esc(c.key)}">${esc(c.label)}</option>`).join('');
     $('a-cat').value = S.A.cat;
     $('s-cat').innerHTML = S.A.cats.map((c) => `<option value="${esc(c.key)}">${esc(c.label)}</option>`).join('');
@@ -419,7 +418,8 @@ const STATUS = { pending: ['Menunggu', 'orange'], approved: ['Disetujui', 'green
 function adminRequests() {
     const q = S.A.q.trim().toLowerCase();
     const f = S.A.filter;
-    const list = S.A.requests.filter((r) => (f === 'all' || r.status === f)
+    // "Disetujui" juga menampilkan yang sudah diambil (status claimed = disetujui lalu diambil)
+    const list = S.A.requests.filter((r) => (f === 'all' || r.status === f || (f === 'approved' && r.status === 'claimed'))
         && (!q || [r.label, r.model, r.name, r.citizenid, r.ticket].some((x) => String(x || '').toLowerCase().includes(q))));
     if (!list.length) return `<div class="empty">${f === 'pending' ? 'Tidak ada permintaan yang menunggu' : 'Belum ada data'}</div>`;
     return list.map((r) => {
@@ -519,6 +519,7 @@ $('a-cat').addEventListener('change', (e) => { S.A.cat = e.target.value; renderA
 $('a-back').addEventListener('click', closeAdminView);
 $('a-close').addEventListener('click', () => post('close'));
 $('btn-admin').addEventListener('click', () => openAdmin(true));
+$('a-add').addEventListener('click', () => openSheet(null));
 
 // --- sheet tambah / ubah ---
 function sMsg(text) { $('s-msg').textContent = text || ''; $('s-msg').classList.toggle('hidden', !text); }
@@ -533,11 +534,12 @@ function openSheet(model) {
     $('s-q').value = '';
     if (model) {
         const v = S.A.vehicles.find((x) => x.model === model);
-        choose(model, v.category, v.price || catalogPrice(model));
+        choose(model, v.category, v.price);
     } else {
         $('s-chosen').classList.add('hidden');
         $('s-cat').value = S.A.cats[0] ? S.A.cats[0].key : '';
         $('s-price').value = '';
+        $('s-results').innerHTML = '<div class="empty">Memuat...</div>';
         renderResults();
         setTimeout(() => $('s-q').focus(), 30);
     }
@@ -546,8 +548,8 @@ function openSheet(model) {
 }
 function closeSheet() { $('sheet').classList.add('hidden'); S.A.edit = null; S.A.pick = null; }
 
-const catalogItem = (m) => (S.A.catalog || []).find((c) => c.model === m);
-const catalogPrice = (m) => (catalogItem(m) || {}).price || 0;
+// hasil pencarian terakhir dari server, dipakai untuk label/kategori/harga default
+const catalogItem = (m) => S.A.found[m];
 
 function choose(model, category, price) {
     const c = catalogItem(model) || S.A.vehicles.find((x) => x.model === model) || { model, label: model };
@@ -562,15 +564,23 @@ function choose(model, category, price) {
     syncPrice();
 }
 
+// cari di server (maks 40 hasil), dengan jeda ketik 250 ms; jawaban lama diabaikan
+let searchSeq = 0, searchT = null;
 function renderResults() {
-    const q = $('s-q').value.trim().toLowerCase();
-    const inShop = new Set(S.A.vehicles.map((v) => v.model));
-    const all = S.A.catalog || [];
-    const list = (q ? all.filter((c) => c.label.toLowerCase().includes(q) || c.model.includes(q)) : all).slice(0, 40);
-    $('s-results').innerHTML = list.length ? list.map((c) => `<div class="row" data-pick="${esc(c.model)}">
-        <span class="t"><b>${esc(c.label)}</b><small>${esc(c.model)} · ${esc(c.category)} · ${rupiah(c.price)}</small></span>
-        ${inShop.has(c.model) ? '<span class="in">Sudah dijual</span>' : ''}
-    </div>`).join('') : '<div class="empty">Model tidak ditemukan</div>';
+    clearTimeout(searchT);
+    searchT = setTimeout(async () => {
+        const my = ++searchSeq;
+        const q = $('s-q').value.trim();
+        const list = await post('admin:search', { q });
+        if (my !== searchSeq) return;
+        const arr = Array.isArray(list) ? list : [];
+        arr.forEach((c) => { S.A.found[c.model] = c; });
+        const inShop = new Set(S.A.vehicles.map((v) => v.model));
+        $('s-results').innerHTML = arr.length ? arr.map((c) => `<div class="row" data-pick="${esc(c.model)}">
+            <span class="t"><b>${esc(c.label)}</b><small>${esc(c.model)} · ${esc(c.category)} · ${rupiah(c.price)}</small></span>
+            ${inShop.has(c.model) ? '<span class="in">Sudah dijual</span>' : ''}
+        </div>`).join('') : `<div class="empty">${q ? 'Model tidak ditemukan' : 'Katalog kosong'}</div>`;
+    }, 250);
 }
 
 function syncPrice() {
@@ -587,7 +597,7 @@ $('s-results').addEventListener('click', (e) => {
     if (!r) return;
     const m = r.dataset.pick;
     const existing = S.A.vehicles.find((x) => x.model === m);
-    const c = catalogItem(m);
+    const c = catalogItem(m) || {};
     choose(m, existing ? existing.category : c.category, existing ? (existing.price || c.price) : c.price);
 });
 $('s-cat').addEventListener('change', syncPrice);

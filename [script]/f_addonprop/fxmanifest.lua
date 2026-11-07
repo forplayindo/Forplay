@@ -37,3 +37,12 @@ data_file 'DLC_ITYP_REQUEST' 'stream/gang_flags/gang_flags.ytyp'
 data_file 'DLC_ITYP_REQUEST' 'stream/ev_charger/4play_ev_charge_station.ytyp'
 data_file 'DLC_ITYP_REQUEST' 'stream/ev_charger/4play_ev_charge_station_empty.ytyp'
 data_file 'DLC_ITYP_REQUEST' 'stream/ev_charger/4play_ev_charge_gun.ytyp'
+-- wine (f_wine): tandan anggur 3 warna (pivot = titik gantung), keranjang panen, tong injak 3 warna jus.
+-- dibuat prosedural oleh _sumber/anggur/gen_props.py -> _tools/build_prop.py -> cw.ps1
+data_file 'DLC_ITYP_REQUEST' 'stream/anggur/f_anggur_ungu.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/anggur/f_anggur_hijau.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/anggur/f_anggur_merah.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/anggur/f_wine_keranjang.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/anggur/f_wine_tong_merah.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/anggur/f_wine_tong_putih.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/anggur/f_wine_tong_rose.ytyp'

@@ -56,7 +56,7 @@ h3 { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: upp
 .state-pill.down { background: var(--red-soft); color: var(--red); }
 .state-pill.ok { background: var(--green-soft); color: var(--green); }
 
-.main { flex: 1; display: grid; grid-template-columns: 380px 1fr; min-height: 0; }
+.main { flex: 1; display: grid; grid-template-columns: minmax(260px, 380px) minmax(0, 1fr); min-height: 0; min-width: 0; }
 
 /* kiri: tubuh */
 .body-col { padding: 6px 18px 16px; display: flex; flex-direction: column; gap: 10px; align-items: center; min-height: 0; overflow: hidden;
@@ -75,7 +75,7 @@ svg.body .slabel { fill: var(--muted); font-size: 13px; font-weight: 600; text-a
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
 
 /* kanan */
-.right { display: flex; flex-direction: column; min-height: 0; }
+.right { display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; }
 /* tab: segmented control iOS */
 .tabs { display: flex; margin: 6px 20px 0; padding: 2px; border-radius: 9px; background: var(--fill); }
 .tabs button { flex: 1; height: 30px; border-radius: 7px; font-size: 13px; font-weight: 500; transition: background .15s; }
@@ -96,10 +96,10 @@ svg.body .slabel { fill: var(--muted); font-size: 13px; font-weight: 600; text-a
 .bill-total { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 12px; background: var(--card); font-size: 15px; font-weight: 600; }
 .bill-total strong { font-size: 20px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
 .unpaid-row { display: flex; justify-content: space-between; padding: 9px 12px; border-radius: 10px; background: var(--red-soft); color: var(--red); font-size: 13px; }
-.vitals { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 14px 20px 0; }
-.vital { padding: 10px 12px; border-radius: 12px; background: var(--card); }
+.vitals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 14px 20px 0; }
+.vital { padding: 10px 12px; border-radius: 12px; background: var(--card); min-width: 0; }
 .vital small { display: block; }
-.vital b { font-size: 15px; font-weight: 600; }
+.vital b { display: block; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
 .vital.bad b { color: var(--red); }
 .vital.warn b { color: var(--orange); }
 .vital.good b { color: var(--green); }
@@ -109,9 +109,9 @@ svg.body .slabel { fill: var(--muted); font-size: 13px; font-weight: 600; text-a
 .row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 12px; border-radius: 12px; background: var(--card); cursor: pointer; text-align: left; transition: background .12s; }
 .row:hover { background: rgba(44, 44, 46, .95); }
 .row .dot { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
-.row .name { flex: 1; }
+.row .name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .row .name span { display: block; color: var(--muted); font-size: 12px; }
-.row .need { font-size: 12px; color: var(--muted); text-align: right; }
+.row .need { flex-shrink: 0; max-width: 45%; font-size: 12px; color: var(--muted); text-align: right; }
 .row .need b { color: var(--text); }
 .empty { padding: 12px 14px; border-radius: 12px; background: var(--green-soft); color: var(--green); font-weight: 600; }
 
@@ -121,10 +121,11 @@ svg.body .slabel { fill: var(--muted); font-size: 13px; font-weight: 600; text-a
 .sev-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 .sev-bar div { height: 6px; border-radius: 3px; background: var(--fill); }
 .kv { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: 10px; background: var(--fill); }
-.kv span { color: var(--muted); }
+.kv span { color: var(--muted); flex-shrink: 0; }
+.kv b { min-width: 0; text-align: right; overflow-wrap: anywhere; }
 .item-need { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; background: var(--accent-soft); }
 .item-need .ico { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 10px; font-size: 26px; background: rgba(0, 0, 0, .35); }
-.item-need .name { flex: 1; }
+.item-need .name { flex: 1; min-width: 0; }
 .item-need .stock { font-weight: 700; }
 .item-need.none { background: var(--red-soft); }
 .item-need.none .stock { color: var(--red); }
@@ -260,10 +261,10 @@ table.list input:disabled { opacity: .5; }
 .ph-item.out { opacity: .55; }
 .ph-item.out .stockline { color: var(--red); font-weight: 600; }
 
-footer { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 14px 20px 18px; border-top: 1px solid var(--line); }
-footer button { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 8px; border-radius: 12px; background: var(--fill); font-weight: 600; transition: background .12s; }
+footer { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 14px 20px 18px; border-top: 1px solid var(--line); }
+footer button { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 8px; border-radius: 12px; background: var(--fill); font-weight: 600; transition: background .12s; }
 footer button:hover:not(:disabled) { background: var(--fill-2); }
-footer button span { white-space: nowrap; }
+footer button span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 footer button small { font-weight: 400; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 footer button.blood { background: var(--red-soft); color: var(--red); }
 footer button.blood:hover:not(:disabled) { background: rgba(255, 69, 58, .26); }

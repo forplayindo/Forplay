@@ -1,0 +1,33 @@
+Gambar item ox_inventory f_wine (6 item). Generate di AI gambar, simpan di folder ini dengan nama file = nama item
+(.png / .jpg / .webp), lalu jalankan:
+
+    python "../../../../[qbx]/f_cafe/_sumber/gambar/proses.py" --dir .
+
+Hasil PNG 256x256 transparan langsung masuk ox_inventory/web/images/<nama_item>.png.
+
+Gaya untuk semua: satu benda saja di tengah, foto produk realistis, latar putih polos, cahaya studio lembut,
+sudut sedikit dari atas (3/4 view), tanpa tangan, tanpa teks lain selain label botol.
+
+botol_jus_merah
+  A large round glass demijohn wine jug wrapped in woven brown rattan around the bottom half, short neck with a cork,
+  filled with deep dark purple-red grape juice, slightly cloudy, product photo, plain white background.
+
+botol_jus_putih
+  A large round glass demijohn wine jug wrapped in woven brown rattan around the bottom half, short neck with a cork,
+  filled with pale golden-green white grape juice, slightly cloudy, product photo, plain white background.
+
+botol_jus_rose
+  A large round glass demijohn wine jug wrapped in woven brown rattan around the bottom half, short neck with a cork,
+  filled with pink rosé grape juice, slightly cloudy, product photo, plain white background.
+
+wine_merah
+  A dark green Bordeaux wine bottle of red wine with a cream paper label reading "4PLAY MARLOWE" and "VINO ROSSO",
+  small purple grape illustration on the label, dark red foil capsule, product photo, plain white background.
+
+wine_putih
+  A clear glass slim wine bottle of white wine (pale gold liquid visible) with a cream paper label reading
+  "4PLAY MARLOWE" and "VINO BIANCO", small green grape illustration, gold foil capsule, product photo, plain white background.
+
+wine_rose
+  A clear glass wine bottle of rosé wine (salmon pink liquid visible) with a white paper label reading
+  "4PLAY MARLOWE" and "ROSÉ", small red grape illustration, pink foil capsule, product photo, plain white background.

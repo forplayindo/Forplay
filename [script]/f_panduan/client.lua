@@ -82,7 +82,7 @@ RegisterCommand('panduan', function(_, args)
 end, false)
 RegisterKeyMapping('panduan', 'Buka Alur Kerja (panduan job)', 'keyboard', config.key)
 TriggerEvent('chat:addSuggestion', '/panduan', 'Buka panel alur kerja', {
-    { name = 'job', help = 'kayu / tambang / nelayan / sampah / kurir (kosongkan = job yang sedang dikerjakan)' },
+    { name = 'job', help = 'kayu / tambang / nelayan / sampah / kurir / wine (kosongkan = job yang sedang dikerjakan)' },
 })
 
 RegisterNUICallback('close', function(data, cb)

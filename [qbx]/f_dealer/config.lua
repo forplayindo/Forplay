@@ -6,7 +6,7 @@ Config.MailFrom = 'Premium Deluxe Motorsport'
 -- NPC dealer (koordinat /coords = posisi kaki). Belum dikalibrasi: berdiri di titik NPC, /vec4, tempel di sini.
 Config.Ped = {
     model = 'a_m_y_business_02',
-    coords = vec4(-32.77, -1095.75, 26.42, 160.0),
+    coords = vec4(-55.61, -1098.03, 25.42, 41.16),
     scenario = 'WORLD_HUMAN_CLIPBOARD',
     distance = 2.0,   -- jarak muncul [E]
 }

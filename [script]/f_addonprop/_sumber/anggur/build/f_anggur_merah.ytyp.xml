@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CMapTypes>
+ <extensions />
+ <archetypes>
+  <Item type="CBaseArchetypeDef">
+   <lodDist value="50" />
+   <flags value="549453856" />
+   <specialAttribute value="0" />
+   <bbMin x="-0.068809" y="-0.061945" z="-0.290187" />
+   <bbMax x="0.069949" y="0.070903" z="0.002689" />
+   <bsCentre x="0.00057" y="0.004479" z="-0.143749" />
+   <bsRadius value="0.175128" />
+   <hdTextureDist value="50" />
+   <name>f_anggur_merah</name>
+   <textureDictionary />
+   <clipDictionary />
+   <drawableDictionary />
+   <physicsDictionary>f_anggur_merah</physicsDictionary>
+   <assetType>ASSET_TYPE_DRAWABLE</assetType>
+   <assetName>f_anggur_merah</assetName>
+   <extensions />
+  </Item>
+ </archetypes>
+ <name>f_anggur_merah</name>
+ <dependencies />
+ <compositeEntityTypes itemType="CCompositeEntityType" />
+</CMapTypes>
