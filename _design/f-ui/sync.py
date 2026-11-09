@@ -42,6 +42,7 @@ TARGETS = [
     '[script]/f_graffiti/html',
     '[script]/f_dashboard/html',
     '[script]/f_panduan/html',
+    '[script]/f_handling/html',
     '[script]/f_antitroll',  # ui_page di ui/ → ui/ios.css
 ]
 

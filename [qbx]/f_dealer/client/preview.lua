@@ -51,6 +51,7 @@ function Preview.show(model)
     local hash = joaat(model)
     if not IsModelInCdimage(hash) or not IsModelAVehicle(hash) then return nil end
     if not pcall(lib.requestModel, hash, 15000) then return nil end
+    Preview.waitInterior(P.coords)
     if my ~= token or not cam then
         SetModelAsNoLongerNeeded(hash)
         return nil
@@ -58,10 +59,13 @@ function Preview.show(model)
 
     deleteVeh()
     local c = P.coords
-    veh = CreateVehicle(hash, c.x, c.y, c.z, heading, false, false)
+    local min, max = GetModelDimensions(hash)
+    -- Tanpa SetVehicleOnGroundProperly: native itu raycast dari atas dan bisa nempel ke ATAP showroom.
+    -- c.z = lantai (posisi kaki /coords), roda diletakkan pas di lantai dari ukuran model.
+    veh = CreateVehicle(hash, c.x, c.y, c.z - min.z, heading, false, false)
     SetModelAsNoLongerNeeded(hash)
     SetEntityAsMissionEntity(veh, true, true)
-    SetVehicleOnGroundProperly(veh)
+    SetEntityCoordsNoOffset(veh, c.x, c.y, c.z - min.z, false, false, false)
     FreezeEntityPosition(veh, true)
     SetEntityInvincible(veh, true)
     SetVehicleDoorsLocked(veh, 2)
@@ -69,7 +73,6 @@ function Preview.show(model)
     SetVehicleNumberPlateText(veh, 'DEALER')
     SetEntityCollision(veh, false, false)
 
-    local min, max = GetModelDimensions(hash)
     local size = max - min
     baseDist = math.max(size.x, size.y, size.z * 1.6) * 1.15 + 2.2
     center = GetEntityCoords(veh) + vec3(0.0, 0.0, (min.z + max.z) * 0.5)
@@ -107,15 +110,33 @@ end
 -- Mobil pajangan showroom: dibuat saat pemain dekat, dihapus saat jauh
 ---------------------------------------------------------------------------
 local display = {}
+local displayGen = 0
+
+-- Showroom PDM = interior GTA. Entity yang dibuat sebelum interiornya siap masuk "room" yang salah
+-- dan tidak terlihat dari dalam (sering terjadi kalau datang cepat, mis. noclip). Tunggu dulu interiornya.
+function Preview.waitInterior(c)
+    local interior = GetInteriorAtCoords(c.x, c.y, c.z)
+    if interior == 0 then return end
+    PinInteriorInMemory(interior)
+    local t = GetGameTimer() + 10000
+    while not IsInteriorReady(interior) and GetGameTimer() < t do Wait(100) end
+    UnpinInterior(interior)
+end
 
 local function spawnDisplay()
+    displayGen = displayGen + 1
+    local gen = displayGen
+    CreateThread(function()
+    Preview.waitInterior(Config.Display[1].coords)
     for i, d in ipairs(Config.Display) do
+        if gen ~= displayGen then return end
         if not display[i] then
             local hash = joaat(d.model)
-            if IsModelInCdimage(hash) and pcall(lib.requestModel, hash, 10000) then
-                local v = CreateVehicle(hash, d.coords.x, d.coords.y, d.coords.z, d.coords.w, false, false)
+            if IsModelInCdimage(hash) and pcall(lib.requestModel, hash, 10000) and gen == displayGen then
+                local min = GetModelDimensions(hash)
+                local v = CreateVehicle(hash, d.coords.x, d.coords.y, d.coords.z - min.z, d.coords.w, false, false)
                 SetModelAsNoLongerNeeded(hash)
-                SetVehicleOnGroundProperly(v)
+                SetEntityCoordsNoOffset(v, d.coords.x, d.coords.y, d.coords.z - min.z, false, false, false)
                 FreezeEntityPosition(v, true)
                 SetEntityInvincible(v, true)
                 SetVehicleDoorsLocked(v, 2)
@@ -125,9 +146,11 @@ local function spawnDisplay()
             end
         end
     end
+    end)
 end
 
 local function clearDisplay()
+    displayGen = displayGen + 1
     for i, v in pairs(display) do
         if DoesEntityExist(v) then DeleteEntity(v) end
         display[i] = nil

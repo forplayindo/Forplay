@@ -180,20 +180,27 @@ end)
 ---------------------------------------------------------------------------
 -- NPC + [E] (dicek tiap frame hanya saat pemain dekat)
 ---------------------------------------------------------------------------
+local pedGen = 0
 local function spawnPed()
     if ped then return end
-    local cfg = Config.Ped
-    local model = joaat(cfg.model)
-    if not pcall(lib.requestModel, model, 10000) then return end
-    ped = CreatePed(4, model, cfg.coords.x, cfg.coords.y, cfg.coords.z, cfg.coords.w, false, true)
-    SetModelAsNoLongerNeeded(model)
-    SetEntityInvincible(ped, true)
-    SetBlockingOfNonTemporaryEvents(ped, true)
-    FreezeEntityPosition(ped, true)
-    if cfg.scenario then TaskStartScenarioInPlace(ped, cfg.scenario, 0, true) end
+    pedGen = pedGen + 1
+    local gen = pedGen
+    CreateThread(function()
+        local cfg = Config.Ped
+        Preview.waitInterior(cfg.coords)   -- NPC di dalam interior PDM: buat setelah interiornya siap
+        local model = joaat(cfg.model)
+        if not pcall(lib.requestModel, model, 10000) or gen ~= pedGen or ped then return end
+        ped = CreatePed(4, model, cfg.coords.x, cfg.coords.y, cfg.coords.z, cfg.coords.w, false, true)
+        SetModelAsNoLongerNeeded(model)
+        SetEntityInvincible(ped, true)
+        SetBlockingOfNonTemporaryEvents(ped, true)
+        FreezeEntityPosition(ped, true)
+        if cfg.scenario then TaskStartScenarioInPlace(ped, cfg.scenario, 0, true) end
+    end)
 end
 
 local function removePed()
+    pedGen = pedGen + 1
     if ped and DoesEntityExist(ped) then DeleteEntity(ped) end
     ped = nil
 end

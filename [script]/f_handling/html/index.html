@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>f_handling</title>
+    <link rel="stylesheet" href="ui/ios.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <svg width="0" height="0" style="position:absolute">
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+        <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+        <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17h14M3 17v-4l2-5h14l2 5v4M7 17v2M17 17v2"/><circle cx="7.5" cy="13.5" r="1"/><circle cx="16.5" cy="13.5" r="1"/></symbol>
+        <symbol id="i-wheel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 3v7M4.5 16.5 10 13M19.5 16.5 14 13"/></symbol>
+        <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></symbol>
+        <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4M9 13h6M9 17h6"/></symbol>
+        <symbol id="i-spawn" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    </svg>
+
+    <div id="panel" class="panel split hidden">
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="logo"><svg class="ic"><use href="#i-sliders"/></svg></span>
+                <div><h1>Handling</h1><small>Kendaraan addon</small></div>
+            </div>
+            <label class="search side-search"><svg class="ic"><use href="#i-search"/></svg><input id="q" placeholder="Cari model…" autocomplete="off"></label>
+            <div class="vlist" id="vlist"></div>
+            <div class="side-note">Dibaca dari resource yang punya <b>HANDLING_FILE</b>. Simpan = tulis ke handling.meta di folder kendaraannya.</div>
+        </aside>
+
+        <section class="detail">
+            <div class="detail-h">
+                <div class="title">
+                    <div class="lt" id="vname">-</div>
+                    <div class="chips" id="vchips"></div>
+                </div>
+                <div class="head-actions">
+                    <button class="b b-sm b-gray" id="drive" title="Tutup fokus mouse supaya bisa menyetir"><svg class="ic"><use href="#i-wheel"/></svg>Kemudi</button>
+                    <button class="circle close" id="close"><svg class="ic"><use href="#i-x"/></svg></button>
+                </div>
+            </div>
+
+            <div id="vbanner" class="banner"></div>
+
+            <div class="stats">
+                <div class="stat"><span>Batas kecepatan</span><b id="s-top">-</b><em id="d-top"></em><div class="bar"><i id="b-top"></i></div></div>
+                <div class="stat"><span>Indeks tenaga/berat</span><b id="s-pw">-</b><em id="d-pw"></em><div class="bar"><i id="b-pw"></i></div></div>
+                <div class="stat"><span>Grip ban</span><b id="s-grip">-</b><em id="d-grip"></em><div class="bar"><i id="b-grip"></i></div></div>
+                <div class="stat"><span>Berat</span><b id="s-mass">-</b><em id="d-mass"></em><div class="bar"><i id="b-mass"></i></div></div>
+            </div>
+
+            <div class="filters tabs-row" id="tabs"></div>
+            <div class="fields" id="fields"></div>
+
+            <div class="foot">
+                <div class="info" id="finfo"></div>
+                <button class="b b-sm b-gray" id="cancel"><svg class="ic"><use href="#i-undo"/></svg>Batal</button>
+                <button class="b b-sm b-red-tint" id="orig">Isi bawaan</button>
+                <button class="b b-sm b-gray" id="export"><svg class="ic"><use href="#i-file"/></svg>Lihat file</button>
+                <button class="b b-sm b-filled" id="save">Simpan untuk semua</button>
+            </div>
+        </section>
+
+        <div id="drive-hint" class="drive-hint hidden">Mode kemudi · tekan <b>INSERT</b> atau ketik <b>/handling</b> untuk kembali ke panel</div>
+    </div>
+
+    <div id="modal" class="modal hidden">
+        <div class="box">
+            <div class="box-h"><b id="m-title">handling.meta</b><button class="b b-sm b-gray" id="m-copy">Salin</button><button class="circle close" id="m-close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+            <textarea id="m-text" readonly spellcheck="false"></textarea>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

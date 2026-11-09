@@ -163,6 +163,18 @@ local function applyHandling(veh, c)
     SetVehicleHandlingFloat(veh, 'CHandlingData', 'fInitialDriveForce', base.fInitialDriveForce * power)
 end
 
+-- f_handling mengubah handling kendaraan ini: perbarui nilai dasar field yang diubah saja
+-- (field lain masih berisi dasar x pengali aus, jangan dibaca ulang), lalu pasang ulang efek aus.
+AddEventHandler('f_handling:applied', function(veh, values)
+    local base = baseHandling[veh]
+    if base then
+        for field, v in pairs(values) do
+            if base[field] then base[field] = v end
+        end
+    end
+    appliedSig[veh] = nil
+end)
+
 local function stutter(veh, ms)
     CreateThread(function()
         SetVehicleEngineOn(veh, false, true, true)

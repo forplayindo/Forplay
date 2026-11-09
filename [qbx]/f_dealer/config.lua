@@ -16,14 +16,14 @@ Config.ServerRadius = 8.0
 
 -- Preview 3D di lantai showroom (lokal, hanya terlihat oleh pemain itu sendiri)
 Config.Preview = {
-    coords = vec4(-45.4, -1098.0, 26.42, 120.0),
+    coords = vec4(-45.4, -1098.0, 25.44, 120.0),   -- z = lantai (posisi kaki /coords)
     camAngle = 35.0,      -- sudut kamera dari depan kendaraan (derajat)
     camHeight = 0.9,      -- tinggi awal kamera di atas pusat kendaraan
     zoomMin = 0.65,
     zoomMax = 1.9,
 }
 
--- Mobil pajangan di showroom (lokal, muncul saat pemain dekat, disembunyikan saat menu dibuka)
+-- Mobil pajangan di showroom (z = lantai / posisi kaki; lokal, muncul saat pemain dekat, disembunyikan saat menu dibuka)
 Config.Display = {
     { coords = vec4(-45.65, -1093.66, 25.44, 69.5),   model = 'asbo' },
     { coords = vec4(-48.27, -1101.86, 25.44, 294.5),  model = 'schafter2' },
