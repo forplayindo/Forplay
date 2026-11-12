@@ -1,4 +1,4 @@
--- Rekening organisasi (society). Renewed-Banking -> qb-banking -> qb-management
+-- Rekening organisasi (society). f_banking -> qb-banking -> qb-management
 Society = {}
 
 local function isUp(res) return GetResourceState(res) == 'started' end
@@ -6,10 +6,10 @@ local function isUp(res) return GetResourceState(res) == 'started' end
 function Society.Add(amount, reason)
     amount = math.floor(amount)
     if amount <= 0 then return true end
-    if isUp('Renewed-Banking') then
-        local ok = exports['Renewed-Banking']:addAccountMoney(Config.Job, amount)
+    if isUp('f_banking') then
+        local ok = exports['f_banking']:addAccountMoney(Config.Job, amount)
         if ok then
-            pcall(exports['Renewed-Banking'].handleTransaction, exports['Renewed-Banking'], Config.Job, Config.Label, amount, reason or 'Penjualan', 'Customer', Config.Label, 'deposit')
+            pcall(exports['f_banking'].handleTransaction, exports['f_banking'], Config.Job, Config.Label, amount, reason or 'Penjualan', 'Customer', Config.Label, 'deposit')
         end
         return ok == true
     elseif isUp('qb-banking') then
@@ -25,10 +25,10 @@ end
 function Society.Remove(amount, reason)
     amount = math.floor(amount)
     if amount <= 0 then return true end
-    if isUp('Renewed-Banking') then
-        local ok = exports['Renewed-Banking']:removeAccountMoney(Config.Job, amount)
+    if isUp('f_banking') then
+        local ok = exports['f_banking']:removeAccountMoney(Config.Job, amount)
         if ok then
-            pcall(exports['Renewed-Banking'].handleTransaction, exports['Renewed-Banking'], Config.Job, Config.Label, amount, reason or 'Pembelian', Config.Label, 'Supplier', 'withdraw')
+            pcall(exports['f_banking'].handleTransaction, exports['f_banking'], Config.Job, Config.Label, amount, reason or 'Pembelian', Config.Label, 'Supplier', 'withdraw')
         end
         return ok == true
     elseif isUp('qb-banking') then
@@ -40,7 +40,7 @@ function Society.Remove(amount, reason)
 end
 
 function Society.Balance()
-    if isUp('Renewed-Banking') then return exports['Renewed-Banking']:getAccountMoney(Config.Job) or 0 end
+    if isUp('f_banking') then return exports['f_banking']:getAccountMoney(Config.Job) or 0 end
     if isUp('qb-banking') then return exports['qb-banking']:GetAccountBalance(Config.Job) or 0 end
     if isUp('qb-management') then return exports['qb-management']:GetAccount(Config.Job) or 0 end
     return 0

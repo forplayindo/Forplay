@@ -160,8 +160,27 @@ local function startTargeting()
                 if not hasTarget or options and IsDisabledControlJustPressed(0, 25) then
                     state.setNuiFocus(false, false)
                 end
-            elseif hasTarget and IsDisabledControlJustPressed(0, mouseButton) then
-                state.setNuiFocus(true, true)
+            elseif hasTarget then
+                -- [f] Forb VI scroll mode: wheel = move selection, E / left click = run, right click = cursor
+                DisableControlAction(0, 14, true) -- weapon wheel next
+                DisableControlAction(0, 15, true) -- weapon wheel prev
+                DisableControlAction(0, 16, true)
+                DisableControlAction(0, 17, true)
+                DisableControlAction(0, 99, true) -- vehicle weapon scroll
+                DisableControlAction(0, 100, true)
+
+                if IsDisabledControlJustPressed(0, 241) or IsControlJustPressed(0, 241) then
+                    SendNuiMessage('{"event":"scrollUp"}')
+                elseif IsDisabledControlJustPressed(0, 242) or IsControlJustPressed(0, 242) then
+                    SendNuiMessage('{"event":"scrollDown"}')
+                end
+
+                if IsDisabledControlJustPressed(0, 38) or IsControlJustPressed(0, 38)
+                    or IsDisabledControlJustPressed(0, 24) or IsControlJustPressed(0, 24) then
+                    SendNuiMessage('{"event":"selectCurrent"}')
+                elseif IsDisabledControlJustPressed(0, mouseButton) then
+                    state.setNuiFocus(true, true)
+                end
             end
 
             Wait(0)

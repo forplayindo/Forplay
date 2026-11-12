@@ -26,7 +26,7 @@ end
 local ACTIVE = detect()
 
 ---@type table Weather module; the table returned at end of file. One API over the supported
----weathersyncs (Renewed-Weathersync, qb-weathersync): a live weather/time snapshot plus a
+---weathersyncs (f_weathersync, qb-weathersync): a live weather/time snapshot plus a
 ---change subscription.
 local weather = {}
 
@@ -44,7 +44,7 @@ local function hashToCode(h) return HASHES[h] or 'CLEAR' end
 function weather.read()
     local cur
 
-    if ACTIVE == 'Renewed-Weathersync' then
+    if ACTIVE == 'f_weathersync' then
         local g = GlobalState.weather
         if type(g) == 'table' then cur = g.weather end
     end
@@ -52,7 +52,7 @@ function weather.read()
     local nxt = hashToCode(GetNextWeatherTypeHashName())
 
     local hour, minute
-    if ACTIVE == 'Renewed-Weathersync' then
+    if ACTIVE == 'f_weathersync' then
         local t = GlobalState.currentTime
         if type(t) == 'table' then hour, minute = t.hour, t.minute end
     end
@@ -66,7 +66,7 @@ end
 ---sync is detected; repeated calls stack handlers.
 ---@param cb fun()
 function weather.onChange(cb)
-    if ACTIVE == 'Renewed-Weathersync' then
+    if ACTIVE == 'f_weathersync' then
         AddStateBagChangeHandler('weather', 'global', function() cb() end)
     elseif ACTIVE == 'qb-weathersync' then
         RegisterNetEvent('qb-weathersync:client:SyncWeather', function() cb() end)

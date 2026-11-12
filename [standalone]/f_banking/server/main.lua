@@ -3,9 +3,9 @@ local cachedPlayers = {}
 
 CreateThread(function()
     Wait(500)
-    if not LoadResourceFile("Renewed-Banking", 'web/public/build/bundle.js') or GetCurrentResourceName() ~= "Renewed-Banking" then
+    if not LoadResourceFile(GetCurrentResourceName(), 'web/public/build/bundle.js') or GetCurrentResourceName() ~= "f_banking" then
         error(locale("ui_not_built"))
-        return StopResource("Renewed-Banking")
+        return StopResource(GetCurrentResourceName())
     end
     local accounts = MySQL.query.await('SELECT * FROM bank_accounts_new', {})
     if accounts then

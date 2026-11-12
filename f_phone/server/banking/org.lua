@@ -4,7 +4,7 @@
 --   - Semua anggota job aktif boleh MELIHAT saldo + riwayat transaksi rekening job-nya.
 --   - Hanya grade dengan flag `isboss` (qbx_core/shared/jobs.lua) yang boleh MENGIRIM uang.
 --   - Job & identitas selalu dibaca dari source, tidak pernah dari payload.
--- Uang & riwayat dibaca dari Renewed-Banking (rekening job = id job, mis. 'police').
+-- Uang & riwayat dibaca dari f_banking (rekening job = id job, mis. 'police').
 
 ---@type table f_phone config root (configs/config.lua).
 local config  = require 'configs.config'
@@ -34,7 +34,7 @@ local SEND_WINDOW, SEND_MAX = 60000, 10
 ---@type table<string, boolean> Job yang tidak punya rekening organisasi.
 local NO_ACCOUNT = { unemployed = true }
 
-local RB = 'Renewed-Banking'
+local RB = 'f_banking'
 
 local function fail(key, msg) return { success = false, messageKey = key, message = msg } end
 
@@ -59,7 +59,7 @@ local function context(src)
     }
 end
 
----Riwayat Renewed-Banking -> bentuk BankTx yang dipakai UI Wallet.
+---Riwayat f_banking -> bentuk BankTx yang dipakai UI Wallet.
 ---@param jobName string
 ---@return table[]
 local function transactionsOf(jobName)
@@ -179,7 +179,7 @@ function org.send(src, payload)
     local rname = (rsrc and player.getName(rsrc)) or rcid
     local message = note ~= '' and note or ('Dikirim oleh %s'):format(senderName)
 
-    -- Riwayat rekening organisasi (Renewed-Banking) - tercatat siapa boss yang mengirim.
+    -- Riwayat rekening organisasi (f_banking) - tercatat siapa boss yang mengirim.
     if GetResourceState(RB) == 'started' then
         pcall(function()
             exports[RB]:handleTransaction(ctx.job, ('%s / %s'):format(ctx.label, ctx.job), amount,

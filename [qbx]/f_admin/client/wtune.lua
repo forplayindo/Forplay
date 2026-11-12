@@ -47,10 +47,9 @@ local function apply()
         local v = eff(hash)
         local mod = 1.0
         if v then
-            if v.b ~= w.dmg then
-                local base = GetWeaponDamage(hash, 0)
-                mod = v.b / ((base and base > 0) and base or w.dmg)
-            end
+            -- selalu dari angka bawaan tabel: GetWeaponDamage bisa ikut membaca pengali yang
+            -- sudah terpasang, sehingga hasilnya bolak-balik setiap kali apply() dipanggil
+            if v.b ~= w.dmg then mod = v.b / w.dmg end
             recoil[tostring(hash)] = v.r -- kunci teks: aman lewat state bag
             if v.h ~= w.head then headCtl = true end
             if v.a ~= v.b then armor = true end
@@ -63,6 +62,7 @@ local function apply()
     armorFix = armor
     setCrits(headCtl)
     LocalPlayer.state:set('f_recoil', next(recoil) and recoil or nil, false)
+    TriggerEvent('f_admin:recoil', recoil) -- f_recoils menyimpan salinannya sendiri
 end
 
 local function loadTune(data)
@@ -78,6 +78,13 @@ AddStateBagChangeHandler(STATE_KEY, 'global', function(_, _, value) loadTune(val
 
 lib.onCache('ped', function(ped)
     if critsOff then SetPedSuffersCriticalHits(ped, false) end
+end)
+
+-- pasang ulang pengali saat senjata dikeluarkan, jaga-jaga kalau game mereset modifier
+lib.onCache('weapon', function(weapon)
+    if not weapon then return end
+    local mod = lastMod[s32(weapon)]
+    if mod and mod ~= 1.0 then SetWeaponDamageModifier(weapon, mod) end
 end)
 
 ---------------------------------------------------------------------------
@@ -187,4 +194,5 @@ AddEventHandler('onResourceStop', function(res)
     end
     if critsOff then SetPedSuffersCriticalHits(cache.ped, true) end
     LocalPlayer.state:set('f_recoil', nil, false)
+    TriggerEvent('f_admin:recoil', {})
 end)

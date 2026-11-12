@@ -16,6 +16,7 @@ client_scripts {
     'client/preview.lua',
     'client/main.lua',
     'client/pet.lua',
+    'client/ride.lua',
 }
 
 server_scripts {

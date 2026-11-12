@@ -586,16 +586,28 @@ end)
 ---------------------------------------------------------------------------
 -- Perintah (target = id hewan, atau 'all' untuk semua yang hidup)
 ---------------------------------------------------------------------------
+-- kuda yang sedang ditunggangi tidak bisa diperintah (kendalinya di tangan penunggang)
+local function ridden(p)
+    local s = petState(p.ped)
+    return s and s.rider ~= nil
+end
+
 local function targets(target)
     local out = {}
     if target == 'all' then
         for _, p in pairs(Pet.list) do
-            if exists(p) and not p.row.dead then out[#out + 1] = p end
+            if exists(p) and not p.row.dead and not ridden(p) then out[#out + 1] = p end
         end
         table.sort(out, function(a, b) return a.slot < b.slot end)
     else
         local p = Pet.list[tonumber(target)]
-        if exists(p) and not p.row.dead then out[1] = p end
+        if exists(p) and not p.row.dead then
+            if ridden(p) then
+                notify(('%s sedang ditunggangi.'):format(p.row.name), 'error')
+                return out, true
+            end
+            out[1] = p
+        end
     end
     return out
 end
@@ -612,6 +624,14 @@ function Pet.command(cmd, target, radius)
         local p = Pet.list[tonumber(target)]
         if exists(p) then Pet.pickUp(p.ped) end
         return
+    end
+
+    -- tunggangi / turun dari kuda (lihat client/ride.lua); panel ditutup supaya keyboard bebas
+    if cmd == 'ride' then
+        local p = Pet.list[tonumber(target)]
+        if not exists(p) or p.row.dead then return end
+        TriggerEvent('f_petshop:client:closeUi')
+        return Ride.toggle(p.ped)
     end
 
     if cmd == 'leash' then
@@ -635,7 +655,8 @@ function Pet.command(cmd, target, radius)
         return
     end
 
-    local list = targets(target)
+    local list, busy = targets(target)
+    if busy then return end
     if #list == 0 then return notify('Tidak ada hewan hidup yang bisa diperintah.', 'error') end
 
     for _, p in ipairs(list) do
@@ -833,6 +854,13 @@ CreateThread(function()
                     elseif p.row.dead and s and s.dead and not busy and not deadNow and not Pet.isCarried(p.ped)
                         and NetworkHasControlOfEntity(p.ped) then
                         dropDead(p.ped) -- harusnya tergeletak mati (baru di-spawn / diganggu game)
+                    elseif s and s.rider then
+                        -- sedang ditunggangi (bisa orang lain): jangan diberi tugas
+                        if p.mode ~= 'ridden' then p.mode = 'ridden' changed() end
+                    elseif p.mode == 'ridden' then
+                        -- penunggang sudah turun: kuda diam di tempat sampai disuruh lagi
+                        p.mode = 'stay'
+                        changed()
                     elseif p.vehicle and not p.row.dead then
                         local sit = animFor(p.cfg, 'sit') or animFor(p.cfg, 'lay')
                         if sit and not IsEntityPlayingAnim(p.ped, sit[1], sit[2], 3) then playAnim(p.ped, sit) end
@@ -996,7 +1024,7 @@ end
 RegisterNetEvent('f_petshop:client:petted', function(netId, petter, duration)
     if not NetworkDoesNetworkIdExist(netId) then return end
     local p = ownedByPed(NetworkGetEntityFromNetworkId(netId))
-    if not exists(p) or p.row.dead or p.vehicle or p.fetching or Pet.isCarried(p.ped) then return end
+    if not exists(p) or p.row.dead or p.vehicle or p.fetching or Pet.isCarried(p.ped) or ridden(p) then return end
     local player = GetPlayerFromServerId(petter)
     local petterPed = player ~= -1 and GetPlayerPed(player) or 0
     if petterPed == 0 then return end
@@ -1315,7 +1343,7 @@ exports.ox_target:addGlobalPed({
         distance = 2.0,
         canInteract = function(entity)
             local s = petState(entity)
-            return s and not s.dead and not petting and not carry and not cache.vehicle
+            return s and not s.dead and not s.rider and not petting and not carry and not cache.vehicle
                 and not IsEntityAttached(entity)
         end,
         onSelect = function(data) stroke(data.entity) end,

@@ -1,4 +1,4 @@
--- Organization (society) accounts in Renewed-Banking, plus invoices through f_phone.
+-- Organization (society) accounts in f_banking, plus invoices through f_phone.
 Society = {}
 Invoice = {}
 
@@ -7,14 +7,14 @@ local function isUp(res) return GetResourceState(res) == 'started' end
 function Society.Add(job, amount, reason, from)
     amount = math.floor(amount)
     if amount <= 0 then return true end
-    if not isUp('Renewed-Banking') then return false end
-    local ok, added = pcall(function() return exports['Renewed-Banking']:addAccountMoney(job, amount) end)
+    if not isUp('f_banking') then return false end
+    local ok, added = pcall(function() return exports['f_banking']:addAccountMoney(job, amount) end)
     if not ok or not added then
         lib.print.error(('Failed to deposit Rp %s into society account "%s"'):format(amount, job))
         return false
     end
     pcall(function()
-        exports['Renewed-Banking']:handleTransaction(job, 'Layanan Publik', amount, reason, from or 'Warga', job, 'deposit')
+        exports['f_banking']:handleTransaction(job, 'Layanan Publik', amount, reason, from or 'Warga', job, 'deposit')
     end)
     return true
 end
@@ -22,11 +22,11 @@ end
 function Society.Remove(job, amount, reason, to)
     amount = math.floor(amount)
     if amount <= 0 then return true end
-    if not isUp('Renewed-Banking') then return false end
-    local ok, removed = pcall(function() return exports['Renewed-Banking']:removeAccountMoney(job, amount) end)
+    if not isUp('f_banking') then return false end
+    local ok, removed = pcall(function() return exports['f_banking']:removeAccountMoney(job, amount) end)
     if not ok or not removed then return false end
     pcall(function()
-        exports['Renewed-Banking']:handleTransaction(job, 'Refund Layanan', amount, reason, job, to or 'Warga', 'withdraw')
+        exports['f_banking']:handleTransaction(job, 'Refund Layanan', amount, reason, job, to or 'Warga', 'withdraw')
     end)
     return true
 end

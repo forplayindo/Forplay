@@ -16,14 +16,14 @@ local society = {}
 
 -- Society money provider export shapes:
 --   qb-banking      : GetAccountBalance / AddMoney / RemoveMoney (account, amount, reason)
---   Renewed-Banking : getAccountMoney / addAccountMoney / removeAccountMoney (account, amount)
+--   f_banking : getAccountMoney / addAccountMoney / removeAccountMoney (account, amount)
 --   qbx_management  : GetAccount / AddMoney / RemoveMoney (account[, amount])
 --   qb-management   : GetAccount / AddMoney / RemoveMoney (account[, amount])
 --   esx_addonaccount / esx_society : esx_addonaccount:getSharedAccount('society_<job>') ->
 --                     { money, addMoney, removeMoney }
 ---@type string[] Society money providers, in detection-priority order.
 local KNOWN = {
-    'qb-banking', 'Renewed-Banking', 'qbx_management', 'qb-management',
+    'qb-banking', 'f_banking', 'qbx_management', 'qb-management',
     'esx_addonaccount', 'esx_society',
 }
 
@@ -97,9 +97,9 @@ function society.getBalance(jobName, override)
         local ok, bal = pcall(function() return exports['qb-banking']:GetAccountBalance(acc) end)
         if ok and type(bal) == 'number' then return bal end
 
-    elseif name == 'Renewed-Banking' then
+    elseif name == 'f_banking' then
         for _, key in ipairs({ override or jobName, 'society_' .. jobName }) do
-            local ok, bal = pcall(function() return exports['Renewed-Banking']:getAccountMoney(key) end)
+            local ok, bal = pcall(function() return exports['f_banking']:getAccountMoney(key) end)
             if ok and type(bal) == 'number' then return bal end
         end
 
@@ -142,8 +142,8 @@ function society.addMoney(jobName, amount, reason, override)
 
     if name == 'qb-banking' then
         return try(function() return exports['qb-banking']:AddMoney(acc, amount, reason) end)
-    elseif name == 'Renewed-Banking' then
-        return try(function() return exports['Renewed-Banking']:addAccountMoney(override or jobName, amount) end)
+    elseif name == 'f_banking' then
+        return try(function() return exports['f_banking']:addAccountMoney(override or jobName, amount) end)
     elseif name == 'qbx_management' or name == 'qb-management' then
         return try(function() return exports[name]:AddMoney(jobName, amount) end)
     elseif name == 'esx_addonaccount' or name == 'esx_society' then
@@ -181,8 +181,8 @@ function society.removeMoney(jobName, amount, reason, override)
 
     if name == 'qb-banking' then
         return try(function() return exports['qb-banking']:RemoveMoney(acc, amount, reason) end)
-    elseif name == 'Renewed-Banking' then
-        return try(function() return exports['Renewed-Banking']:removeAccountMoney(override or jobName, amount) end)
+    elseif name == 'f_banking' then
+        return try(function() return exports['f_banking']:removeAccountMoney(override or jobName, amount) end)
     elseif name == 'qbx_management' or name == 'qb-management' then
         return try(function() return exports[name]:RemoveMoney(jobName, amount) end)
     elseif name == 'esx_addonaccount' or name == 'esx_society' then

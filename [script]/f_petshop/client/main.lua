@@ -99,6 +99,9 @@ local function panelData()
             canFight = p and Pet.canFight(p.cfg) or false,
             guarding = p and p.guard ~= nil or false,
             leash = p and p.ped ~= 0 and DoesEntityExist(p.ped) and (Entity(p.ped).state.fpet or {}).leash == true or false,
+            canRide = p and Config.Ride.kinds[p.cfg.kind] == true or false,
+            riding = p and p.ped ~= 0 and Ride.isOn(p.ped) or false,
+            ridden = p and p.ped ~= 0 and DoesEntityExist(p.ped) and (Entity(p.ped).state.fpet or {}).rider ~= nil or false,
             trial = r.trial == true,
             left = r.trial and math.max(0, math.floor((r.endsAt - GetGameTimer()) / 1000)) or nil,
         }

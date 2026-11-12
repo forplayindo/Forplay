@@ -52,7 +52,7 @@ Panel mana pun yang punya class `gl` atau atribut `data-blur` otomatis ikut di-b
 - Blur: mulai `off` sampai karakter spawn & HUD tampil; `off` saat HUD tersembunyi / pause menu / layar gelap;
   `pause` (frame terakhir dibiarkan) saat menu Settings terbuka. Mode `auto` paling tinggi `medium`
   (`Config.Blur.autoHigh = true` untuk mengizinkan high). Kanvas komposit 75% (medium) / 50% (low).
-  Event `0r-hud:blurTier` tetap mengirim tier pilihan pemain (dipakai f_chat, ox_lib, Renewed-Banking).
+  Event `0r-hud:blurTier` tetap mengirim tier pilihan pemain (dipakai f_chat, ox_lib, f_banking).
 - Lua hanya mengirim bagian `Hud.data` yang berubah (client_info / compass / navigation_widget / vehicle_info / bars / hygiene).
 - React: `useData()` sekarang mencatat field yang dibaca komponen dan hanya render ulang kalau field itu berubah
   (DataProvider memberi store tetap, bukan value baru tiap render).

@@ -72,7 +72,7 @@ lib.callback.register('f_koperasi:server:sell', function(src, wanted)
     end
 
     if tax > 0 then
-        local okT, added = pcall(function() return exports['Renewed-Banking']:addAccountMoney(config.govAccount, tax) end)
+        local okT, added = pcall(function() return exports['f_banking']:addAccountMoney(config.govAccount, tax) end)
         if okT and added then
             pcall(function() exports.f_tax:AddCitizenTax(tax) end)
         else

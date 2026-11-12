@@ -2,9 +2,9 @@ Config = {}
 
 -- Job pemerintah: bisa /auditpajak (wajib on duty), menerima uang pajak, dan TIDAK kena pajak
 Config.Government = 'government'
-Config.GovAccount = 'government'   -- rekening Renewed-Banking tujuan pembayaran pajak
+Config.GovAccount = 'government'   -- rekening f_banking tujuan pembayaran pajak
 
--- Job yang dikenakan pajak (nama job = nama rekening organisasi di Renewed-Banking).
+-- Job yang dikenakan pajak (nama job = nama rekening organisasi di f_banking).
 -- Job baru harus didaftarkan di sini dulu, sebelum itu pendapatannya tidak dihitung.
 Config.Jobs = {
     'cafe',

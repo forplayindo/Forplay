@@ -1,6 +1,6 @@
 -- Pajak perusahaan. Pendapatan dicatat lewat event 'f_tax:income' yang dipicu dari
--- AddAccountMoney di Renewed-Banking (setoran karyawan job itu sendiri sudah dilewati di sana).
-local Bank = 'Renewed-Banking'
+-- AddAccountMoney di f_banking (setoran karyawan job itu sendiri sudah dilewati di sana).
+local Bank = 'f_banking'
 
 local Data = {}       -- [job] = { income, count, lastPaid }
 local pending = {}    -- pemasukan yang masuk sebelum tabel siap: { job, amount }

@@ -98,7 +98,7 @@ return {
         beingUnlocked = 'Seseorang sedang membuka borgolmu',
         lockpickBroke = 'Lockpick patah',
         escort = 'Seret',
-        carry = 'Gendong / Lepas',
+        carry = 'Carry / Lepas',
         putInVehicle = 'Masukkan ke Mobil',
         takeOut = 'Keluarkan Penumpang',
         putInTrunk = 'Masukkan ke Bagasi',

@@ -1,25 +1,26 @@
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&display=swap");
+/* Forb Target VI style (scroll mode), local fonts. Backup of old UI: resources/backups/ox_target_sebelum_forbvi_20261111 */
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 500 600;
+  src: url('fonts/oswald-latin.woff2') format('woff2');
+}
 
-:root {
-  --color-default: #cfd2da;
-  --color-hover: white;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Oswald', 'Arial Narrow', sans-serif;
+  user-select: none;
 }
 
 body {
-  visibility: hidden;
-  user-select: none;
-  white-space: nowrap;
-  margin: 0;
-  user-select: none;
+  background: transparent;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
-}
-
-p {
-  margin: 0;
-}
-
-.material-symbols-outlined {
-  font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 40;
+  visibility: hidden;
+  white-space: nowrap;
 }
 
 #eye {
@@ -27,65 +28,180 @@ p {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 22pt;
-  fill: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
 }
 
-.eye-hover {
-  fill: var(--color-default);
+/* [f] bidik varian C (28px at 1080p) */
+#eyeSvg {
+  position: relative;
+  width: 28px;
+  height: 28px;
+}
+
+#eyeSvg svg {
+  position: absolute;
+  overflow: visible;
+  transition: opacity 0.18s ease, transform 0.22s ease, filter 0.22s ease;
+}
+
+#eyeSvg .ret {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.9));
+}
+
+#eyeSvg .ring,
+#eyeSvg .dot {
+  transform-origin: 20px 20px;
+  transition: transform 0.3s ease;
+}
+
+/* mouse sits inside the ring, hidden until a target is hit */
+#eyeSvg .mouse {
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 12px;
+  margin: -6px 0 0 -4px;
+  opacity: 0;
+  transform: scale(0.7);
+}
+
+#eyeSvg.eye-hover .ret {
+  opacity: 1;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+}
+
+#eyeSvg.eye-hover .ring {
+  transform: rotate(30deg) scale(1.35);
+}
+
+#eyeSvg.eye-hover .dot {
+  transform: scale(0);
+}
+
+#eyeSvg.eye-hover .mouse {
+  opacity: 1;
+  transform: scale(1);
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.6));
 }
 
 #options-wrapper {
   position: absolute;
-  top: calc(48.4%);
-  left: calc(50% + 18pt);
+  top: 50%;
+  left: calc(50% + 30px); /* clears the widened ring (38px) */
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 5;
+  padding-left: 20px;
+}
+
+/* vertical line through all dots */
+#options-wrapper:not(:empty)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  transform: translateX(-50%);
+  top: 15px;
+  bottom: 15px;
+  width: 1.5px;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.2);
+  z-index: 1;
 }
 
 .option-container {
-  color: var(--color-default);
+  position: relative;
   display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
   align-items: center;
-  font-family: "Nunito";
-  background: linear-gradient(
-    90deg,
-    rgba(20, 20, 20, 0.7) 0%,
-    rgba(20, 20, 20, 0.6) 66%,
-    rgba(47, 48, 53, 0) 100%
-  );
-  font-size: 11pt;
-  line-height: 22pt;
-  vertical-align: middle;
-  margin: 2pt;
-  transition: 300ms;
-  transform-origin: left top;
-  scale: 1;
-  height: 22pt;
-  width: 150pt;
-  top: 0;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  padding: 6px 8px;
+  transition: all 0.2s ease;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9), 0px 0px 3px rgba(0, 0, 0, 0.8);
+  animation: fadeInRight 0.3s ease forwards;
+  opacity: 0;
 }
 
-.option-container:hover {
-  background: linear-gradient(
-    90deg,
-    rgba(30, 30, 30, 0.7) 0%,
-    rgba(30, 30, 30, 0.6) 66%,
-    rgba(57, 58, 63, 0) 100%
-  );
-  transform-origin: left top;
-  color: var(--color-hover);
-  margin-left: 4pt;
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(-5px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
+/* dot on the line */
+.option-container::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 5px;
+  height: 5px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8), 0 0 1px rgba(0, 0, 0, 0.9);
+  z-index: 2;
+  transition: all 0.2s ease;
+}
+
+.option-selected::before {
+  width: 9px;
+  height: 9px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 1);
+}
+
+.option-selected {
+  padding-left: 12px;
+}
+
+/* round icon */
 .option-icon {
-  font-size: 12pt;
-  line-height: 22pt;
-  width: 14pt;
-  margin: 5pt;
-  color: var(--color-default);
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  width: 23px !important;
+  height: 23px;
+  line-height: 1;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  margin-right: 8px;
+  background: rgba(5, 5, 5, 0.75);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* auto icon colours when the option has no iconColor */
+.option-container:nth-child(7n+1) .option-icon { color: #00e5ff; }
+.option-container:nth-child(7n+2) .option-icon { color: #ff2a7f; }
+.option-container:nth-child(7n+3) .option-icon { color: #00ff88; }
+.option-container:nth-child(7n+4) .option-icon { color: #ffaa00; }
+.option-container:nth-child(7n+5) .option-icon { color: #b266ff; }
+.option-container:nth-child(7n+6) .option-icon { color: #ff4d4d; }
+.option-container:nth-child(7n)   .option-icon { color: #5588ff; }
+
+.option-selected .option-icon {
+  transform: scale(1.1);
+  box-shadow: inset 0 0 0 20px currentColor, 0 2px 4px rgba(0, 0, 0, 0.5);
+  -webkit-text-fill-color: #fff;
 }
 
 .option-label {
-  font-weight: 500;
+  line-height: 1;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }

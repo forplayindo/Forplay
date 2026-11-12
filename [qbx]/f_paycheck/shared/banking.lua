@@ -1,20 +1,20 @@
--- Model ATM + koordinat NPC bank dibaca langsung dari config Renewed-Banking,
--- jadi Renewed-Banking tidak perlu dipatch dan lokasi selalu sama dengan bank.
+-- Model ATM + koordinat NPC bank dibaca langsung dari config f_banking,
+-- jadi f_banking tidak perlu dipatch dan lokasi selalu sama dengan bank.
 local result = { atms = {}, banks = {}, pedModels = {} }
 
-local code = LoadResourceFile('Renewed-Banking', 'config.lua')
+local code = LoadResourceFile('f_banking', 'config.lua')
 if not code then
-    lib.print.error('config.lua Renewed-Banking tidak ditemukan, Ambil Gaji di ATM/Bank nonaktif')
+    lib.print.error('config.lua f_banking tidak ditemukan, Ambil Gaji di ATM/Bank nonaktif')
     return result
 end
 
 -- lib.locale() di config bank tidak boleh jalan di resource ini
 local env = setmetatable({ lib = { locale = function() end } }, { __index = _G })
-local chunk, err = load(code, '@Renewed-Banking/config.lua', 't', env)
+local chunk, err = load(code, '@f_banking/config.lua', 't', env)
 local ok = chunk and pcall(chunk)
 local bank = ok and env.Config
 if not bank then
-    lib.print.error(('Gagal membaca config Renewed-Banking: %s'):format(err or 'error saat dijalankan'))
+    lib.print.error(('Gagal membaca config f_banking: %s'):format(err or 'error saat dijalankan'))
     return result
 end
 

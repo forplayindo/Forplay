@@ -236,7 +236,7 @@ RegisterNetEvent('police:server:Radar', function(fine)
     local price  = sharedConfig.radars.speedFines[fine].fine
     local player = exports.qbx_core:GetPlayer(src)
     if not player.Functions.RemoveMoney('bank', math.floor(price), 'Radar Fine') then return end
-    exports['Renewed-Banking']:addAccountMoney('police', price)
+    exports['f_banking']:addAccountMoney('police', price)
     exports.qbx_core:Notify(src, locale('info.fine_received', price), 'inform')
 end)
 
@@ -443,7 +443,7 @@ RegisterNetEvent('police:server:BillPlayer', function(targetSrc, price)
     if not targetPlayer then return end
 
     if not targetPlayer.Functions.RemoveMoney('bank', price, 'paid-bills') then return end
-    exports['Renewed-Banking']:addAccountMoney('police', price)
+    exports['f_banking']:addAccountMoney('police', price)
     exports.qbx_core:Notify(targetPlayer.PlayerData.source, locale('info.fine_received', price), 'inform')
 end)
 

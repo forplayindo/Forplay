@@ -2,7 +2,7 @@ return {
     doctorCallCooldown = 1, -- Time in minutes for cooldown between doctors calls
     wipeInvOnRespawn = false, -- item tidak dihapus saat dibawa ke rumah sakit (hanya bayar administrasi)
     depositSociety = function(society, amount)
-        exports['Renewed-Banking']:addAccountMoney(society, amount)
+        exports['f_banking']:addAccountMoney(society, amount)
     end,
 
     -- Email tagihan (f_phone Mail) yang dikirim saat pasien bangun dari kasur.

@@ -104,7 +104,7 @@ lib.callback.register('f_paycheck:withdraw', function(src, method, where)
     player.Functions.Save()
 
     if tax > 0 then
-        local okT, added = pcall(function() return exports['Renewed-Banking']:addAccountMoney(config.govAccount, tax) end)
+        local okT, added = pcall(function() return exports['f_banking']:addAccountMoney(config.govAccount, tax) end)
         if okT and added then
             -- tanpa riwayat transaksi per pencairan; cukup total di /auditpajak (Pajak Warga)
             pcall(function() exports.f_tax:AddCitizenTax(tax) end)

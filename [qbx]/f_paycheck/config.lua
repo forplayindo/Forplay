@@ -1,9 +1,9 @@
 return {
     taxRate = 5,                -- % potongan pajak saat paycheck dicairkan
-    govAccount = 'government',  -- rekening Renewed-Banking penerima pajak
+    govAccount = 'government',  -- rekening f_banking penerima pajak
     mailFrom = 'Penggajian',    -- pengirim email f_phone
 
-    -- Ambil Gaji lewat ox_target di ATM & NPC bank (lokasi dari config Renewed-Banking)
+    -- Ambil Gaji lewat ox_target di ATM & NPC bank (lokasi dari config f_banking)
     atmDistance = 3.0,          -- jarak maksimal (meter) player ke ATM, dicek ulang di server
     bankDistance = 6.0,         -- jarak maksimal (meter) player ke NPC bank, dicek ulang di server
 

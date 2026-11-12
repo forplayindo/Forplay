@@ -169,8 +169,36 @@ local function setState(src, a)
     Entity(ent).state:set('fpet', {
         id = a.id, owner = src, name = a.row.name, pet = a.row.pet, dead = a.dead,
         carrier = a.carrier, seatVeh = a.seatVeh, seat = a.seat, leash = a.leash,
+        rider = a.rider, passenger = a.passenger,
     }, true)
     Entity(ent).state:set('fpetacc', accOf(a.row).worn, true)
+end
+
+---------------------------------------------------------------------------
+-- Tunggang kuda (Config.Ride): siapa pun boleh naik. rider = pengendali, passenger = bonceng.
+---------------------------------------------------------------------------
+local riding = {} -- [src] = netId kuda yang sedang dinaiki
+
+-- turunkan semua penunggang (kuda dipulangkan / mati)
+local function kickRiders(a)
+    for _, s in ipairs({ a.rider or false, a.passenger or false }) do
+        if s then
+            riding[s] = nil
+            TriggerClientEvent('f_petshop:client:forceDismount', s, a.netId)
+        end
+    end
+    a.rider, a.passenger = nil, nil
+end
+
+local function unmount(src)
+    local netId = riding[src]
+    if not netId then return end
+    riding[src] = nil
+    local a, owner = findByNet(netId)
+    if not a then return end
+    if a.rider == src then a.rider = nil end
+    if a.passenger == src then a.passenger = nil end
+    setState(owner, a)
 end
 
 local function pushStatus(src, a)
@@ -185,6 +213,7 @@ local function despawn(src, id)
     if not a then return end
     local ent = entityOf(a)
     if a.carrier then TriggerClientEvent('f_petshop:client:forceDrop', a.carrier, a.netId) end
+    kickRiders(a)
     if ent ~= 0 then
         if a.dead then deadAt[a.id] = GetEntityCoords(ent) end
         DeleteEntity(ent)
@@ -492,6 +521,7 @@ RegisterNetEvent('f_petshop:server:died', function(id)
     end
     a.dead = true
     a.leash = nil -- tali lepas saat mati
+    kickRiders(a)
     a.row.health = 0
     savePet(a)
     setState(src, a)
@@ -655,6 +685,7 @@ CreateThread(function()
                         if r.health <= 0 then
                             a.dead = true
                             a.leash = nil
+                            kickRiders(a)
                             TriggerClientEvent('f_petshop:client:kill', src, a.id)
                             notify(src, ('%s mati %s. Bawa ke %s dan minta petugas EMS menyembuhkannya.'):format(r.name, why, Config.Vet.label), 'error')
                             setState(src, a)
@@ -702,6 +733,7 @@ end)
 ---------------------------------------------------------------------------
 AddEventHandler('playerDropped', function()
     local src = source
+    unmount(src)
     despawnAll(src)
     cooldown[src] = nil
     -- pemain keluar saat menggendong hewan orang lain: lepaskan status gendongnya
@@ -716,7 +748,45 @@ AddEventHandler('playerDropped', function()
 end)
 
 RegisterNetEvent('QBCore:Server:OnPlayerUnload', function(src)
+    unmount(src or source)
     despawnAll(src or source)
+end)
+
+-- naik kuda (milik siapa pun): kursi depan kosong -> pengendali, kalau tidak -> bonceng
+lib.callback.register('f_petshop:mount', function(src, netId)
+    if spam(src, 'mount', 800) then return end
+    netId = tonumber(netId) or 0
+    local a, owner = findByNet(netId)
+    local cfg = a and petsById[a.row.pet]
+    if not a or not cfg or not Config.Ride.kinds[cfg.kind] then return { msg = 'Hewan itu tidak bisa ditunggangi.' } end
+    if a.dead then return { msg = 'Kuda itu mati.' } end
+    if riding[src] then unmount(src) end -- sisa status lama (mis. client sempat crash)
+
+    local ped, ent = GetPlayerPed(src), entityOf(a)
+    if ent == 0 or ped == 0 or GetVehiclePedIsIn(ped, false) ~= 0
+        or #(GetEntityCoords(ent) - GetEntityCoords(ped)) > Config.Ride.distance + 2.0 then
+        return { msg = 'Dekati kudanya dulu.' }
+    end
+
+    -- kursi milik pemain yang sudah keluar dianggap kosong
+    if a.rider and not GetPlayerName(a.rider) then a.rider = nil end
+    if a.passenger and not GetPlayerName(a.passenger) then a.passenger = nil end
+
+    local role
+    if not a.rider then
+        a.rider, role = src, 'rider'
+    elseif not a.passenger then
+        a.passenger, role = src, 'passenger'
+    else
+        return { msg = 'Kuda itu sudah dinaiki dua orang.' }
+    end
+    riding[src] = netId
+    setState(owner, a)
+    return { role = role }
+end)
+
+RegisterNetEvent('f_petshop:server:dismount', function()
+    unmount(source)
 end)
 
 ---------------------------------------------------------------------------

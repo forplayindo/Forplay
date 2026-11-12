@@ -85,10 +85,11 @@ Config.Pets = {
     { id = 'deer',       group = 'Ternak', label = 'Rusa',      model = 'a_c_deer', kind = 'farm', price = 15000000, attack = false, icon = '🦌', carry = false },
 
     -- Kuda (model di stream/flight_animals, GPL-3)
-    { id = 'donkey',      group = 'Kuda', label = 'Keledai',       model = 'Donkey',     kind = 'horse', price = 20000000, attack = false, icon = '🫏', carry = false },
-    { id = 'horse_young', group = 'Kuda', label = 'Kuda Muda',     model = 'Younghorse', kind = 'horse', price = 35000000, attack = false, icon = '🐎', carry = false },
-    { id = 'horse_full',  group = 'Kuda', label = 'Kuda Ras Murni', model = 'Fullhorse', kind = 'horse', price = 45000000, attack = false, icon = '🐎', carry = false },
-    { id = 'horse_range', group = 'Kuda', label = 'Kuda Padang',   model = 'Rangehorse', kind = 'horse', price = 60000000, attack = false, icon = '🐎', carry = false },
+    -- rideRate = pengali kecepatan lari kencang saat ditunggangi (lihat Config.Ride)
+    { id = 'donkey',      group = 'Kuda', label = 'Keledai',       model = 'Donkey',     kind = 'horse', price = 20000000, attack = false, icon = '🫏', carry = false, rideRate = 0.90 },
+    { id = 'horse_young', group = 'Kuda', label = 'Kuda Muda',     model = 'Younghorse', kind = 'horse', price = 35000000, attack = false, icon = '🐎', carry = false, rideRate = 1.00 },
+    { id = 'horse_full',  group = 'Kuda', label = 'Kuda Ras Murni', model = 'Fullhorse', kind = 'horse', price = 45000000, attack = false, icon = '🐎', carry = false, rideRate = 1.10 },
+    { id = 'horse_range', group = 'Kuda', label = 'Kuda Padang',   model = 'Rangehorse', kind = 'horse', price = 60000000, attack = false, icon = '🐎', carry = false, rideRate = 1.20 },
 
     -- Hewan liar
     { id = 'cougar',     group = 'Hewan Liar', label = 'Singa Gunung', model = 'a_c_mtlion', kind = 'cougar', price = 25000000, attack = true, icon = '🐆' },
@@ -155,6 +156,31 @@ Config.VehicleEnter = {
     ape       = false,
 }
 Config.BoardTimeout = 8000 -- ms; kalau hewan belum sampai pintu (atau mobil sudah jalan), langsung didudukkan
+
+-- Tunggang kuda: SIAPA PUN boleh naik (ox_target "Tunggangi" / "Bonceng", atau tombol di Menu Hewan).
+-- Orang pertama = pengendali, orang kedua = bonceng di belakang. Tanpa stamina.
+-- Kendali: W maju, A/D belok, Shift lari kencang, S berhenti, F turun.
+-- Turun otomatis kalau kuda mati / dipulangkan, pemain mati, atau kena pukulan >= fallDamage (terjatuh).
+Config.Ride = {
+    kinds = { horse = true },   -- jenis hewan yang bisa ditunggangi
+    distance = 3.0,             -- jarak maksimal untuk naik (meter)
+    speed = { walk = 1.0, gallop = 3.0 }, -- kecepatan tugas jalan GTA (1 = jalan, 2 = lari, 3 = sprint)
+    gallopRate = 1.25,          -- pengali animasi lari kencang (dikali rideRate per kuda di Config.Pets)
+    turnRate = 90.0,            -- derajat per detik saat belok (lari kencang = 75%)
+    fallDamage = 25,            -- terjatuh kalau nyawa pemain turun sekian dalam sekali kena
+    -- posisi duduk relatif ke badan kuda: x kanan, y depan, z atas (per id hewan, sisanya default).
+    -- Setel di game dengan /kudapos x y z (Config.Debug) sambil duduk, lalu salin angkanya ke sini.
+    seat = {
+        default = { rider = vec3(0.0, 0.15, 0.55), passenger = vec3(0.0, -0.45, 0.55) },
+        donkey  = { rider = vec3(0.0, 0.10, 0.35), passenger = vec3(0.0, -0.40, 0.35) },
+    },
+    -- animasi duduk mengangkang; dicoba urut, yang pertama ada di game yang dipakai
+    anims = {
+        { 'veh@bike@chopper@front@base', 'sit' },
+        { 'veh@bike@dirt@front@base', 'sit' },
+        { 'anim@arena@celeb@flat@paired@no_props@', 'piggyback_c_player_b' },
+    },
+}
 
 -- true = perintah /petseat aktif untuk menyetel posisi duduk di kendaraan. Matikan setelah selesai.
 Config.Debug = true

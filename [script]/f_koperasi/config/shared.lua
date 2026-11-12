@@ -6,7 +6,7 @@ return {
     distance = 1.5,                  -- jarak tombol [E] muncul
 
     taxRate = 2,                     -- % pajak penjualan
-    govAccount = 'government',       -- rekening Renewed-Banking penerima pajak
+    govAccount = 'government',       -- rekening f_banking penerima pajak
 
     -- barang yang dibeli Koperasi (harga per buah). Tambah barang baru cukup satu baris.
     categories = {

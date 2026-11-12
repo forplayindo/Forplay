@@ -420,7 +420,7 @@ $('stage').addEventListener('wheel', (e) => post('zoom', { dir: e.deltaY > 0 ? 1
 const MODES = {
     follow: 'Mengikuti', stay: 'Diam', sit: 'Duduk', lay: 'Rebahan', vehicle: 'Di kendaraan', idle: 'Diam',
     trick: 'Main trik', fetch: 'Main bola', petted: 'Dielus', boarding: 'Naik/turun mobil',
-    attack: 'Menyerang', guard: 'Menjaga area',
+    attack: 'Menyerang', guard: 'Menjaga area', ridden: 'Ditunggangi',
 };
 
 function bar(label, value, color) {
@@ -489,6 +489,12 @@ function renderPanelInner(d) {
                     ${one && one.canLeash ? `<button class="cmd ${one.leash ? 'on' : ''}" data-cmd="leash"><span>🦮</span>${one.leash ? 'Lepas Tali' : 'Pasang Tali'}</button>` : ''}
                     <button class="cmd ${one && one.canLeash ? '' : 'span2'} danger" data-cmd="dismiss"><span>🏠</span>${selected === 'all' && active.length > 1 ? 'Pulangkan Semua' : one && one.trial ? 'Kembalikan' : 'Pulangkan'}</button>
                 </div>
+                ${one && one.canRide ? `<span class="side-label">Tunggang</span>
+                <div class="cmds">
+                    ${one.riding ? `<button class="cmd wide on" data-cmd="ride"><span>🐎</span>Turun</button>`
+                        : one.ridden ? `<div class="hint">${esc(one.name)} sedang ditunggangi orang lain.</div>`
+                        : `<button class="cmd wide" data-cmd="ride"><span>🐎</span>Tunggangi</button>`}
+                </div>` : ''}
                 ${one && one.canFight && !one.inVehicle ? `<span class="side-label">Pertahanan</span>
                 <div class="cmds two">
                     <button class="cmd ${one.mode === 'attack' ? 'on' : ''}" data-cmd="attack"><span>⚔️</span>Serang</button>

@@ -107,7 +107,7 @@ end
 
 local function addRevenue(amount, reason)
     if not config.revenueAccount or amount <= 0 then return end
-    local ok, added = pcall(function() return exports['Renewed-Banking']:addAccountMoney(config.revenueAccount, amount) end)
+    local ok, added = pcall(function() return exports['f_banking']:addAccountMoney(config.revenueAccount, amount) end)
     if not (ok and added) then
         lib.print.error(('%s %s gagal masuk ke rekening %s'):format(reason, rupiah(amount), config.revenueAccount))
     end

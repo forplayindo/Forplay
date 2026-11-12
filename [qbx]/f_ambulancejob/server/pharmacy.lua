@@ -188,7 +188,7 @@ CreateThread(function()
     if (tonumber(exists) or 0) == 0 then return end
     for _, r in ipairs(MySQL.query.await("SELECT * FROM ems_pharmacy_orders WHERE status IN ('unpaid', 'paid')") or {}) do
         if r.status == 'paid' then
-            pcall(function() exports['Renewed-Banking']:removeAccountMoney(cfg.job, r.total) end)
+            pcall(function() exports['f_banking']:removeAccountMoney(cfg.job, r.total) end)
             exports.qbx_core:AddMoney(r.citizenid, 'bank', r.total, 'pharmacy-refund')
         elseif r.invoice_id then
             MySQL.update.await("UPDATE phone_service_invoices SET status = 'cancelled' WHERE id = ? AND status = 'pending'", { r.invoice_id })

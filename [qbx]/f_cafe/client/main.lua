@@ -70,6 +70,32 @@ end
 ---------------------------------------------------------------------------
 local cooking = false
 
+-- Mainkan anim dari awal, lalu ulangi potongan anim.loop = { dari, sampai } (detik) selama masih memasak.
+local function playSegmentLoop(anim)
+    local dict, clip = anim.dict, anim.clip
+    if not pcall(lib.requestAnimDict, dict, 5000) then return end
+    local dur = GetAnimDuration(dict, clip)
+    if dur <= 0.0 then RemoveAnimDict(dict) return end
+
+    local from = math.min(anim.loop[1] / dur, 1.0)
+    local to = math.min(anim.loop[2] / dur, 0.99)
+    local ped = cache.ped
+    TaskPlayAnim(ped, dict, clip, 3.0, 3.0, -1, anim.flag or 1, 0.0, false, false, false)
+
+    CreateThread(function()
+        while cooking do
+            if not IsEntityPlayingAnim(ped, dict, clip, 3) then
+                TaskPlayAnim(ped, dict, clip, 3.0, 3.0, -1, anim.flag or 1, from, false, false, false)
+            elseif GetEntityAnimCurrentTime(ped, dict, clip) >= to then
+                SetEntityAnimCurrentTime(ped, dict, clip, from)
+            end
+            Wait(0)
+        end
+        StopAnimTask(ped, dict, clip, 2.0)
+        RemoveAnimDict(dict)
+    end)
+end
+
 local function cook(stationId, recipe)
     local options = {}
     for i, n in ipairs(Config.BatchOptions) do options[i] = { value = n, label = ('%d porsi'):format(n) } end
@@ -83,13 +109,15 @@ local function cook(stationId, recipe)
 
     cooking = true
     local st = Config.Stations[stationId]
+    local segLoop = st.anim and st.anim.loop
+    if segLoop then playSegmentLoop(st.anim) end
     local done = lib.progressBar({
         duration = res.duration,
         label = ('Membuat %d %s...'):format(tonumber(input[1]), res.label),
         useWhileDead = false,
         canCancel = true,
         disable = { move = true, car = true, combat = true },
-        anim = st.anim,
+        anim = not segLoop and st.anim or nil,
         prop = st.prop,
     })
     cooking = false

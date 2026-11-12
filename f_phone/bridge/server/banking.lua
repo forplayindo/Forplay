@@ -22,7 +22,7 @@ local banking = {}
 ---@type string[] Banking resources, in detection-priority order.
 local KNOWN = {
     'wasabi_banking', 'omes_banking', 'prism_banking', 'tgg-banking', 'okokBanking',
-    'Renewed-Banking', 'qb-banking', 'esx_banking', 'qs-banking', 'fd_banking',
+    'f_banking', 'qb-banking', 'esx_banking', 'qs-banking', 'fd_banking',
     'new_banking', 'ps-banking',
 }
 

@@ -3,7 +3,7 @@
 --  * stash / bagasi / drop   -> tabel f_dirtymoney_inv (drop hanya di memori)
 -- Aturan:
 --  * cash berkurang (belanja, bayar bisnis, kasih, dirampok, disita) -> bagian kotor terpakai duluan
---  * setor bank -> hanya bagian bersih (BlockDeposit dipanggil dari Renewed-Banking)
+--  * setor bank -> hanya bagian bersih (BlockDeposit dipanggil dari f_banking)
 --  * uang pindah antar inventory -> bagian kotornya ikut pindah (hook swapItems ox_inventory)
 local QBX = exports.qbx_core
 local Inv = exports.ox_inventory

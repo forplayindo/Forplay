@@ -564,7 +564,7 @@ function actions.complete(src, payload)
         if driverSrc then money.add(driverSrc, 'bank', driverEarn, 'Pendapatan Ryde') end
         paid = true
         if tax > 0 then
-            local okT, added = pcall(function() return exports['Renewed-Banking']:addAccountMoney(config.TaxAccount or 'government', tax) end)
+            local okT, added = pcall(function() return exports['f_banking']:addAccountMoney(config.TaxAccount or 'government', tax) end)
             if okT and added then
                 pcall(function() exports.f_tax:AddCitizenTax(tax) end)
             else

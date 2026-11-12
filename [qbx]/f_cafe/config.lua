@@ -50,7 +50,8 @@ Config.Stations = {
               anim = { dict = 'amb@prop_human_bbq@male@idle_a', clip = 'idle_b', flag = 1 },
               prop = { model = 'prop_fish_slice_01', bone = 28422, pos = vec3(0.0, 0.0, 0.0), rot = vec3(0.0, 0.0, 0.0) } },  -- sudip
     drink = { label = 'Drink Station',  icon = 'fa-solid fa-mug-hot',     coords = vec3(-1712.79, -802.4, 10.34),
-              anim = { dict = 'anim@amb@clubhouse@tutorial@bkr_tut_ig3@', clip = 'machinic_loop_mechandplayer', flag = 1 },
+              -- loop = { dari, sampai } dalam detik: setelah intro, potongan ini diulang terus sampai progress bar selesai
+              anim = { dict = 'anim_casino_b@amb@casino@games@blackjack@dealer', clip = 'check_and_turn_card', flag = 1, loop = { 0.60, 1.80 } },
               prop = { model = 'p_amb_coffeecup_01', bone = 28422, pos = vec3(0.0, 0.0, 0.0), rot = vec3(0.0, 0.0, 0.0) } },  -- gelas kopi
 }
 

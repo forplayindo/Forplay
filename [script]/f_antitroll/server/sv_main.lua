@@ -46,68 +46,109 @@ if Config.Framework == "ESX" then
     end
 elseif Config.Framework == "QBCore" then
     FrameworkObject.Commands.Add(getCommandString(), "Toggle Troll Protection", {}, false, function(source, args)
-        local id = args[1]
-        local target = id or source
-        print(target)
-        -- check if source exists on the server
-        if not GetPlayerName(target) then
+        local target = tonumber(args[1]) or source
+        if not target or not GetPlayerName(target) then
             cPrint("Player not found!", "error")
             return
         end
 
-        if not target then
-            cPrint("Player not found!", "error")
-            return
-        end
-
-        ToggleTrollProtection(target)
-        cPrint("Troll protection toggled for " .. target .. " for " .. Config.HowLong .. " min!", "info")
+        local on = ToggleTrollProtection(target)
+        cPrint(("Troll protection %s for %s"):format(on and ("ON " .. Config.HowLong .. " min") or "OFF", target), "info")
     end, getCommandRang())
 end
-function ToggleTrollProtection(target, toogleOverride, timeOverride)
-    TriggerClientEvent("bk_antitroll:toggle", target, timeOverride)
+
+-- Server-authoritative: server yang menghitung sisa waktu (os.time), client cuma tampilan.
+-- Disimpan ke DB tiap Config.TimeToSave menit, saat logout/keluar, dan saat resource stop.
+local active = {} -- [src] = { id = identifier, base = menit saat mulai, started = os.time() }
+
+local function minutesLeft(e)
+    return math.max(0, e.base - math.floor((os.time() - e.started) / 60))
 end
 
-RegisterNetEvent("bk_antitroll:updateTime", function(time)
-    local identifier = GetPlayerIdentifier(source)
+local function saveEntry(e)
+    update(e.id, minutesLeft(e))
+end
 
-    time = tonumber(time)
-    if not time or time < 0 then return end
+local function startFor(src, identifier, minutes)
+    active[src] = { id = identifier, base = minutes, started = os.time() }
+    updateOrInsert(identifier, minutes)
+    TriggerClientEvent("bk_antitroll:toggle", src, true, minutes)
+end
 
-    if not doesUserExist(identifier) then
-        -- First sync after join: accept up to the configured protection length only.
-        insert(identifier, math.min(time, Config.HowLong))
-        return
+local function stopFor(src)
+    local e = active[src]
+    if not e then return end
+    active[src] = nil
+    update(e.id, 0)
+    TriggerClientEvent("bk_antitroll:toggle", src, false, 0)
+end
+
+local function pauseFor(src)
+    local e = active[src]
+    if not e then return end
+    active[src] = nil
+    saveEntry(e)
+end
+
+function ToggleTrollProtection(target)
+    target = tonumber(target)
+    if not target or not GetPlayerName(target) then return false end
+    if active[target] then
+        stopFor(target)
+        return false
     end
-
-    local current = getTimeLeft(identifier)
-
-    -- The client ticks this down by ~1 per minute. Never allow it to jump back up
-    -- (extend protection) or skip straight down past a single tick (bypass it early).
-    if time > current or (current - time) > 1 then return end
-
-    update(identifier, time)
-end)
+    local identifier = GetPlayerIdentifier(target)
+    if not identifier then return false end
+    startFor(target, identifier, Config.HowLong)
+    return true
+end
 
 RegisterNetEvent("bk_antitroll:onjoin", function()
-    local source = source
-    local identifier = GetPlayerIdentifier(source)
-    local isNew = isNewPlayer(identifier)
-    onJoin(source, identifier, isNew)
+    local src = source
+    local e = active[src]
+    if e then
+        -- ganti karakter / event dobel: kirim ulang sisa waktu, jangan reset
+        TriggerClientEvent("bk_antitroll:toggle", src, true, minutesLeft(e))
+        return
+    end
+
+    local identifier = GetPlayerIdentifier(src)
+    if not identifier then return end
+
+    local time = isNewPlayer(identifier) and Config.HowLong or getTimeLeft(identifier)
+    if time > 0 then
+        startFor(src, identifier, time)
+    end
 end)
 
-function onJoin(source, identifier, isNew)
-    if isNew then
-        ToggleTrollProtection(source, true, Config.HowLong)
-        return
+AddEventHandler("playerDropped", function()
+    pauseFor(source)
+end)
+
+AddEventHandler("QBCore:Server:OnPlayerUnload", function(src)
+    pauseFor(src)
+end)
+
+AddEventHandler("onResourceStop", function(res)
+    if res ~= GetCurrentResourceName() then return end
+    for _, e in pairs(active) do saveEntry(e) end
+end)
+
+CreateThread(function()
+    local tick = 0
+    while true do
+        Wait(60000)
+        tick = tick + 1
+        local doSave = tick % math.max(1, Config.TimeToSave) == 0
+        for src, e in pairs(active) do
+            if not GetPlayerName(src) then
+                active[src] = nil
+                saveEntry(e)
+            elseif minutesLeft(e) <= 0 then
+                stopFor(src)
+            elseif doSave then
+                saveEntry(e)
+            end
+        end
     end
-
-    local time = getTimeLeft(identifier)
-
-    if time > 0 then
-        TriggerClientEvent("bk_antitroll:toggle", source, true, time)
-        return
-    end
-
-    updateOrInsert(identifier, time)
-end
+end)

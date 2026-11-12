@@ -183,11 +183,11 @@ AddEventHandler('QBCore:Server:OnMoneyChange', function(src, moneyType, amount, 
     push({ dir = diff > 0 and 'in' or 'out', amount = math.abs(math.floor(diff)), reason = reason, cid = l.cid, src = src })
 end)
 
--- Renewed-Banking (patch): perubahan saldo rekening job/gang/bersama
+-- f_banking (patch): perubahan saldo rekening job/gang/bersama
 AddEventHandler('f_dashboard:account', function(account, amount, dir, resource)
     amount = tonumber(amount)
     if not amount then return end
-    push({ dir = dir == 'add' and 'in' or 'out', amount = math.floor(amount), reason = ('%s (%s)'):format(resource or 'Renewed-Banking', account) })
+    push({ dir = dir == 'add' and 'in' or 'out', amount = math.floor(amount), reason = ('%s (%s)'):format(resource or 'f_banking', account) })
 end)
 
 local function hookInventory()

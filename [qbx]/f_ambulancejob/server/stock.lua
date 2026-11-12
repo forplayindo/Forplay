@@ -78,18 +78,18 @@ exports('TakeStock', function(need)
 end)
 
 ---------------------------------------------------------------------------
--- Rekening organisasi (Renewed-Banking)
+-- Rekening organisasi (f_banking)
 ---------------------------------------------------------------------------
 local function balance()
-    local ok, v = pcall(function() return exports['Renewed-Banking']:getAccountMoney(cfg.job) end)
+    local ok, v = pcall(function() return exports['f_banking']:getAccountMoney(cfg.job) end)
     return ok and tonumber(v) or 0
 end
 
 local function societyRemove(amount, reason)
-    local ok, removed = pcall(function() return exports['Renewed-Banking']:removeAccountMoney(cfg.job, amount) end)
+    local ok, removed = pcall(function() return exports['f_banking']:removeAccountMoney(cfg.job, amount) end)
     if not ok or not removed then return false end
     pcall(function()
-        exports['Renewed-Banking']:handleTransaction(cfg.job, cfg.label, amount, reason, cfg.label, 'Supplier', 'withdraw')
+        exports['f_banking']:handleTransaction(cfg.job, cfg.label, amount, reason, cfg.label, 'Supplier', 'withdraw')
     end)
     return true
 end

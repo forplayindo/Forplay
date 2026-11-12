@@ -1,4 +1,4 @@
--- Jembatan ke resource lain: qbx_core (gang), Renewed-Banking (kas), f_garages (garasi),
+-- Jembatan ke resource lain: qbx_core (gang), f_banking (kas), f_garages (garasi),
 -- pma-voice/mm_radio (channel), f_phone (notifikasi & nomor HP). Semua dipanggil hanya saat ada
 -- aksi; tidak ada loop. Resource yang belum/tidak jalan dilewati tanpa error.
 local config = require 'config'
@@ -41,13 +41,13 @@ function links.registerGangs(list)
     if any then exports.qbx_core:CreateGangs(defs) end
 end
 
--- Renewed-Banking ----------------------------------------------------------------------------
+-- f_banking ----------------------------------------------------------------------------
 
 ---@param g table
 function links.ensureAccount(g)
-    if not started('Renewed-Banking') then return end
+    if not started('f_banking') then return end
     local ok, err = pcall(function()
-        exports['Renewed-Banking']:CreateJobAccount({ name = g.name, label = g.label })
+        exports['f_banking']:CreateJobAccount({ name = g.name, label = g.label })
     end)
     if not ok then lib.print.warn(('f_crew: gagal membuat rekening %s: %s'):format(g.name, err)) end
 end
@@ -55,31 +55,31 @@ end
 ---@param name string
 ---@return integer? balance nil saat banking tidak tersedia
 function links.balance(name)
-    if not started('Renewed-Banking') then return nil end
-    local ok, value = pcall(function() return exports['Renewed-Banking']:getAccountMoney(name) end)
+    if not started('f_banking') then return nil end
+    local ok, value = pcall(function() return exports['f_banking']:getAccountMoney(name) end)
     if ok and type(value) == 'number' then return math.floor(value) end
     return nil
 end
 
 ---@return boolean
 function links.addAccount(name, amount)
-    if not started('Renewed-Banking') then return false end
-    local ok, res = pcall(function() return exports['Renewed-Banking']:addAccountMoney(name, amount) end)
+    if not started('f_banking') then return false end
+    local ok, res = pcall(function() return exports['f_banking']:addAccountMoney(name, amount) end)
     return ok and res == true
 end
 
 ---@return boolean
 function links.removeAccount(name, amount)
-    if not started('Renewed-Banking') then return false end
-    local ok, res = pcall(function() return exports['Renewed-Banking']:removeAccountMoney(name, amount) end)
+    if not started('f_banking') then return false end
+    local ok, res = pcall(function() return exports['f_banking']:removeAccountMoney(name, amount) end)
     return ok and res == true
 end
 
----Catat juga di riwayat rekening Renewed-Banking (supaya terlihat di aplikasi bank).
+---Catat juga di riwayat rekening f_banking (supaya terlihat di aplikasi bank).
 function links.bankHistory(name, title, amount, message, issuer, receiver, kind)
-    if not started('Renewed-Banking') then return end
+    if not started('f_banking') then return end
     pcall(function()
-        exports['Renewed-Banking']:handleTransaction(name, title, amount, message, issuer, receiver, kind)
+        exports['f_banking']:handleTransaction(name, title, amount, message, issuer, receiver, kind)
     end)
 end
 

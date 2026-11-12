@@ -270,7 +270,7 @@ local function callAiDoctor(src, d)
     end
 
     if price > 0 and Config.Society then
-        pcall(function() exports['Renewed-Banking']:addAccountMoney(Config.Society, price) end)
+        pcall(function() exports['f_banking']:addAccountMoney(Config.Society, price) end)
     end
 
     local lines = {}

@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------
--- Halaman Server: cuaca, waktu, radio, stash (Renewed-Weathersync membaca GlobalState)
+-- Halaman Server: cuaca, waktu, radio, stash (f_weathersync membaca GlobalState)
 ---------------------------------------------------------------------------
 local WEATHER = {
     EXTRASUNNY = 'Cerah terik', CLEAR = 'Cerah', NEUTRAL = 'Netral', SMOG = 'Kabut asap', FOGGY = 'Berkabut',

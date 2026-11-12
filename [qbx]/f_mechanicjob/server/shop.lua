@@ -68,12 +68,12 @@ end
 
 local function societyAdd(amount)
     if amount <= 0 then return end
-    pcall(function() exports['Renewed-Banking']:addAccountMoney(cfg.job, amount) end)
+    pcall(function() exports['f_banking']:addAccountMoney(cfg.job, amount) end)
 end
 
 local function societyRemove(amount)
     if amount <= 0 then return end
-    pcall(function() exports['Renewed-Banking']:removeAccountMoney(cfg.job, amount) end)
+    pcall(function() exports['f_banking']:removeAccountMoney(cfg.job, amount) end)
 end
 
 ---------------------------------------------------------------------------

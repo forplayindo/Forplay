@@ -30,5 +30,5 @@ dependencies {
     'ox_lib',
     'oxmysql',
     'qbx_core',
-    'Renewed-Banking',
+    'f_banking',
 }

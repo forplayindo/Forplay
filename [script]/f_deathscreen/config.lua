@@ -36,7 +36,7 @@ Config.Hospitals     = { 'pillbox' }
 -- Player yang sedang dipenjara (metadata injail > 0) selalu dibawa ke sini. nil = ikut aturan biasa.
 Config.JailHospital = 'jail'
 
--- Uang dokter AI masuk ke rekening society ini (Renewed-Banking). nil = tidak kemana-mana
+-- Uang dokter AI masuk ke rekening society ini (f_banking). nil = tidak kemana-mana
 Config.Society = 'ambulance'
 
 -------------------------------------------------------------------------------

@@ -123,11 +123,11 @@ return {
     end,
 
     getSocietyAccount = function(accountName)
-        return exports['Renewed-Banking']:getAccountMoney(accountName)
+        return exports['f_banking']:getAccountMoney(accountName)
     end,
 
     removeSocietyMoney = function(accountName, payment)
-        return exports['Renewed-Banking']:removeAccountMoney(accountName, payment)
+        return exports['f_banking']:removeAccountMoney(accountName, payment)
     end,
 
     ---Paycheck function

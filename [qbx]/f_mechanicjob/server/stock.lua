@@ -98,18 +98,18 @@ local function nearPoint(src) return near(src, SC.point.coords, SC.point.distanc
 local function nearSupplier(src) return near(src, SC.supplier.coords, SC.supplier.distance + 2.0) end
 
 ---------------------------------------------------------------------------
--- Rekening organisasi (Renewed-Banking)
+-- Rekening organisasi (f_banking)
 ---------------------------------------------------------------------------
 local function balance()
-    local ok, v = pcall(function() return exports['Renewed-Banking']:getAccountMoney(BILL.job) end)
+    local ok, v = pcall(function() return exports['f_banking']:getAccountMoney(BILL.job) end)
     return ok and tonumber(v) or 0
 end
 
 local function societyRemove(amount, reason)
-    local ok, removed = pcall(function() return exports['Renewed-Banking']:removeAccountMoney(BILL.job, amount) end)
+    local ok, removed = pcall(function() return exports['f_banking']:removeAccountMoney(BILL.job, amount) end)
     if not ok or not removed then return false end
     pcall(function()
-        exports['Renewed-Banking']:handleTransaction(BILL.job, BILL.label, amount, reason, BILL.label, 'Supplier', 'withdraw')
+        exports['f_banking']:handleTransaction(BILL.job, BILL.label, amount, reason, BILL.label, 'Supplier', 'withdraw')
     end)
     return true
 end

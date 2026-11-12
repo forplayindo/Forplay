@@ -1177,7 +1177,7 @@ AddEventHandler('onResourceStart', function(res)
         for _, g in pairs(Gangs) do links.syncGarage(g) end
     elseif res == 'pma-voice' then
         for _, g in pairs(Gangs) do links.radioLock(g) end
-    elseif res == 'Renewed-Banking' then
+    elseif res == 'f_banking' then
         SetTimeout(2000, function()
             for _, g in pairs(Gangs) do links.ensureAccount(g) end
         end)
@@ -1189,7 +1189,7 @@ end)
 local function cleanupInactive()
     -- tunggu banking siap supaya sisa kas bisa dikembalikan ke boss
     local deadline = os.time() + 60
-    while not links.started('Renewed-Banking') and os.time() < deadline do Wait(1000) end
+    while not links.started('f_banking') and os.time() < deadline do Wait(1000) end
     Wait(3000)
     local cutoff = os.time() - config.InactiveDays * DAY
     local stale = {}

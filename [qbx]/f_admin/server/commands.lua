@@ -101,9 +101,9 @@ lib.addCommand('addsociety', {
         { name = 'amount', help = 'Jumlah, minus untuk mengurangi (contoh -5000)', type = 'number' },
     },
 }, function(src, args)
-    if GetResourceState('Renewed-Banking') ~= 'started' then return Notify(src, 'Renewed-Banking tidak berjalan.', 'error') end
+    if GetResourceState('f_banking') ~= 'started' then return Notify(src, 'f_banking tidak berjalan.', 'error') end
     local account, amount = args.account:lower(), math.floor(args.amount)
-    local banking = exports['Renewed-Banking']
+    local banking = exports['f_banking']
     local balance = banking:getAccountMoney(account)
     if type(balance) ~= 'number' then return Notify(src, ('Rekening organisasi "%s" tidak ditemukan.'):format(account), 'error') end
     if amount == 0 then return Notify(src, 'Jumlah tidak valid.', 'error') end

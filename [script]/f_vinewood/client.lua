@@ -84,6 +84,12 @@ hexToRgb = function(hex)
     }
 end
 
+-- karakter selain huruf -> nama model (dibuat sendiri, lihat _sumber/mkglyph.py)
+SYMBOL_MODELS = {
+    ['4'] = 'vw_4',
+    ['#'] = 'vw_hash',
+}
+
 UpdateMap = function(data)
     for k, v in pairs(modelCreated) do
         DeleteEntity(v)
@@ -93,7 +99,8 @@ UpdateMap = function(data)
     local completeText = data[1]
     if not completeText then return end
     for i=1, math.min(#completeText, 8), 1 do
-        local model = completeText:sub(i, i):lower()
+        local char = completeText:sub(i, i):lower()
+        local model = SYMBOL_MODELS[char] or char
         local coords = Config.Coords[i].coordinate
         local heading = Config.Coords[i].heading
         -- huruf tanpa model (mis. karakter aneh) dilewati, bukan ditunggu selamanya

@@ -1,3 +1,6 @@
+-- DINONAKTIFKAN: tackle dimatikan (permintaan owner). Hapus baris return di bawah untuk mengaktifkan lagi.
+do return end
+
 lib.addKeybind({
     name = 'tackle',
     description = 'Tackle',

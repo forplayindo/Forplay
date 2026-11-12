@@ -29,7 +29,7 @@ end
 -- alasan blur ditahan: hidden (HUD tidak tampil / pause menu), faded (layar gelap) -> off; settings -> pause (frame terakhir dibiarkan)
 local suspended = {}
 
---- Tier pilihan pemain / auto, tanpa melihat status HUD (dipakai juga oleh f_chat, ox_lib, Renewed-Banking)
+--- Tier pilihan pemain / auto, tanpa melihat status HUD (dipakai juga oleh f_chat, ox_lib, f_banking)
 local function baseTier()
     if cfg.enabled == false then return 'off' end
     if mode ~= 'auto' then return mode end
@@ -96,7 +96,7 @@ CreateThread(function()
             end
             send(currentTier())
         end
-        -- let other resources (f_chat, ox_lib, Renewed-Banking) follow the same blur tier
+        -- let other resources (f_chat, ox_lib, f_banking) follow the same blur tier
         TriggerEvent('0r-hud:blurTier', baseTier())
     end
 end)

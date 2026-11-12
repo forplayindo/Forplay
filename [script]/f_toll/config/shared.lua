@@ -31,7 +31,7 @@ return {
         -- saldo minimal saat masuk = tarif termahal dari gerbang itu (dihitung otomatis)
     },
 
-    -- Uang tarif & penjualan kartu masuk rekening ini (Renewed-Banking). nil = tidak ke mana-mana.
+    -- Uang tarif & penjualan kartu masuk rekening ini (f_banking). nil = tidak ke mana-mana.
     revenueAccount = 'government',
 
     barrier = {

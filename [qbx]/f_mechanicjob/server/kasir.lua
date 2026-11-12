@@ -44,7 +44,7 @@ end
 
 local function societyAdd(amount)
     if amount <= 0 then return end
-    pcall(function() exports['Renewed-Banking']:addAccountMoney(BILL.job, amount) end)
+    pcall(function() exports['f_banking']:addAccountMoney(BILL.job, amount) end)
 end
 
 local function broadcastMechanics(msg)
@@ -334,7 +334,7 @@ local function staffData(src, player)
         end
     end
     table.sort(list, function(a, b) return a.id > b.id end)
-    local okBal, balance = pcall(function() return exports['Renewed-Banking']:getAccountMoney(BILL.job) end)
+    local okBal, balance = pcall(function() return exports['f_banking']:getAccountMoney(BILL.job) end)
     return {
         bills = list, unpaid = unpaid, wait = wait, sum = sum,
         balance = okBal and tonumber(balance) or nil,

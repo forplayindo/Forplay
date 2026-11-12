@@ -28,7 +28,7 @@ return {
     MaxFare    = 300000,
 
     -- Pajak dari tarif yang dipotong saat perjalanan selesai; supir menerima sisanya.
-    -- Masuk ke rekening Renewed-Banking TaxAccount + dihitung "Pajak Warga" di f_tax.
+    -- Masuk ke rekening f_banking TaxAccount + dihitung "Pajak Warga" di f_tax.
     TaxRate    = 0.05,
     TaxAccount = 'government',
 
